@@ -1,15 +1,15 @@
 <template>
     <section>
         <div class="container">    
-            <div class="d-flex justify-space-between mt-2">
+            <div class="d-flex justify-space-between mt-2 align-center">
                 <div>
                     <router-link class="text-black" to="/">Home</router-link> 
-                    <contador />
+                    <contador class="contador" />
                 </div>
                 <div class="d-flex align-center">
                     <router-link to="/leges" class="linkTO">Busca por termo</router-link>
-                    <help title="ajuda" :idHelp="2" class="ml-2" />
-                    <menuOpt />
+                    <help title="ajuda" :idHelp="2" class="ml-2 contador" />
+                    <menuOpt class="contador" />
                 </div>
             </div>
             <div v-if="load" class="load">
@@ -314,6 +314,9 @@
     .even-columns {
         display: grid;
         grid-template-columns: 1fr;
+    }
+    .contador{
+        display: none;
     }
 }
 </style>

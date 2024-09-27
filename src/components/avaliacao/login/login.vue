@@ -2,7 +2,7 @@
      <div class="login">
         <div class="mb-3">
             <h3 v-if="flutuante">Faça seu Login</h3>
-            <p class="destaque">Acesse com a senha do SEFAZNET</p>
+            <p class="destaque px-2">Login</p>
         </div>
         <v-form ref="form" @submit.prevent="login">
             <v-text-field

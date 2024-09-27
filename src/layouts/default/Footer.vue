@@ -26,7 +26,7 @@
       </div>
       <div class="subfooter">
         <h3>© 2024 - OH-MY-SEARCH</h3>
-        <p>Desenvolvido e idealizado por JOÃO HUMBERTO S R JR.</p>
+        <p class="text-center">Desenvolvido e idealizado por <br class="off"> JOÃO HUMBERTO S R JR.</p>
       </div>
   </div>
 </template>
@@ -99,6 +99,9 @@
 .btn{
   margin: 0 1rem;
 }
+.off{
+  display: none;
+}
 @media (max-width:900px) {
   .container{
     flex-direction: column;
@@ -115,6 +118,9 @@
   }
   .btn{
     margin: 0;
+  }
+  .off{
+    display: block;
   }
 }
 @media print {

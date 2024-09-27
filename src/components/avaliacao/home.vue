@@ -21,7 +21,7 @@
                     <div class="login">
                         <div class="mb-3">
                             <h3>Faça seu login</h3>
-                            <p class="destaque">Acesse com a senha do <b>SEFAZNET</b>.</p>
+                            <p class="destaque">Acesse com a senha do <b></b>.</p>
                         </div>
                         <v-form ref="form" @submit.prevent="login">
                             <v-text-field

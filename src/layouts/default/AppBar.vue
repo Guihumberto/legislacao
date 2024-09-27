@@ -19,7 +19,7 @@
         <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <div class="logo" @click="$router.push(titleApp.to)">
           <small class="text-white">{{titleApp.title}}</small>
-          <h1 class="text-white">OH-MY-SEARCH</h1>
+          <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
         </div>
       </div>
       <nav class="navbar">
@@ -30,7 +30,7 @@
         </ul>
       </nav>
       <div class="btn_group">    
-        <loginInfo :flutuante="false" />   
+        <loginInfo :flutuante="false" class="gov" />   
         <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
       </div>
     </div>
@@ -273,6 +273,9 @@ header .container {
 @media (max-width:500px) {
   .gov{
     display: none;
+  }
+  .texto_title{
+    font-size: 1.3rem;
   }
 }
 @media (max-width:740px) {

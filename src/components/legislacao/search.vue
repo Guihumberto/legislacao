@@ -4,12 +4,12 @@
             <div class="headSearch">
                 <div>
                     <router-link class="text-black" to="/">{{ reqRead }}</router-link> 
-                    <contador />
+                    <contador class="contador" />
                 </div> 
                 <div class="d-flex align-center">
                     <router-link to="/legesporlei" class="linkTO">Busca por Norma</router-link>
-                    <help title="ajuda" :idHelp="1" class="ml-2" />
-                    <menuOpt />
+                    <help title="ajuda" :idHelp="1" class="ml-2 contador" />
+                    <menuOpt class="contador" />
                 </div>
             </div>
             <div class="headSearchTwo my-5">
@@ -41,7 +41,7 @@
                                                 :disabled="search.termo == 1 || search.semantic == 2"
                                                 density="compact"
                                                 v-bind="props"
-                                                class="checkboxx"
+                                                class="checkboxx contador"
                                                 label="Precisão" color="red-darken-3" 
                                                 v-model="search.precision"
                                                 hide-details="true"
@@ -1154,6 +1154,9 @@ section{
     }
     .spaceFooter{
         display: block;
+    }
+    .contador{
+        display: none;
     }
     /* .v-input--density-compact {
         --v-input-control-height: 10px;
