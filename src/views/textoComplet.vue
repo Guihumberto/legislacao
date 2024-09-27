@@ -83,6 +83,9 @@
 </script>
 
 <style lang="scss" scoped>
+section {
+    min-height: calc(100vh - 466px);
+}
 .sizeLoad{
     height: 55vh;
     display: flex;
