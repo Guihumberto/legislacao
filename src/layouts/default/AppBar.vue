@@ -10,30 +10,33 @@
         </h6>
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
+          <v-btn title="ocultar cabeçalho" density="compact" @click="headerShow = !headerShow" variant="icon" :icon="headerShow ? 'mdi-chevron-down' :'mdi-chevron-right'"></v-btn>
           <!-- <v-icon @click="dark = !dark" size="small">{{ dark ? 'mdi-brightness-3' : 'mdi-brightness-4'}}</v-icon> -->
         </div>
       </div>
     </div>
-    <div class="container">
-      <div class="d-flex justify-center align-center">
-        <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-        <div class="logo" @click="$router.push(titleApp.to)">
-          <small class="text-white">{{titleApp.title}}</small>
-          <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
+    <v-expand-transition>
+      <div class="container" v-if="headerShow">
+        <div class="d-flex justify-center align-center">
+          <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <div class="logo" @click="$router.push(titleApp.to)">
+            <small class="text-white">{{titleApp.title}}</small>
+            <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
+          </div>
+        </div>
+        <nav class="navbar">
+          <ul role="list">
+            <li> <a @click="menu = !menu">INSTITUCIONAL</a></li>
+            <li> <a href="#">CONTATO</a></li>
+            <li> <a class="active">QUEM SOMOS</a></li>
+          </ul>
+        </nav>
+        <div class="btn_group">    
+          <loginInfo :flutuante="false" class="gov" />   
+          <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
         </div>
       </div>
-      <nav class="navbar">
-        <ul role="list">
-          <li> <a @click="menu = !menu">INSTITUCIONAL</a></li>
-          <li> <a href="#">CONTATO</a></li>
-          <li> <a class="active">QUEM SOMOS</a></li>
-        </ul>
-      </nav>
-      <div class="btn_group">    
-        <loginInfo :flutuante="false" class="gov" />   
-        <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
-      </div>
-    </div>
+    </v-expand-transition>
   </header>
   <menu-bar @menu="menu = !menu" class="menu" v-if="menu" id="menu"  />
   <v-navigation-drawer
@@ -99,6 +102,7 @@
             menu: false,
             drawer: false,
             drawer2: false,
+            headerShow: true,
             items: [
               { text: 'Início', icon: 'mdi-home' },
               { text: 'Documentos', icon: 'mdi-folder' },

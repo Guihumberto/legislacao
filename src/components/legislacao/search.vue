@@ -974,7 +974,7 @@ section{
     transition: all .8s ease;
 }
 .container{
-    min-height: calc(100vh - 820px);
+    min-height: calc(100vh - 408px);
 }
 .headSearch{
     display: flex;

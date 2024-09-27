@@ -15,7 +15,9 @@
                     <p >{{ listPage.tipo }} | {{ listPage.page_to_norma.title }} | {{ listPage.ano }}</p> 
                     <p>Página: {{ listPage.num_page }} </p>
                 </div>
-                <p v-html="listPage.text_page"></p> 
+                <div class="corpo">
+                    <p v-html="listPage.text_page"></p> 
+                </div>
             </div>
         </div>
     </section>
@@ -79,6 +81,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.corpo{
+    margin: 2rem;
+    font-size: 15px;
+    line-height: 2.1em
 }
 @media print {
     .btn {

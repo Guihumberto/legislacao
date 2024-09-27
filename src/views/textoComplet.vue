@@ -92,6 +92,11 @@ section {
     justify-content: center;
     align-items: center;
 }
+.corpo{
+    margin: 2rem;
+    font-size: 15px;
+    line-height: 2.1em
+}
 @media print {
     .btn {
         display: none;

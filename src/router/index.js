@@ -82,7 +82,7 @@ const routes = [
       {
         path: '',
         name: 'Painel',
-        component: () => import('@/views/Painel.vue'),
+        component: () => import('@/views/Test.vue'),
       },
     ]
   }
