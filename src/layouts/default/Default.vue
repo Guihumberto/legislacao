@@ -148,4 +148,9 @@ section .container{
     display: none;
   }
 }
+@media (max-width: 700px) {
+    html{
+      font-size: 75%;
+    }
+  }
 </style>

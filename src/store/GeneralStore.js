@@ -34,7 +34,8 @@ export const useGeneralStore = defineStore("General", {
             {nome:"resolucoes", mudar: "Resoluções", sigla:"RES"},               
             {nome:"ricms", mudar: "RICMS", sigla:"RICMS"},
             {nome:"pareceres", mudar: "Parecer de 1º inst", sigla:"P1"},
-            {nome:"voto_relator", mudar: "Voto Relator", sigla:"VTR"}         
+            {nome:"voto_relator", mudar: "Voto Relator", sigla:"VTR"},
+            {nome:"informativos-jurisprudencia", mudar: "Informativos Jurisprudenciais", sigla:"IJP"}
         ],
         resultsSearch: [],
         semanticSearchList: []
@@ -90,8 +91,12 @@ export const useGeneralStore = defineStore("General", {
             this.listSearch = []
         },
         fonteNome(item){
-            const tipo = this.tipos.find(x => x.nome == item)
-            return tipo
+            try {
+                const tipo = this.tipos.find(x => x.nome == item)
+                return tipo
+            } catch (error) {
+                console.log('erro nome-mudar');
+            }
         },
         changeShowsNews(item){
             this.noShowNews = item

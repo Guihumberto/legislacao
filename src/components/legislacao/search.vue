@@ -148,52 +148,90 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <div class="border my-5 px-2 d-flex justify-space-between align-center"  v-if="resultsSearch.length"> 
-                        <div class="d-flex justify-center align-center">
-                            <p class="py-5">Total de páginas encontradas: {{ this.totalDocs }}</p>
-                            <v-btn 
-                                    v-if="resultsSearch.length" 
-                                    @click="resultsSearch = [], searchOn = false, limpar()" 
-                                    variant="text" size="small" color="primary"
-                                    title="limpa os resultados da busca"
-                                    class="ml-1"
-                                >Limpar</v-btn>
+                    <div class="border my-5 pa-2"  v-if="resultsSearch.length"> 
+                        <div class="facetas">
+                            <div class="d-flex align-center">
+                                <h2 class="text-overline mr-1">Fonte: </h2>
+                                <v-chip-group
+                                    v-model="facetas.fonte"
+                                    selected-class="text-primary"
+                                    multiple
+                                >
+                                    <v-chip
+                                        v-for="f in resultSearchFonte" :key="f"
+                                        :text="f"
+                                        :value="f"
+                                        variant="outlined"
+                                        filter
+                                        density="compact"
+                                    ></v-chip>
+                                </v-chip-group>
+                            </div>
+                            <div class="d-flex align-center">
+                                <h2 class="text-overline mr-1">Ano: </h2>
+                                <v-chip-group
+                                    v-model="facetas.ano"
+                                    selected-class="text-primary"
+                                    multiple
+                                >
+                                    <v-chip
+                                        v-for="ano in resultSearchAno" :key="ano"
+                                        :text="ano"
+                                        :value="ano"
+                                        variant="outlined"
+                                        filter
+                                        density="compact"
+                                    ></v-chip>
+                                </v-chip-group>
+                            </div>
                         </div>
-                        <div class="btns2 pa-2">
-                            <v-tooltip text="Ativar/desativar a visualização da página">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        variant="outlined"
-                                        color="grey"
-                                        size="small"
-                                        class="mr-2"
-                                        @click="viewPreview = !viewPreview"
-                                        title="Mudar visualização"
-                                        v-if="!viewsAggs"
-                                    ><v-icon>{{viewPreview ?'mdi-eye-outline':'mdi-eye-off-outline'}}</v-icon> </v-btn>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip text="altera para uma página ou para todas as páginas agregadas por norma">
-                                <template v-slot:activator="{ props }">
-                                    <v-btn
-                                        v-bind="props"
-                                        variant="outlined"
-                                        color="grey"
-                                        size="small"
-                                        class="mr-2"
-                                        @click="viewsAggs = !viewsAggs"
-                                        title="Mudar visualização"
-                                    ><v-icon>{{viewsAggs ?'mdi-file-document-multiple-outline':'mdi-file'}}</v-icon> </v-btn>
-                                </template>
-                            </v-tooltip>                                
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex justify-center align-center">
+                                <p class="py-3">Total de páginas encontradas: {{ this.totalDocs }}</p>
+                                <v-btn 
+                                        v-if="resultsSearch.length" 
+                                        @click="resultsSearch = [], searchOn = false, limpar()" 
+                                        variant="text" size="small" color="primary"
+                                        title="limpa os resultados da busca"
+                                        class="ml-1"
+                                    >Limpar</v-btn>
+                            </div>
+                            <div class="btns2">
+                                <v-tooltip text="Ativar/desativar a visualização da página">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            variant="outlined"
+                                            color="grey"
+                                            size="small"
+                                            class="mr-2"
+                                            @click="viewPreview = !viewPreview"
+                                            title="Mudar visualização"
+                                            v-if="!viewsAggs"
+                                        ><v-icon>{{viewPreview ?'mdi-eye-outline':'mdi-eye-off-outline'}}</v-icon> </v-btn>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip text="altera para uma página ou para todas as páginas agregadas por norma">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            v-bind="props"
+                                            variant="outlined"
+                                            color="grey"
+                                            size="small"
+                                            class="mr-2"
+                                            @click="viewsAggs = !viewsAggs"
+                                            title="Mudar visualização"
+                                        ><v-icon>{{viewsAggs ?'mdi-file-document-multiple-outline':'mdi-file'}}</v-icon> </v-btn>
+                                    </template>
+                                </v-tooltip>                                
+                            </div>
                         </div>
                     </div>
-                    <div v-if="resultsSearch.length" class="searchResult">
+                    <div v-if="resultsSearchFilter.length" class="searchResult">
                         <aggs :searchResults="resultsSearch" v-if="viewsAggs" class="aggsResult"/>
                         <div class="lineResult" v-else>
                             <div 
-                                v-for="res, r in resultsSearch" :key="r"
+                                v-for="res, r in resultsSearchFilter" :key="r"
                                 class="allresultslist"    
                             >
                                 <div class="oneresult">
@@ -225,15 +263,27 @@
                                     <resumoSearch v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="res._source" :searchP="search.text" />
                                 </v-expand-transition>
                             </div>
-                            <v-pagination 
-                                density="compact"
-                                v-if="totalDocs > 20"
-                                class="my-5" 
-                                :total-visible="3"
-                                :length="Math.ceil(totalDocs/pagination.qtd)"
-                                v-model="pagination.page"
-                                @click="pagination.inicio=pagination.page*pagination.qtd-pagination.qtd, searchEnv(3)"
-                            ></v-pagination>
+                            <div class="pagination">
+                               
+                                <v-pagination 
+                                    density="compact"
+                                    v-if="totalDocs > 20"
+                                    class="my-5" 
+                                    :total-visible="5"
+                                    :length="Math.ceil(totalDocs/pagination.qtd)"
+                                    v-model="pagination.page"
+                                    @click="pagination.inicio=pagination.page*pagination.qtd-pagination.qtd, searchEnv(3)"
+                                ></v-pagination>
+                                <v-select
+                                    label="Quantidade"
+                                    density="compact"
+                                    :items="[5, 10, 20, 30, 40, 50]"
+                                    style="width: 100px;"
+                                    v-model="pagination.qtd"
+                                    variant="outlined"
+                                    hide-details="true"
+                                ></v-select>
+                            </div>
                         </div>
                     </div>
                     <div v-else>
@@ -295,7 +345,9 @@
     import resultSemantic from "@/components/legislacao/elements/resultSemantic.vue"
 
     import { useGeneralStore } from '@/store/GeneralStore'
+    import { useGeralStore } from '@/store/GeralStore'
     const generalStore = useGeneralStore()  
+    const geralStore = useGeralStore()
 
     export default {
         components:{
@@ -342,7 +394,7 @@
                 viewsAggs: false,
                 pagination:{
                     inicio: 0,
-                    qtd: 20,
+                    qtd: 5,
                     page: 1
                 },
                 totalDocs: 0,
@@ -357,6 +409,19 @@
                 termsSearch: [],
                 focusedIndex: 0,
                 selected: null,
+                facetas:{
+                    ano: [],
+                    fonte: []
+                },
+            }
+        },
+        watch:{
+            'pagination.qtd': {
+                handler(newVal, oldVal) {
+                    this.searchEnv(1) 
+                    this.pagination.page = 1
+                },
+                deep: true
             }
         },
         computed:{
@@ -386,6 +451,32 @@
                 } else {
                     return []
                 }
+            },
+            resultSearch(){
+                return generalStore.readResultSearch.map(x => x._source)
+            },
+            resultSearchAno(){
+                const list = this.resultSearch.map(x => x.ano)
+                const listAnos = [...new Set(list)].sort((a, b) => a - b)
+                return listAnos
+            },
+            resultSearchFonte(){
+                const list = this.resultSearch.map(x => x.tipo)
+                const listAnos = [...new Set(list)].sort((a, b) => a.localeCompare(b))
+                return listAnos
+            },
+            resultsSearchFilter(){
+                let list = this.resultsSearch
+
+                if(this.facetas.ano.length){
+                    list = list.filter(x => this.facetas.ano.includes(x._source.ano))
+                }
+
+                if(this.facetas.fonte.length){
+                    list = list.filter(x => this.facetas.fonte.includes(x._source.tipo))
+                }
+
+                return list
             }
         },
         methods:{
@@ -444,6 +535,8 @@
                 this.$router.push(`leges?search=${this.search.text}&years=${this.search.years}&fonte=${this.search.fonte}&termo=${this.search.termo}&precision=${this.search.precision}`)
                 const { valid } = await this.$refs.form.validate()
                 if(valid){
+                    geralStore.changeHeaderNoShow(false)
+                    this.facetasClear()
                     this.autosuggestion = []
                     if(envSolici==1) generalStore.addListSearch(this.search)
                     this.salvaNoBanco()
@@ -774,7 +867,8 @@
                                         match: {
                                             "text_page": {
                                                 "query": this.search.text,
-                                                "fuzziness": "AUTO"
+                                                "fuzziness": "AUTO",
+                                                "minimum_should_match": "75%"
                                             }
                                         }
                                         // fuzzy:{
@@ -959,6 +1053,12 @@
             openPage(item){
                 window.open(`help/${item}`, '_blank');
             },
+            facetasClear(){
+                this.facetas = {
+                    ano: [],
+                    fonte: []
+                }
+            }
         },
         created(){
             this.limpar()
@@ -1089,6 +1189,12 @@ section{
 }
 .spaceFooter{
     display: none;
+}
+.pagination{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 @media (max-width: 1020px) {
     .radioDiv{

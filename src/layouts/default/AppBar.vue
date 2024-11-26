@@ -10,30 +10,38 @@
         </h6>
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
-          <v-btn title="ocultar cabeçalho" density="compact" @click="headerShow = !headerShow" variant="icon" :icon="headerShow ? 'mdi-chevron-down' :'mdi-chevron-right'"></v-btn>
+          <v-btn 
+            title="ocultar cabeçalho" 
+            density="compact" 
+            variant="text"
+            @click="changeHeaderShow()" 
+            :icon="headerShow ? 'mdi-chevron-down' :'mdi-chevron-right'">
+          </v-btn>
           <!-- <v-icon @click="dark = !dark" size="small">{{ dark ? 'mdi-brightness-3' : 'mdi-brightness-4'}}</v-icon> -->
         </div>
       </div>
     </div>
     <v-expand-transition>
-      <div class="container" v-if="headerShow">
-        <div class="d-flex justify-center align-center">
-          <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-          <div class="logo" @click="$router.push(titleApp.to)">
-            <small class="text-white">{{titleApp.title}}</small>
-            <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
+      <div v-if="headerShow">
+        <div class="container">
+          <div class="d-flex justify-center align-center">
+            <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <div class="logo" @click="$router.push(titleApp.to)">
+              <small class="text-white">{{titleApp.title}}</small>
+              <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
+            </div>
           </div>
-        </div>
-        <nav class="navbar">
-          <ul role="list">
-            <li> <a @click="menu = !menu">INSTITUCIONAL</a></li>
-            <li> <a href="#">CONTATO</a></li>
-            <li> <a class="active">QUEM SOMOS</a></li>
-          </ul>
-        </nav>
-        <div class="btn_group">    
-          <loginInfo :flutuante="false" class="gov" />   
-          <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
+          <nav class="navbar">
+            <ul role="list">
+              <li> <a @click="menu = !menu">INSTITUCIONAL</a></li>
+              <li> <a href="#">CONTATO</a></li>
+              <li> <a class="active">QUEM SOMOS</a></li>
+            </ul>
+          </nav>
+          <div class="btn_group">    
+            <loginInfo :flutuante="false" class="gov" />   
+            <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
+          </div>
         </div>
       </div>
     </v-expand-transition>
@@ -102,7 +110,6 @@
             menu: false,
             drawer: false,
             drawer2: false,
-            headerShow: true,
             items: [
               { text: 'Início', icon: 'mdi-home' },
               { text: 'Documentos', icon: 'mdi-folder' },
@@ -117,9 +124,15 @@
       },
       titleApp(){
         return geralStore.readTitleApp
+      },
+      headerShow(){
+        return geralStore.readHeaderShow
       }
     },
     methods: {
+        changeHeaderShow(){
+            geralStore.changeHeaderShow()
+        },
         isSearch() {
             geralStore.changeSearch();
         },
@@ -139,8 +152,7 @@
             setTimeout(() => {
               this.menu = false
             }, 1000);
-          }
-          
+          }  
         },
     },
     components: { MenuBar, sidebarleft, loginInfo },
@@ -223,7 +235,6 @@ header .container {
   align-items: center;
   width: min(90%, 1000px);
   margin-inline: auto;
-  height: min(10%, 10vh);
   padding: 2rem 0;
   transition: 1s ease;
 }

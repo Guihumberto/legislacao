@@ -40,7 +40,10 @@
                 novo_array.push('(...)')
                 linhasFiltradas.push('(...)')
 
-                if(novo_array.length <= 2) return ''
+                if(novo_array.length <= 2) {
+                    let texto_cortado = [this.text.replace('\n', '<br><br>').substring(0,500), "...", "<br>", "(...)"]
+                    return texto_cortado.join('')
+                }
                 
                 return novo_array.join('<br>');
             },

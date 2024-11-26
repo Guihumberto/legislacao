@@ -43,7 +43,7 @@
                     list1.push(x)
                 })
                     
-                return list1
+                return list1.sort((a, b) => a.num_page - b.num_page)
             }
         },
         methods:{

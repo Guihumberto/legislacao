@@ -93,7 +93,7 @@
                         </v-expansion-panel>
                     </v-expansion-panels>
                     <v-alert variant="tonal" type="warning" v-else>
-                        <p>Não há conexão com o banco de dados</p>
+                        <p>Carregando...</p>
                     </v-alert>
                 </div>
             </div>

@@ -4,6 +4,7 @@ export const useGeralStore = defineStore("geral", {
   state: () => ({
     search: false,
     menuSide: false,
+    headerShow: true,
     titleApp: {title:'Legislação', to: '/' }
   }),
   getters: {
@@ -15,6 +16,9 @@ export const useGeralStore = defineStore("geral", {
     },
     readTitleApp(){
       return this.titleApp
+    },
+    readHeaderShow(){
+      return this.headerShow
     }
   },
   actions:{
@@ -29,6 +33,12 @@ export const useGeralStore = defineStore("geral", {
         title: item.title,
         to: item.to
       }
+    },
+    changeHeaderShow(){
+      this.headerShow = !this.headerShow
+    },
+    changeHeaderNoShow(value){
+      this.headerShow = value
     }
   }
 });

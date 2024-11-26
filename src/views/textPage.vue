@@ -74,10 +74,10 @@
 
 <style lang="scss" scoped>
 .section {
-    min-height: 1000vh;
+    min-height: 100vh;
 }
 .sizeLoad{
-    height: 55vh;
+    min-height: 60vh;
     display: flex;
     justify-content: center;
     align-items: center;
