@@ -5,7 +5,6 @@
         <div class="text-right">
             <page :id="id" :page="page" :searchP="searchP" />
         </div>
-        
     </div>
 </template>
 

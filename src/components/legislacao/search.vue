@@ -179,11 +179,17 @@
                                         :text="ano"
                                         :value="ano"
                                         variant="outlined"
+                                        :disabled="!disableFacetaAno(ano)"
                                         filter
                                         density="compact"
                                     ></v-chip>
                                 </v-chip-group>
                             </div>
+                            <v-expand-transition>
+                                <div v-if="facetas.ano.length || facetas.fonte.length">
+                                    <p class="py-3">Total de páginas filtradas: {{ this.resultsSearchFilter.length }}</p>
+                                </div>
+                            </v-expand-transition>
                         </div>
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex justify-center align-center">
@@ -456,13 +462,19 @@
                 return generalStore.readResultSearch.map(x => x._source)
             },
             resultSearchAno(){
-                const list = this.resultSearch.map(x => x.ano)
+                let list = this.resultSearch.map(x => x.ano)
+
+                // if(this.facetas.fonte.length) list= this.resultsSearchFilter.map(x => x._source.ano)
+         
                 const listAnos = [...new Set(list)].sort((a, b) => a - b)
+
                 return listAnos
             },
             resultSearchFonte(){
-                const list = this.resultSearch.map(x => x.tipo)
+                let list = this.resultSearch.map(x => x.tipo)
+
                 const listAnos = [...new Set(list)].sort((a, b) => a.localeCompare(b))
+
                 return listAnos
             },
             resultsSearchFilter(){
@@ -477,6 +489,19 @@
                 }
 
                 return list
+            },
+            filterFacetaFonte(){
+                 const list = this.resultsSearchFilter.map(x => x._source.ano)
+                 const listSet = [...new Set(list)]
+                 return listSet
+            },
+            filterFacetaFonteAll(){
+                let list = this.resultsSearch
+                list = list.filter(x => this.facetas.fonte.includes(x._source.tipo))
+                list = list.map(x => x._source.ano)
+                const listSet = [...new Set(list)]
+                
+                return listSet
             }
         },
         methods:{
@@ -1052,6 +1077,21 @@
             },
             openPage(item){
                 window.open(`help/${item}`, '_blank');
+            },
+            disableFacetaAno(item){
+                if(this.facetas.fonte.length && this.facetas.ano.length){
+                    const list = this.filterFacetaFonteAll.includes(item)
+                    return !!list
+                }
+                if(this.facetas.fonte.length){
+                    const list = this.filterFacetaFonte.includes(item)
+                    return !!list
+                }
+                if(!this.facetas.ano.length) {
+                    const list = this.filterFacetaFonte.includes(item)
+                    return !!list
+                }
+                return true
             },
             facetasClear(){
                 this.facetas = {

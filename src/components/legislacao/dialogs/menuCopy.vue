@@ -10,7 +10,7 @@
         >
         </v-btn>
       </template>
-      <v-list>
+      <v-list class="my-0 py-0">
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
@@ -35,7 +35,7 @@
     },
     methods:{
       copyLink(){
-        const text =`https://legislacao.sefaz.ma.gov.br/textpage/${this.page}`
+        const text =`https://legislacao.estudodalei.com.br/textpage/${this.page}`
         navigator.clipboard.writeText(text);
         this.$emit('copyLink', text);
       } 
