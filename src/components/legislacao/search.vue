@@ -12,10 +12,10 @@
                     <menuOpt class="contador" />
                 </div>
             </div>
-            <div class="headSearchTwo my-5">
+            <!--<div class="headSearchTwo my-5">
                 <h2>Busca na legislação</h2>
                 <small>Busca por termos, frases, fontes e periodos.</small>
-            </div>
+            </div> -->
             <div class="content">
                 <v-form @submit.prevent="searchEnv(1)" ref="form">
                     <div class="line1">
@@ -436,7 +436,7 @@
                 if(reqq){
                     this.recActive()
                 }
-                return "Home"
+                return "Legislação"
             },
             periodo(){
                 return generalStore.readPeriodo
@@ -1121,6 +1121,7 @@ section{
     justify-content: space-between;
     align-items: center;
     animation: slideTopSearch .5s ease-in;
+    margin-bottom: 2rem
 }
 .headSearchTwo{
     animation: slideTopSearch 1s ease-in;
