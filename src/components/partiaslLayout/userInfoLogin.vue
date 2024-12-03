@@ -8,17 +8,17 @@
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
-            :icon="readLogin.id ? 'mdi-account-tie': 'mdi-login'"
+            :icon="readLogin.login ? 'mdi-account-tie': 'mdi-login'"
             class="mr-2"
-            :title="readLogin.id ? 'Sair': 'Entrar'"
+            :title="readLogin.login ? 'Sair': 'Entrar'"
           >
           </v-btn>
         </template>
-        <v-card min-width="300" v-if="readLogin.id">
+        <v-card min-width="300" v-if="readLogin.login">
           <v-list>
             <v-list-item
               prepend-icon="mdi-account-circle"
-              :subtitle="readUser.cargo"
+              :subtitle="readUser.setor"
               :title="readUser.nome"
             >
               <template v-slot:append>
@@ -51,8 +51,8 @@
     </div>
   </template>
   <script>
-  import { useAvaliacaoStore } from '@/store/AvaliacaoStore'
-  const avaliacaoStore = useAvaliacaoStore() 
+  import { useLoginStore } from '../../store/LoginStore'
+  const loginStore = useLoginStore()
 
   import login from '@/components/avaliacao/login/login.vue'
 
@@ -63,7 +63,7 @@
     }),
     methods:{
       logout(){
-        avaliacaoStore.limpar()
+        loginStore.logOut()
         this.menu = false
         this.$router.push('/avaliacao')
       },
@@ -86,13 +86,13 @@
       readUser(){
         let user = this.readLogin
         let userData = {
-          nome: this.getFirstAndSecondName(user.nome),
-          cargo: this.getFirstAndSecondName(user.cargo),
+          nome: this.getFirstAndSecondName(user.name),
+          cargo: this.getFirstAndSecondName(user.setor),
         }
         return userData
       },
       readLogin(){
-        return avaliacaoStore.readLogin
+        return loginStore.readLogin
       }
     }
   }

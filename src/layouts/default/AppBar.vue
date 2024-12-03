@@ -5,11 +5,13 @@
         <h6 class="ml-n2">
           <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2"></v-app-bar-nav-icon>
           <!-- <img class="img_flag" src="../../assets/flagma.png" /> -->
-          <v-icon>mdi-script-text</v-icon>
+          <!-- <v-icon>mdi-script-text</v-icon> -->
           <span class="gov">LEGISLAÇÃO</span>
         </h6>
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
+          <router-link to="/login" class="mr-2" v-if="!isLogin">ENTRAR</router-link>
+          <a @click="logOut()" class="mr-2 text-orange" v-else>SAIR</a>
           <v-btn 
             title="ocultar cabeçalho" 
             density="compact" 
@@ -39,7 +41,7 @@
             </ul>
           </nav>
           <div class="btn_group">    
-            <loginInfo :flutuante="false" class="gov" />   
+            <loginInfo :isLogin="!isLogin" :flutuante="false" class="gov" />   
             <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
           </div>
         </div>
@@ -102,6 +104,9 @@
   import { useGeneralStore } from '@/store/GeneralStore'
   const generalStore = useGeneralStore()
 
+  import { useLoginStore } from '../../store/LoginStore'
+  const loginStore = useLoginStore()
+
 
   export default{
     data() {
@@ -127,6 +132,9 @@
       },
       headerShow(){
         return geralStore.readHeaderShow
+      },
+      isLogin(){
+        return !!loginStore.readLogin.login
       }
     },
     methods: {
@@ -154,6 +162,9 @@
             }, 1000);
           }  
         },
+        logOut(){
+          loginStore.logOut()
+        }
     },
     components: { MenuBar, sidebarleft, loginInfo },
     created(){
