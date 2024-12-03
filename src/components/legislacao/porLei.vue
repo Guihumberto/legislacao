@@ -3,8 +3,8 @@
         <div class="container">    
             <div class="d-flex justify-space-between mt-2 align-center">
                 <div>
-                    <router-link class="text-black" to="/">Home</router-link> 
-                    <contador class="contador" />
+                    <router-link class="text-black" to="/">Legislação</router-link> <br>
+                    <small>Busca da lei por ano, fonte ou texto.</small>
                 </div>
                 <div class="d-flex align-center">
                     <router-link to="/leges" class="linkTO">Busca por termo</router-link>
@@ -20,8 +20,6 @@
                     ></v-progress-circular>
             </div>
             <div class="legislacao  my-5" v-else>
-                <h2 class="font-weight-bold">Legislação</h2>
-                <small>Busca da lei por ano, fonte ou texto.</small>
                 <div class="content">
                     <v-text-field
                         label="Buscar"

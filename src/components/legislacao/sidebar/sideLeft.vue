@@ -111,7 +111,7 @@
 
                 const classificacao = list.reduce((acumulador, item) => {
                 // Verifica se a categoria já existe no acumulador
-                    const categoriaExistente = acumulador.find(c => c.title === item.tipo);
+                    const categoriaExistente = acumulador.find(c => c.title === this.nomeTipo(item.tipo));
 
                     if (categoriaExistente) {
                         const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
@@ -125,7 +125,7 @@
                     } else {
                         // Se a categoria não existe, crie uma nova categoria com a subcategoria
                         acumulador.push({
-                            title: item.tipo,
+                            title: this.nomeTipo(item.tipo),
                             open: 0,
                             children: [{
                                 id: item.page_to_norma.parent,
@@ -160,7 +160,11 @@
             },
             large_sidebar(){
                 this.$emit('large')
-            }
+            },
+            nomeTipo(item){
+                let nome = generalStore.fonteNome(item)
+                return nome.mudar
+            },
         }
     }
 </script>

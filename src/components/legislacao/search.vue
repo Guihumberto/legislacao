@@ -35,7 +35,9 @@
                             @keydown.enter.prevent="actionEnterBusca()"
                         >
                             <template v-slot:append>
-                                    <v-tooltip text="Usa o conectivo 'E' na busca realizada, retornando apenas as páginas que tiverem todos os termos digitados, reduzindo a quantidade de resultados.">
+                                    <v-tooltip 
+                                        max-width="300"
+                                        text="Usa o conectivo 'E' na busca realizada, retornando apenas as páginas que tiverem todos os termos digitados, reduzindo a quantidade de resultados.">
                                         <template v-slot:activator="{ props }">
                                             <v-checkbox 
                                                 :disabled="search.termo == 1 || search.semantic == 2"
@@ -96,6 +98,7 @@
                                             @click="search.precision = false"
                                             class="mr-2"
                                             v-for="item, i in semantic" :key="i" 
+                                            :disabled="item.disabled"
                                             :label="item.name" :value="item.id">
                                         </v-radio>
                                     </div>
@@ -159,7 +162,7 @@
                                 >
                                     <v-chip
                                         v-for="f in resultSearchFonte" :key="f"
-                                        :text="f"
+                                        :text="nomeTipo(f)"
                                         :value="f"
                                         variant="outlined"
                                         filter
@@ -269,7 +272,7 @@
                                     <resumoSearch v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="res._source" :searchP="search.text" />
                                 </v-expand-transition>
                             </div>
-                            <div class="pagination">
+                            <div class="pagination" v-if="!facetas.ano.length && !facetas.fonte.length">
                                
                                 <v-pagination 
                                     density="compact"
@@ -386,8 +389,8 @@
                     {id:1, name: "Frase Exata"}
                 ],
                 semantic:[
-                    {id:1, name: "Palavras-chave"},
-                    {id:2, name: "Semântica"}
+                    {id:1, name: "Palavras-chave", disabled: false},
+                    {id:2, name: "Semântica", disabled: true}
                 ],
                 rules:{
                     required: (value) => !!value || "Campo obrigatório",
@@ -936,18 +939,22 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.termo == 1 && !this.search.precision){
                                 console.log("teste 16");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
+                                    from: 0,
+                                    size: 100,
                                     query: {
                                         match_phrase: {
                                             text_page:{
-                                                query: this.search.text,
-                                                slop: 1
+                                                query: alterSearch,
+                                                slop: 2
                                             }
                                         }
                                     }
                                 })
                                 this.resultsSearch = response.data.hits.hits;
                                 this.totalDocs = response.data.hits.total.value;
+                                console.log(response)
                             } else {
                                 console.log("teste 17");
                                 const response = await api.post("pages_v2/_search", {
@@ -1098,6 +1105,11 @@
                     ano: [],
                     fonte: []
                 }
+            },
+            removerAcentos(str) {
+                return str
+                    .normalize("NFD")         // Decomposição em caracteres base + diacríticos
+                    .replace(/[\u0300-\u036f]/g, ""); // Remove os diacríticos
             }
         },
         created(){
