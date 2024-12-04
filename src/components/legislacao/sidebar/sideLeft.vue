@@ -79,7 +79,7 @@
 
                 const classificacao = list.reduce((acumulador, item) => {
                 // Verifica se a categoria já existe no acumulador
-                    const categoriaExistente = acumulador.find(c => c.title === item.ano);
+                    const categoriaExistente = acumulador.find(c => c.title == item.ano);
 
                     if (categoriaExistente) {
                         const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
@@ -93,7 +93,7 @@
                     } else {
                         // Se a categoria não existe, crie uma nova categoria com a subcategoria
                         acumulador.push({
-                            title: parseInt(item.ano),
+                            title: item.ano.toString(),
                             children: [{
                                 id: item.page_to_norma.parent,
                                 title:  item.page_to_norma.title.toLowerCase()

@@ -161,7 +161,7 @@
                                     multiple
                                 >
                                     <v-chip
-                                        v-for="f in resultSearchFonte" :key="f"
+                                        v-for="f, fi in resultSearchFonte" :key="fi"
                                         :text="nomeTipo(f)"
                                         :value="f"
                                         variant="outlined"
@@ -179,7 +179,7 @@
                                 >
                                     <v-chip
                                         v-for="ano in resultSearchAno" :key="ano"
-                                        :text="ano"
+                                        :text="ano.toString()"
                                         :value="ano"
                                         variant="outlined"
                                         :disabled="!disableFacetaAno(ano)"
@@ -265,6 +265,7 @@
                                     </div>   
                                     <div class="btns pr-1">
                                         <menuCopy :page="res._id" @copyLink="snackCopy()"  />
+                                        <Favorito :page="res" />
                                         <v-btn title="ver todo o documento" variant="tonal" size="small" color="red" @click="openLaw(res)">PDF</v-btn>
                                     </div>
                                 </div>
@@ -355,6 +356,7 @@
 
     import { useGeneralStore } from '@/store/GeneralStore'
     import { useGeralStore } from '@/store/GeralStore'
+    import Favorito from "./dialogs/favorito.vue"
     const generalStore = useGeneralStore()  
     const geralStore = useGeralStore()
 
@@ -370,7 +372,8 @@
             news,
             menuOpt,
             contador,
-            resultSemantic
+            resultSemantic,
+            Favorito
         },
         data(){
             return{
@@ -1124,6 +1127,7 @@
 <style  scoped>
 section{
     transition: all .8s ease;
+    margin-left: .5em
 }
 .container{
     min-height: calc(100vh - 408px);
