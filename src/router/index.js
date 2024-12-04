@@ -69,10 +69,26 @@ const routes = [
         component: () => import('@/views/Help.vue'),
       },
       {
+        path: '/history',
+        name: 'Histórico',
+        component: () => import('@/views/History.vue'),
+      },
+      {
+        path: '/favorites',
+        name: 'Favoritos',
+        component: () => import('@/views/Favorites.vue'),
+      },
+      {
+        path: '/documents',
+        name: 'Documentos',
+        component: () => import('@/views/Documents.vue'),
+      },
+      {
         path: '/:pathMatch(.*)*', // Captura todas as rotas não definidas
         name: 'NotFound',
         component: () => import('@/views/NotFound.vue'),
       },
+      
     ],
   },
   {

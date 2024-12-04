@@ -3,7 +3,7 @@
     <div class="wrappersubheader">
       <div class="subheader">
         <h6 class="ml-n2">
-          <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2"></v-app-bar-nav-icon>
+          <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2" :disabled="!isLogin" title="Necessário estar logado."></v-app-bar-nav-icon>
           <!-- <img class="img_flag" src="../../assets/flagma.png" /> -->
           <!-- <v-icon>mdi-script-text</v-icon> -->
           <span class="gov">LEGISLAÇÃO</span>
@@ -49,54 +49,27 @@
     </v-expand-transition>
   </header>
   <menu-bar @menu="menu = !menu" class="menu" v-if="menu" id="menu"  />
-  <v-navigation-drawer
-            v-model="drawer"
-            temporary
-        >
-            <sidebarleft />
-  </v-navigation-drawer>
-  <v-navigation-drawer 
-     location="left"
-     v-model="drawer2"
-     color="#ECEFF1"
-  >
-    <div class="text-center my-5">
-      <v-avatar class="mb-3" size="5rem" variant="tonal" color="blue"><v-icon size="3rem">mdi-account</v-icon></v-avatar>
-      <h3>Nome do usuário</h3>
-      <h4>@emaildousuário</h4>
-      <!-- <v-btn color="red" variant="text" class="text-lowecase">Sair <v-icon class="ml-1" size=".9rem">mdi-logout</v-icon></v-btn> -->
-    </div>
-    <v-divider></v-divider>
-    <v-card
-      class="mx-auto"
-      max-width="300"
-      elevation="0"
-      color="transparent"
+    <v-navigation-drawer
+              v-model="drawer"
+              temporary
+          >
+              <sidebarleft />
+    </v-navigation-drawer>
+    <v-navigation-drawer 
+      location="left"
+      v-model="drawer2"
+      color="#ECEFF1"
+      v-if="isLogin"
     >
-      <v-list density="compact">
-        <v-list-subheader>Menu</v-list-subheader>
-
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :value="item"
-          color="primary"
-        >
-          <template v-slot:prepend>
-            <v-icon :icon="item.icon"></v-icon>
-          </template>
-
-          <v-list-item-title v-text="item.text"></v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-card>
-</v-navigation-drawer>
+      <menuUser />
+    </v-navigation-drawer>
 </template>
 
 <script>
   import sidebarleft from '@/components/legislacao/sidebar/sideLeft.vue'
   import MenuBar from '@/components/dialogs/menuBar.vue'
   import loginInfo from '@/components/partiaslLayout/userInfoLogin.vue'
+  import menuUser from './MenuUser.vue'
 
   import { useGeralStore } from '@/store/GeralStore'
   const geralStore = useGeralStore()
@@ -114,13 +87,7 @@
             dark: false,
             menu: false,
             drawer: false,
-            drawer2: false,
-            items: [
-              { text: 'Início', icon: 'mdi-home' },
-              { text: 'Documentos', icon: 'mdi-folder' },
-              { text: 'Favoritos', icon: 'mdi-star' },
-              { text: 'Histórico', icon: 'mdi-history' },
-            ],
+            drawer2: false
         };
     },
     computed:{
@@ -166,7 +133,7 @@
           loginStore.logOut()
         }
     },
-    components: { MenuBar, sidebarleft, loginInfo },
+    components: { MenuBar, sidebarleft, loginInfo, menuUser},
     created(){
       setTimeout(() => {
         this.isSearch()

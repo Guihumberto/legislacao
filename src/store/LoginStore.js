@@ -6,6 +6,8 @@ export const useLoginStore = defineStore("loginStore", {
             login: "017.917.433-90",
             name: 'João Humberto Silva Ribeiro Júnior',
             nickname: 'Humberto',
+            orgao: 'SEFAZ MA',
+            setor: 'LEGES',
             password: 123456,
             firstLogin: true
         },
