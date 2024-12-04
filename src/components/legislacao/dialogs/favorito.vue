@@ -52,7 +52,6 @@
     const isFav = () => {
         if(loginStore.readLogin.login) {
             isExist.value = areaUserStore.readFavoritos
-                            .filter(x => x.fav)
                             .find(x => x.id == props.page._id)
         }
     }

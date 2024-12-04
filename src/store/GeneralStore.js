@@ -84,6 +84,17 @@ export const useGeneralStore = defineStore("General", {
             this.req = item
             this.search = this.listSearch[i]
         },
+        reqChangeFromHistory(req, item){
+            const objeto = {
+                text: item.text_search,
+                years: item.years,
+                fonte: item.sources,
+                termo: item.termos,
+                precision: item.precision
+            }
+            this.req = req
+            this.search = objeto
+        },
         removeListSearch(item){
             this.listSearch.splice(item, 1)
         },

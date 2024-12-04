@@ -259,7 +259,7 @@
                                             </v-tooltip>
                                         </div>
                                         <div class="resulttitle">
-                                            <p>{{res._source.page_to_norma.title}}</p>
+                                            <FavLaws :law="res" />
                                             <small>Pág: {{ res._source.num_page }} | {{ res._source.tipo }} | {{ res._source.ano }} | <v-icon :color="relevancia(res._score).color" :icon="relevancia(res._score).icon" :title="`${relevancia(res._score).title} - ${res._score}`" /> </small>
                                         </div>
                                     </div>   
@@ -332,8 +332,8 @@
             </v-snackbar>
             <div v-if="document.length" class="fixed-element">
                 <docs :docs="document" />
-                <v-btn color="error" variant="text" @click="document=[]">
-                    <v-icon>mdi-delete</v-icon> Excluir</v-btn>
+                <v-btn color="error" variant="text" prepend-icon="mdi-delete" @click="document=[]"> Excluir</v-btn>
+                <DocumentSave :document="document" />
             </div>
         </div>
     </section>
@@ -357,8 +357,15 @@
     import { useGeneralStore } from '@/store/GeneralStore'
     import { useGeralStore } from '@/store/GeralStore'
     import Favorito from "./dialogs/favorito.vue"
+    import FavLaws from "./dialogs/favLaws.vue"
     const generalStore = useGeneralStore()  
     const geralStore = useGeralStore()
+  
+    import { useLoginStore } from '@/store/LoginStore'
+    import DocumentSave from "./dialogs/documentSave.vue"
+    const loginStore = useLoginStore()
+   
+   
 
     export default {
         components:{
@@ -373,7 +380,9 @@
             menuOpt,
             contador,
             resultSemantic,
-            Favorito
+            Favorito, 
+            FavLaws,
+            DocumentSave
         },
         data(){
             return{
@@ -1024,9 +1033,9 @@
                 ? find
                 : false
             },
-            recActive(){     
-                let reqSearch = generalStore.readSearch
-                this.search = { ...reqSearch}
+            async recActive(){     
+                const reqSearch = await generalStore.readSearch
+                this.search = await { ...reqSearch}
                 this.searchEnv(2)
                 this.search.semantic = 1
                 generalStore.reqChange(false)
@@ -1042,7 +1051,9 @@
                         "years": this.search.years,
                         "sources": this.search.fonte,
                         "precision": this.search.precision,
-                        "termos":  this.search.termo
+                        "termos":  this.search.termo,
+                        "usuario": loginStore.readLogin.login ? loginStore.readLogin.login : null,
+                        "date": Date.now()
                     })
                 } catch (error) {
                     console.log("error search todo salvar no banco");
@@ -1073,7 +1084,6 @@
                 generalStore.copyResults([])
             },
             snackCopy(){
-                console.log("snack dada");
                 this.snack = {
                     snackbar: true,
                     text: 'Link copiado para área de transferência.',
@@ -1113,6 +1123,9 @@
                 return str
                     .normalize("NFD")         // Decomposição em caracteres base + diacríticos
                     .replace(/[\u0300-\u036f]/g, ""); // Remove os diacríticos
+            },
+            salvarDocumento(){
+                console.log(this.document);
             }
         },
         created(){

@@ -5,48 +5,55 @@
             <div class="text-right mb-2">
                 <AddFolderFavortite />
             </div>
-            <v-card>
+            <v-card v-if="areaUserStore.readFavoritos.length">
                 <!-- <div class="pa-2">
                     <h3 class="text-h6">Pastas</h3>
                     <div class="listFolder">
                         <v-btn v-for="item,i in 5" variant="text" prepend-icon="mdi-folder">Respostas</v-btn>
                     </div>
-                </div>
+                </div> -->
                 <v-list class="pa-0">
-                    <v-list-item v-for="item, i in 5">
+                    <v-list-subheader>Normas</v-list-subheader>
+                    <v-list-item 
+                        link
+                        v-for="item, i in areaUserStore.readFavoritos.filter(x => x.section == 'law')"
+                        :key="item.id"
+                        @click.stop="goTo(item)"
+                    >
                         <template v-slot:prepend>
                             <v-icon color="primary">
                                 mdi-notebook
                             </v-icon>
                         </template>
                         <template v-slot:append>
-                            <v-btn variant="text" icon="mdi-dots-vertical">
-                            </v-btn>
+                            <RemoveFav :id="item" />
                         </template>
-                        Rótulo: Pesquisa tarara<br>
-                        Página: 12, nome da norma, 2024, portaria <br>
+                         {{ item.norma }}<br>
+                        <small class="font-weight-bold">{{ item.ano }}, {{ item.tipo }}</small>
                     </v-list-item>
-                </v-list> -->
+                </v-list>
                 <v-list class="pa-0">
+                    <v-list-subheader>Páginas</v-list-subheader>
                     <v-list-item 
                         link
                         v-for="item, i in areaUserStore.readFavoritos.filter(x => x.section == 'page')"
-                        @click.stop="goTo(item.id)"
-                        >
+                        :key="item.id"
+                        @click.stop="goTo(item)"
+                    >
                         <template v-slot:prepend>
                             <v-icon>
                                 mdi-text-box
                             </v-icon>
                         </template>
                         <template v-slot:append>
-                            <v-btn variant="text" icon="mdi-dots-vertical">
-                            </v-btn>
+                            <RemoveFav :id="item" />
                         </template>
                         Página: {{ item.num_page }}, {{ item.ano }}, {{ item.tipo }} <br>
                         <small class="font-weight-bold">{{ item.norma }}</small>
                     </v-list-item>
                 </v-list>
             </v-card>
+            <v-alert v-else type="warning" variant="outlined" text="Não há normativos favoritados"></v-alert>
         </div>
     </section>
 </template>
@@ -60,9 +67,13 @@
 
 
     import AddFolderFavortite from '@/components/userArea/addFolderFavortite.vue';
+    import RemoveFav from '@/components/userArea/removeFav.vue';
 
     const goTo = (item) => {
-        window.open(`/textpage/${item}`, '_blank');
+
+        if(item.section == 'page') window.open(`/textpage/${item.id}`, '_blank');
+
+        if(item.section == 'law') window.open(`/text/${item.id}`, '_blank');
     }
 
 </script>
