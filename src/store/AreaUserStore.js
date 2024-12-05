@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
-import { id } from "vuetify/lib/locale/index.mjs";
 
 export const useUserAreaStore = defineStore("userAreaStoe", {
     state: () => ({
@@ -39,7 +38,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             return formatado
         },
         readDocumentos(){
-            return this.documentos
+            return this.documentos.filter( x => x.active)
         },
         readLoad(){
             return this.load
@@ -91,6 +90,22 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 this.load = false
             }
         },
+        saveDoc(item){
+            const doc = { ...item }
+            const findDoc = this.documentos.find(x => x.title == doc.title)
+
+            if(findDoc) {
+                console.log("Já existe um documento com o mesmo nome.");
+                return
+            }
+            this.documentos.push(doc)
+            console.log(this.documentos);
+        },
+        removeDoc(item){
+            const doc = { ...item }
+            this.documentos = this.documentos.filter(x => x.title != doc.title)
+            this.documentos.push(doc)
+        },
         formatDate(timestamp){
             const data = new Date(timestamp);
 
@@ -101,6 +116,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 }).format(data);
 
             return dataFormatada
-        }
+        },
+
     }
 })

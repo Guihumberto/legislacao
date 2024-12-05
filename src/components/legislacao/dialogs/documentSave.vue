@@ -8,12 +8,13 @@
         width="auto"
       >
         <v-card
-          width="500"
+          min-width="400"
           prepend-icon="mdi-content-save"
           title="Salvar Documento"
         >
           <v-card-text>
-            <div>
+            <div class="border pa-2">
+              <p class="mb-2">Escolha um nome para o documento.</p>
                 <v-form @submit.prevent="saveDocument()" ref="form">
                   <v-text-field
                     label="Nome do Documento"
@@ -28,18 +29,22 @@
                   </div>
                 </v-form>
             </div>
-            <v-list class="border mt-5 pa-0">
-              <v-list-item v-for="doc, i in document" :key="i" link class="border-b">
+            <v-list class="mt-5 pa-0 border">
+              <v-list-item 
+                v-for="doc, i in document" :key="i" link class="py-2"
+                :subtitle="`${doc._source.tipo} - ${doc._source.ano}`"
+               >
                 <template v-slot:prepend>
-                  <div class="mr-4">
-                    {{ i+1 }}
+                  <v-icon icon="mdi-file-document"></v-icon>
+                </template>
+                <template v-slot:append>
+                  <div class="ml-2">
+                    {{ i + 1 }}
                   </div>
                 </template>
-                {{ doc._source.page_to_norma.title }} <br>
-                {{ doc._source.ano }} - {{ doc._source.tipo }} - num pag. {{ doc._source.num_page }}
+                <span>pag. {{ doc._source.num_page }}, do doc {{ doc._source.page_to_norma.title }}</span>
               </v-list-item>
             </v-list>
-
           </v-card-text>
           <template v-slot:actions>
             <v-btn
@@ -52,7 +57,12 @@
       </v-dialog>
   </template>
   <script setup>
+    import { useUserAreaStore } from '@/store/AreaUserStore';
+    const userAreaStore = useUserAreaStore()
+
     import { ref } from 'vue';
+
+
 
     const dialog = ref(false)
     const form = ref(null)
@@ -62,6 +72,9 @@
       document: Array
     })
 
+
+    const emit = defineEmits(['fecharDoc'])
+
     const rules = {
         required: value => !!value || "campo obrigatório", 
         minfield: (v) => (v||'').length >= 3 || "Mínimo 4 caracteres",
@@ -70,8 +83,14 @@
     const saveDocument = async () => {
         const { valid } = await form.value.validate()
             if(valid){
-               console.log(title.value, props.document);
-               //emit para excuir o doc criado
+               const objeto = {
+                title: title.value.trim(),
+                pages: props.document,
+                active: true,
+                date: Date.now()
+               }
+               userAreaStore.saveDoc(objeto)
+               emit("fecharDoc")
             }
     }
     

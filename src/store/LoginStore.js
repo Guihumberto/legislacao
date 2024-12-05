@@ -36,6 +36,7 @@ export const useLoginStore = defineStore("loginStore", {
         },
         logOut(){
             this.clearLogin()
+            window.location.href = '/'
         },
         clearLogin(){
             this.login = {

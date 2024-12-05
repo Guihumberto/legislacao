@@ -333,7 +333,7 @@
             <div v-if="document.length" class="fixed-element">
                 <docs :docs="document" />
                 <v-btn color="error" variant="text" prepend-icon="mdi-delete" @click="document=[]"> Excluir</v-btn>
-                <DocumentSave :document="document" />
+                <DocumentSave v-if="readLogin" :document="document" @fecharDoc="document=[]" />
             </div>
         </div>
     </section>
@@ -365,8 +365,6 @@
     import DocumentSave from "./dialogs/documentSave.vue"
     const loginStore = useLoginStore()
    
-   
-
     export default {
         components:{
             page,
@@ -446,6 +444,9 @@
             }
         },
         computed:{
+            readLogin(){
+                return !!loginStore.readLogin.login
+            },
             reqRead(){
                 let reqq = generalStore.readReq
                 if(reqq){

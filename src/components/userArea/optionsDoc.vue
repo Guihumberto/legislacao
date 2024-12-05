@@ -15,30 +15,48 @@
             v-for="(item, index) in items"
             :key="index"
             :value="index"
-            @click="removeFav()"
+            @click="actions(item.id)"
           >
             <v-list-item-title> {{ item.title }} </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
+      <v-dialog
+          v-model="dialog"
+          activator="parent"
+          max-width="1080"
+      >
+        <DocumentOpen :docs="document" />
+    </v-dialog>
   </template>
   
   <script setup>
+    import { ref } from 'vue';
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
+    import DocumentOpen from './documentOpen.vue';
     const userAreaStore = useUserAreaStore()
+
+    const dialog = ref(false)
     
     const items = ([
-         { title: 'Excluir' }
+         {id:1, title: 'Abrir Documento' },
+         {id:2, title: 'Excluir' }
     ])
 
     const props = defineProps({
-        id: Object
+        document: Object
     })
 
-    const removeFav = () => {
-        props.id.fav = false
-        userAreaStore.saveFavoritos(props.id)
+    const actions = (action) => {
+        if(action == 2) {
+          props.document.active = false
+          userAreaStore.removeDoc(props.document)
+        }
+
+        if(action == 1) {
+          dialog.value = true
+        }
     } 
 
 
