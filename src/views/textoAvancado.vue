@@ -9,19 +9,87 @@
         </div>
         <div class="container" v-else>
             <v-btn variant="tonal" @click="voltar" class="mb-2 btn">Voltar</v-btn>
-            <v-btn variant="tonal" @click="$router.push(`/text/${id}`)" class="mb-2 ml-2 btn" color="primary">MODO TEXTO</v-btn>
+            <v-btn variant="tonal" @click="$router.push(`/text/${id}`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
+            <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn">ocultar cabeçalho</v-btn>
 
-            <div class="border pa-5 mb-2 bg-white pagina" v-for="item, i in listFinal" :key="i">
-                <div class="corpo">
-                     {{ item.textlaw }}
+            <div>
+                <v-expand-transition>
+                    <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
+                        <p v-html="cabecalho"></p>
+                    </div>
+                </v-expand-transition>
+            </div>
+
+            <v-card class="my-5">
+                <v-card-text>
+                    <div class="form">
+                        <v-text-field
+                            variant="outlined"
+                            density="compact"
+                            label="Busca"
+                            append-inner-icon="mdi-magnify"
+                            v-model.trim="search"
+                            @keydown.enter="filterJustArt(search.replace(/[^0-9]/g,''))"
+                            :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                        ></v-text-field>
+                    </div>
+                    <div v-if="suggestArtBtn">
+                        <v-chip 
+                            @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                            >
+                            Art. {{search.replace(/[^0-9]/g,'')}}
+                        </v-chip>
+                    </div>
+                    <div>
+                        <v-chip-group
+                            v-if="artsFilterActive"
+                        >
+                            <v-chip 
+                                @click="pageFilter(false)" 
+                                variant="text" v-if="artsFilter.length == 1"
+                                exact-active-class="0"
+                            >
+                                <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+                            </v-chip>
+                            <v-chip
+                                v-for=" tag in artsFilter" :key="tag"
+                                @click:close="artFilterRemove(tag)"
+                                closable
+                                >
+                                    art. {{tag}}
+                            </v-chip>
+                            <v-btn 
+                                variant="text" 
+                                @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                Limpar Filtro
+                            </v-btn>
+                            <v-chip 
+                                @click="pageFilter(true)" 
+                                variant="text" v-if="artsFilter.length == 1">
+                                    <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+                            </v-chip>
+                        </v-chip-group>
+                    </div>
+                </v-card-text>
+            </v-card>
+
+            <Pagination :totalPage="totalPage" :pagination="pagination" />
+
+            <div class="bg-white">
+                <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
+                        <TextDispositivo :dispositivo="item" />
                 </div>
             </div>
+
+            <Pagination :totalPage="totalPage" :pagination="pagination" />
            
         </div>
     </section>
 </template>
 
 <script>
+    import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
+    import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
     import api from "@/services/api"
 
     export default {
@@ -35,8 +103,32 @@
                 part1: '',
                 keyEstrutura: false,
                 orderEstrutura: 1000,
-                textWork: []
+                textWork: [],
+                hiddenCabecalho: false,
+                search: null,
+                artsFilterActive: false, 
+                textLaw:{
+                    size: 0
+                },
+                pagination:{
+                    page: 1,
+                    perPage: 15
+                },
+                artIndice: null,
+                artsFilter: []
             }
+        },
+        components:{
+            TextDispositivo, Pagination
+        },
+        watch:{
+            'pagination.perPage': {
+                handler(newVal, oldVal) {
+                    this.pagination.page = 1
+                },
+                deep: true
+            },
+            search(ante, depois) { this.pagination.page = 1 }
         },
         computed:{
             textoInicital(){
@@ -263,6 +355,74 @@
                 });
                 return novoArray
             },
+            listTextLaw(){
+                let list = this.listFinal
+
+                if(this.search){
+                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                    //retirar caracteres especiais
+                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+                    //fazer o filtro
+                    let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+                    list = filtro
+                } 
+
+                if(this.artsFilterActive){
+                    let novoFiltro = []
+
+                    if(this.artsFilter.length){
+                        list.forEach(item => {
+                            this.artsFilter.forEach( art => {
+                                if(art == item.art){
+                                    novoFiltro.push(item)
+                                }
+                            })
+                        })
+                    }
+                    list = novoFiltro
+                }
+
+                let page = this.pagination.page - 1
+                let start = page * this.pagination.perPage
+                let end = start + this.pagination.perPage
+
+                return list.slice(start, end)
+
+            },
+            totalPage(){
+                let total = this.listFinal.length
+
+                if(this.search){
+                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                    //retirar caracteres especiais
+                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+                    //fazer o filtro
+                    let filtro =  this.listFinal.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+                    total = filtro.length
+                } 
+
+                if(this.artsFilterActive){
+                    let novoFiltro = []
+
+                    if(this.artsFilter.length){
+                        this.listFinal.forEach(item => {
+                            this.artsFilter.forEach( art => {
+                                if(art == item.art){
+                                    novoFiltro.push(item)
+                                }
+                            })
+                        })
+                    }
+                    total = novoFiltro.length
+                }
+
+                return Math.ceil(total/this.pagination.perPage)
+            },
+            cabecalho(){
+                return this.textoInicital.textoincial.join('<br>')
+            },
             divisores(){
                 return ['art.', 'livro'];
             },
@@ -283,6 +443,17 @@
             },
             referencias(){
                 return this.arrayEstrturaONly.concat(this.arrayTextLawEstrutura)
+            },
+            lastArt(){
+                const law = this.listFinal
+                const lastArt = law[law.length -1]
+                return lastArt.art
+            },
+            suggestArtBtn(){
+                if(this.search){
+                    return !!this.search.replace(/[^0-9]/g,'')
+                }
+                return false
             }
         },
         methods:{
@@ -313,7 +484,53 @@
             },
             voltar(){
                 this.$router.push("/leges");
-            }
+            },
+            filterJustArt(search){
+                console.log(search)
+            },
+            filterJustArt(art){     
+                if(art <= this.lastArt){
+                    this.artIndice = ''
+                    this.search = ''
+                    let findArt = this.artsFilter.find( x => x == art ) 
+                    if(!findArt){
+                        art > 0 ? this.artsFilter.push(art) : console.log('artigo não existe')
+                    }
+                    
+                    if(this.artsFilter.length > 0) {
+                        this.artsFilterActive = true
+                    } else {
+                        this.artsFilterActive = false
+                    } 
+                } else {
+                    console.log('artigo não existe')
+                }
+                console.log(this.artsFilter)
+            },  
+            clearAllArtsFilter(){
+                this.artsFilter = []
+                this.artsFilterActive = false
+            },
+            artFilterRemove(art){
+                let artRemove = this.artsFilter.findIndex( i => i == art)
+                this.artsFilter.splice(artRemove, 1)
+                
+                if(!this.artsFilter.length > 0) {
+                    this.artsFilterActive = false
+                }
+            },
+            pageFilter(item){
+                let art = this.artsFilter[0]
+                if(item) {
+                    art == this.lastArt ? art : art++  
+                  
+                } else {
+                  art == 1 ? art : art--
+                }   
+                this.artsFilter = []
+                this.artsFilter.push(art)
+                console.log(art);
+            },
         },
         created(){
             this.getAll()
@@ -335,6 +552,14 @@ section {
     margin: 2rem;
     font-size: 15px;
     line-height: 2.1em
+}
+.form{
+    width: 50%;
+}
+@media (max-width:900px){
+    .form{
+        width: 100%;
+    }
 }
 @media print {
     .btn {
