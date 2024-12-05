@@ -31,6 +31,7 @@
                             v-model.trim="search"
                             @keydown.enter="filterJustArt(search.replace(/[^0-9]/g,''))"
                             :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                            clearable
                         ></v-text-field>
                     </div>
                     <div v-if="suggestArtBtn">
@@ -52,7 +53,7 @@
                                 <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
                             </v-chip>
                             <v-chip
-                                v-for=" tag in artsFilter" :key="tag"
+                                v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
                                 @click:close="artFilterRemove(tag)"
                                 closable
                                 >
@@ -77,13 +78,28 @@
 
             <div class="bg-white">
                 <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
-                        <TextDispositivo :dispositivo="item" />
+                        <TextDispositivo :dispositivo="item" :search="search" />
                 </div>
             </div>
 
             <Pagination :totalPage="totalPage" :pagination="pagination" />
            
         </div>
+        <v-snackbar
+                v-model="snack.snackbar"
+                :timeout="snack.timeout"
+            >
+                {{ snack.text }}
+                <template v-slot:actions>
+                    <v-btn
+                    color="blue"
+                    variant="text"
+                    @click="snack.snackbar = false"
+                    >
+                    X
+                    </v-btn>
+                </template>
+            </v-snackbar>
     </section>
 </template>
 
@@ -115,7 +131,12 @@
                     perPage: 15
                 },
                 artIndice: null,
-                artsFilter: []
+                artsFilter: [],
+                snack: {
+                    snackbar: false,
+                    text: 'Nova página adicionada ao documento.',
+                    timeout: 2000
+                },
             }
         },
         components:{
@@ -485,16 +506,13 @@
             voltar(){
                 this.$router.push("/leges");
             },
-            filterJustArt(search){
-                console.log(search)
-            },
             filterJustArt(art){     
                 if(art <= this.lastArt){
                     this.artIndice = ''
                     this.search = ''
                     let findArt = this.artsFilter.find( x => x == art ) 
                     if(!findArt){
-                        art > 0 ? this.artsFilter.push(art) : console.log('artigo não existe')
+                        art > 0 ? this.artsFilter.push(art) : this.snackAction()
                     }
                     
                     if(this.artsFilter.length > 0) {
@@ -503,10 +521,16 @@
                         this.artsFilterActive = false
                     } 
                 } else {
-                    console.log('artigo não existe')
+                    this.snackAction()
                 }
-                console.log(this.artsFilter)
             },  
+            snackAction(){
+                this.snack = {
+                    snackbar: true,
+                    text: 'Artigo nâo encontrado.',
+                    timeout: 2000
+                }
+            },
             clearAllArtsFilter(){
                 this.artsFilter = []
                 this.artsFilterActive = false
@@ -529,7 +553,6 @@
                 }   
                 this.artsFilter = []
                 this.artsFilter.push(art)
-                console.log(art);
             },
         },
         created(){
