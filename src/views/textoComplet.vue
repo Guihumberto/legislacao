@@ -9,6 +9,7 @@
         </div>
         <div class="container" v-else>
             <v-btn variant="tonal" @click="voltar" class="mb-2 btn">Voltar</v-btn>
+            <v-btn variant="tonal" @click="$router.push(`/avancado/${id}`)" class="mb-2 ml-2 btn" color="primary">MODO AVANÇADO</v-btn>
             <div class="border pa-5 mb-2 bg-white pagina" v-for="item, i in listPage" :key="i">
                 <div class="font-weight-bold d-flex justify-space-between header">
                     <p>{{ item.page_to_norma.title }} | {{ item.ano }}</p> 

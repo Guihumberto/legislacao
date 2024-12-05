@@ -1,10 +1,10 @@
 <template>
-     <v-tooltip :text="lawFav.fav ? 'Desfavoritar a Norma' : 'Favoritar a Norma'">
+     <v-tooltip width="200" :text="lawFav.fav ? 'Dê dois cliques para desfavoritar a Norma' : 'Dê dois cliques para favoritar a Norma'">
         <template v-slot:activator="{ props }">
             <div  v-bind="props">
                 <p 
                     @dblclick="saveFavoritos()"
-                    class="d-flex align-center">{{ law._source.page_to_norma.title }} 
+                    class="d-flex align-center"> <span class="destaqueTitle">{{ law._source.page_to_norma.title }} </span>
                     <v-icon class="favoritar" v-if="lawFav.fav" color="primary">mdi-star</v-icon>
                 </p> 
             </div>
@@ -108,6 +108,15 @@
 .favoritar{
     font-size: 1.2rem;
     animation: aumentar 1s ease;
+}
+.destaqueTitle{
+    transition: .4s ease-in-out;
+    padding: 1px 5px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.destaqueTitle:hover{
+    background: rgb(164, 212, 227);
 }
 @keyframes aumentar {
     from{

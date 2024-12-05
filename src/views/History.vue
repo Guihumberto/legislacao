@@ -14,21 +14,26 @@
                     :rules="[rules.required]"
                 ></v-text-field>
             </v-form>
-            <v-card>
-                <v-list>
-                    <v-list-item v-for="item, i in areaUserStore.readHistoricoFormatdo" :key="i">
-                        <h3 class="font-weight-bold">{{ formateDateTitle(item.date) }}</h3>
-                        <v-list class="mx-0 px-0">
-                            <v-list-item v-for="a, ai in item.agg" class="py-0" :key="ai" link @click.stop="goToSearch(a)">
-                                <small class="mr-5">{{ getHours(a.date) }}</small> {{ a.text_search }}
-                                <template v-slot:append>
-                                    <MoreDetailSearch :search="a" />
-                                </template>
-                            </v-list-item>
-                        </v-list>
-                    </v-list-item>
-                </v-list>
-            </v-card>
+            <v-alert v-if="areaUserStore.readLoad">Aguarde....</v-alert>
+            <div v-else>
+                <v-card v-if="areaUserStore.readHistoricoFormatdo.length">
+                    <v-list>
+                        <v-list-item v-for="item, i in areaUserStore.readHistoricoFormatdo.sort((a,b) => b.date - a.date )" :key="i">
+                            <h3 class="font-weight-bold">{{ formateDateTitle(item.date) }}</h3>
+                            <v-list class="mx-0 px-0">
+                                <v-list-item v-for="a, ai in item.agg" class="py-0" :key="ai" link @click.stop="goToSearch(a)">
+                                    <small class="mr-5">{{ getHours(a.date) }}</small> {{ a.text_search }}
+                                    <template v-slot:append>
+                                        <MoreDetailSearch :search="a" />
+                                    </template>
+                                </v-list-item>
+                            </v-list>
+                        </v-list-item>
+                    </v-list>
+                </v-card>
+                <v-alert v-else type="warning" variant="outlined" text="Não há histórico salvo no momento."></v-alert>
+            </div>
+            
         </div>
     </section>
 </template>

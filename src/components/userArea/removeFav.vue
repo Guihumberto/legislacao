@@ -21,25 +21,39 @@
           </v-list-item>
         </v-list>
       </v-menu>
+      <ComfirmDelete :doc="id" />
   </template>
   
   <script setup>
+    import { provide, ref, watch } from 'vue';
+    
+    import ComfirmDelete from './comfirmDelete.vue';
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
     const userAreaStore = useUserAreaStore()
-    
+  
     const items = ([
          { title: 'Excluir' }
     ])
+
+    const dialog = ref(false)
+    const confirmacao = ref(false)
+
+    provide('dialog', dialog)
+    provide('confirmacao', confirmacao)
 
     const props = defineProps({
         id: Object
     })
 
     const removeFav = () => {
-        props.id.fav = false
-        userAreaStore.saveFavoritos(props.id)
+        dialog.value = true
     } 
+
+    watch(confirmacao, (newConfirm) => {
+       props.id.fav = false
+       userAreaStore.saveFavoritos(props.id)
+    })
 
 
   </script>

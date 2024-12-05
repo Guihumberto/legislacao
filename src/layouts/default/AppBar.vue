@@ -6,7 +6,7 @@
           <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2" :disabled="!isLogin" title="Necessário estar logado."></v-app-bar-nav-icon>
           <!-- <img class="img_flag" src="../../assets/flagma.png" /> -->
           <!-- <v-icon>mdi-script-text</v-icon> -->
-          <span class="gov">LEGISLAÇÃO</span>
+          <router-link to="/leges" class="linkinitial">LEGISLAÇÃO</router-link>
         </h6>
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
@@ -155,6 +155,9 @@ header{
 header h1{
   font-weight: 700;
   font-size: 2rem;
+}
+.linkinitial{
+  color: #fff;
 }
 .menu {
   position: fixed;

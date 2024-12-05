@@ -22,22 +22,29 @@
         </v-list>
       </v-menu>
       <v-dialog
-          v-model="dialog"
+          v-model="dialog2"
           activator="parent"
           max-width="1080"
       >
         <DocumentOpen :docs="document" />
     </v-dialog>
+    <ComfirmDelete :doc="document" />
   </template>
   
   <script setup>
-    import { ref } from 'vue';
+    import { ref, provide, watch } from 'vue';
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
     import DocumentOpen from './documentOpen.vue';
+    import ComfirmDelete from './comfirmDelete.vue';
     const userAreaStore = useUserAreaStore()
 
+    const dialog2 = ref(false)
     const dialog = ref(false)
+    const confirmacao = ref(false)
+
+    provide('dialog', dialog)
+    provide('confirmacao', confirmacao)
     
     const items = ([
          {id:1, title: 'Abrir Documento' },
@@ -50,14 +57,18 @@
 
     const actions = (action) => {
         if(action == 2) {
-          props.document.active = false
-          userAreaStore.removeDoc(props.document)
+          dialog.value = true
         }
 
         if(action == 1) {
-          dialog.value = true
+          dialog2.value = true
         }
     } 
+
+    watch(confirmacao, (newConfirm) => {
+      props.document.active = false
+      userAreaStore.removeDoc(props.document)
+    })
 
 
   </script>

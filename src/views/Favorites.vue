@@ -54,6 +54,7 @@
                 </v-list>
             </v-card>
             <v-alert v-else type="warning" variant="outlined" text="Não há normativos favoritados"></v-alert>
+           
         </div>
     </section>
 </template>
@@ -68,6 +69,7 @@
 
     import AddFolderFavortite from '@/components/userArea/addFolderFavortite.vue';
     import RemoveFav from '@/components/userArea/removeFav.vue';
+
 
     const goTo = (item) => {
 

@@ -44,6 +44,11 @@ const routes = [
         component: () => import('@/views/textoComplet.vue'),
       },
       {
+        path: '/avancado/:id',
+        name: 'Avancado',
+        component: () => import('@/views/textoAvancado.vue'),
+      },
+      {
         path: '/textTimeLine/:id',
         name: 'TimeLine',
         component: () => import('@/views/textoTimeLine.vue'),
