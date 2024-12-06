@@ -1,7 +1,9 @@
 <template>
     <div>
-        <p :class="dispositivo.estrutura ? 'estrutura': ''"
-            v-html="dispositivo.textlaw.startsWith('Art') ?  `<b>${dispositivo.textlaw.substr(0, 4)}</b> ${markSearch(dispositivo.textlaw.substr(4))}` : markSearch(dispositivo.textlaw)">
+        <p 
+            :class="dispositivo.estrutura ? 'estrutura': ''"
+            :title="`Artigo ${dispositivo.art}`"
+            v-html="highlightText(dispositivo)">
         </p>
     </div>
 </template>
@@ -14,14 +16,31 @@
         search: String
     })
 
-    const markSearch = (item) => {
+    const highlightText = (text) => {
         if(props.search) {
-            let termoPesquisado = props.search.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-            let pattern = new RegExp(termoPesquisado,"gi");
+            const normalize = str => 
+            str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            
+            const normalizedText = normalize(text.textlaw);
+            const normalizedKeyword = normalize(props.search);
+            const regex = new RegExp(`(${normalizedKeyword})`, 'gi');
+            
+            let highlightedText = normalizedText.replace(regex, '<mark>$1</mark>');
     
-            return item.replace(pattern, match => `<mark>${match}</mark>`);
+            if(text.textlaw.startsWith('Art')) {    
+                highlightedText = `<b>${highlightedText.substr(0, 4)}</b> ${highlightedText.substr(4)}`
+            } 
+            else {
+                highlightedText = ` (art. ${text.art}º), ${highlightedText}`
+            }
+    
+            return highlightedText;
         } else {
-            return item
+            if(text.textlaw.startsWith('Art')){
+                return `<b>${text.textlaw.substr(0, 4)}</b> ${text.textlaw.substr(4)}`
+            } else {
+                return text.textlaw
+            }
         }
     }
     
