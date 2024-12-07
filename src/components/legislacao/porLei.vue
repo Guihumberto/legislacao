@@ -59,6 +59,8 @@
                         ></v-autocomplete>
                     </div>
                 </div>
+                <SearchLaw :search="search.text" />
+                <MainLaws />
                 <div class="d-flex justify-end">
                     <small>Total de normas: {{ totalLaws }} com {{ totalPages }} páginas</small>
                 </div>
@@ -111,11 +113,12 @@
 
     import help from "./dialogs/help.vue"
     import menuOpt from "./elements/menu.vue"
-    import contador from "@/components/legislacao/elements/contador.vue"
+    import MainLaws from './searchLaw/mainLaws.vue'
+import SearchLaw from './searchLaw/searchLaw.vue'
     
     export default {
         components:{
-            help, menuOpt, contador
+            help, menuOpt, MainLaws, SearchLaw
         },
         data(){
             return{ 

@@ -905,6 +905,15 @@
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
                                     query: {
+                                        // "multi_match": {
+                                        //     "query": this.search.text,
+                                        //         "fields": [
+                                        //             "text_page^2",
+                                        //             "page_to_norma.title",
+                                        //             "tipo"
+                                        //         ]
+                                        //     }
+
                                         match: {
                                             "text_page": {
                                                 "query": this.search.text,
