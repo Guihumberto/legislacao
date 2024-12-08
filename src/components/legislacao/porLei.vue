@@ -21,45 +21,50 @@
             </div>
             <div class="legislacao  my-5" v-else>
                 <div class="content">
-                    <v-text-field
-                        label="Buscar"
-                        placeholder="Digite o nome ou número da norma"
-                        variant="outlined"
-                        density="compact"
-                        prepend-inner-icon="mdi-magnify"
-                        v-model.trim="search.text"
-                        clearable
-                    ></v-text-field>
-                    <div class="autocompletes">
-                        <v-autocomplete
-                            clearable
-                            chips
-                            label="Fonte"
-                            density="compact"
-                            :items="fontes"
-                            item-value="nome"
-                            item-title="mudar"
-                            multiple
+                    <v-form @submit.prevent="searchForLaw()" ref="form">
+                        <v-text-field
+                            label="Buscar"
+                            placeholder="Digite o nome ou número da norma"
                             variant="outlined"
-                            v-model="search.fonte"
-                            closable-chips
-                            prepend-inner-icon="mdi-alpha-f-box"
-                        ></v-autocomplete>
-                        <v-autocomplete
-                            prepend-inner-icon="mdi-calendar"
-                            clearable
-                            chips
-                            label="Período"
                             density="compact"
-                            :items="periodo"
-                            multiple
-                            variant="outlined"
-                            v-model="search.years"
-                            closable-chips
-                        ></v-autocomplete>
-                    </div>
+                            prepend-inner-icon="mdi-magnify"
+                            v-model.trim="search.text"
+                            clearable
+                        ></v-text-field>
+                        <div class="autocompletes">
+                            <v-autocomplete
+                                clearable
+                                chips
+                                label="Fonte"
+                                density="compact"
+                                :items="fontes"
+                                item-value="nome"
+                                item-title="mudar"
+                                multiple
+                                variant="outlined"
+                                v-model="search.fonte"
+                                closable-chips
+                                prepend-inner-icon="mdi-alpha-f-box"
+                            ></v-autocomplete>
+                            <v-autocomplete
+                                prepend-inner-icon="mdi-calendar"
+                                clearable
+                                chips
+                                label="Período"
+                                density="compact"
+                                :items="periodo"
+                                multiple
+                                variant="outlined"
+                                v-model="search.years"
+                                closable-chips
+                            ></v-autocomplete>
+                        </div>
+                        <div class="text-right">
+                            <v-btn color="success" variant="flat" type="submit">Buscar</v-btn>
+                        </div>
+                    </v-form>
                 </div>
-                <SearchLaw :search="search.text" />
+                <SearchLaw :resultsSearch="resultsSearch" :load="loadSearch" />
                 <MainLaws />
                 <div class="d-flex justify-end">
                     <small>Total de normas: {{ totalLaws }} com {{ totalPages }} páginas</small>
@@ -95,6 +100,9 @@
                     <v-alert variant="tonal" type="warning" v-else>
                         <p>Carregando...</p>
                     </v-alert>
+                    <div class="text-right mt-5">
+                        <v-btn :loading="readLoad" @click="changeNroLaws()" variant="flat" color="primary">baixar todas</v-btn>
+                    </div>
                 </div>
             </div>
         </div>
@@ -102,6 +110,7 @@
 </template>
 
 <script>
+    import api from "@/services/api"
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
 
@@ -114,7 +123,7 @@
     import help from "./dialogs/help.vue"
     import menuOpt from "./elements/menu.vue"
     import MainLaws from './searchLaw/mainLaws.vue'
-import SearchLaw from './searchLaw/searchLaw.vue'
+    import SearchLaw from './searchLaw/searchLaw.vue'
     
     export default {
         components:{
@@ -131,8 +140,10 @@ import SearchLaw from './searchLaw/searchLaw.vue'
                     required: (value) => !!value || "Campo obrigatório",
                     minname: (v) => (v||'').length >= 4 || "Mínimo 4 caracteres",
                 },
-                load: false,
+                loadSearch: false,
                 reverse: false,
+                resultsSearch: [], 
+                load: false
             }
         },
         props:{
@@ -207,9 +218,41 @@ import SearchLaw from './searchLaw/searchLaw.vue'
             },
             totalPages(){
                 return consultaStore.readTotalPages
-            } 
+            },
+            readLoad(){
+                return lawStore.readLoad
+            }
         },
         methods:{
+            async searchForLaw(){
+                this.resultsSearch = []
+                this.loadSearch = true
+                try {
+                    const response = await api.post("laws_v3/_search", {
+                        from: 0,
+                        size: 5,
+                        query:{
+                            multi_match:{
+                                "query": this.search.text,
+                                "fields":[
+                                    "title^2",
+                                    "description_norm^1",
+                                    "tipo"
+                                ],
+                                "type": "cross_fields"
+                            }
+                        }
+                    })
+                    this.resultsSearch = response.data.hits.hits;
+                } catch (error) {
+                    console.log("erro searchForLaw");
+                } finally{
+                    this.loadSearch = false
+                }
+            },
+            async changeNroLaws(){
+                lawStore.changeNroLaws()
+            },
             nomeTipo(item){
                 let nome = generalStore.fonteNome(item)
                 return nome.mudar

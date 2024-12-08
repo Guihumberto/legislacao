@@ -5,7 +5,8 @@ export const useLawStore = defineStore("Law", {
     state: () => ({
         listAllLaws: [],
         load: false,
-        totalLaws: 0
+        totalLaws: 0,
+        nroLaws: 500
     }),
     getters: {
         readListAllLaws(){
@@ -24,7 +25,7 @@ export const useLawStore = defineStore("Law", {
                 this.load = true
                 const response = await api.post("laws_v3/_search", {
                     from: 0,
-                    size: 7915
+                    size: this.nroLaws
                 })
                 this.listAllLaws = response.data.hits.hits
                 this.totalLaws = response.data.hits.total.value
@@ -33,6 +34,10 @@ export const useLawStore = defineStore("Law", {
             }finally{
                 this.load = false
             }
+        },
+        changeNroLaws(){
+            this.nroLaws = 4000
+            this.getAllLaw()
         }
     }
 })
