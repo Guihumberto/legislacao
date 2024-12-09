@@ -34,6 +34,21 @@ const routes = [
         component: () => import('@/views/About.vue'),
       },
       {
+        path: '/importar',
+        name: 'Ingestão',
+        component: () => import('@/views/AdmImportar.vue'),
+      },
+      {
+        path: '/laws',
+        name: 'Normas',
+        component: () => import('@/views/AdmLaws.vue'),
+      },
+      {
+        path: '/users',
+        name: 'Usuários',
+        component: () => import('@/views/AdmUsers.vue'),
+      },
+      {
         path: '/leges',
         name: 'Legislacao',
         component: () => import('@/views/Legislacao.vue'),

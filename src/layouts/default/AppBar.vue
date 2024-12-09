@@ -50,10 +50,10 @@
   </header>
   <menu-bar @menu="menu = !menu" class="menu" v-if="menu" id="menu"  />
     <v-navigation-drawer
-              v-model="drawer"
-              temporary
-          >
-              <sidebarleft />
+        v-model="drawer"
+        temporary
+    >
+        <sidebarleft />
     </v-navigation-drawer>
     <v-navigation-drawer 
       location="left"
