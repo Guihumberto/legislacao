@@ -16,9 +16,9 @@ export const useLawStore = defineStore("Law", {
         lawsListConfigAdm: [],
         totalLawsListConfigAdm: 0,
         search:{
-            text: '2024',
-            tipo: ['leis-estaduais', 'portarias'],
-            ano: [2024],
+            text: '',
+            fonte: [],
+            years: [],
             sigiloso: false, 
             revogado: false,
             eficaz: true
@@ -64,7 +64,63 @@ export const useLawStore = defineStore("Law", {
             this.nroLaws = 4000
             this.getAllLaw()
         },
-        async getLawsAdmConfig(){
+        searchform(item){
+            this.search = { ...item }
+            if(!this.search.text && !this.search.fonte.length && !this.search.years.length){
+                this.initSearch()
+                this.search.revogado = item.revogado
+                this.search.sigiloso = item.sigiloso
+                this.search.eficaz = item.eficaz
+                this.getLawsAdmConfig()
+                return
+            } 
+            if(this.search.text && !this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig1()
+            if(this.search.text && this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig2()
+            if(this.search.text && this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig3()
+            if(this.search.text && !this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig4()
+            if(!this.search.text && this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig5()
+            if(!this.search.text && !this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig6()
+            if(!this.search.text && this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig7()
+        },
+        async getLawsAdmConfig1(){
+            console.log('teste 1');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "title": this.search.text
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig2(){
+            console.log('teste 2');
             try {
                 this.load = true
                 const response = await api.post("laws_v3/_search", {
@@ -80,12 +136,22 @@ export const useLawStore = defineStore("Law", {
                                 },
                                 {
                                     "terms": {
-                                        "tipo": this.search.tipo
+                                        "tipo": this.search.fonte
                                     }
                                 },
                                 {
                                     "terms": {
-                                        "ano": this.search.ano
+                                        "ano": this.search.years
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
                                     }
                                 }
                             ]
@@ -100,9 +166,247 @@ export const useLawStore = defineStore("Law", {
                 this.load = false
             }
         },
-        searchform(item){
-            this.search.text = item.text
-            this.getLawsAdmConfig()
+        async getLawsAdmConfig3(){
+            console.log('teste 3');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "title": this.search.text
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "tipo": this.search.fonte
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig4(){
+            console.log('teste 4');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "title": this.search.text
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "ano": this.search.years
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig(){
+            console.log('teste');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig5(){
+            console.log('teste 2');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "tipo": this.search.fonte
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "ano": this.search.years
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig6(){
+            console.log('teste 2');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "ano": this.search.years
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getLawsAdmConfig7(){
+            console.log('teste 2');
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "tipo": this.search.fonte
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        initSearch(){
+            this.search = {
+                text: '',
+                fonte: [],
+                years: [],
+                sigiloso: false, 
+                revogado: false,
+                eficaz: true
+            }
         }
     }
 })

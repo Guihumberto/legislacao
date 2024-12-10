@@ -32,6 +32,7 @@
                     density="compact"
                     hide-details
                     color="success"
+                    v-model="teste"
                ></v-switch>
             </template>
             
@@ -40,9 +41,11 @@
 </template>
 
 <script setup>
+    import { onMounted, ref } from 'vue';
     import { useLawStore } from '@/store/LawsStore';
-    import { onMounted } from 'vue';
     const lawStore = useLawStore()
+
+    const teste = ref(true)
 
     onMounted(() => {
         lawStore.getLawsAdmConfig()

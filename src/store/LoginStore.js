@@ -17,11 +17,19 @@ export const useLoginStore = defineStore("loginStore", {
             apelido: null,
             firstLogin: false,
             dateFirstLogin: null
-        }
+        },
+        listUsers: [],
+        load: false
     }),
     getters: {
         readLogin(){
             return this.login
+        },
+        readListUsers(){
+            return this.listUsers
+        },
+        readLoad(){
+            return this.load
         }
     },
     actions:{
@@ -45,6 +53,39 @@ export const useLoginStore = defineStore("loginStore", {
                 apelido: null,
                 firstLogin: false,
                 dateFirstLogin: null
+            }
+        },
+        getUsers(){
+            this.load = true
+            try {
+                const users = [ 'Maria', 'José', 'João', 'Roberto', 'Pedro']
+                this.listUsers = [ ...users ]
+                
+            } catch (error) {
+                console.log('erro ao carregar usuários');
+            } finally {
+                this.load = false
+            }
+        },
+        addUser(item){
+            this.load = true
+            try {
+                this.listUsers.push(item)
+            } catch (error) {
+                console.log('erro ao add user');
+            } finally {
+                this.load = false
+            }
+           
+        },
+        editUser(){
+            this.load = true
+            try {
+                this.listUsers.push(item)
+            } catch (error) {
+                console.log('erro ao edit user');
+            } finally {
+                this.load = false
             }
         }
     }
