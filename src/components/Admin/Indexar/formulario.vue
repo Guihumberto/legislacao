@@ -20,7 +20,7 @@
                 Ano: 2020<br>
                 Fonte: Lei Estadual<br>
                 Total de página: 55 <br>
-                <router-link to="text/"></router-link>
+                <router-link to="text/">Ira para norma</router-link>
             </div>
             <div class="mt-5">
                 <v-btn variant="text" color="primary" class="pa-0" @click="clear()">Limpar</v-btn>

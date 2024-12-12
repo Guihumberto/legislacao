@@ -59,7 +59,8 @@
               { text: 'Início', icon: 'mdi-home', url:'/leges' },
               { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
               { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
-              { text: 'Histórico', icon: 'mdi-history', url:'/history' }
+              { text: 'Histórico', icon: 'mdi-history', url:'/history' },
+              { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' }
     ])
 
     const adms = ref([

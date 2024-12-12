@@ -104,11 +104,25 @@ const routes = [
         component: () => import('@/views/Documents.vue'),
       },
       {
+        path: '/blog',
+        name: 'Blog',
+        component: () => import('@/views/Blog.vue'),
+      },
+      {
+        path: '/myposts',
+        name: 'Meus Posts',
+        component: () => import('@/views/MyPosts.vue'),
+      },
+      {
+        path: '/myposts/create',
+        name: 'Criar Post',
+        component: () => import('@/views/MyPostCreate.vue'),
+      },
+      {
         path: '/:pathMatch(.*)*', // Captura todas as rotas não definidas
         name: 'NotFound',
         component: () => import('@/views/NotFound.vue'),
       },
-      
     ],
   },
   {
