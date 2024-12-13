@@ -1,5 +1,4 @@
 <template>
-    <div class="text-center">
       <v-menu location="top">
         <template v-slot:activator="{ props }">
           <v-btn density="compact" variant="text" icon="mdi-dots-vertical" v-bind="props"></v-btn>
@@ -9,6 +8,7 @@
             v-for="(item, index) in items"
             :key="index"
             link
+             @click="actions(item.id)"
           >
             <template v-slot:prepend>
                 <v-icon>
@@ -19,23 +19,43 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </div>
+      <ComfirmDelete :doc="document" />
   </template>
-  <script>
-    export default {
-      data: () => ({
-        items: [
-          { title: 'Editar', icon: 'mdi-pencil'},
-          { title: 'Excluir', icon: 'mdi-delete' },
-        ],
-        locations: [
-          'top',
-          'bottom',
-          'start',
-          'end',
-          'center',
-        ],
-        location: 'end',
-      }),
-    }
+  <script setup>
+        import ComfirmDelete from '@/components/userArea/comfirmDelete.vue';
+        import { ref, provide, watch } from 'vue';
+
+        const items = [
+          { id:1, title: 'Editar', icon: 'mdi-pencil'},
+          { id:2, title: 'Excluir', icon: 'mdi-delete' },
+        ]
+
+        const dialog = ref(false)
+        const confirmacao = ref(false)
+
+        provide('dialog', dialog)
+        provide('confirmacao', confirmacao)
+
+        const props = defineProps({
+            document: true
+        })
+
+        const actions = (action) => {
+              if(action == 2) {
+                dialog.value = true
+              }
+
+              if(action == 1) {
+                // dialog2.value = true
+                console.log('editar')
+              }
+        } 
+
+        const emit = defineEmits(['apagarRef', 'apagarRefDoc'])
+
+        watch(confirmacao, (newConfirm) => {
+          if(typeof props.document === 'string') emit("apagarRef", props.document)
+          if(typeof props.document === 'object') emit("apagarRefDoc", props.document)
+        })
+
   </script>

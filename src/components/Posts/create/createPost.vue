@@ -26,7 +26,7 @@
                 </v-btn>
                <v-expand-transition>
                    <div v-if="showref">
-                    <v-btn prepend-icon="mdi-link" variant="outlined" class="text-lowercase" >incluir a partir dos meus documentos</v-btn>
+                    <DialogListDocs @enviarDocRef="saveDocRef" />
                     <v-form @submit.prevent="addRef()" ref="formref">
                         <v-text-field
                             label="Referência"
@@ -56,10 +56,31 @@
                                 </v-icon>
                             </template>
                             <template v-slot:append>
-                                <OptionsRef />
+                                <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef" />
                             </template>
                             <div>
-                                <span class="font-weight-bold">Title</span> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maxime quod doloremque consecte
+                                {{ item }}
+                            </div>
+                            </v-list-item>
+                        </v-list>
+                    </div>
+                    <div class="listref mt-5" v-if="post.refdoc.length">
+                        <div class="d-flex align-center">
+                            <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                            <h3>Lista de Referências (documentos)</h3>
+                        </div>
+                        <v-list class="pa-0 mt-5">
+                            <v-list-item v-for="item, i in post.refdoc" :key="i" class="border-b" link>
+                            <template v-slot:prepend>
+                                <v-icon>
+                                    mdi-note-text-outline
+                                </v-icon>
+                            </template>
+                            <template v-slot:append>
+                                <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef"  />
+                            </template>
+                            <div>
+                                <span class="font-weight-bold">{{ item.norma }}</span>, pág. {{ item.num_page }}, {{ item.tipo }}, {{ item.ano }}
                             </div>
                             </v-list-item>
                         </v-list>
@@ -87,32 +108,89 @@
                     :rules="[rules.minfield, rules.required]"
                ></v-textarea>
                <div>
+                <v-form @submit.prevent="addRef()" ref="formref">
+                        <v-text-field
+                            label="Referência"
+                            density="compact"
+                            variant="outlined"
+                            class="mt-5"
+                            placeholder="Exemplo: art. 77, do CTE-MA (lei 7.799/2010)"
+                            clearable
+                            v-model="textref"
+                            :rules="[rules.required, rules.minfield]"
+                        >
+                            <template v-slot:append>
+                                <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
+                            </template>
+                        </v-text-field>
+                    </v-form>
+                    <div class="listref" v-if="post.references.length">
+                        <div class="d-flex align-center">
+                            <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                            <h3>Lista de Referências</h3>
+                        </div>
+                        <v-list class="pa-0 mt-5">
+                            <v-list-item v-for="item, i in post.references" :key="i" class="border-b" link>
+                            <template v-slot:prepend>
+                                <v-icon>
+                                    mdi-note-text-outline
+                                </v-icon>
+                            </template>
+                            <template v-slot:append>
+                                <OptionsRef :document="item"  @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef" />
+                            </template>
+                            <div>
+                                {{ item }}
+                            </div>
+                            </v-list-item>
+                        </v-list>
+                    </div>
+                    <div class="listref mt-5" v-if="post.refdoc.length">
+                        <div class="d-flex align-center">
+                            <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                            <h3>Lista de Referências (documentos)</h3>
+                        </div>
+                        <v-list class="pa-0 mt-5">
+                            <v-list-item v-for="item, i in post.refdoc" :key="i" class="border-b" link>
+                            <template v-slot:prepend>
+                                <v-icon>
+                                    mdi-note-text-outline
+                                </v-icon>
+                            </template>
+                            <template v-slot:append>
+                                <OptionsRef :document="item"  @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef" />
+                            </template>
+                            <div>
+                                <span class="font-weight-bold">{{ item.norma }}</span>, pág. {{ item.num_page }}, {{ item.tipo }}, {{ item.ano }}
+                            </div>
+                            </v-list-item>
+                        </v-list>
+                    </div>
+               </div>
+               <v-form @submit.prevent="addTag()" class="form mt-5" ref="tagform">
                    <v-text-field
-                        label="Referências"
+                        label="Tags"
                         placeholder="Digite o título do post"
                         variant="outlined"
-                        v-model="textref"
+                        v-model="tag"
                         density="compact"
                         clearable
-                   ></v-text-field>
-                    <p>lista de referencias</p>
-               </div>
-               <v-text-field
-                    label="Tags"
-                    placeholder="Digite o título do post"
-                    variant="outlined"
-                    v-model="tag"
-                    density="compact"
-                    clearable
-                    style="max-width: 300px;"
-               >
-                    <template v-slot:append>
-                        <v-btn @click="addTag()" density="compact" color="success" icon="mdi-plus"></v-btn>
-                    </template>
-                </v-text-field>
+                        style="max-width: 300px;"
+                        :rules="[rules.required]"
+                   >
+                        <template v-slot:append>
+                            <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
+                        </template>
+                    </v-text-field>
+               </v-form>
                <div v-if="post.tags.length">
                     <v-chip-group>
-                        <v-chip v-for="chip, c in post.tags" :key="c">{{ chip }}</v-chip>
+                        <v-chip 
+                            closable
+                            @click:close="removeTag(chip)"
+                            v-for="chip, c in post.tags" 
+                            :key="c">{{ chip }}
+                        </v-chip>
                     </v-chip-group>
                </div>
                <div class="d-flex justify-end">
@@ -130,7 +208,8 @@
 <script setup>
 import { ref } from 'vue';
 import OptionsRef from './optionsRef.vue';
-import {  useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
+import DialogListDocs from './dialogListDocs.vue';
 const router = useRouter()
 
 const showref = ref(false)
@@ -146,18 +225,18 @@ const post = ref({
     text: null,
     tags: [],
     references: [],
+    refdoc: [],
     publish: false,
 })
 
 const form = ref(null)
-const formref = ref(false)
+const formref = ref(null)
+const tagform = ref(null)
 
 const rules = {
     required: value => !!value || "campo obrigatório", 
     minfield: (v) => (v||'').length >= 3 || "Mínimo 4 caracteres",
 }
-
-const listRef = ref([1])
 
 const addRef = async () => {
         const { valid } = await formref.value.validate()
@@ -167,9 +246,42 @@ const addRef = async () => {
         }
 }
 
-const addTag = () => {
-    post.value.tags.push(tag.value)
-    tag.value = null
+const deleteRef = (item) => {
+    post.value.references = post.value.references.filter( x => x != item)
+}
+
+const saveDocRef = (evento) => {
+    const list = [ ...evento ]
+    list.forEach(x => {
+        const objeto = {
+            idPage: x._id, 
+            idLaw: x._source.page_to_norma.parent,
+            ano: x._source.ano, 
+            num_page: x._source.num_page, 
+            tipo: x._source.tipo, 
+            norma: x._source.page_to_norma.title
+        }
+        post.value.refdoc.push(objeto)
+    })
+    
+}
+
+const deleteDocRef = (item) => {
+    post.value.refdoc = post.value.refdoc.filter( x => x.idPage != item.idPage)
+}
+
+const addTag = async () => {
+    const { valid } = await tagform.value.validate()
+    if(valid){
+        const isExist = post.value.tags.find(x => x == tag.value)
+        if(isExist) return
+        post.value.tags.push(tag.value)
+        tag.value = null
+    }
+}
+
+const removeTag = (c) => {
+    post.value.tags = post.value.tags.filter(x => x != c)
 }
 
 const savePost = async () => {
@@ -183,7 +295,6 @@ const saveText = async () => {
     const { valid } = await form.value.validate()
         if(valid) {
             console.log('salvar', 'voltar');
-
         }
 }
 
@@ -203,9 +314,9 @@ const clear = () => {
 </script>
 
 <style lang="scss" scoped>
-.form{
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-}
+    .form{
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+    }
 </style>
