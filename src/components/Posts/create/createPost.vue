@@ -98,15 +98,7 @@
                 <h2 class="text-h5">{{ post.subtitle }}</h2>
             </div>
             <v-form @submit.prevent="saveText()" ref="form" class="form">
-                 <v-textarea
-                    label="Texto"
-                    placeholder="Escreva o texto"
-                    variant="outlined"
-                    v-model="post.text"
-                    density="compact"
-                    clearable
-                    :rules="[rules.minfield, rules.required]"
-               ></v-textarea>
+               <PageEditor />
                <div>
                 <v-form @submit.prevent="addRef()" ref="formref">
                         <v-text-field
@@ -210,10 +202,11 @@ import { ref } from 'vue';
 import OptionsRef from './optionsRef.vue';
 import { useRouter } from 'vue-router';
 import DialogListDocs from './dialogListDocs.vue';
+import PageEditor from '../pageEditor.vue';
 const router = useRouter()
 
 const showref = ref(false)
-const writeText = ref(false)
+const writeText = ref(true)
 const textref = ref(null)
 const tag = ref('teste')
 
