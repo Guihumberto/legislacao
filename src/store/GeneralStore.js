@@ -35,7 +35,8 @@ export const useGeneralStore = defineStore("General", {
             {nome:"ricms", mudar: "RICMS", sigla:"RICMS"},
             {nome:"pareceres", mudar: "Parecer de 1º inst", sigla:"P1"},
             {nome:"voto_relator", mudar: "Voto Relator", sigla:"VTR"},
-            {nome:"informativos-jurisprudencia", mudar: "Informativos Jurisprudenciais", sigla:"IJP"}
+            {nome:"informativos-jurisprudencia", mudar: "Informativos Jurisprudenciais", sigla:"IJP"},
+            {nome:"diario", mudar: "Diário Oficial", sigla:"DOE"}
         ],
         resultsSearch: [],
         semanticSearchList: []
