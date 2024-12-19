@@ -134,6 +134,40 @@
                                     placeholder="Todo o período"
                                 ></v-autocomplete>
                             </div>
+                            <v-expand-transition>
+                                <div v-if="search.fonte == 'diario'">
+                                    <div class="autocompletes">
+                                        <v-autocomplete
+                                            class="fonteSearch"
+                                            density="compact"
+                                            clearable
+                                            chips
+                                            label="Caderno"
+                                            :items="['Executivo']"
+                                            item-value="nome"
+                                            item-title="mudar"
+                                            multiple
+                                            variant="outlined"
+                                            v-model="search.notebook"
+                                            closable-chips
+                                            placeholder="Todas os Cadernos"
+                                        ></v-autocomplete>
+                                        <v-autocomplete
+                                            class="periodoSearch"
+                                            density="compact"
+                                            clearable
+                                            chips
+                                            label="Estado"
+                                            :items="['Maranhão']"
+                                            multiple
+                                            variant="outlined"
+                                            v-model="search.estado"
+                                            closable-chips
+                                            placeholder="Todo os Estados"
+                                        ></v-autocomplete>
+                                    </div>
+                                </div>
+                            </v-expand-transition>
                         </div>
                     </v-expand-transition>
                     <div class="text-center">
@@ -390,7 +424,9 @@
                     fonte: [],
                     termo: 2,
                     semantic: 1,
-                    precision: false
+                    precision: false,
+                    notebook: 'Executivo',
+                    estado: 'Maranhão'
                 },
                 filtrosavacados: false,
                 searchOn: false,
