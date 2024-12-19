@@ -723,6 +723,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && this.search.fonte.length && this.search.precision && this.search.termo == 2){
                                 console.log("teste 4");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -731,7 +732,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        text_page: {query: this.search.text, operator: "and"}
+                                                        text_page: {query: alterSearch, operator: "and"}
                                                     }
                                                 },
                                                 {
@@ -752,6 +753,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && !this.search.fonte.length && this.search.precision && this.search.termo == 2){
                                 console.log("teste 5");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -760,7 +762,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        text_page: {query: this.search.text, operator: "and"}
+                                                        text_page: {query: alterSearch, operator: "and"}
                                                     }
                                                 },
                                                 {
@@ -776,6 +778,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(!this.search.years.length && this.search.fonte.length && this.search.precision && this.search.termo == 2){
                                 console.log("teste 6");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -784,7 +787,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        text_page: {query: this.search.text, operator: "and"}
+                                                        text_page: {query: alterSearch, operator: "and"}
                                                     }
                                                 },
                                                 {
@@ -800,6 +803,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && this.search.fonte.length && !this.search.precision && this.search.termo == 1){
                                 console.log("teste 7");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -808,7 +812,7 @@
                                             "must": [
                                                 {
                                                     "match_phrase": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
@@ -829,6 +833,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && !this.search.fonte.length && !this.search.precision && this.search.termo == 1){
                                 console.log("teste 8");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -837,7 +842,7 @@
                                             "must": [
                                                 {
                                                     "match_phrase": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
@@ -853,6 +858,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(!this.search.years.length && this.search.fonte.length && !this.search.precision && this.search.termo == 1){
                                 console.log("teste 9");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -861,7 +867,7 @@
                                             "must": [
                                                 {
                                                     "match_phrase": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
@@ -877,6 +883,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && this.search.fonte.length && this.search.precision  && this.search.termo == 1){
                                 console.log("teste 10");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -906,6 +913,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && !this.search.fonte.length && this.search.precision  && this.search.termo == 1){
                                 console.log("teste 11");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -930,6 +938,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(!this.search.years.length && this.search.fonte.length && this.search.precision  && this.search.termo == 1){
                                 console.log("teste 12");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -954,6 +963,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.termo == 2 && !this.search.precision) {
                                 console.log("teste 13");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -986,12 +996,13 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.termo == 2 && this.search.precision){
                                 console.log("teste 14");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
                                     query: {
                                         match: {
-                                            text_page: {query: this.search.text, operator: "and"}
+                                            text_page: {query: alterSearch, operator: "and"}
                                         }
                                     }
                                 })
@@ -999,6 +1010,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.termo == 1 && this.search.precision){
                                 console.log("teste 15");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -1032,6 +1044,7 @@
                                 console.log(response)
                             } else {
                                 console.log("teste 17");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: 0,
                                     size: 100,
