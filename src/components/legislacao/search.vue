@@ -165,6 +165,19 @@
                                             closable-chips
                                             placeholder="Todo os Estados"
                                         ></v-autocomplete>
+                                        <v-autocomplete
+                                            class="periodoSearch"
+                                            density="compact"
+                                            clearable
+                                            chips
+                                            label="Mês"
+                                            :items="['Dezembro']"
+                                            multiple
+                                            variant="outlined"
+                                            v-model="search.mes"
+                                            closable-chips
+                                            placeholder="Todos os Meses"
+                                        ></v-autocomplete>
                                     </div>
                                 </div>
                             </v-expand-transition>
@@ -426,7 +439,8 @@
                     semantic: 1,
                     precision: false,
                     notebook: 'Executivo',
-                    estado: 'Maranhão'
+                    estado: 'Maranhão',
+                    mes: 'Dezembro'
                 },
                 filtrosavacados: false,
                 searchOn: false,
@@ -629,6 +643,7 @@
                             this.load = true
                             if(this.search.years.length && this.search.fonte.length && !this.search.precision && this.search.termo == 2){
                                 console.log("teste 1");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -637,7 +652,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
@@ -658,6 +673,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(this.search.years.length && !this.search.fonte.length && !this.search.precision && this.search.termo == 2){
                                 console.log("teste 2");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -666,7 +682,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
@@ -682,6 +698,7 @@
                                 this.totalDocs = response.data.hits.total.value;
                             } else if(!this.search.years.length && this.search.fonte.length && !this.search.precision && this.search.termo == 2){
                                 console.log("teste 3");
+                                const alterSearch = this.removerAcentos(this.search.text)
                                 const response = await api.post("pages_v2/_search", {
                                     from: this.pagination.inicio,
                                     size: this.pagination.qtd,
@@ -690,7 +707,7 @@
                                             "must": [
                                                 {
                                                     "match": {
-                                                        "text_page": this.search.text
+                                                        "text_page": alterSearch
                                                     }
                                                 },
                                                 {
