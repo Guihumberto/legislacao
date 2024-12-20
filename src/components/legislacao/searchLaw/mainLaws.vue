@@ -1,4 +1,5 @@
 <template>
+  <h5 class="mb-3 text-h6">Acessadas frequentemente</h5>
     <v-row class="mb-5">
       <v-col cols="12" md="4" v-for="item, i in resultsSearch.map(x => x._source)" :key="i">
         <v-card

@@ -163,19 +163,19 @@
                     .filter(i => i != '\n' )
                     .map(item => item.trim())
                 
-                    const divisorIndex = list.findIndex(str => 
-                        this.divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
-                    );
+                const divisorIndex = list.findIndex(str => 
+                    this.divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
+                );
 
-                    if (divisorIndex !== -1) {
-                        const textoincial = list.slice(0, divisorIndex);
-                        const legislacao = list.slice(divisorIndex);
+                if (divisorIndex !== -1) {
+                    const textoincial = list.slice(0, divisorIndex);
+                    const legislacao = list.slice(divisorIndex);
 
-                        return { textoincial, legislacao }
+                    return { textoincial, legislacao }
 ;
-                    } else {
-                         console.log('Nenhum divisor encontrado');
-                    }
+                } else {
+                        console.log('Nenhum divisor encontrado');
+                }
                     
                 return list
             },
@@ -468,7 +468,7 @@
             lastArt(){
                 const law = this.listFinal
                 const lastArt = law[law.length -1]
-                return lastArt.art
+                return 254
             },
             suggestArtBtn(){
                 if(this.search){
@@ -507,6 +507,7 @@
                 this.$router.push("/leges");
             },
             filterJustArt(art){     
+                console.log(this.lastArt);
                 if(art <= this.lastArt){
                     this.artIndice = ''
                     this.search = ''

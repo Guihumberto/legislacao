@@ -4,7 +4,7 @@
         color="white"
         variant="outlined"
       >
-      Documento Criado ({{ docs.length }})
+        Documento Criado ({{ docs.length }})
         <v-dialog
           v-model="dialog"
           activator="parent"
