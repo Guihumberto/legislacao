@@ -104,11 +104,6 @@ const routes = [
         component: () => import('@/views/Documents.vue'),
       },
       {
-        path: '/blog',
-        name: 'Blog',
-        component: () => import('@/views/Blog.vue'),
-      },
-      {
         path: '/myposts',
         name: 'Meus Posts',
         component: () => import('@/views/MyPosts.vue'),
@@ -133,6 +128,17 @@ const routes = [
         path: '',
         name: 'Painel',
         component: () => import('@/views/Test.vue'),
+      },
+    ]
+  },
+  {
+    path: '/blog',
+    component: () => import('@/layouts/blog/Blog.vue'),
+    children:[
+      {
+        path: '',
+        name: 'Blog Arcádio',
+        component: () => import('@/views/Blog.vue'),
       },
     ]
   }
