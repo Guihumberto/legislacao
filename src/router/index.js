@@ -104,6 +104,11 @@ const routes = [
         component: () => import('@/views/Documents.vue'),
       },
       {
+        path: '/collection_search/:id',
+        name: 'Coleção pesquisa',
+        component: () => import('@/views/collectionSearch.vue'),
+      },
+      {
         path: '/myposts',
         name: 'Meus Posts',
         component: () => import('@/views/MyPosts.vue'),

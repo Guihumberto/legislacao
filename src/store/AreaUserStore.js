@@ -7,7 +7,9 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         favoritos: [],
         historico: [],
         documentos: [],
-        load: false
+        collection: [],
+        load: false,
+        temp: {}
     }),
     getters: {
         readFavoritos(){
@@ -39,6 +41,12 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         },
         readDocumentos(){
             return this.documentos.filter( x => x.active)
+        },
+        readCollection(){
+            return this.collection.filter( x => x.active)
+        },
+        readTempView(){
+            return this.temp
         },
         readLoad(){
             return this.load
@@ -106,6 +114,21 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             this.documentos = this.documentos.filter(x => x.title != doc.title)
             this.documentos.push(doc)
         },
+        saveCollection(item){
+            const doc = { ...item, dateCreated: Date.now() }
+            const findDoc = this.collection.find(x => x.title == doc.title)
+
+            if(findDoc) {
+                console.log("Já existe uma colleção com o mesmo nome.");
+                return
+            }
+
+            this.collection.push(doc)
+            console.log(this.collection);
+        },
+        printAndViewTemp(item){
+            this.temp = { ...item }
+        },
         formatDate(timestamp){
             const data = new Date(timestamp);
 
@@ -116,7 +139,6 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 }).format(data);
 
             return dataFormatada
-        },
-
+        }
     }
 })

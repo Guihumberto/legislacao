@@ -50,7 +50,7 @@
         </template>
     </v-snackbar>
     <div v-if="document.length" class="fixed-element">
-        <CollectionDialog :docs="document" />   
+        <CollectionDialog :docs="document" @apagarDocs="document = []"/>   
         <v-btn color="error" variant="text" prepend-icon="mdi-delete" @click="document=[]"> Excluir</v-btn>
         <!-- <DocumentSave v-if="readLogin" :document="document" @fecharDoc="document=[]" /> -->
     </div>

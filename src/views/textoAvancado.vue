@@ -466,9 +466,9 @@
                 return this.arrayEstrturaONly.concat(this.arrayTextLawEstrutura)
             },
             lastArt(){
-                const law = this.listFinal
-                const lastArt = law[law.length -1]
-                return 254
+                const law = this.listFinal.map(x => x.art)
+                const lastArt = Math.max(...law)
+                return lastArt
             },
             suggestArtBtn(){
                 if(this.search){
