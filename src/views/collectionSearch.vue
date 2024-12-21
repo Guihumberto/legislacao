@@ -89,14 +89,14 @@
             </v-card>
             <Pagination :totalPage="totalPage" :pagination="pagination" v-if="false" />
             <div class="bg-white" v-if="avancado">
-                <div v-for="lei, l in collectionList" :key="l">
+                <div v-for="lei, l in readFilterLaw" :key="l">
                     <h1 class="text-h5 bg-primary px-2">{{ lei.title }}</h1>
                     <div class="px-5 py-3" v-for="item, i in listTextLaw.filter(x => x.id == lei.id)" :key="i">
                         <TextDispositivo :dispositivo="item" :search="search" v-if="avancado" />
                     </div>
                 </div>
             </div>
-            <div class="border pa-5 mb-2 bg-white pagina mt-5" v-for="item, i in listPage" :key="i" v-else>
+            <div class="border pa-5 mb-2 bg-white pagina mt-5" v-for="item, i in readListPage" :key="i" v-else>
                 <div class="font-weight-bold d-flex justify-space-between header">
                     <p>{{ item.page_to_norma.title }} | {{ item.ano }}</p> 
                     <p>Página: {{ item.num_page }}/{{ listPage.length }} </p>
@@ -374,6 +374,20 @@
                     return !!this.search.replace(/[^0-9]/g,'')
                 }
                 return false
+            },
+            readFilterLaw(){
+                let list = this.collectionList
+                if(this.selectedLaw){
+                    list = list.filter(x => x.id == this.selectedLaw)
+                }
+                return list
+            },
+            readListPage(){
+                let list = this.listPage
+                if(this.selectedLaw){
+                    list = list.filter(x => x.page_to_norma.parent == this.selectedLaw)
+                }
+                return list
             }
         },
         methods:{
