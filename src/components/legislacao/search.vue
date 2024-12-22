@@ -1289,6 +1289,13 @@ section{
   box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra opcional */
   z-index: 1000; /* Certifique-se de que está acima de outros elementos */
   animation: slideTopDocument .5s ease-in;
+  transition: 1s ease;
+}
+@media (max-width: 1200px) {
+    .fixed-element{
+        left: 50%;
+        transform: translateX(-50%);       
+    }
 }
 @keyframes slideTopDocument {
     0%{

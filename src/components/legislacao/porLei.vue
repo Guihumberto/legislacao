@@ -110,7 +110,6 @@
 </template>
 
 <script>
-    import api from "@/services/api"
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
 
@@ -227,25 +226,12 @@
             async searchForLaw(){
                 this.resultsSearch = []
                 this.loadSearch = true
+                
                 try {
-                    const response = await api.post("laws_v3/_search", {
-                        from: 0,
-                        size: 5,
-                        query:{
-                            multi_match:{
-                                "query": this.search.text,
-                                "fields":[
-                                    "title^2",
-                                    "description_norm^1",
-                                    "tipo"
-                                ],
-                                "type": "cross_fields"
-                            }
-                        }
-                    })
-                    this.resultsSearch = response.data.hits.hits;
+                    this.resultsSearch = await lawStore.getSearchPorlei(this.search);
                 } catch (error) {
                     console.log("erro searchForLaw");
+                    this.resultsSearch = []
                 } finally{
                     this.loadSearch = false
                 }

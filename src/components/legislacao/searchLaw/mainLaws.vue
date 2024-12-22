@@ -3,7 +3,9 @@
     <v-row class="mb-5">
       <v-col cols="12" md="4" v-for="item, i in resultsSearch.map(x => x._source)" :key="i">
         <v-card
-          :subtitle="item.tipo"
+
+           color="primary"
+          :subtitle="nomeTipo(item.tipo)"
           :title="item.title"
           :to="`/text/${item.id}`"
         ></v-card>
@@ -14,6 +16,9 @@
 <script setup>
     import api from "@/services/api"
     import { ref } from "vue";
+
+    import { useGeneralStore } from '@/store/GeneralStore'
+    const generalStore = useGeneralStore() 
 
     const resultsSearch = ref([])
 
@@ -28,6 +33,11 @@
             }
         })
         resultsSearch.value = response.data.hits.hits;
+    }
+
+    const nomeTipo = (item) => {
+                let nome = generalStore.fonteNome(item)
+                return nome.mudar
     }
 
     getLaws()

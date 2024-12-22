@@ -74,9 +74,6 @@
     const searchForm = async () => {
         await lawStore.searchform(search.value)
     }
-
-
-    
 </script>
 
 <style lang="scss" scoped>

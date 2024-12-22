@@ -120,7 +120,6 @@ export const useLawStore = defineStore("Law", {
             }
         },
         async getLawsAdmConfig2(){
-            console.log('teste 2');
             try {
                 this.load = true
                 const response = await api.post("laws_v3/_search", {
@@ -394,6 +393,162 @@ export const useLawStore = defineStore("Law", {
                 this.totalLawsListConfigAdm = response.data.hits.total.value
             } catch (error) {
                 console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getSearchPorlei(item){
+            if(item.text && !item.fonte.length && !item.years.length){
+                const resp = await this.getSearchPorlei1(item)
+                return resp
+            } 
+            if(item.text && item.fonte.length && item.years.length){
+                const resp = await this.getSearchPorlei2(item)
+                return resp
+            } 
+            if(item.text && item.fonte.length && !item.years.length){
+                const resp = await this.getSearchPorlei3(item)
+                return resp
+            } 
+            if(item.text && !item.fonte.length && item.years.length){
+                const resp = await this.getSearchPorlei4(item)
+                return resp
+            } 
+        },
+        async getSearchPorlei1(item){
+            this.load = true
+            try {
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
+                    size: 5,
+                    query:{
+                        multi_match:{
+                            "query": item.text,
+                            "fields":[
+                                "title^2",
+                                "description_norm^1",
+                                "tipo"
+                            ],
+                            "type": "cross_fields"
+                        }
+                    }
+                })
+                return response.data.hits.hits;
+            } catch (error) {
+                console.log("erro searchForLaw");
+            } finally{
+                this.load = false
+            }
+        },
+        async getSearchPorlei2(item){
+            this.load = true
+            try {
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
+                    size: 5,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "multi_match":{
+                                        "query": item.text,
+                                        "fields":[
+                                            "title^2",
+                                            "description_norm^1",
+                                            "tipo"
+                                        ],
+                                        "type": "cross_fields"
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "tipo": item.fonte
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "ano": item.years
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return response.data.hits.hits;
+            } catch (error) {
+                console.log("error searchlaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getSearchPorlei3(item){
+            this.load = true
+            try {
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
+                    size: 5,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "multi_match":{
+                                        "query": item.text,
+                                        "fields":[
+                                            "title^2",
+                                            "description_norm^1",
+                                            "tipo"
+                                        ],
+                                        "type": "cross_fields"
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "tipo": item.fonte
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return response.data.hits.hits;
+            } catch (error) {
+                console.log("error searchlaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getSearchPorlei4(item){
+            this.load = true
+            try {
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
+                    size: 5,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "multi_match":{
+                                        "query": item.text,
+                                        "fields":[
+                                            "title^2",
+                                            "description_norm^1",
+                                            "tipo"
+                                        ],
+                                        "type": "cross_fields"
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "ano": item.years
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return response.data.hits.hits;
+            } catch (error) {
+                console.log("error searchlaw");
             }finally{
                 this.load = false
             }

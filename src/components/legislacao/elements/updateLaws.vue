@@ -29,7 +29,11 @@
                 >
                   <v-list-item 
                     link 
-                    v-for="item, i in allLaw.sort(orderName)" :key="i"
+                    v-for="item, i in allLaw.sort((a, b) => {
+                                    const dataA = converterParaData(a._source.data_include);
+                                    const dataB = converterParaData(b._source.data_include);
+                                    return dataB - dataA; // Decrescente
+                                  })" :key="i"
                   >
                     <template v-slot:prepend>
                       <v-avatar color="grey-lighten-1">
@@ -62,7 +66,7 @@
       load: false,
       allLaw: [],
       qtdLaws: 0,
-      reverse: false
+      reverse: true
     }),
     methods:{
       async getAll(){
@@ -83,10 +87,16 @@
               this.load = false
           }
       },
+      converterParaData(dataStr) {
+        const [data, hora] = dataStr.split(" ");
+        const [dia, mes, ano] = data.split("-").map(Number);
+        const [horaStr, minutoStr] = hora.split(":").map(Number);
+        return new Date(ano, mes - 1, dia, horaStr, minutoStr);
+      },
       orderName(a, b){
-          return this.reverse
-              ? a._source.title -  b._source.title
-              : b._source.title -  a._source.title
+        const dataA = converterParaData(a);
+        const dataB = converterParaData(b);
+        return dataB - dataA
       },
     },
     created(){

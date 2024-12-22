@@ -104,8 +104,10 @@
     .fixed-element {
         position: fixed;
         text-align: center;
+        display: flex;
+        flex-direction: column;
         bottom: 0; /* Ajuste conforme necessário */
-        right: 80%; /* Centraliza horizontalmente */
+        left: 80%; /* Centraliza horizontalmente */
         border-radius: 12px 12px 0 0;
         color: #fff;
         background-color: #2cba16; /* Fundo para visualizar melhor */
@@ -113,5 +115,20 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra opcional */
         z-index: 1000; /* Certifique-se de que está acima de outros elementos */
         animation: slideTopDocument .5s ease-in;
+        transition: 1s ease;
+    }
+    @keyframes slideTopDocument {
+        0%{
+            transform: translateY(300px);
+        }
+        100%{
+            transform: translateY(0);
+        }
+    }
+    @media (max-width: 1200px) {
+        .fixed-element{
+            left: 50%;
+            transform: translateX(-50%);       
+        }
     }
 </style>
