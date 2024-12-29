@@ -23,6 +23,7 @@
                                 :title="docExiste(item.id)?'excluir norma': 'adicionar norma'"
                                 class="ml-n1 mr-n2"
                                 @click.stop="inserirDoc(item)"
+                                :disabled="!loginStore.readLogin.cpf"
                             ></v-btn>
                         </template>
                     </v-tooltip>
@@ -61,6 +62,9 @@
     import PageOne from './pageOne.vue';
     import { ref } from 'vue';
     import CollectionDialog from '../collection/CollectionDialog.vue';
+    import { useLoginStore } from '@/store/LoginStore';
+
+    const loginStore = useLoginStore()
 
     const router = useRouter()
 
@@ -84,12 +88,12 @@
             snack.value.text = "Norma Removida da coleção."
             snack.value.snackbar = true
         }else {
-            document.value.push(item)
-            snack.value.text = 'Norma adicionada a Coleação.',
+            const objeto = (({ description_norm, description_norm_vector, fonte, page_to_norma, path, data_include, ...rest }) => rest)(item)
+            document.value.push(objeto)
+            snack.value.text = 'Norma adicionada a Coleção.',
             snack.value.snackbar = true
         }
-    }
-            
+    }   
     const docExiste = (item) => {
         let ids = document.value.map(x => x.id)
         let find = ids.find(x => x == item)

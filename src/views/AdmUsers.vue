@@ -12,11 +12,9 @@
 </template>
 
 <script setup>
-import AddUser from '@/components/Admin/Users/addUser.vue';
-import ListUser from '@/components/Admin/Users/listUser.vue';
-import SearchUser from '@/components/Admin/Users/searchUser.vue';
-
-
+    import AddUser from '@/components/Admin/Users/addUser.vue';
+    import ListUser from '@/components/Admin/Users/listUser.vue';
+    import SearchUser from '@/components/Admin/Users/searchUser.vue';
 </script>
 
 <style scoped>

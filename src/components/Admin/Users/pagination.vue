@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-pagination :length="4"></v-pagination>
+        <v-pagination :length="1"></v-pagination>
     </div>
 </template>
 

@@ -61,6 +61,9 @@
       color="#ECEFF1"
       v-if="isLogin"
     >
+      <div class="text-right">
+        <v-btn variant="text" @click="drawer2 = false">Fechar</v-btn>
+      </div>
       <menuUser />
     </v-navigation-drawer>
 </template>
@@ -101,7 +104,7 @@
         return geralStore.readHeaderShow
       },
       isLogin(){
-        return !!loginStore.readLogin.login
+        return !!loginStore.readLogin.cpf
       }
     },
     methods: {
@@ -138,6 +141,7 @@
       setTimeout(() => {
         this.isSearch()
       }, 1);
+      loginStore.loadUserData()
     },
     mounted() {
       window.addEventListener('scroll', this.handleScroll);

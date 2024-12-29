@@ -5,10 +5,12 @@
             <div class="text-right mb-2">
                 <AddFolderFavortite />
             </div>
-            <ListDocuments v-if="userAreaStore.readDocumentos.length" />
+            <v-alert v-if="userAreaStore.readLoad">Carregando..</v-alert>
+            <ListDocuments v-else-if="userAreaStore.readDocumentos.length" />
             <v-alert v-else type="warning" variant="outlined" text="Não há documentos salvos."></v-alert>
             <h1 class="text-h5 my-10">Coleção de normas</h1>
-            <ListCollection v-if="userAreaStore.readCollection.length" />
+            <v-alert v-if="userAreaStore.readLoad">Carregando..</v-alert>
+            <ListCollection v-else-if="userAreaStore.readCollection.length" />
             <v-alert class="mt-5" v-else type="warning" variant="outlined" text="Não há coleção de normas salvas."></v-alert>
         </div>
     </section>
@@ -21,6 +23,9 @@
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
     const userAreaStore = useUserAreaStore()
+
+    userAreaStore.getCollection()
+    userAreaStore.getDocs()
 
 </script>
 

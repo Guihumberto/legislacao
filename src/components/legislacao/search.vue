@@ -495,7 +495,7 @@
         },
         computed:{
             readLogin(){
-                return !!loginStore.readLogin.login
+                return !!loginStore.readLogin.cpf
             },
             reqRead(){
                 let reqq = generalStore.readReq
@@ -1093,17 +1093,28 @@
             inserirDoc(item){
                 const res = this.docExiste(item._id)
                 if(res){
-                    this.document = this.document.filter(x => x._id != res)
+                    this.document = this.document.filter(x => x.id != res)
                     this.snack.text = "Página Removida."
                     this.snack.snackbar = true
                 }else {
-                    this.document.push(item)
+                    const objeto = {
+                        id: item._id,
+                        id_law: item._source.page_to_norma.parent,
+                        name_law: item._source.page_to_norma.title,
+                        text_page: item._source.text_page,
+                        ano: item._source.ano,
+                        tipo: item._source.tipo,
+                        num_page: item._source.num_page,
+                        revogado: item._source.revogado,
+                        sigiloso: item._source.sigiloso
+                    }
+                    this.document.push(objeto)
                     this.snack.text = 'Nova página adicionada ao documento.',
                     this.snack.snackbar = true
                 }
             },
             docExiste(item){
-                let ids = this.document.map(x => x._id)
+                let ids = this.document.map(x => x.id)
                 let find = ids.find(x => x == item)
                 return !!find
                 ? find
@@ -1121,6 +1132,7 @@
                 window.open(`text/${link}`, '_blank');
             },
             async salvaNoBanco(){
+                
                 try {
                     const response = await api.post("searchs_todo/_doc", {
                         "text_search": this.search.text,
@@ -1128,7 +1140,7 @@
                         "sources": this.search.fonte,
                         "precision": this.search.precision,
                         "termos":  this.search.termo,
-                        "usuario": loginStore.readLogin.login ? loginStore.readLogin.login : null,
+                        "usuario": loginStore.readLogin.cpf ? loginStore.readLogin.cpf : null,
                         "date": Date.now()
                     })
                 } catch (error) {

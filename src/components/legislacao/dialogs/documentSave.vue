@@ -32,7 +32,7 @@
             <v-list class="mt-5 pa-0 border">
               <v-list-item 
                 v-for="doc, i in document" :key="i" link class="py-2"
-                :subtitle="`${doc._source.tipo} - ${doc._source.ano}`"
+                :subtitle="`${doc.tipo} - ${doc.ano}`"
                >
                 <template v-slot:prepend>
                   <v-icon icon="mdi-file-document"></v-icon>
@@ -42,7 +42,7 @@
                     {{ i + 1 }}
                   </div>
                 </template>
-                <span>pag. {{ doc._source.num_page }}, do doc {{ doc._source.page_to_norma.title }}</span>
+                <span>pag. {{ doc.num_page }}, do doc {{ doc.name_law }}</span>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -87,7 +87,7 @@
                 title: title.value.trim(),
                 pages: props.document,
                 active: true,
-                date: Date.now()
+                publish: false,
                }
                userAreaStore.saveDoc(objeto)
                emit("fecharDoc")

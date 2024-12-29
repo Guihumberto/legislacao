@@ -114,7 +114,7 @@ const routes = [
         component: () => import('@/views/MyPosts.vue'),
       },
       {
-        path: '/myposts/create',
+        path: '/myposts/create/:id?',
         name: 'Criar Post',
         component: () => import('@/views/MyPostCreate.vue'),
       },

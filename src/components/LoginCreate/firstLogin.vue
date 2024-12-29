@@ -2,6 +2,7 @@
     <v-dialog
       v-model="dialog"
       width="auto"
+      persistent
     >
       <v-card
         max-width="400"
@@ -60,9 +61,12 @@
 </template>
 
 <script setup>
+    import { useLoginStore } from '@/store/LoginStore';
     import { ref, inject } from 'vue';
     import { useRouter } from 'vue-router';
     const router = useRouter()
+
+    const loginStore = useLoginStore()
 
     const form = ref(null)
     const dialog = inject('dialog')
@@ -77,7 +81,7 @@
         name: null, 
         nickname: null, 
         setor: null,
-        orgao: null
+        cargo: 'autor'
     })
 
     const clear = () => {
@@ -99,6 +103,12 @@
     }
 
     const completCaduser = async () => {
+                const login = { ...loginStore.readLogin }
+                login.name = user.value.name
+                login.nickname = user.value.nickname
+                login.cargo = user.value.cargo
+                login.setor = user.value.setor
+                await loginStore.editUser(login)
                 router.push(`/leges`)
                 clear()
                 dialog.value = false

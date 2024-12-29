@@ -9,14 +9,14 @@
                     <v-list>
                       <v-list-item 
                         v-for="ind, x in docs.pages" :key="x" 
-                        :subtitle="`${ind._source.tipo} - ${ind._source.ano}`"
+                        :subtitle="`${ind.tipo} - ${ind.ano}`"
                         link
                         @click="findPage(x)"
                       >
                         <template v-slot:prepend>
                           <v-icon icon="mdi-file-document"></v-icon>
                         </template>
-                          <span>pag. {{ ind._source.num_page }}, do doc {{ ind._source.page_to_norma.title }}</span>
+                          <span>pag. {{ ind.num_page }}, do doc {{ ind.name_law }}</span>
                         <template v-slot:append>
                           {{ x + 1 }}
                         </template>
@@ -27,11 +27,11 @@
                 <!-- conteúdo das paginas -->
                 <div class="border pa-5 mt-2" v-for="item, i in docs.pages" :key="i" :id="i">
                   <div class="border-b">
-                      {{ item._source.ano }} |  {{ item._source.tipo }}  |  {{ item._source.page_to_norma.title }} | pág:  {{ item._source.num_page }}
+                      {{ item.ano }} |  {{ item.tipo }}  |  {{ item.name_law }} | pág:  {{ item.num_page }}
                   </div>
                   <p 
                       class="formatText mt-10" 
-                      v-html="textPage(item._source.text_page)"
+                      v-html="textPage(item.text_page)"
                   ></p>
                 </div>
             </v-card-text>

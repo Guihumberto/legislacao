@@ -124,14 +124,14 @@
     import TextAlign from '@tiptap/extension-text-align'
     import ListItem from '@tiptap/extension-list-item'
 
-
-
     const alignment = ref(1)
     const formatting = ref([])
     const toggle_exclusive = ref(0)
     const text = ref('center')
 
     const editor = ref(null)
+
+    const emits = defineEmits(['updateContent'])
 
     onMounted(()=> {
       editor.value = new Editor({
@@ -141,6 +141,10 @@
               }
           },
           content: "<p>Digite seu texto aqui</p>",
+          onUpdate({editor}){
+            const html = editor.getHTML()
+            emits('updateContent', html)
+          },
           extensions: [
               StarterKit, 
               TextStyle.configure({ types: [ListItem.name] }),

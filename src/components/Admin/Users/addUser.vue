@@ -4,54 +4,62 @@
         <v-text-field
             label="CPF do Usuário"
             placeholder="Digite o cpf do usuário"
-            v-model="nameUser"
+            v-model="cpf"
             density="compact"
             variant="outlined"
             :rules="[rules.required, rules.minfield]"
         >
             <template v-slot:append>
-                <v-btn color="success" type="submit" variant="flat">Adicionar</v-btn>
+                <v-btn color="success" type="submit" variant="flat" :loading="loginStore.readLoad">Adicionar</v-btn>
             </template>
         </v-text-field>
     </v-form>
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed  } from 'vue';
 
     import { useLoginStore } from '@/store/LoginStore';
+    import { useSnackStore } from '@/store/snackStore';
+    const snackStore = useSnackStore()
     const loginStore = useLoginStore()
 
-    const nameUser = ref(null)
-    const password = ref(null)
+    const cpf = ref(null)
     const form = ref(null)
 
     const rules = {
         required: value => !!value || "campo obrigatório", 
-        minfield: (v) => (v||'').length >= 3 || "Mínimo 4 caracteres",
-    }
-
-    const gerarSenha = () => {
-        password.value = 123456
-        console.log('gerar senha', password.value);
+        minfield: (v) => (v||'').length == 11 || "CPF possui 11 dígitos",
     }
 
     const clear = () => {
-        nameUser.value = null
-        password.value = null
+        cpf.value = null
+    }
+
+    const list_users = computed(() => {
+        return loginStore.readListUsers.map( x => x.cpf)
+    })
+
+    const isCpfExist = () => {
+        const user = list_users.value.find(x => x == cpf.value )
+        return !!user
+    }
+
+    const msgErro = () => {
+        cpf.value = ""
+        snackStore.activeSnack({text:'Usuário já adicionado', color: 'error' })
     }
 
     const addUserElastic = async () => {
         const { valid } = await form.value.validate()
-        if(valid) {
-            gerarSenha()
+        const isExist = isCpfExist()
+        if(isExist) msgErro()
+        if(valid && !isExist) {
             const objeto = {
-                cpf: nameUser.value,
-                password: password.value,
-                perfil: 1,
-                adm: false
+                cpf: cpf.value,
             }
-            loginStore.addUser(objeto.cpf)
+            const resp = await loginStore.addUser(objeto.cpf)
+            if(resp) msgErro()
             clear()
         }
     }

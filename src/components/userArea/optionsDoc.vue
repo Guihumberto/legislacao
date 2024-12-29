@@ -39,6 +39,7 @@
     import ComfirmDelete from './comfirmDelete.vue';
     const userAreaStore = useUserAreaStore()
 
+    const dialog3 = ref(false)
     const dialog2 = ref(false)
     const dialog = ref(false)
     const confirmacao = ref(false)
@@ -48,6 +49,7 @@
     
     const items = ([
          {id:1, title: 'Abrir Documento' },
+        //  {id:3, title: 'Publicar' },
          {id:2, title: 'Excluir' }
     ])
 
@@ -56,18 +58,14 @@
     })
 
     const actions = (action) => {
-        if(action == 2) {
-          dialog.value = true
-        }
-
-        if(action == 1) {
-          dialog2.value = true
-        }
+        if(action == 2) dialog.value = true
+        if(action == 1) dialog2.value = true
+        if(action == 3) dialog3.value = true
     } 
 
     watch(confirmacao, (newConfirm) => {
       props.document.active = false
-      userAreaStore.removeDoc(props.document)
+      userAreaStore.editDoc(props.document)
     })
 
 

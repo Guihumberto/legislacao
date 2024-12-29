@@ -1,5 +1,7 @@
 <template>
-      <v-btn @click="dialog = true" prepend-icon="mdi-link" variant="outlined" class="text-lowercase" >incluir a partir dos meus documentos</v-btn>
+      <v-btn 
+        @click="dialog = true" prepend-icon="mdi-link" 
+        variant="outlined" class="text-lowercase" >incluir a partir dos meus documentos</v-btn>
   
       <v-dialog
         v-model="dialog"
@@ -46,7 +48,7 @@
     const dialog = ref(false)
 
     const resumo = (item) => {
-        const res = item.map(x => x._source.page_to_norma.title)
+        const res = item.map(x => x.name_law)
         return res.join(", ")
     }
 

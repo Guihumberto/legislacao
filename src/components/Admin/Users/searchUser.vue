@@ -36,12 +36,24 @@
                             >                
                             </v-text-field>
                         </div>
-                        <div class="text-right">
-                            <v-switch
-                                label="Administrador"
-                                v-model="search.perfilAdm"
-                                color="success"
-                            ></v-switch>
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex">
+                                <v-select
+                                    label="Perfil"
+                                    density="compact"
+                                    hide-details
+                                    variant="outlined"
+                                    class="mr-5"
+                                    style="width: 110px;"
+                                ></v-select>
+                                <v-switch
+                                    label="Administrador"
+                                    v-model="search.perfilAdm"
+                                    density="compact"
+                                    color="success"
+                                    hide-details
+                                ></v-switch>
+                            </div>
                             <v-btn color="primary" type="submit" variant="flat" prepend-icon="mdi-magnify">Buscar</v-btn>
                         </div>
                     </v-form>

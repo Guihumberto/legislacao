@@ -26,69 +26,71 @@
                 </v-btn>
                <v-expand-transition>
                    <div v-if="showref">
-                    <DialogListDocs @enviarDocRef="saveDocRef" />
-                    <v-form @submit.prevent="addRef()" ref="formref">
-                        <v-text-field
-                            label="Referência"
-                            density="compact"
-                            variant="outlined"
-                            class="mt-5"
-                            placeholder="Exemplo: art. 77, do CTE-MA (lei 7.799/2010)"
-                            clearable
-                            v-model="textref"
-                            :rules="[rules.required, rules.minfield]"
-                        >
-                            <template v-slot:append>
-                                <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
-                            </template>
-                        </v-text-field>
-                    </v-form>
-                    <div class="listref" v-if="post.references.length">
-                        <div class="d-flex align-center">
-                            <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
-                            <h3>Lista de Referências</h3>
-                        </div>
-                        <v-list class="pa-0 mt-5">
-                            <v-list-item v-for="item, i in post.references" :key="i" class="border-b" link>
-                            <template v-slot:prepend>
-                                <v-icon>
-                                    mdi-note-text-outline
-                                </v-icon>
-                            </template>
-                            <template v-slot:append>
-                                <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef" />
-                            </template>
-                            <div>
-                                {{ item }}
+                        <DialogListDocs @enviarDocRef="saveDocRef" />
+                        <v-form @submit.prevent="addRef()" ref="formref">
+                            <v-text-field
+                                label="Referência"
+                                density="compact"
+                                variant="outlined"
+                                class="mt-5"
+                                placeholder="Exemplo: art. 77, do CTE-MA (lei 7.799/2010)"
+                                clearable
+                                v-model="textref"
+                                :rules="[rules.required, rules.minfield]"
+                            >
+                                <template v-slot:append>
+                                    <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
+                                </template>
+                            </v-text-field>
+                        </v-form>
+                        <div class="listref" v-if="post.references.length">
+                            <div class="d-flex align-center">
+                                <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                                <h3>Lista de Referências</h3>
                             </div>
-                            </v-list-item>
-                        </v-list>
-                    </div>
-                    <div class="listref mt-5" v-if="post.refdoc.length">
-                        <div class="d-flex align-center">
-                            <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
-                            <h3>Lista de Referências (documentos)</h3>
+                            <v-list class="pa-0 mt-5">
+                                <v-list-item v-for="item, i in post.references" :key="i" class="border-b" link>
+                                <template v-slot:prepend>
+                                    <v-icon>
+                                        mdi-note-text-outline
+                                    </v-icon>
+                                </template>
+                                <template v-slot:append>
+                                    <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef" />
+                                </template>
+                                <div>
+                                    {{ item }}
+                                </div>
+                                </v-list-item>
+                            </v-list>
                         </div>
-                        <v-list class="pa-0 mt-5">
-                            <v-list-item v-for="item, i in post.refdoc" :key="i" class="border-b" link>
-                            <template v-slot:prepend>
-                                <v-icon>
-                                    mdi-note-text-outline
-                                </v-icon>
-                            </template>
-                            <template v-slot:append>
-                                <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef"  />
-                            </template>
-                            <div>
-                                <span class="font-weight-bold">{{ item.norma }}</span>, pág. {{ item.num_page }}, {{ item.tipo }}, {{ item.ano }}
+                        <div class="listref mt-5" v-if="post.refdoc.length">
+                            <div class="d-flex align-center">
+                                <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                                <h3>Lista de Referências (documentos)</h3>
                             </div>
-                            </v-list-item>
-                        </v-list>
-                    </div>
+                            <v-list class="pa-0 mt-5">
+                                <v-list-item v-for="item, i in post.refdoc" :key="i" class="border-b" link>
+                                <template v-slot:prepend>
+                                    <v-icon>
+                                        mdi-note-text-outline
+                                    </v-icon>
+                                </template>
+                                <template v-slot:append>
+                                    <OptionsRef :document="item" @apagarRef="deleteRef" @apagarRefDoc="deleteDocRef"  />
+                                </template>
+                                <div>
+                                    <span 
+                                        class="font-weight-bold">{{ item.norma }}</span>
+                                        , pág. {{ item.num_page }}, {{ item.tipo }}, {{ item.ano }}
+                                </div>
+                                </v-list-item>
+                            </v-list>
+                        </div>
                    </div>
                </v-expand-transition>
                <div class="text-right">
-                   <v-btn :disabled="!post.title" type="submit" variant="flat" color="primary">Salvar e continuar</v-btn>
+                   <v-btn :disabled="!post.title" type="submit" variant="flat" color="primary" :loading="postStore.readLoad">Salvar e continuar</v-btn>
                </div>  
             </v-form>
         </v-card-text>
@@ -98,23 +100,23 @@
                 <h2 class="text-h5">{{ post.subtitle }}</h2>
             </div>
             <v-form @submit.prevent="saveText()" ref="form" class="form">
-               <PageEditor />
+               <PageEditor @updateContent="updateContent" />
                <div>
-                <v-form @submit.prevent="addRef()" ref="formref">
-                        <v-text-field
-                            label="Referência"
-                            density="compact"
-                            variant="outlined"
-                            class="mt-5"
-                            placeholder="Exemplo: art. 77, do CTE-MA (lei 7.799/2010)"
-                            clearable
-                            v-model="textref"
-                            :rules="[rules.required, rules.minfield]"
-                        >
-                            <template v-slot:append>
-                                <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
-                            </template>
-                        </v-text-field>
+                    <v-form @submit.prevent="addRef()" ref="formref">
+                            <v-text-field
+                                label="Referência"
+                                density="compact"
+                                variant="outlined"
+                                class="mt-5"
+                                placeholder="Exemplo: art. 77, do CTE-MA (lei 7.799/2010)"
+                                clearable
+                                v-model="textref"
+                                :rules="[rules.required, rules.minfield]"
+                            >
+                                <template v-slot:append>
+                                    <v-btn type="submit" density="compact" color="success" icon="mdi-plus"></v-btn>
+                                </template>
+                            </v-text-field>
                     </v-form>
                     <div class="listref" v-if="post.references.length">
                         <div class="d-flex align-center">
@@ -190,23 +192,28 @@
                </div>
                <div class="text-right">
                    <v-btn @click="router.push('/myposts')" variant="text" class="mr-2">Cancelar</v-btn>
-                   <v-btn color="success" type="submit">salvar</v-btn>
+                   <v-btn color="success" type="submit" :loading="postStore.readLoad">salvar</v-btn>
                </div>
             </v-form>
         </v-card-text>
+        
     </v-card>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import OptionsRef from './optionsRef.vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import DialogListDocs from './dialogListDocs.vue';
 import PageEditor from '../pageEditor.vue';
 const router = useRouter()
+const route = useRoute()
+
+import { usePostStore } from '@/store/PostStore';
+const postStore = usePostStore()
 
 const showref = ref(false)
-const writeText = ref(true)
+const writeText = ref(false)
 const textref = ref(null)
 const tag = ref('teste')
 
@@ -215,12 +222,26 @@ const post = ref({
     title: 'Alcool Etílico', 
     subtitle: 'Benefícios do alcool etílico', 
     imgLink: null,
-    text: null,
+    text: '',
     tags: [],
     references: [],
     refdoc: [],
     publish: false,
+    active: true,
+    views: 0,
 })
+
+onMounted(async ()=> {
+    if(route.params.id){
+       const resp = await postStore.getPost(route.params.id)
+       writeText.value = true
+       post.value = resp
+    }
+})
+
+const updateContent = (newContent) => {
+    post.value.text = newContent
+}
 
 const form = ref(null)
 const formref = ref(null)
@@ -244,19 +265,20 @@ const deleteRef = (item) => {
 }
 
 const saveDocRef = (evento) => {
+    console.log(evento);
+    if(!evento) return
     const list = [ ...evento ]
     list.forEach(x => {
         const objeto = {
-            idPage: x._id, 
-            idLaw: x._source.page_to_norma.parent,
-            ano: x._source.ano, 
-            num_page: x._source.num_page, 
-            tipo: x._source.tipo, 
-            norma: x._source.page_to_norma.title
+            idPage: x.id, 
+            idLaw: x.id_law,
+            ano: x.ano, 
+            num_page: x.num_page, 
+            tipo: x.tipo, 
+            norma: x.name_law
         }
         post.value.refdoc.push(objeto)
     })
-    
 }
 
 const deleteDocRef = (item) => {
@@ -280,26 +302,36 @@ const removeTag = (c) => {
 const savePost = async () => {
     const { valid } = await form.value.validate()
         if(valid) {
+            const resp = await postStore.savePost(post.value)
             writeText.value = true
+            post.value.id = resp.id
+            post.value.dateCreated = resp.dateCreated
+            post.value.created_by = resp.created_by
         }
 }
 
 const saveText = async () => {
     const { valid } = await form.value.validate()
         if(valid) {
-            console.log('salvar', 'voltar');
+            console.log('salvar', 'voltar', post.value);
+            postStore.editPost(post.value)
+            router.push('/myposts')
+            clear()
         }
 }
 
 const clear = () => {
     post.value = {
-        title: null, 
-        subtitle: null, 
+        title: 'Alcool Etílico 2', 
+        subtitle: 'Be222nefícios do alcool etílico', 
         imgLink: null,
-        text: null,
+        text: '',
         tags: [],
         references: [],
+        refdoc: [],
         publish: false,
+        active: true,
+        views: 0,
     }
 }
 

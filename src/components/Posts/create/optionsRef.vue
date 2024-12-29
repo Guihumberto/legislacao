@@ -26,7 +26,7 @@
         import { ref, provide, watch } from 'vue';
 
         const items = [
-          { id:1, title: 'Editar', icon: 'mdi-pencil'},
+          // { id:1, title: 'Editar', icon: 'mdi-pencil'},
           { id:2, title: 'Excluir', icon: 'mdi-delete' },
         ]
 

@@ -50,7 +50,7 @@
     const isExist = ref(false)
 
     const isFav = () => {
-        if(loginStore.readLogin.login) {
+        if(loginStore.readLogin.cpf) {
             isExist.value = areaUserStore.readFavoritos
                             .find(x => x.id == props.page._id)
         }
@@ -77,7 +77,7 @@
     }) 
 
     const saveFavorite = async() =>{
-        if(loginStore.readLogin.login) {
+        if(loginStore.readLogin.cpf) {
             favorite.value.fav = !favorite.value.fav
             favorite.value.date = Date.now()
             await areaUserStore.saveFavoritos(favorite.value)

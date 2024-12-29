@@ -64,7 +64,6 @@
         mincpf: (v) => (v||'').length == 14 || "11 dígitos",
         mindn: (v) => (v||'').length == 10 || "8 dígitos",
     }
-     
 
     const loadLogin = ref(false) 
     const userLogin = ref({
@@ -95,9 +94,8 @@
                     readErro.value = "usuário ou senha incorretos"
                     return
                  } 
- 
 
-                 if(login.firstLogin){
+                 if(!login.name){
                     dialog.value = true
                  } else {
                     router.push(`/leges`)

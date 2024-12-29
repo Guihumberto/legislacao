@@ -8,17 +8,17 @@
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
-            :icon="readLogin.login ? 'mdi-account-tie': 'mdi-login'"
+            :icon="readLogin.cpf ? 'mdi-account-tie': 'mdi-login'"
             class="mr-2"
-            :title="readLogin.login ? 'Sair': 'Entrar'"
+            :title="readLogin.cpf ? 'Sair': 'Entrar'"
           >
           </v-btn>
         </template>
-        <v-card min-width="300" v-if="readLogin.login">
+        <v-card min-width="300" v-if="readLogin.cpf">
           <v-list>
             <v-list-item
               prepend-icon="mdi-account-circle"
-              :subtitle="readUser.setor"
+              :subtitle="readUser.cargo"
               :title="readUser.nome"
             >
               <template v-slot:append>
@@ -87,7 +87,7 @@
         let user = this.readLogin
         let userData = {
           nome: this.getFirstAndSecondName(user.name),
-          cargo: this.getFirstAndSecondName(user.setor),
+          cargo: user.cargo,
         }
         return userData
       },

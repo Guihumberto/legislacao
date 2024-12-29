@@ -4,6 +4,22 @@
       <default-bar />
       <default-view class="content" />
       <Footer />
+      <v-snackbar
+                v-model=" $snackStore.readSnack.snackbar"
+                :timeout=" $snackStore.readSnack.timeout"
+                :color=" $snackStore.readSnack.color"
+            >
+          {{  $snackStore.readSnack.text }}
+          <template v-slot:actions>
+              <v-btn
+              color="blue"
+              variant="text"
+              @click="$snackStore.readSnack.snackbar = false"
+              >
+              X
+              </v-btn>
+          </template>
+      </v-snackbar>
     </div>
   </v-app>
 </template>
@@ -19,7 +35,6 @@
   import { useConsultaStore } from '@/store/ConsultaStore'
   const consultaStore = useConsultaStore()  
   
-
   lawStore.getAllLaw()
   consultaStore.contadores()
 

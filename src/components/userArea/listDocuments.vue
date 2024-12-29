@@ -10,6 +10,7 @@
                         mdi-text-box-multiple-outline
                     </v-icon>
                 </template>
+                
                 <template v-slot:append>
                     <OptionsDoc :document="item" />
                 </template>
@@ -24,7 +25,7 @@
     const userAreaStore = useUserAreaStore()
 
     const resumo = (item) => {
-        const res = item.map(x => x._source.page_to_norma.title)
+        const res = item.map(x => x.name_law)
         return res.join(", ")
     }
 

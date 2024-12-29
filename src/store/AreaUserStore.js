@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
+import { useLoginStore } from "./LoginStore";
+const loginStore = useLoginStore()
 
 export const useUserAreaStore = defineStore("userAreaStoe", {
     state: () => ({
@@ -76,10 +78,10 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 const resp = await api.post('searchs_todo/_search', {
                     from: 0,
                     size: 2000,
-                    "query": {
-                        "match":{
-                            "usuario": "017.917.433-90"
-                        }      
+                    "query":{
+                        match:{
+                            usuario: loginStore.readLogin.cpf
+                        }
                     }
                 })
 
@@ -98,24 +100,65 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 this.load = false
             }
         },
-        saveDoc(item){
-            const doc = { ...item }
+        async saveDoc(item){
+            this.load = true
+            const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
             const findDoc = this.documentos.find(x => x.title == doc.title)
 
             if(findDoc) {
                 console.log("Já existe um documento com o mesmo nome.");
                 return
             }
-            this.documentos.push(doc)
-            console.log(this.documentos);
+
+            try {
+                const resp = await api.post('documents/_doc', doc)
+                this.documentos.push(doc)
+            } catch (error) {
+                console.log('erro ao salvar o documento');
+            } finally { 
+                this.load = false
+            }      
         },
-        removeDoc(item){
-            const doc = { ...item }
-            this.documentos = this.documentos.filter(x => x.title != doc.title)
-            this.documentos.push(doc)
+        async editDoc(item){
+            this.load = true
+            const objeto = (({ id, ...rest }) => rest)(item);
+            try {
+                const response = await api.post(`documents/_doc/${item.id}`, objeto)
+                const updatedData = this.documentos.map(x =>
+                    x.id === item.id ? {...item } : x
+                );
+            } catch (error) {
+                console.log('erro ao editar collection');
+            } finally {
+                this.load = false
+            }
         },
-        saveCollection(item){
-            const doc = { ...item, dateCreated: Date.now() }
+        async getDocs(){
+            if(!loginStore.readLogin?.cpf){
+                return
+            }
+            try {
+                this.load = true
+                this.documentos = []
+                const response = await api.post('documents/_search', {
+                    query:{
+                        match:{
+                            created_by: loginStore.readLogin.cpf
+                        }
+                    }
+                })
+                const resp = response.data.hits.hits
+                this.documentos = resp.map( x => ({id: x._id, ...x._source}))
+
+            } catch (error) {
+                console.log('erro ao recuperar a pilha de documentos');
+            } finally{
+                this.load = false
+            }
+        },
+        async saveCollection(item){
+            this.load = true
+            const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
             const findDoc = this.collection.find(x => x.title == doc.title)
 
             if(findDoc) {
@@ -123,8 +166,51 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 return
             }
 
-            this.collection.push(doc)
-            console.log(this.collection);
+            try {
+                const resp = await api.post('collection/_doc', doc)
+                this.collection.push(doc)
+            } catch (error) {
+                console.log('erro ao salvar a colecao');
+            } finally { 
+                this.load = false
+            }           
+        },
+        async editCollection(item){
+            this.load = true
+            const objeto = (({ id, ...rest }) => rest)(item);
+            try {
+                const response = await api.post(`collection/_doc/${item.id}`, objeto)
+                const updatedData = this.collection.map(x =>
+                    x.id === item.id ? {...item } : x
+                );
+            } catch (error) {
+                console.log('erro ao editar collection');
+            } finally {
+                this.load = false
+            }
+        },
+        async getCollection(){
+            if(!loginStore.readLogin?.cpf){
+                return
+            }
+            try {
+                this.load = true
+                this.collection = []
+                const response = await api.post('collection/_search', {
+                    query:{
+                        match:{
+                            created_by: loginStore.readLogin.cpf
+                        }
+                    }
+                })
+                const resp = response.data.hits.hits
+                this.collection = resp.map( x => ({id: x._id, ...x._source}))
+
+            } catch (error) {
+                
+            } finally{
+                this.load = false
+            }
         },
         printAndViewTemp(item){
             this.temp = { ...item }

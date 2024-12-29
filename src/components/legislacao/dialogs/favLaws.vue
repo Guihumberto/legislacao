@@ -52,14 +52,14 @@
     })
 
     const isFav = () => {
-        if(loginStore.readLogin.login) {
+        if(loginStore.readLogin.cpf) {
             isExist.value = areaUserStore.readFavoritos
                             .find(x => x.id == props.law._source.page_to_norma.parent)
         }
     }
 
     onMounted(() => {
-        if(loginStore.readLogin.login) {
+        if(loginStore.readLogin.cpf) {
             isFav()
             lawFav.value = {
                 fav: !!isExist.value,
@@ -74,7 +74,7 @@
     })
 
     const saveFavoritos = async () => {
-        if(loginStore.readLogin.login) {
+        if(loginStore.readLogin.cpf) {
             lawFav.value.fav = !lawFav.value.fav
 
             lawFav.value.date = Date.now()

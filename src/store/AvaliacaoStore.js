@@ -452,7 +452,6 @@ export const useAvaliacaoStore = defineStore("avaliacao", {
         this.isLogin = {}
         this.erro = ''
         this.saveUserData()
-
     },
     verificarServidorNaequipe(item){
         console.log("verificar servidor na equipe");

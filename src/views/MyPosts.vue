@@ -15,6 +15,14 @@
     import { useRouter } from 'vue-router' 
     const router = useRouter()
 
+    import { useUserAreaStore } from '@/store/AreaUserStore';
+    import { usePostStore } from '@/store/PostStore';
+    const postStore = usePostStore()
+    const userAreaStore = useUserAreaStore()
+
+    postStore.getPosts()
+    userAreaStore.getDocs()
+
 </script>
 
 <style lang="scss" scoped>
