@@ -55,20 +55,39 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         }
     },
     actions:{
-        getAllFavoritos(){
+        async getAllFavoritos(){
+            if(!loginStore.readLogin?.cpf){
+                return
+            }
+            try {
+                this.load = true
+                this.favoritos = []
+                const response = await api.post('favorites/_search', {
+                    query:{
+                        match:{
+                            created_by: loginStore.readLogin.cpf
+                        }
+                    }
+                })
+                const resp = response.data.hits.hits
+                this.favoritos = resp.map( x => ({ ...x._source}))
 
+            } catch (error) {
+                console.log('erro ao recuperar a pilha de FAVORITOS');
+            } finally{
+                this.load = false
+            }
         },
-        getOnetFavoritos(item){
-
-        },
-        saveFavoritos(item){
-            const doc = { ...item }
-            const findFav = this.favoritos.find(x => x.id == doc.id)
-            if(!findFav) {
-                this.favoritos.push(doc)
-            } else {
-                this.favoritos = this.favoritos.filter(x => x.id != doc.id)
-                this.favoritos.push(doc)
+        async saveFavoritos(item){
+            const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
+            try {
+                this.load = true
+                const resp = await api.post(`favorites/_doc/${item.id}`, doc) //tem que localizar o cpf
+                this.favoritos.push({ ...data._source })
+            } catch (error) {
+                console.log('erro fav')
+            } finally {
+                this.load = false
             }
         },
         async getAllHistórico(){

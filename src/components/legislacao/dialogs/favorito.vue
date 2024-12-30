@@ -61,12 +61,15 @@
         favorite.value = {
             fav: !!isExist.value,
             section: 'page',
-            folder: 'PROCESSOS',
+            folder: null,
             ano: props.page._source.ano,
             tipo: props.page._source.tipo,
             num_page: props.page._source.num_page,
-            norma: props.page._source.page_to_norma.title,
-            id: props.page._id
+            id_law: props.page._source.page_to_norma.parent,
+            name_law: props.page._source.page_to_norma.title,
+            id: props.page._id,
+            revogado: props.page._source.revogado,
+            sigiloso: props.page._source.sigiloso,
         }
     })
 
@@ -79,7 +82,6 @@
     const saveFavorite = async() =>{
         if(loginStore.readLogin.cpf) {
             favorite.value.fav = !favorite.value.fav
-            favorite.value.date = Date.now()
             await areaUserStore.saveFavoritos(favorite.value)
 
             snack.value = {

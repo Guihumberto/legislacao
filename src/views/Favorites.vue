@@ -78,6 +78,7 @@
         if(item.section == 'law') window.open(`/text/${item.id}`, '_blank');
     }
 
+
 </script>
 
 <style scoped>

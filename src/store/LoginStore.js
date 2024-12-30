@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import api from "@/services/api"
 
+import { useUserAreaStore } from "./AreaUserStore";
+
 export const useLoginStore = defineStore("loginStore", {
     state: () => ({
         login:{
@@ -42,6 +44,7 @@ export const useLoginStore = defineStore("loginStore", {
     },
     actions:{
         async loginSSO(item){
+            const userAreaStore = useUserAreaStore()
             const cpf = this.apenasNumeros(item.login)
             const user = await this.findUserElastic(cpf)
             if(user._source.cpf == cpf && user._source.password == item.password){
@@ -53,6 +56,7 @@ export const useLoginStore = defineStore("loginStore", {
                     await this.editUser(this.login)
                 }
                 this.saveUserData()
+                userAreaStore.getAllFavoritos()
                 return this.login
             } else {
                 return false

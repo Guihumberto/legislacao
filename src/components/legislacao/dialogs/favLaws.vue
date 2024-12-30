@@ -67,8 +67,12 @@
                 folder: null,
                 ano: props.law._source.ano,
                 tipo: props.law._source.tipo,
-                norma: props.law._source.page_to_norma.title,
-                id: props.law._source.page_to_norma.parent
+                num_page: null,
+                id_law: props.law._source.page_to_norma.parent,
+                name_law: props.law._source.page_to_norma.title,
+                id: props.law._source.page_to_norma.parent,
+                revogado: props.law._source.revogado,
+                sigiloso: props.law._source.sigiloso
             }
         }
     })
@@ -76,8 +80,6 @@
     const saveFavoritos = async () => {
         if(loginStore.readLogin.cpf) {
             lawFav.value.fav = !lawFav.value.fav
-
-            lawFav.value.date = Date.now()
             await areaUserStore.saveFavoritos(lawFav.value)
 
             snack.value = {
