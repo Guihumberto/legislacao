@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
-const loginStore = useLoginStore()
+// const loginStore = useLoginStore()
 
 export const useUserAreaStore = defineStore("userAreaStoe", {
     state: () => ({
@@ -56,9 +56,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
     },
     actions:{
         async getAllFavoritos(){
-            if(!loginStore.readLogin?.cpf){
-                return
-            }
+            const loginStore = useLoginStore()
             try {
                 this.load = true
                 this.favoritos = []
@@ -70,8 +68,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                     }
                 })
                 const resp = response.data.hits.hits
-                this.favoritos = resp.map( x => ({ ...x._source}))
-
+                this.favoritos = resp.map( x => ({ idU: x._id, ...x._source}))
             } catch (error) {
                 console.log('erro ao recuperar a pilha de FAVORITOS');
             } finally{
@@ -79,18 +76,78 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async saveFavoritos(item){
-            const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
+            const loginStore = useLoginStore()
+            this.load = true
+            const isFavExist = await this.isFavExist(item)
+            if(!isFavExist.length){
+                const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
+                try {
+                    const resp = await api.post('favorites/_doc/', doc) 
+                    this.favoritos.push({ id: resp.idU, ...resp._source })
+                } catch (error) {
+                    console.log('erro fav')
+                } finally {
+                    this.load = false
+                }    
+            } else {
+                try {
+                    const doc_update = isFavExist[0]._source
+                    doc_update.fav = !doc_update.fav
+                    const resp = await api.post(`favorites/_doc/${isFavExist[0]._id}`, doc_update) 
+                    const updatedData = this.favoritos.map(x =>
+                        x.id === doc_update.id ? {...doc_update } : x
+                    );
+                } catch (error) {
+                    console.log('erro fav')
+                } finally {
+                    this.load = false
+                }    
+            }
+            
+        },
+        async isFavExist(item){
+            const loginStore = useLoginStore()
             try {
                 this.load = true
-                const resp = await api.post(`favorites/_doc/${item.id}`, doc) //tem que localizar o cpf
-                this.favoritos.push({ ...data._source })
+                const response = await api.post('favorites/_search/', {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "id": item.id
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "created_by": loginStore.readLogin.cpf
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return response.data.hits.hits
             } catch (error) {
-                console.log('erro fav')
+                console.log('erro procura isfav');
+            }
+        },
+        async editFav(item){
+            this.load = true
+            const objeto = (({ id, ...rest }) => rest)(item);
+            try {
+                const response = await api.post(`favorites/_doc/${item.id}`, objeto)
+                const updatedData = this.favoritos.map(x =>
+                    x.id === item.id ? {...item } : x
+                );
+            } catch (error) {
+                console.log('erro ao editar favorito');
             } finally {
                 this.load = false
             }
         },
         async getAllHistórico(){
+            const loginStore = useLoginStore()
             this.historico = []
             this.load = true
             try {
@@ -120,6 +177,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async saveDoc(item){
+            const loginStore = useLoginStore()
             this.load = true
             const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
             const findDoc = this.documentos.find(x => x.title == doc.title)
@@ -153,6 +211,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async getDocs(){
+            const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf){
                 return
             }
@@ -176,6 +235,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async saveCollection(item){
+            const loginStore = useLoginStore()
             this.load = true
             const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
             const findDoc = this.collection.find(x => x.title == doc.title)
@@ -209,6 +269,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async getCollection(){
+            const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf){
                 return
             }

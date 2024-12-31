@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-    import AddFolderFavortite from '@/components/userArea/addFolderFavortite.vue';
+    import AddFolderFavortite from '@/components/userArea/addFolder.vue';
     import ListCollection from '@/components/userArea/collection/listCollection.vue';
     import ListDocuments from '@/components/userArea/listDocuments.vue';
 
