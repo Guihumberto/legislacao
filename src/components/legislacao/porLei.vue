@@ -64,8 +64,9 @@
                         </div>
                     </v-form>
                 </div>
-                <SearchLaw :resultsSearch="resultsSearch" :load="loadSearch" />
+                <SearchLaw :resultsSearch="resultsSearch" :load="loadSearch" :searchActive="searchActive" />
                 <MainLaws />
+                <CollectionLaws />
                 <div class="d-flex justify-end">
                     <small>Total de normas: {{ totalLaws }} com {{ totalPages }} páginas</small>
                 </div>
@@ -123,10 +124,11 @@
     import menuOpt from "./elements/menu.vue"
     import MainLaws from './searchLaw/mainLaws.vue'
     import SearchLaw from './searchLaw/searchLaw.vue'
+    import CollectionLaws from './searchLaw/collectionLaws.vue'
     
     export default {
         components:{
-            help, menuOpt, MainLaws, SearchLaw
+            help, menuOpt, MainLaws, SearchLaw, CollectionLaws
         },
         data(){
             return{ 
@@ -142,7 +144,8 @@
                 loadSearch: false,
                 reverse: false,
                 resultsSearch: [], 
-                load: false
+                load: false,
+                searchActive: false
             }
         },
         props:{
@@ -229,6 +232,7 @@
                 
                 try {
                     this.resultsSearch = await lawStore.getSearchPorlei(this.search);
+                    this.searchActive = true
                 } catch (error) {
                     console.log("erro searchForLaw");
                     this.resultsSearch = []

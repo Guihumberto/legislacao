@@ -82,6 +82,37 @@ export const useLawStore = defineStore("Law", {
             if(!this.search.text && !this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig6()
             if(!this.search.text && this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig7()
         },
+        async getLawsAdmConfig(){
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "revogado": this.search.revogado
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "sigiloso": this.search.sigiloso
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
         async getLawsAdmConfig1(){
             console.log('teste 1');
             try {
@@ -249,38 +280,6 @@ export const useLawStore = defineStore("Law", {
                 this.load = false
             }
         },
-        async getLawsAdmConfig(){
-            console.log('teste');
-            try {
-                this.load = true
-                const response = await api.post("laws_v3/_search", {
-                    from: this.pagination.page * this.pagination.start - 1,
-                    size: this.pagination.perPage,
-                    query: {
-                        "bool": {
-                            "must": [
-                                {
-                                    "term": {
-                                        "revogado": this.search.revogado
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        "sigiloso": this.search.sigiloso
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                })
-                this.lawsListConfigAdm = response.data.hits.hits
-                this.totalLawsListConfigAdm = response.data.hits.total.value
-            } catch (error) {
-                console.log("error getAllLaw");
-            }finally{
-                this.load = false
-            }
-        },
         async getLawsAdmConfig5(){
             console.log('teste 2');
             try {
@@ -398,20 +397,23 @@ export const useLawStore = defineStore("Law", {
             }
         },
         async getSearchPorlei(item){
+            const search = { ...item}
+            search.text = this.removerAcentos(item.text)
+
             if(item.text && !item.fonte.length && !item.years.length){
-                const resp = await this.getSearchPorlei1(item)
+                const resp = await this.getSearchPorlei1(search)
                 return resp
             } 
             if(item.text && item.fonte.length && item.years.length){
-                const resp = await this.getSearchPorlei2(item)
+                const resp = await this.getSearchPorlei2(search)
                 return resp
             } 
             if(item.text && item.fonte.length && !item.years.length){
-                const resp = await this.getSearchPorlei3(item)
+                const resp = await this.getSearchPorlei3(search)
                 return resp
             } 
             if(item.text && !item.fonte.length && item.years.length){
-                const resp = await this.getSearchPorlei4(item)
+                const resp = await this.getSearchPorlei4(search)
                 return resp
             } 
         },
@@ -419,8 +421,8 @@ export const useLawStore = defineStore("Law", {
             this.load = true
             try {
                 const response = await api.post("laws_v3/_search", {
-                    from: 0,
-                    size: 5,
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
                     query:{
                         multi_match:{
                             "query": item.text,
@@ -433,7 +435,9 @@ export const useLawStore = defineStore("Law", {
                         }
                     }
                 })
-                return response.data.hits.hits;
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+                return response.data.hits;
             } catch (error) {
                 console.log("erro searchForLaw");
             } finally{
@@ -444,8 +448,8 @@ export const useLawStore = defineStore("Law", {
             this.load = true
             try {
                 const response = await api.post("laws_v3/_search", {
-                    from: 0,
-                    size: 5,
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
                     query: {
                         "bool": {
                             "must": [
@@ -474,7 +478,9 @@ export const useLawStore = defineStore("Law", {
                         }
                     }
                 })
-                return response.data.hits.hits;
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+                return response.data.hits;
             } catch (error) {
                 console.log("error searchlaw");
             }finally{
@@ -485,8 +491,8 @@ export const useLawStore = defineStore("Law", {
             this.load = true
             try {
                 const response = await api.post("laws_v3/_search", {
-                    from: 0,
-                    size: 5,
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
                     query: {
                         "bool": {
                             "must": [
@@ -510,7 +516,9 @@ export const useLawStore = defineStore("Law", {
                         }
                     }
                 })
-                return response.data.hits.hits;
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+                return response.data.hits;
             } catch (error) {
                 console.log("error searchlaw");
             }finally{
@@ -521,8 +529,8 @@ export const useLawStore = defineStore("Law", {
             this.load = true
             try {
                 const response = await api.post("laws_v3/_search", {
-                    from: 0,
-                    size: 5,
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
                     query: {
                         "bool": {
                             "must": [
@@ -546,7 +554,9 @@ export const useLawStore = defineStore("Law", {
                         }
                     }
                 })
-                return response.data.hits.hits;
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+                return response.data.hits;
             } catch (error) {
                 console.log("error searchlaw");
             }finally{
@@ -562,6 +572,11 @@ export const useLawStore = defineStore("Law", {
                 revogado: false,
                 eficaz: true
             }
+        },
+        removerAcentos(str) {
+            return str
+                .normalize("NFD")         // Decomposição em caracteres base + diacríticos
+                .replace(/[\u0300-\u036f]/g, ""); // Remove os diacríticos
         }
     }
 })

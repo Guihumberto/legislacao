@@ -3,16 +3,20 @@
         <div v-if="load">
             Carregando...
         </div>
-        <div class="mb-5" v-if="resultsSearch.length">
+        <div class="mb-5" v-if="resultsSearch?.total?.value">
             <v-list class="ma-0 pa-0">
                 <v-list-subheader>Resultado da Busca</v-list-subheader>
+                <div class="ml-4 d-flex align-center">
+                    <small>Total de normas encontradas: {{ resultsSearch.total.value }}</small>
+                    <v-btn variant="text" color="info" @click="resultsSearch = []">Limpar</v-btn>
+                </div>
                 <v-list-item 
-                    v-for="item, i in resultsSearch.map(x => x._source)" :key="i"
+                    v-for="item, i in resultsSearch.hits.map(x => x._source)" :key="i"
                     link
                     @click.stop="router.push(`text/${item.id}`)"
                 >
                 {{ item.title }} <br>
-                <small>{{item.tipo}}</small>
+                <small>{{ nomeTipo(item.tipo) }}</small>
 
                 <template v-slot:prepend>
                     <v-tooltip text="inserir norma">
@@ -34,6 +38,9 @@
                 </v-list-item>
             </v-list>
         </div>
+        <v-alert v-else-if="!load && !resultsSearch?.total?.value && searchActive" type="warning" variant="outlined" class="mb-5">
+            não foi encontrado resultados para essa busca
+        </v-alert>
     </v-expand-transition>
     <v-snackbar
         v-model="snack.snackbar"
@@ -62,15 +69,19 @@
     import PageOne from './pageOne.vue';
     import { ref } from 'vue';
     import CollectionDialog from '../collection/CollectionDialog.vue';
+    
     import { useLoginStore } from '@/store/LoginStore';
-
     const loginStore = useLoginStore()
+
+    import { useGeneralStore } from '@/store/GeneralStore'
+    const generalStore = useGeneralStore()  
 
     const router = useRouter()
 
     const props = defineProps({
-        resultsSearch: Array, 
-        load: Boolean
+        resultsSearch: Object, 
+        load: Boolean,
+        searchActive: Boolean
     })
 
     const document = ref([])
@@ -100,6 +111,11 @@
         return !!find
         ? find
         : false
+    }
+
+    const nomeTipo = (item) => {
+        let nome = generalStore.fonteNome(item)
+        return nome.mudar
     }
    
 </script>
