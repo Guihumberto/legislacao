@@ -87,7 +87,7 @@
                                     <v-expansion-panel-text>
                                         <div class="even-columns">
                                             <div   v-for="law, l in ano.norma.sort(orderName)" :key="l">
-                                                <a class="openLaw" :href="`text/${law.id}`" target="_blank">{{ law.title }}</a>
+                                                <a class="openLaw" :href="`text/${law.id}?search=leges`" target="_blank">{{ law.title }}</a>
                                             </div>
                                         </div>
                                     </v-expansion-panel-text>

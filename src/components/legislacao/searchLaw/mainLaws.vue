@@ -7,7 +7,7 @@
            color="primary"
           :subtitle="nomeTipo(item.tipo)"
           :title="item.title"
-          :to="`/text/${item.id}`"
+          :to="`/text/${item.id}?search=leges`"
         ></v-card>
       </v-col>
     </v-row>

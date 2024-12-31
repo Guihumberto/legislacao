@@ -424,7 +424,7 @@
                 }
             },
             voltar(){
-                this.$router.push("/legesporlei");
+                this.$router.go(-1);
             },
             filterJustArt(art){     
                 console.log(this.lastArt);

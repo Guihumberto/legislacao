@@ -1129,7 +1129,7 @@
             },
             openLaw(item){
                 let link = item._source.page_to_norma.parent
-                window.open(`text/${link}`, '_blank');
+                window.open(`text/${link}?search=search`, '_blank');
             },
             async salvaNoBanco(){
                 

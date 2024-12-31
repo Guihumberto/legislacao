@@ -47,7 +47,7 @@
                       {{ item._source.data_include }}
                     </v-list-item-subtitle>
                     <template v-slot:append>
-                      <a class="openLaw" :href="`text/${item._source.id}`" target="_blank"><v-icon color="primary" class="border">mdi-arrow-right</v-icon></a>
+                      <a class="openLaw" :href="`text/${item._source.id}?search=leges`" target="_blank"><v-icon color="primary" class="border">mdi-arrow-right</v-icon></a>
                     </template>
                   </v-list-item>
                   <v-list-item>

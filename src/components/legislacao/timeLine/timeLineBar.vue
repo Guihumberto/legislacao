@@ -18,7 +18,7 @@
           <div>
             <ul>
               <li v-for="item, l in year.laws" :key="l">
-                <a class="openLaw" :href="`../text/${item.id}`" target="_blank">{{ item.title }}</a>     
+                <a class="openLaw" :href="`../text/${item.id}?search=leges`" target="_blank">{{ item.title }}</a>     
               </li>
             </ul>
           </div>

@@ -7,7 +7,7 @@
              color="success"
              :subtitle="item.description"
              :title="item.title"
-             to="`/text/${item.id}`"
+             :to="`/collection_search/${item.id}`"
            ></v-card>
          </v-col>
        </v-row>

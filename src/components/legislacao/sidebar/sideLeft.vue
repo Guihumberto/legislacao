@@ -145,7 +145,7 @@
                 console.log("", this.active)
                 let link = this.active[0]
                 if(link){
-                    window.open(`text/${link}`, '_blank');
+                    window.open(`text/${link}?search=search`, '_blank');
                 }
             },
             order(a, b){

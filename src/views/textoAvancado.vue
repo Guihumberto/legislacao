@@ -9,7 +9,7 @@
         </div>
         <div class="container" v-else>
             <v-btn variant="tonal" @click="voltar" class="mb-2 btn">Voltar</v-btn>
-            <v-btn variant="tonal" @click="$router.push(`/text/${id}`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
+            <v-btn variant="tonal" @click="$router.push(`/text/${id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
             <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn">ocultar cabeçalho</v-btn>
 
             <div>

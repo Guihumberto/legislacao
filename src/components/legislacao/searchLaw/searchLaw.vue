@@ -13,7 +13,7 @@
                 <v-list-item 
                     v-for="item, i in resultsSearch.hits.map(x => x._source)" :key="i"
                     link
-                    @click.stop="router.push(`text/${item.id}`)"
+                    @click.stop="router.push(`text/${item.id}?search=leges`)"
                 >
                 {{ item.title }} <br>
                 <small>{{ nomeTipo(item.tipo) }}</small>

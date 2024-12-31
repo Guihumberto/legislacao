@@ -34,7 +34,8 @@
             return{
                 id: this.$route.params.id,
                 textLaws: {},
-                load: false
+                load: false,
+                route_query: this.$route.query.search 
             }
         },
         computed:{
@@ -63,7 +64,10 @@
                 printStore.downloadPDF(this.listPage)
             },
             voltar(){
-                this.$router.push("/leges");
+                if(this.route_query == 'search') this.$router.push("/leges");
+                if(this.route_query == 'leges') this.$router.push("/legesporlei");
+                if(this.route_query == 'favs') this.$router.push("/favorites");
+                if(!this.route_query) this.$router.push("/leges");
             }
         },
         created(){

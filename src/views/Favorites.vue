@@ -167,9 +167,9 @@
 
     const goTo = (item) => {
 
-        if(item.section == 'page') window.open(`/textpage/${item.id}`, '_blank');
+        if(item.section == 'page') window.open(`/textpage/${item.id}?search=favs`, '_blank');
 
-        if(item.section == 'law') window.open(`/text/${item.id}`, '_blank');
+        if(item.section == 'law') window.open(`/text/${item.id}?search=favs`, '_blank');
     }
 
 </script>

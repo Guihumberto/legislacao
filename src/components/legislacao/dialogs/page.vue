@@ -77,7 +77,7 @@
         return resultado;
       },
       openUrl(){
-        window.open(`textpage/${this.id}`, '_blank');
+        window.open(`textpage/${this.id}?search=search`, '_blank');
       }
     }
   }

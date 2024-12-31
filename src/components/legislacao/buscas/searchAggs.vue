@@ -83,7 +83,7 @@
         methods:{
             openLaw(item){
                 let link = item.parent
-                window.open(`text/${link}`, '_blank');
+                window.open(`text/${link}?search=search`, '_blank');
             },
             nomeTipo(item){
                 let nome = generalStore.fonteNome(item)
