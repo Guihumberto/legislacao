@@ -71,6 +71,11 @@ export const useLawStore = defineStore("Law", {
             this.getAllLaw()
         },
         searchform(item){
+            if(item.fav_law){
+                const laws = this.readMainLaws.map(x => x.id)
+                this.getJustMainLaws(laws)
+                return
+            }
             this.search = { ...item }
             if(!this.search.text && !this.search.fonte.length && !this.search.years.length){
                 this.initSearch()
@@ -87,6 +92,32 @@ export const useLawStore = defineStore("Law", {
             if(!this.search.text && this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig5()
             if(!this.search.text && !this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig6()
             if(!this.search.text && this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig7()
+        },
+        async getJustMainLaws(items){
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "id": items
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                this.lawsListConfigAdm = response.data.hits.hits
+                this.totalLawsListConfigAdm = response.data.hits.total.value
+            } catch (error) {
+                console.log("error get main laws admin");
+            }finally{
+                this.load = false
+            }
         },
         async getLawsAdmConfig(){
             try {
@@ -595,8 +626,7 @@ export const useLawStore = defineStore("Law", {
                 const loginStore = useLoginStore()
                 const doc = { ...item, created_by: loginStore.readLogin.cpf }
                 const response = await api.post(`main_laws/_doc/${item.id}`, doc)
-                console.log(doc);
-                
+                this.main_laws.push({...doc})
             } catch (error) {
                 console.log('erro add law');
             } finally {

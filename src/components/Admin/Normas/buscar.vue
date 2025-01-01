@@ -10,9 +10,11 @@
                     prepend-inner-icon="mdi-magnify"
                     v-model.trim="search.text"
                     clearable
+                    :disabled="search.fav_law"
                 ></v-text-field>
                 <div class="autocompletes">
                     <v-autocomplete
+                        :disabled="search.fav_law"
                         clearable
                         chips
                         label="Fonte"
@@ -27,6 +29,7 @@
                         prepend-inner-icon="mdi-alpha-f-box"
                     ></v-autocomplete>
                     <v-autocomplete
+                        :disabled="search.fav_law"
                         prepend-inner-icon="mdi-calendar"
                         clearable
                         chips
@@ -40,9 +43,12 @@
                     ></v-autocomplete>
                 </div>
                 <div class="checkbox">
-                        <v-checkbox label="Eficaz" v-model="search.eficaz" color="success"></v-checkbox>
-                        <v-checkbox label="Sigiloso" v-model="search.sigiloso" color="warning"></v-checkbox>
-                        <v-checkbox label="Revogado" v-model="search.revogado" color="error"></v-checkbox>
+                        <v-checkbox :disabled="search.fav_law" hide-details label="Eficaz" v-model="search.eficaz" color="success"></v-checkbox>
+                        <v-checkbox :disabled="search.fav_law" hide-details label="Sigiloso" v-model="search.sigiloso" color="warning"></v-checkbox>
+                        <v-checkbox :disabled="search.fav_law" hide-details label="Revogado" v-model="search.revogado" color="error"></v-checkbox>
+                </div>
+                <div>
+                    <v-checkbox v-model="search.fav_law" color="amber" label="Apenas marcados como favoritos" hide-details></v-checkbox>
                 </div>
                 
                 <div class="text-right">
@@ -68,7 +74,8 @@
         fonte: [], 
         eficaz: true,
         sigiloso: false,  
-        revogado: false
+        revogado: false,
+        fav_law: false
     })
 
     const searchForm = async () => {
