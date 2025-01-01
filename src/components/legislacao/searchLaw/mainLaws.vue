@@ -3,7 +3,7 @@
     carregando...
     </v-alert>
     <div class="my-10" v-else>
-      <h5 class="mb-5 text-h6">Acessadas frequentemente</h5>
+      <h5 class="mb-5 text-h6" v-if="lawStore.readMainLaws.length">Acessadas frequentemente</h5>
       <v-row class="mb-5">
         <v-col cols="12" md="4" v-for="item, i in lawStore.readMainLaws" :key="i">
           <v-card

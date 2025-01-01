@@ -3,7 +3,7 @@
     carregando...
   </v-alert>
     <div class="my-10" v-else>
-        <h5 class="mb-5 text-h6">Coleção de Normas</h5>
+        <h5 class="mb-5 text-h6" v-if="collectionStore.readCollections.length">Coleção de Normas</h5>
         <v-row class="mb-5">
          <v-col cols="12" md="4" v-for="item, i in collectionStore.readCollections" :key="i">
            <v-card

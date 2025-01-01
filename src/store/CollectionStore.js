@@ -8,7 +8,7 @@ export const useCollectionStore = defineStore("collection", {
     }),
     getters: {
         readCollections(){
-            return this.collections.filter(x => x.active)
+            return this.collections.filter(x => x.active && x.publish)
         },
         readLoad(){
             return this.load

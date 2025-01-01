@@ -57,6 +57,7 @@
 
     const items = ref([
               { text: 'Início', icon: 'mdi-home', url:'/leges' },
+              { text: 'Normas', icon: 'mdi-file-document-multiple', url:'/legesporlei' },
               { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
               { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
               { text: 'Histórico', icon: 'mdi-history', url:'/history' },

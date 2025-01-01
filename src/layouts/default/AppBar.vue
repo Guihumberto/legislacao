@@ -35,9 +35,11 @@
           </div>
           <nav class="navbar">
             <ul role="list">
-              <li> <a @click="menu = !menu">INSTITUCIONAL</a></li>
-              <li> <a href="#">CONTATO</a></li>
-              <li> <a class="active">QUEM SOMOS</a></li>
+              <li> <router-link :class="routeName == 'Legislacao' ? 'active' : ''" to="/leges">INÍCIO</router-link></li>
+              <li> <a @click.prevent="menu = !menu">INSTITUCIONAL</a></li>
+              <li> <router-link :class="routeName == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
+              <li> <router-link  to="/about">CONTATO</router-link></li>
+              <li> <router-link  to="/about">QUEM SOMOS</router-link></li>
             </ul>
           </nav>
           <div class="btn_group">    
@@ -105,7 +107,10 @@
       },
       isLogin(){
         return !!loginStore.readLogin.cpf
-      }
+      },
+        routeName() {
+        return this.$route.name;
+      },
     },
     methods: {
         changeHeaderShow(){
@@ -246,6 +251,27 @@ header .container {
 }
 .navbar a:hover::after{
   transform: scaleX(1);
+}
+.navbar .active{
+  position: relative;
+  display: inline-block;
+  margin-left: 1.5rem;
+  padding: 0;
+  transition: .6s ease;
+  font-weight: 500;
+  color: white;
+}
+.navbar .active::after{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 100%;
+  height: .5rem;
+  background: white;
+  border-radius: 5px;
+  transform: scaleX(1);
+  transition: transform .5s;
 }
 .subheader h6{
   display: flex;

@@ -8,7 +8,7 @@ export const useLawStore = defineStore("Law", {
         listAllLaws: [],
         load: false,
         totalLaws: 0,
-        nroLaws: 500,
+        nroLaws: 1500,
         pagination:{
             page: 1, 
             start: 1, 
@@ -56,6 +56,26 @@ export const useLawStore = defineStore("Law", {
                 this.load = true
                 const response = await api.post("laws_v3/_search", {
                     from: 0,
+                    size: this.nroLaws,
+                    query:{
+                        terms:{
+                            ano: [2025, 2024, 2023]
+                        }
+                    }
+                })
+                this.listAllLaws = response.data.hits.hits
+                this.totalLaws = response.data.hits.total.value
+            } catch (error) {
+                console.log("error getAllLaw");
+            }finally{
+                this.load = false
+            }
+        },
+        async getAllLaw2(){
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
                     size: this.nroLaws
                 })
                 this.listAllLaws = response.data.hits.hits
@@ -68,7 +88,7 @@ export const useLawStore = defineStore("Law", {
         },
         changeNroLaws(){
             this.nroLaws = 4000
-            this.getAllLaw()
+            this.getAllLaw2()
         },
         searchform(item){
             if(item.fav_law){

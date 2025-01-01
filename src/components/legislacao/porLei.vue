@@ -102,7 +102,7 @@
                         <p>Carregando...</p>
                     </v-alert>
                     <div class="text-right mt-5">
-                        <v-btn :loading="readLoad" @click="changeNroLaws()" variant="flat" color="primary">baixar todas</v-btn>
+                        <v-btn :disabled="totalPagesDowload == totalLaws" :loading="readLoad" @click="changeNroLaws()" variant="flat" color="primary">baixar normas anteriores a 2023</v-btn>
                     </div>
                 </div>
             </div>
@@ -216,10 +216,13 @@
                 return lawStore.listAllLaws
             },  
             totalLaws(){
-                return lawStore.readTotalLaws
+                return consultaStore.readTotalLaws
             },
             totalPages(){
                 return consultaStore.readTotalPages
+            },
+            totalPagesDowload(){
+                return lawStore.readTotalLaws
             },
             readLoad(){
                 return lawStore.readLoad
