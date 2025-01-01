@@ -7,7 +7,7 @@
                     <small>Busca da lei por ano, fonte ou texto.</small>
                 </div>
                 <div class="d-flex align-center">
-                    <router-link to="/leges" class="linkTO">Busca por termo</router-link>
+                    <router-link to="/leges" class="linkTO"> Ir para busca por termo</router-link>
                     <help title="ajuda" :idHelp="2" class="ml-2 contador" />
                     <menuOpt class="contador" />
                 </div>

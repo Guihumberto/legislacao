@@ -7,7 +7,7 @@
                     <contador class="contador" />
                 </div> 
                 <div class="d-flex align-center">
-                    <router-link to="/legesporlei" class="linkTO">Busca por Norma</router-link>
+                    <router-link to="/legesporlei" class="linkTO">Ir para busca por norma</router-link>
                     <help title="ajuda" :idHelp="1" class="ml-2 contador" />
                     <menuOpt class="contador" />
                 </div>
