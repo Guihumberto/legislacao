@@ -34,6 +34,12 @@
                     color="success"
                     v-model="teste"
                ></v-switch>
+               <v-btn variant="text" 
+                :class="isFav(item._source.id) ? 'favoritar':''"
+                :icon="isFav(item._source.id) ? 'mdi-star': 'mdi-star-outline'" 
+                :color="isFav(item._source.id) ? 'amber': 'grey'"
+                @click.stop="changeLawFav(item._source)"
+                ></v-btn>
             </template>
             
         </v-list-item>
@@ -43,6 +49,7 @@
 <script setup>
     import { onMounted, ref } from 'vue';
     import { useLawStore } from '@/store/LawsStore';
+import { computed } from 'vue';
     const lawStore = useLawStore()
 
     const teste = ref(true)
@@ -51,8 +58,31 @@
         lawStore.getLawsAdmConfig()
     })
 
+    const idsMainLaws = computed(() => {
+        return lawStore.readMainLaws.map(x => x.id)
+    })
+
+    const isFav = (id) => idsMainLaws.value.includes(id)
+
+    const changeLawFav = async (item) => {
+        const { ano, description_norm, id, path, revogado, sigiloso, tipo, title, total_pages } = item
+        const objeto = { ano, description_norm, id, path, revogado, sigiloso, tipo, title, total_pages }
+        await lawStore.addMainLaw(objeto)
+    }
+
 </script>
 
 <style lang="scss" scoped>
-
+.favoritar{
+    font-size: 1.1rem;
+    animation: aumentar 1s ease;
+}
+@keyframes aumentar {
+    from{
+        scale: 2;
+    }
+    to{
+        scale: 1;
+    }
+}
 </style>

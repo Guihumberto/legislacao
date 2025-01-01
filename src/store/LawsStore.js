@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
+
 import api from "@/services/api"
+import { useLoginStore } from "./LoginStore";
 
 export const useLawStore = defineStore("Law", {
     state: () => ({
@@ -578,6 +580,45 @@ export const useLawStore = defineStore("Law", {
                 console.log('error get main laws');
             } finally {
                 this.load = false
+            }
+        },
+        async addMainLaw(item){
+            this.load = true
+            const isExist = await this.isMainLawExist(item.id)
+
+            if(isExist) {
+                this.removeMainLaw(item.id)
+                return
+            }       
+
+            try {
+                const loginStore = useLoginStore()
+                const doc = { ...item, created_by: loginStore.readLogin.cpf }
+                const response = await api.post(`main_laws/_doc/${item.id}`, doc)
+                console.log(doc);
+                
+            } catch (error) {
+                console.log('erro add law');
+            } finally {
+                this.load = false
+            }
+        },
+        async removeMainLaw(id){
+            try {
+                const response = await api.delete(`main_laws/_doc/${id}`)
+                this.main_laws = this.main_laws.filter(x => x.id != id)
+            } catch (error) {
+                console.log("erro remove main law");
+            } finally {
+                this.load = false
+            }
+        },
+        async isMainLawExist(id){
+            try {
+                const response = await api.get(`main_laws/_doc/${id}`)
+                return response.data._id
+            } catch (error) {
+                console.log("erro main law exist");
             }
         },
         initSearch(){
