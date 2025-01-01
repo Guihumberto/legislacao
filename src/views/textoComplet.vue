@@ -77,7 +77,7 @@
             voltar(){
                 if(this.route_query == 'search') this.$router.push("/leges");
                 if(this.route_query == 'leges') this.$router.push("/legesporlei");
-                if(this.route_query == 'docs') this.$router.push("/favorites");
+                if(this.route_query == 'favs') this.$router.push("/favorites");
                 if(!this.route_query) this.$router.push("/leges");
             }
         },

@@ -36,6 +36,7 @@
   const consultaStore = useConsultaStore()  
   
   lawStore.getAllLaw()
+  lawStore.getMainLaws()
   consultaStore.contadores()
 
 

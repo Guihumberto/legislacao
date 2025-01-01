@@ -77,12 +77,12 @@
 </template>
 
 <script setup>
-    import { useRouter } from 'vue-router';
     import { ref } from 'vue';
     import { useUserAreaStore } from '@/store/AreaUserStore'
-
-    const router = useRouter()
     const userAreaStore = useUserAreaStore()
+    import { useRouter } from 'vue-router';
+    const router = useRouter()
+   
 
     const dialog = ref(false)
 

@@ -22,7 +22,8 @@ export const useLawStore = defineStore("Law", {
             sigiloso: false, 
             revogado: false,
             eficaz: true
-        }
+        },
+        main_laws: []
     }),
     getters: {
         readListAllLaws(){
@@ -43,6 +44,9 @@ export const useLawStore = defineStore("Law", {
         readTotalPagesLawsAdmConfig(){
             return Math.ceil(this.readTotalLawsAdmConfig/this.pagination.perPage) 
         },
+        readMainLaws(){
+            return this.main_laws
+        }
     },
     actions:{
         async getAllLaw(){
@@ -560,6 +564,19 @@ export const useLawStore = defineStore("Law", {
             } catch (error) {
                 console.log("error searchlaw");
             }finally{
+                this.load = false
+            }
+        },
+        async getMainLaws(){
+            try {
+                this.load = true
+                this.main_laws = []
+                const response = await api.get('main_laws/_search')
+                const resp = response.data.hits.hits
+                this.main_laws = resp.map(x => ({ id: x._id, ...x._source }))
+            } catch (error) {
+                console.log('error get main laws');
+            } finally {
                 this.load = false
             }
         },
