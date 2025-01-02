@@ -1,6 +1,6 @@
 <template>
     <section>
-        <div class="sizeLoad" v-if="load">
+        <div class="sizeLoad" v-if="pageStore.readLoad">
             <v-progress-circular
                 :size="50"
                 color="primary"
@@ -12,73 +12,78 @@
             <v-btn variant="tonal" color="red" prepend-icon="mdi-file-pdf-box" class="ml-2 mb-2 btn" @click="gerarPdf()">PDF</v-btn>
             <div class="border pa-5 mb-2 bg-white">
                 <div class="font-weight-bold d-flex justify-space-between">
-                    <p >{{ listPage.tipo }} | {{ listPage.page_to_norma.title }} | {{ listPage.ano }}</p> 
-                    <p>Página: {{ listPage.num_page }} </p>
+                    <p >{{ pageStore.readPage?.tipo }} | {{ pageStore.readPage?.page_to_norma.title }} | {{ pageStore.readPage?.ano }}</p> 
+                    <p>Página: {{ pageStore.readPage?.num_page }} </p>
                 </div>
-                <div class="corpo">
-                    <p v-html="listPage.text_page"></p> 
+                <div class="corpo" @mouseup="handleTextSelection()"  style="position: relative;">
+                    <p v-html="listPage"></p> 
+                    <SelectionSearch 
+                        :menuPosition="menuPosition"
+                        :selectedText="selectedText"
+                        :menu="menu"
+                    />
                 </div>
             </div>
         </div>
     </section>
 </template>
 
-<script>
-     import api from "@/services/api"
+<script setup>
+     import { computed, ref } from "vue"
+     import SelectionSearch from '@/components/legislacao/elements/selectionSearch.vue'
+     import { usePageStore } from '@/store/PageStore'
+     const pageStore = usePageStore()
 
      import { usePrintMail } from '@/store/PrintMailStore'
-     const printStore = usePrintMail()    
+     const printStore = usePrintMail() 
+     
+     import { useRoute, useRouter } from "vue-router"
+     const route = useRoute()
+     const router = useRouter()
 
-    export default {
-        data(){
-            return{
-                id: this.$route.params.id,
-                textLaws: {},
-                load: false,
-                route_query: this.$route.query.search 
-            }
-        },
-        computed:{
-            listPage(){
-                let list = this.textLaws
+     const menu = ref(false)
+     const menuPosition = ref({ top: 0, left: 0 });
+     const selectedText = ref("")
 
-                list.text_page = list.text_page.replace(/\n+/g, '<br>');
-                
-                    
-                return list
+     
+
+     pageStore.getPage(route.params.id)
+
+     const listPage = computed(() => {
+        let list = pageStore.readPage?.text_page
+        if(pageStore.readPage) list = list.replace(/\n+/g, '<br>');  
+        return list
+     })
+
+     const gerarPdf = () => {
+        router.push(`/text/${pageStore.readPage.page_to_norma.parent}?idpage=${route.params.id}`)
+     }
+     const voltar = () => {
+        router.push("/leges");
+     }
+
+     const handleTextSelection = (event) => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().trim()) {
+            selectedText.value = selection.toString().trim();
+
+            const range = selection.getRangeAt(0).getBoundingClientRect();
+            menuPosition.value = {
+                top: range.top + window.scrollY - 50, 
+                left: range.left + window.scrollX,
             }
-        },
-        methods:{
-            async getPage(){
-                this.load = true
-                try {
-                    const response = await api.get(`pages_v2/_doc/${this.id}`)
-                    this.textLaws = response.data._source
-                } catch (error) {
-                    console.log("error");
-                }finally{
-                    this.load = false
-                }
-            },
-            gerarPdf(){
-                printStore.downloadPDF(this.listPage)
-            },
-            voltar(){
-                if(this.route_query == 'search') this.$router.push("/leges");
-                if(this.route_query == 'leges') this.$router.push("/legesporlei");
-                if(this.route_query == 'favs') this.$router.push("/favorites");
-                if(!this.route_query) this.$router.push("/leges");
-            }
-        },
-        created(){
-            this.getPage()
+            menu.value = true;
+        } else {
+            menu.value = false;
+            selectedText.value = ""
         }
-    }
+     }
+    
 </script>
 
 <style lang="scss" scoped>
-.section {
-    min-height: 100vh;
+section {
+    min-height: 70vh;
 }
 .sizeLoad{
     min-height: 60vh;

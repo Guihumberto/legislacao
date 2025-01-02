@@ -106,14 +106,14 @@
 <script>
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
-    import api from "@/services/api"
+    import { usePageStore } from "@/store/PageStore";
+    const pageStore = usePageStore()
 
     export default {
         data(){
             return{
                 id: this.$route.params.id,
                 textLaws: [],
-                load: false,
                 art: 0,
                 order: 0,
                 part1: '',
@@ -152,6 +152,9 @@
             search(ante, depois) { this.pagination.page = 1 }
         },
         computed:{
+            load(){
+                return pageStore.readLoad
+            },
             textoInicital(){
                 const list = this.textLaws.map(x => x._source)
                     .sort((a, b) => a.num_page - b.num_page)
@@ -479,29 +482,8 @@
         },
         methods:{
             async getAll(){
-                this.load = true
-                try {
-                    const response = await api.post("pages_v2/_search", {
-                        from: 0,
-                        size: 5000,
-                        "query": {
-                            "bool": {
-                                "must": [
-                                    {
-                                    "match": {
-                                        "page_to_norma.parent": this.id
-                                    }
-                                    }
-                                ]
-                            }
-                        }
-                    })
-                    this.textLaws = response.data.hits.hits
-                } catch (error) {
-                    console.log("error");
-                }finally{
-                    this.load = false
-                }
+                const resp = await pageStore.getAllPages(this.id)
+                this.textLaws = pageStore.readAllPages
             },
             voltar(){
                 this.$router.push("/leges");
