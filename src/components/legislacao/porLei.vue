@@ -1,6 +1,6 @@
 <template>
     <section>
-        <div class="container">    
+        <div class="container">
             <div class="d-flex justify-space-between mt-2 align-center">
                 <div>
                     <router-link class="text-black" to="/">Legislação</router-link> <br>
@@ -145,7 +145,8 @@
                 reverse: false,
                 resultsSearch: [], 
                 load: false,
-                searchActive: false
+                searchActive: false,
+                text_search: this.$route.query.text_search 
             }
         },
         props:{
@@ -265,6 +266,12 @@
                     ? a.tipo -  b.tipo
                     : b.tipo -  a.tipo
             },
+        },
+        created(){
+            if(this.text_search){
+                this.search.text = this.text_search
+                this.searchForLaw()
+            }
         }
     }
 </script>

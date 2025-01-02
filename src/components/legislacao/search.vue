@@ -12,10 +12,6 @@
                     <menuOpt class="contador" />
                 </div>
             </div>
-            <!--<div class="headSearchTwo my-5">
-                <h2>Busca na legislação</h2>
-                <small>Busca por termos, frases, fontes e periodos.</small>
-            </div> -->
             <div class="content">
                 <v-form @submit.prevent="searchEnv(1)" ref="form">
                     <div class="line1">
@@ -482,6 +478,7 @@
                     ano: [],
                     fonte: []
                 },
+                text_search: this.$route.query.text_search 
             }
         },
         watch:{
@@ -1221,6 +1218,9 @@
         },
         mounted(){
             this.deslocarTela("pri-hea")
+            if(this.text_search){
+                this.search.text = this.text_search
+            }
         }
     }
 </script>
