@@ -124,11 +124,6 @@
       selectedText.value = ""
     }
   }
-  
-  const actionsSearch = (action) => {
-    console.log(selectedText.value);
-    menu.value = false;
-  }
     
 </script>
 

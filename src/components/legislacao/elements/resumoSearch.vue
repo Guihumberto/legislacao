@@ -1,30 +1,41 @@
 <template>
     <div class="wrapperesumo">
-        <p class="font-weight-light" v-html="extrairLinha">
-        </p>
+        <div  @mouseup="handleTextSelection()"  style="position: relative;">
+            <p class="font-weight-light" v-html="extrairLinha">
+            </p>
+            <SelectionSearch 
+                :menuPosition="menuPosition"
+                :selectedText="selectedText"
+                :menu="menu"
+            />
+        </div>
         <div class="text-right">
-            <page :id="id" :page="page" :searchP="searchP" />
+            <pageDialog :id="id" :page="page" :searchP="searchP" />
         </div>
     </div>
 </template>
 
-<script>
-    import page from "@/components/legislacao/dialogs/page"
+<script setup>
+    import pageDialog from "@/components/legislacao/dialogs/page"
+    import { computed, ref } from "vue"
+    import { useRoute } from "vue-router"
+    const route = useRoute()
+    import SelectionSearch from "./selectionSearch.vue"
 
-    export default {
-        components:{
-            page
-        },
-        props:{
-            text: true,
-            page: Object,
-            searchP: String,
-            id: String
-        },
-        computed: {
-            extrairLinha(){
+    const menu = ref(false)
+    const menuPosition = ref({ top: 0, left: 0 });
+    const selectedText = ref("")
+
+    const props = defineProps({
+        text: true,
+        page: Object,
+        searchP: String,
+        id: String
+    })
+
+    const extrairLinha = computed(()=> {
                 
-                let texto = this.markSearch()
+                let texto = markSearch()
                 let regex = /<b>.*?<\/b>/;
 
                 const linhas = texto.split('\n');
@@ -40,36 +51,54 @@
                 linhasFiltradas.push('(...)')
 
                 if(novo_array.length <= 2) {
-                    let texto_cortado = [this.text.replace('\n', '<br><br>').substring(0,500), "...", "<br>", "(...)"]
+                    let texto_cortado = [props.text.replace('\n', '<br><br>').substring(0,500), "...", "<br>", "(...)"]
                     return texto_cortado.join('')
                 }
                 
                 return novo_array.join('<br>');
-            },
-        },
-        methods: {
-            markSearch(){
-                let texto = this.text
-                let palavrasChave = this.$route.query.search.split(' ');
 
-                palavrasChave = this.excluirStopWords(palavrasChave)
+    })
+  
+        
+    const markSearch = () => {
+        let texto = props.text
+        let palavrasChave = route.query.search.split(' ');
 
-                const escapedKeywords = palavrasChave.map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        palavrasChave = excluirStopWords(palavrasChave)
 
-                const regex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
-                const textoMarcado = texto.replace(regex, '<b>$1</b>');
+        const escapedKeywords = palavrasChave.map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
-                return textoMarcado;
-                
-            },
-            excluirStopWords(arrayPrincipal) {
-                const stopWords = ["a", "o", "e", "é", "um", "uma", "com", "de", "do", "da", "para", "por", "em", "os", "as", "isso", "essa", "esse", "isso", "está"];
-                const resultado = arrayPrincipal.filter(palavra => !stopWords.includes(palavra));
+        const regex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
+        const textoMarcado = texto.replace(regex, '<b>$1</b>');
 
-                return resultado;
-            }
-        },
+        return textoMarcado;
+        
     }
+    const excluirStopWords = (arrayPrincipal) => {
+        const stopWords = ["a", "o", "e", "é", "um", "uma", "com", "de", "do", "da", "para", "por", "em", "os", "as", "isso", "essa", "esse", "isso", "está"];
+        const resultado = arrayPrincipal.filter(palavra => !stopWords.includes(palavra));
+
+        return resultado;
+    }
+
+    const handleTextSelection = (event) => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().trim()) {
+            selectedText.value = selection.toString().trim();
+
+            const range = selection.getRangeAt(0).getBoundingClientRect();
+            menuPosition.value = {
+                top: range.top + window.scrollY, 
+                left: range.left + window.scrollX,
+            }
+            menu.value = true;
+        } else {
+            menu.value = false;
+            selectedText.value = ""
+        }
+    }
+        
+
 </script>
 
 <style lang="scss" scoped>
