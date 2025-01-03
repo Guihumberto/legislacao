@@ -21,6 +21,7 @@
                         :menuPosition="menuPosition"
                         :selectedText="selectedText"
                         :menu="menu"
+                        :direct="true"
                     />
                 </div>
             </div>
@@ -83,7 +84,7 @@
 
 <style lang="scss" scoped>
 section {
-    min-height: 70vh;
+    min-height: 85vh;
 }
 .sizeLoad{
     min-height: 60vh;

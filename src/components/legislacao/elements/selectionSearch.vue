@@ -26,20 +26,33 @@
   import { useRouter } from 'vue-router';
   const router = useRouter()
 
+  import { useGeneralStore } from '@/store/GeneralStore'
+  const generalStore = useGeneralStore()
+
   const isVisible = ref(false)
   
   const props = defineProps({
     menu: Boolean,
     selectedText: String,
     menuPosition: Object,
-
+    direct: {
+      type: Boolean,
+      default: false
+    }
   })
   
   const actionsSearch = (action) => {
     if(action == 'search') {
-      window.open(`/leges?text_search=${props.selectedText}`, '_blank');
+      if(props.direct){
+        router.push('/leges')
+        generalStore.reqChangeFromSelectSearch(true, props.selectedText)
+      } else {
+        generalStore.reqChangeFromSelectSearch(true, props.selectedText)
+      }
     } 
+    
     if(action == 'leges') router.push(`/legesporlei?text_search=${props.selectedText}`)
+
     isVisible.value = false;
   }
 

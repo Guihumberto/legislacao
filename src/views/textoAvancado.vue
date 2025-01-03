@@ -29,7 +29,7 @@
                             label="Busca"
                             append-inner-icon="mdi-magnify"
                             v-model.trim="search"
-                            @keydown.enter="filterJustArt(search.replace(/[^0-9]/g,''))"
+                            @keydown.enter="filterJustArt(search)"
                             :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
                             clearable
                         ></v-text-field>
@@ -99,7 +99,7 @@
                     X
                     </v-btn>
                 </template>
-            </v-snackbar>
+        </v-snackbar>
     </section>
 </template>
 
@@ -488,8 +488,17 @@
             voltar(){
                 this.$router.push("/leges");
             },
-            filterJustArt(art){     
-                console.log(this.lastArt);
+            filterJustArt(item){
+                const art = item.replace(/[^0-9,]/g,'')
+                const hasComma = art.includes(",");
+
+                if(hasComma && art){   
+                    const list = art.split(",").forEach(x => this.filterArts(x))
+                } else {
+                    this.filterArts(art)
+                }
+            },  
+            filterArts(art){
                 if(art <= this.lastArt){
                     this.artIndice = ''
                     this.search = ''
@@ -506,7 +515,7 @@
                 } else {
                     this.snackAction()
                 }
-            },  
+            },
             snackAction(){
                 this.snack = {
                     snackbar: true,
@@ -546,7 +555,7 @@
 
 <style lang="scss" scoped>
 section {
-    min-height: calc(100vh - 466px);
+    min-height: calc(100vh - 266px);
 }
 .sizeLoad{
     height: 55vh;

@@ -84,6 +84,18 @@ export const useGeneralStore = defineStore("General", {
         reqChange(item, i){
             this.req = item
             this.search = this.listSearch[i]
+
+        },
+        reqChangeFromSelectSearch(item, i){
+            const objeto = {
+                text: i,
+                years: [],
+                fonte: [],
+                termo: 2,
+                precision: false
+            }
+            this.req = item
+            this.search = objeto
         },
         reqChangeFromHistory(req, item){
             const objeto = {

@@ -86,7 +86,7 @@
 
 <style lang="scss" scoped>
 section {
-    min-height: calc(100vh - 466px);
+    min-height: calc(100vh - 266px);
 }
 .sizeLoad{
     height: 55vh;

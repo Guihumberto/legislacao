@@ -6,7 +6,7 @@
         variant="text"
         title="Ver a página"
       >
-        Ver mais
+        Ver Pág. {{ page.num_page }}
         <v-dialog
           v-model="dialog"
           activator="parent"

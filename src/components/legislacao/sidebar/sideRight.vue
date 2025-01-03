@@ -19,7 +19,7 @@
                         @click="searchAgain(item, i)">
                         <v-card-text class="pa-2 d-flex align-center justify-space-between">
                             <div>
-                                {{ item.text }} 
+                                {{ item.text }}
                                 <v-icon size="small" color="success" v-if="item.precision" title="precisão">mdi-check</v-icon>
                             </div>
                             <v-icon @click.stop="removeSearch(i)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
@@ -72,8 +72,7 @@
         },
         methods:{
             searchAgain(item, i){
-                const req = true
-                generalStore.reqChange(req, i)
+                generalStore.reqChange(true, i)
                 this.$router.push(`leges?search=${item.text}&years=${item.years}&fonte=${item.fonte}&termo=${item.termo}&precision=${item.precision}`)
             },
             removeSearch(item){
