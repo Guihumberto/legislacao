@@ -83,7 +83,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
                 try {
                     const resp = await api.post('favorites/_doc/', doc) 
-                    this.favoritos.push({ id: resp.idU, ...resp._source })
+                    this.favoritos.push({ idU: resp.data._id, ...doc })
                 } catch (error) {
                     console.log('erro fav')
                 } finally {

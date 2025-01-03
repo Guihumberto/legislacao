@@ -1,17 +1,6 @@
 <template>
     <section>
         <div class="container">
-            <div class="d-flex justify-space-between mt-2 align-center">
-                <div>
-                    <router-link class="text-black" to="/">Legislação</router-link> <br>
-                    <small>Busca da lei por ano, fonte ou texto.</small>
-                </div>
-                <div class="d-flex align-center">
-                    <router-link to="/leges" class="linkTO"> Ir para busca por termo</router-link>
-                    <help title="ajuda" :idHelp="2" class="ml-2 contador" />
-                    <menuOpt class="contador" />
-                </div>
-            </div>
             <div v-if="load" class="load">
                 <v-progress-circular
                         :size="50"
@@ -20,7 +9,7 @@
                     ></v-progress-circular>
             </div>
             <div class="legislacao  my-5" v-else>
-                <div class="content">
+                <!-- <div class="content">
                     <v-form @submit.prevent="searchForLaw()" ref="form">
                         <v-text-field
                             label="Buscar"
@@ -63,11 +52,45 @@
                             <v-btn color="success" variant="flat" type="submit">Buscar</v-btn>
                         </div>
                     </v-form>
+                </div> -->
+                <div class="d-flex justify-end">
+                    <small>Total de normas: {{ totalLaws }} com {{ totalPages }} páginas</small>
                 </div>
-                <SearchLaw :resultsSearch="resultsSearch" :load="loadSearch" :searchActive="searchActive" />
-                <MainLaws />
-                <CollectionLaws />
-                <ListLaws />
+                <div class="allLaws">
+                    <v-expansion-panels v-if="orgLaws.length">
+                        <v-expansion-panel
+                            v-for="tipo, t in orgLaws.sort(orderTipo)" :key="t"
+                        >
+                        <v-expansion-panel-title 
+                            expand-icon="mdi-plus" collapse-icon="mdi-minus">
+                            {{ nomeTipo(tipo.tipo) }}
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-expansion-panels variant="popout">
+                                <v-expansion-panel
+                                    v-for="ano, a in tipo.subcategorias.sort(order)" :key="a" >
+                                    <v-expansion-panel-title>{{ ano.ano }} ({{ ano.norma.length }}) </v-expansion-panel-title>
+                                    <v-expansion-panel-text>
+                                        <div class="even-columns">
+                                            <div   v-for="law, l in ano.norma.sort(orderName)" :key="l">
+                                                <a class="openLaw" :href="`text/${law.id}?search=leges`" target="_blank">{{ law.title }}</a>
+                                            </div>
+                                        </div>
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
+            
+                        </v-expansion-panel-text>
+            
+                        </v-expansion-panel>
+                    </v-expansion-panels>
+                    <v-alert variant="tonal" type="warning" v-else>
+                        <p>Carregando...</p>
+                    </v-alert>
+                    <div class="text-right mt-5">
+                        <v-btn :disabled="totalPagesDowload == totalLaws" :loading="readLoad" @click="changeNroLaws()" variant="flat" color="primary">baixar normas anteriores a 2023</v-btn>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -83,16 +106,12 @@
     import { useConsultaStore } from '@/store/ConsultaStore'
     const consultaStore = useConsultaStore()  
 
-    import help from "./dialogs/help.vue"
-    import menuOpt from "./elements/menu.vue"
-    import MainLaws from './searchLaw/mainLaws.vue'
-    import SearchLaw from './searchLaw/searchLaw.vue'
-    import CollectionLaws from './searchLaw/collectionLaws.vue'
-    import ListLaws from './searchLaw/listLaws.vue'
+    import help from "./../dialogs/help.vue"
+    import menuOpt from "./../elements/menu.vue"
     
     export default {
         components:{
-            help, menuOpt, MainLaws, SearchLaw, CollectionLaws, ListLaws
+            help, menuOpt
         },
         data(){
             return{ 

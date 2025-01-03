@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="subfooter">
-        <h3>© 2024 - OH-MY-SEARCH</h3>
+        <h3>© {{ new Date().getFullYear() }} - OH-MY-SEARCH</h3>
         <p class="text-center">Desenvolvido e idealizado por <br class="off"> JOÃO HUMBERTO S R JR.</p>
       </div>
   </div>
