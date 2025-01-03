@@ -60,6 +60,9 @@
                     hide-details
                   ></v-switch>
                 </v-list-item>
+                <v-list-item>
+                  <v-btn @click="deleteLaw(item.id)" prepend-icon="mdi-delete" variant="text" color="red">Apagar</v-btn>
+                </v-list-item>
               </v-list>
           </div>
   
@@ -84,6 +87,9 @@
       </v-menu>
 </template>
 <script setup>
+    import { useLawStore } from '@/store/LawsStore';
+    const lawStore = useLawStore()
+
     import { ref } from 'vue';
     const fav = ref(true)
     const menu = ref(false)
@@ -93,5 +99,10 @@
     const props = defineProps({
         item: Object
     })
+
+    const deleteLaw = async(item) => {
+      await lawStore.deleteLaw(item)
+      console.log(item);
+    }
 
   </script>

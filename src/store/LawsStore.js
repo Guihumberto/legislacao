@@ -671,6 +671,22 @@ export const useLawStore = defineStore("Law", {
                 console.log("erro main law exist");
             }
         },
+        async deleteLaw(id){
+            try {
+                this.load = true
+                const response = await api.post('laws_v3/_delete_by_query', {
+                    "query": {
+                        "match": {
+                        "id": id
+                        }
+                    }
+                })
+            } catch (error) {
+                console.log('erro delete law')
+            } finally {
+                this.load = false
+            }
+        },
         initSearch(){
             this.search = {
                 text: '',

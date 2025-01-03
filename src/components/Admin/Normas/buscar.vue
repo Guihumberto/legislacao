@@ -60,12 +60,16 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue';
+    import { useRouter, useRoute } from 'vue-router';
+    const router = useRouter()
+    const route = useRoute()
 
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
 
     import { useLawStore } from '@/store/LawsStore';
+
     const lawStore = useLawStore()
 
     const search = ref({
@@ -80,7 +84,21 @@
 
     const searchForm = async () => {
         await lawStore.searchform(search.value)
+        router.push(`/laws?fonte=${search.value.fonte}`)
     }
+
+    const getRouterQuery = async () => {
+        if(route.query.fonte){
+            search.value.fonte.push(route.query.fonte)
+            await searchForm()
+        }
+    } 
+
+    onMounted(() => {
+        getRouterQuery()
+    })
+
+   
 </script>
 
 <style lang="scss" scoped>
