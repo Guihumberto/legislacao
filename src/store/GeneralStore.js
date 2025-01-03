@@ -36,6 +36,7 @@ export const useGeneralStore = defineStore("General", {
             {nome:"pareceres", mudar: "Parecer de 1º inst", sigla:"P1"},
             {nome:"voto_relator", mudar: "Voto Relator", sigla:"VTR"},
             {nome:"informativos-jurisprudencia", mudar: "Informativos Jurisprudenciais", sigla:"IJP"},
+            {nome:"normativo", mudar: "Legislação", sigla:"NMT"},
             {nome:"diario", mudar: "Diário Oficial", sigla:"DOE"}
         ],
         resultsSearch: [],
