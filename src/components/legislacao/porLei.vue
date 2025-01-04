@@ -37,7 +37,7 @@
                                 chips
                                 label="Fonte"
                                 density="compact"
-                                :items="fontes"
+                                :items="generalStore.readTipos"
                                 item-value="nome"
                                 item-title="mudar"
                                 multiple
@@ -52,7 +52,7 @@
                                 chips
                                 label="Período"
                                 density="compact"
-                                :items="periodo"
+                                :items="generalStore.readPeriodo"
                                 multiple
                                 variant="outlined"
                                 v-model="search.years"
@@ -73,15 +73,17 @@
     </section>
 </template>
 
-<script>
+<script setup>
+    import { ref } from 'vue'
+
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
 
     import { useLawStore } from '@/store/LawsStore'
-    const lawStore = useLawStore()  
+    const lawStore = useLawStore()      
 
-    import { useConsultaStore } from '@/store/ConsultaStore'
-    const consultaStore = useConsultaStore()  
+    import { useRoute } from 'vue-router'
+    const route = useRoute()
 
     import help from "./dialogs/help.vue"
     import menuOpt from "./elements/menu.vue"
@@ -89,155 +91,52 @@
     import SearchLaw from './searchLaw/searchLaw.vue'
     import CollectionLaws from './searchLaw/collectionLaws.vue'
     import ListLaws from './searchLaw/listLaws.vue'
+
     
-    export default {
-        components:{
-            help, menuOpt, MainLaws, SearchLaw, CollectionLaws, ListLaws
-        },
-        data(){
-            return{ 
-                search:{
-                    text: '',
-                    years: [],
-                    fonte: []
-                },
-                rules:{
-                    required: (value) => !!value || "Campo obrigatório",
-                    minname: (v) => (v||'').length >= 4 || "Mínimo 4 caracteres",
-                },
-                loadSearch: false,
-                reverse: false,
-                resultsSearch: [], 
-                load: false,
-                searchActive: false,
-                text_search: this.$route.query.text_search 
-            }
-        },
-        props:{
-            laws: Array
-        },
-        computed:{
-            orgLaws(){
-                let list = this.listAllLaws.map(x => x._source)
+    const search =ref ({
+        text: '',
+        years: [],
+        fonte: []
+    })
 
-                if(this.search.text){
-                    let search = this.search.text.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '')
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    list =  list.filter(item => exp.test(item.title.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '') ) )
-                }
+    const rules = {
+        required: value => !!value || "campo obrigatório", 
+        minfield: (v) => (v||'').length == 11 || "CPF possui 11 dígitos",
+    }
 
-                if(this.search.years.length){
-                    list = list.filter(x => this.search.years.includes(x.ano))
-                }
 
-                if(this.search.fonte.length){
-                    list = list.filter(x => this.search.fonte.includes(x.tipo))
-                }
+    const loadSearch = ref(false)
+    const reverse = ref(false)
+    const resultsSearch = ref([])
+    const load = ref(false)
+    const searchActive = ref(false)
 
-                const classificacao = list.reduce((acumulador, item) => {
-                // Verifica se a categoria já existe no acumulador
-                const categoriaExistente = acumulador.find(c => c.tipo === item.tipo);
+    const props = defineProps({
+        laws: Array
+    })
 
-                if (categoriaExistente) {
-                    // Se a categoria já existe, verifica se a subcategoria já existe
-                    const subcategoriaExistente = categoriaExistente.subcategorias.find(s => s.ano === item.ano);
-
-                    if (subcategoriaExistente) {
-                        // Se a subcategoria já existe, adicione o valor
-                        subcategoriaExistente.norma.push({id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado});
-                    } else {
-                        // Se a subcategoria não existe, crie uma nova subcategoria
-                        categoriaExistente.subcategorias.push({
-                            ano: item.ano,
-                            norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
-                        });
-                    }
-                } else {
-                    // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                    acumulador.push({
-                        tipo: item.tipo,
-                        subcategorias: [{
-                            ano: item.ano,
-                            norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
-                        }],
-                    });
-                }
-
-                return acumulador;
-                }, []);
-
-                return classificacao
-            },
-            periodo(){
-                return generalStore.readPeriodo
-            },
-            fontes(){
-                const list = generalStore.readTipos
-                return list
-            },
-            listAllLaws(){
-                return lawStore.listAllLaws
-            },  
-            totalLaws(){
-                return consultaStore.readTotalLaws
-            },
-            totalPages(){
-                return consultaStore.readTotalPages
-            },
-            totalPagesDowload(){
-                return lawStore.readTotalLaws
-            },
-            readLoad(){
-                return lawStore.readLoad
-            }
-        },
-        methods:{
-            async searchForLaw(){
-                this.resultsSearch = []
-                this.loadSearch = true
-                
-                try {
-                    this.resultsSearch = await lawStore.getSearchPorlei(this.search);
-                    this.searchActive = true
-                } catch (error) {
-                    console.log("erro searchForLaw");
-                    this.resultsSearch = []
-                } finally{
-                    this.loadSearch = false
-                }
-            },
-            async changeNroLaws(){
-                lawStore.changeNroLaws()
-            },
-            nomeTipo(item){
-                let nome = generalStore.fonteNome(item)
-                return nome.mudar
-            },
-            order(a, b){
-                return this.reverse
-                    ? a.ano -  b.ano
-                    : b.ano -  a.ano
-            },
-            orderName(a, b){
-                return this.reverse
-                    ? a.title -  b.title
-                    : b.title -  a.title
-            },
-            orderTipo(a, b){
-                return this.reverse
-                    ? a.tipo -  b.tipo
-                    : b.tipo -  a.tipo
-            },
-        },
-        created(){
-            if(this.text_search){
-                this.search.text = this.text_search
-                this.searchForLaw()
-            }
+  
+    const searchForLaw = async() => {
+        resultsSearch.value = []
+        loadSearch.value = true
+        
+        try {
+            resultsSearch.value = await lawStore.getSearchPorlei(search.value);
+            searchActive.value = true
+        } catch (error) {
+            console.log("erro searchForLaw");
+            resultsSearch.value = []
+        } finally{
+            loadSearch.value = false
         }
     }
+    
+    
+    if(route.query.text_search){
+        search.value.text = route.query.text_search
+        searchForLaw()
+    }
+
 </script>
 
 <style lang="scss" scoped>

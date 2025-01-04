@@ -1,7 +1,7 @@
 <template>
      <section>
         <div class="container">
-            <div v-if="load" class="load">
+            <div v-if="LawsStore.readLoad" class="load">
                 <v-progress-circular
                         :size="50"
                         color="primary"
@@ -29,11 +29,7 @@
                 >
                   <v-list-item 
                     link 
-                    v-for="item, i in allLaw.sort((a, b) => {
-                                    const dataA = converterParaData(a._source.data_include);
-                                    const dataB = converterParaData(b._source.data_include);
-                                    return dataB - dataA; // Decrescente
-                                  })" :key="i"
+                    v-for="item, i in allLaw" :key="i"
                   >
                     <template v-slot:prepend>
                       <v-avatar color="grey-lighten-1">
@@ -59,50 +55,18 @@
     </section>
 </template>
 
-<script>
-  import api from "@/services/api"
-  export default {
-    data: () => ({
-      load: false,
-      allLaw: [],
-      qtdLaws: 0,
-      reverse: true
-    }),
-    methods:{
-      async getAll(){
-          try {
-              this.load = true
-              const response = await api.post("laws_v3/_search", {
-              query:{
-                exists: {
-                  field: "data_include"
-                }
-              }
-          })
-          this.allLaw = response.data.hits.hits
-          this.qtdLaws = response.data.hits.total.value
-          } catch (error) {
-              console.log("error");
-          }finally{
-              this.load = false
-          }
-      },
-      converterParaData(dataStr) {
-        const [data, hora] = dataStr.split(" ");
-        const [dia, mes, ano] = data.split("-").map(Number);
-        const [horaStr, minutoStr] = hora.split(":").map(Number);
-        return new Date(ano, mes - 1, dia, horaStr, minutoStr);
-      },
-      orderName(a, b){
-        const dataA = converterParaData(a);
-        const dataB = converterParaData(b);
-        return dataB - dataA
-      },
-    },
-    created(){
-            this.getAll()
-    }
-  }
+<script setup>
+  import { useLawStore } from '@/store/LawsStore';
+  import { onMounted, ref } from 'vue';
+  const LawsStore = useLawStore()
+
+  const allLaw = ref(false)
+
+  onMounted(async() => {
+      const resp = await LawsStore.asyncGetLastLawsAdd()
+      allLaw.value = resp
+  })
+ 
 </script>
 
 <style scoped>

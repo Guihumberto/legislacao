@@ -9,70 +9,26 @@
                     ></v-progress-circular>
             </div>
             <div class="legislacao  my-5" v-else>
-                <!-- <div class="content">
-                    <v-form @submit.prevent="searchForLaw()" ref="form">
-                        <v-text-field
-                            label="Buscar"
-                            placeholder="Digite o nome ou número da norma"
-                            variant="outlined"
-                            density="compact"
-                            prepend-inner-icon="mdi-magnify"
-                            v-model.trim="search.text"
-                            clearable
-                        ></v-text-field>
-                        <div class="autocompletes">
-                            <v-autocomplete
-                                clearable
-                                chips
-                                label="Fonte"
-                                density="compact"
-                                :items="fontes"
-                                item-value="nome"
-                                item-title="mudar"
-                                multiple
-                                variant="outlined"
-                                v-model="search.fonte"
-                                closable-chips
-                                prepend-inner-icon="mdi-alpha-f-box"
-                            ></v-autocomplete>
-                            <v-autocomplete
-                                prepend-inner-icon="mdi-calendar"
-                                clearable
-                                chips
-                                label="Período"
-                                density="compact"
-                                :items="periodo"
-                                multiple
-                                variant="outlined"
-                                v-model="search.years"
-                                closable-chips
-                            ></v-autocomplete>
-                        </div>
-                        <div class="text-right">
-                            <v-btn color="success" variant="flat" type="submit">Buscar</v-btn>
-                        </div>
-                    </v-form>
-                </div> -->
                 <div class="d-flex justify-end">
-                    <small>Total de normas: {{ totalLaws }} com {{ totalPages }} páginas</small>
+                    <small>Total de normas: {{ consultaStore.readTotalLaws }} com {{ consultaStore.readTotalPages }} páginas</small>
                 </div>
                 <div class="allLaws">
                     <v-expansion-panels v-if="orgLaws.length">
                         <v-expansion-panel
-                            v-for="tipo, t in orgLaws.sort(orderTipo)" :key="t"
+                            v-for="tipo, t in orgLaws.sort(orderBy('tipo'))" :key="t"
                         >
                         <v-expansion-panel-title 
                             expand-icon="mdi-plus" collapse-icon="mdi-minus">
-                            {{ nomeTipo(tipo.tipo) }}
+                            {{ generalStore.fonteNome(tipo.tipo).mudar }}
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
                             <v-expansion-panels variant="popout">
                                 <v-expansion-panel
-                                    v-for="ano, a in tipo.subcategorias.sort(order)" :key="a" >
+                                    v-for="ano, a in tipo.subcategorias.sort(orderBy('ano'))" :key="a" >
                                     <v-expansion-panel-title>{{ ano.ano }} ({{ ano.norma.length }}) </v-expansion-panel-title>
                                     <v-expansion-panel-text>
                                         <div class="even-columns">
-                                            <div   v-for="law, l in ano.norma.sort(orderName)" :key="l">
+                                            <div   v-for="law, l in ano.norma.sort(orderBy('tilte'))" :key="l">
                                                 <a class="openLaw" :href="`text/${law.id}?search=leges`" target="_blank">{{ law.title }}</a>
                                             </div>
                                         </div>
@@ -88,7 +44,7 @@
                         <p>Carregando...</p>
                     </v-alert>
                     <div class="text-right mt-5">
-                        <v-btn :disabled="totalPagesDowload == totalLaws" :loading="readLoad" @click="changeNroLaws()" variant="flat" color="primary">baixar normas anteriores a 2023</v-btn>
+                        <v-btn :disabled="lawStore.readTotalLaws == consultaStore.readTotalLaws" :loading="lawStore.readLoad" @click="lawStore.changeNroLaws()" variant="flat" color="primary">baixar normas anteriores a 2023</v-btn>
                     </div>
                 </div>
             </div>
@@ -96,7 +52,9 @@
     </section>
 </template>
 
-<script>
+<script setup>
+
+    import { ref, computed } from 'vue'
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
 
@@ -106,157 +64,78 @@
     import { useConsultaStore } from '@/store/ConsultaStore'
     const consultaStore = useConsultaStore()  
 
-    import help from "./../dialogs/help.vue"
-    import menuOpt from "./../elements/menu.vue"
+    const search = ref({
+        text: '',
+        years: [],
+        fonte: []
+    })
+
+    const reverse = ref(true)
+    const load = ref(false)
     
-    export default {
-        components:{
-            help, menuOpt
-        },
-        data(){
-            return{ 
-                search:{
-                    text: '',
-                    years: [],
-                    fonte: []
-                },
-                rules:{
-                    required: (value) => !!value || "Campo obrigatório",
-                    minname: (v) => (v||'').length >= 4 || "Mínimo 4 caracteres",
-                },
-                loadSearch: false,
-                reverse: false,
-                resultsSearch: [], 
-                load: false,
-                searchActive: false,
-                text_search: this.$route.query.text_search 
-            }
-        },
-        props:{
-            laws: Array
-        },
-        computed:{
-            orgLaws(){
-                let list = this.listAllLaws.map(x => x._source)
 
-                if(this.search.text){
-                    let search = this.search.text.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '')
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    list =  list.filter(item => exp.test(item.title.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '') ) )
-                }
+    const orgLaws = computed(() => {
+        let list = lawStore.listAllLaws.map(x => x._source)
 
-                if(this.search.years.length){
-                    list = list.filter(x => this.search.years.includes(x.ano))
-                }
-
-                if(this.search.fonte.length){
-                    list = list.filter(x => this.search.fonte.includes(x.tipo))
-                }
-
-                const classificacao = list.reduce((acumulador, item) => {
-                // Verifica se a categoria já existe no acumulador
-                const categoriaExistente = acumulador.find(c => c.tipo === item.tipo);
-
-                if (categoriaExistente) {
-                    // Se a categoria já existe, verifica se a subcategoria já existe
-                    const subcategoriaExistente = categoriaExistente.subcategorias.find(s => s.ano === item.ano);
-
-                    if (subcategoriaExistente) {
-                        // Se a subcategoria já existe, adicione o valor
-                        subcategoriaExistente.norma.push({id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado});
-                    } else {
-                        // Se a subcategoria não existe, crie uma nova subcategoria
-                        categoriaExistente.subcategorias.push({
-                            ano: item.ano,
-                            norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
-                        });
-                    }
-                } else {
-                    // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                    acumulador.push({
-                        tipo: item.tipo,
-                        subcategorias: [{
-                            ano: item.ano,
-                            norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
-                        }],
-                    });
-                }
-
-                return acumulador;
-                }, []);
-
-                return classificacao
-            },
-            periodo(){
-                return generalStore.readPeriodo
-            },
-            fontes(){
-                const list = generalStore.readTipos
-                return list
-            },
-            listAllLaws(){
-                return lawStore.listAllLaws
-            },  
-            totalLaws(){
-                return consultaStore.readTotalLaws
-            },
-            totalPages(){
-                return consultaStore.readTotalPages
-            },
-            totalPagesDowload(){
-                return lawStore.readTotalLaws
-            },
-            readLoad(){
-                return lawStore.readLoad
-            }
-        },
-        methods:{
-            async searchForLaw(){
-                this.resultsSearch = []
-                this.loadSearch = true
-                
-                try {
-                    this.resultsSearch = await lawStore.getSearchPorlei(this.search);
-                    this.searchActive = true
-                } catch (error) {
-                    console.log("erro searchForLaw");
-                    this.resultsSearch = []
-                } finally{
-                    this.loadSearch = false
-                }
-            },
-            async changeNroLaws(){
-                lawStore.changeNroLaws()
-            },
-            nomeTipo(item){
-                let nome = generalStore.fonteNome(item)
-                return nome.mudar
-            },
-            order(a, b){
-                return this.reverse
-                    ? a.ano -  b.ano
-                    : b.ano -  a.ano
-            },
-            orderName(a, b){
-                return this.reverse
-                    ? a.title -  b.title
-                    : b.title -  a.title
-            },
-            orderTipo(a, b){
-                return this.reverse
-                    ? a.tipo -  b.tipo
-                    : b.tipo -  a.tipo
-            },
-        },
-        created(){
-            if(this.text_search){
-                this.search.text = this.text_search
-                this.searchForLaw()
-            }
+        if(search.value.text){
+            let search = search.value.text.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '')
+            //retirar caracteres especiais
+            let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+            //fazer o filtro
+            list =  list.filter(item => exp.test(item.title.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace('.', '') ) )
         }
-    }
+
+        if(search.value.years.length){
+            list = list.filter(x => search.value.years.includes(x.ano))
+        }
+
+        if(search.value.fonte.length){
+            list = list.filter(x => search.value.fonte.includes(x.tipo))
+        }
+
+        const classificacao = list.reduce((acumulador, item) => {
+        // Verifica se a categoria já existe no acumulador
+        const categoriaExistente = acumulador.find(c => c.tipo === item.tipo);
+
+        if (categoriaExistente) {
+            // Se a categoria já existe, verifica se a subcategoria já existe
+            const subcategoriaExistente = categoriaExistente.subcategorias.find(s => s.ano === item.ano);
+
+            if (subcategoriaExistente) {
+                // Se a subcategoria já existe, adicione o valor
+                subcategoriaExistente.norma.push({id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado});
+            } else {
+                // Se a subcategoria não existe, crie uma nova subcategoria
+                categoriaExistente.subcategorias.push({
+                    ano: item.ano,
+                    norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
+                });
+            }
+        } else {
+            // Se a categoria não existe, crie uma nova categoria com a subcategoria
+            acumulador.push({
+                tipo: item.tipo,
+                subcategorias: [{
+                    ano: item.ano,
+                    norma: [{id: item.id, page: item.total_pages, title: item.title, path: item.path, revogado: item.revogado}],
+                }],
+            });
+        }
+
+        return acumulador;
+        }, []);
+
+        return classificacao
+    })
+
+    const orderBy = (key) => (a, b) => {
+        if (reverse.value) {
+            return a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0;
+        } else {
+            return a[key] < b[key] ? 1 : a[key] > b[key] ? -1 : 0;
+        }
+    };
+        
 </script>
 
 <style lang="scss" scoped>

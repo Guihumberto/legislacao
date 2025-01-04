@@ -86,6 +86,29 @@ export const useLawStore = defineStore("Law", {
                 this.load = false
             }
         },
+        async asyncGetLastLawsAdd(){
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                  size: 10,
+                  query: {
+                    match_all: {}, // Retorna todos os documentos
+                  },
+                  sort: [
+                    {
+                      _doc: {
+                        order: "desc", // Ordena pelos IDs em ordem decrescente
+                      },
+                    },
+                  ],
+                  })
+                return response.data.hits.hits
+            } catch (error) {
+                console.log("error");
+            }finally{
+                this.load = false
+            }
+        },
         changeNroLaws(){
             this.nroLaws = 4000
             this.getAllLaw2()
