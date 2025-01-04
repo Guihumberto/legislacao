@@ -9,11 +9,21 @@
             divided
             variant="flat"
             rounded="xl"
-            >
-                <v-btn class="bg-success" @click="actionsSearch('search')" prepend-icon="mdi-magnify">
+            density="compact"
+            > 
+                <v-btn 
+                   title="Acrescentar termo a busca padrão"
+                   class="bg-green-lighten-1" @click="actionsSearch('acrescentar')">
+                  <v-icon>mdi-magnify-plus</v-icon>
+                </v-btn>
+                <v-btn 
+                    title="Buscar termo por página (padrão)"
+                    class="bg-success" @click="actionsSearch('search')" prepend-icon="mdi-magnify">
                     <span class="hidden-sm-and-down">por termo</span>
                 </v-btn>
-                <v-btn class="bg-primary" @click="actionsSearch('leges')" prepend-icon="mdi-magnify">
+                <v-btn 
+                    title="Buscar termo por norma"
+                    class="bg-primary" @click="actionsSearch('leges')" prepend-icon="mdi-file-find">
                     <span class="hidden-sm-and-down">por norma</span>
                 </v-btn>
             </v-btn-toggle>
@@ -35,6 +45,10 @@
     menu: Boolean,
     selectedText: String,
     menuPosition: Object,
+    searchP:{
+      type: String,
+      default: ""
+    },
     direct: {
       type: Boolean,
       default: false
@@ -50,6 +64,16 @@
         generalStore.reqChangeFromSelectSearch(true, props.selectedText)
       }
     } 
+
+    if(action == 'acrescentar') {
+      const search = (`${props.searchP} ${props.selectedText}`).trim()
+      if(props.direct){
+        router.push('/leges')
+        generalStore.reqChangeFromSelectSearch(true, search)
+      } else {
+        generalStore.reqChangeFromSelectSearch(true, search)
+      }
+    }
     
     if(action == 'leges') router.push(`/legesporlei?text_search=${props.selectedText}`)
 
@@ -62,10 +86,7 @@
         isVisible.value = newVal;
       }
   )
-
-
 </script>
 
 <style lang="scss" scoped>
-
 </style>

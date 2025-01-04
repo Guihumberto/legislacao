@@ -313,7 +313,9 @@
                                     </div>
                                 </div>
                                 <v-expand-transition>
-                                    <resumoSearch v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="res._source" :searchP="search.text" />
+                                    <resumoSearch 
+                                    v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="res._source" 
+                                    :searchP="search.text"  />
                                 </v-expand-transition>
                             </div>
                             <div class="pagination" v-if="!facetas.ano.length && !facetas.fonte.length">
@@ -346,11 +348,17 @@
                         <v-list>
                             <p>Precisa de ajuda para melhorar suas buscas?  <router-link to="/help" class="linkTO">Ajuda</router-link></p>
                             <small class="mb-2">Você também pode tentar fazer estas pesquisas:</small>
-                            <v-list-item link  @click="searchAgain('Substituição tributária', 1)">
+                            <v-list-item link  @click="searchAgain('Substituição tributária')">
                                 <template v-slot:prepend>
                                     <v-icon>mdi-magnify</v-icon>
                                 </template>
                                 Substituição tributária
+                            </v-list-item>
+                            <v-list-item link  @click="searchAgain('Desistir Processo')">
+                                <template v-slot:prepend>
+                                    <v-icon>mdi-magnify</v-icon>
+                                </template>
+                                Desistência de Processo Administrativo
                             </v-list-item>
                         </v-list>
                     </div>
@@ -1128,8 +1136,7 @@
                 let link = item._source.page_to_norma.parent
                 window.open(`text/${link}?search=search`, '_blank');
             },
-            async salvaNoBanco(){
-                
+            async salvaNoBanco(){             
                 try {
                     const response = await api.post("searchs_todo/_doc", {
                         "text_search": this.search.text,
@@ -1175,10 +1182,9 @@
                     timeout: 2000
                 }
             },
-            searchAgain(item, i){
-                const req = true
-                generalStore.reqChange(req, i)
-                this.$router.push(`leges?search=${item}`)
+            searchAgain(search){
+                this.$router.push(`leges?search=${search}`)
+                generalStore.reqChangeFromSelectSearch(true, search)
             },
             openPage(item){
                 window.open(`help/${item}`, '_blank');

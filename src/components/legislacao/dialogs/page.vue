@@ -19,7 +19,7 @@
                     {{ page.tipo }} | Ano: {{ page.ano }} | Pág: {{ page.num_page }}<br>
                     {{ page.path }}
                 </div>
-                <div class="border pa-5 mt-2" @mouseup="handleTextSelection()"  style="padding: 20px; position: relative;" >
+                <div class="border pa-5 mt-2" @mouseup="selectionGet()"  style="padding: 20px; position: relative;" >
                   <p 
                       class="formatText" 
                       v-html="searchP ? markSearch(textePage) : textePage"
@@ -64,12 +64,9 @@
 <script setup>
   import { computed, ref } from 'vue'
   import SelectionSearch from '../elements/selectionSearch.vue';
-  
-  const dialog = ref(false)
+  import { useHandleTextSelection  } from '@/composables/handleTextSelection'
 
-  const menu = ref(false)
-  const menuPosition = ref({ top: 0, left: 0 });
-  const selectedText = ref("")
+  const dialog = ref(false)
 
   const props = defineProps({
         page: Object,
@@ -108,22 +105,7 @@
     window.open(`textpage/${props.id}?search=search`, '_blank');
   }
 
-  const handleTextSelection = (event) => {
-    const selection = window.getSelection();
-    if (selection && selection.toString().trim()) {
-      selectedText.value = selection.toString().trim();
-
-      const range = selection.getRangeAt(0).getBoundingClientRect();
-      menuPosition.value = {
-        top: range.top + window.scrollY, 
-        left: range.left + window.scrollX,
-      }
-      menu.value = true;
-    } else {
-      menu.value = false;
-      selectedText.value = ""
-    }
-  }
+  const { selectionGet, selectedText, menu, menuPosition } = useHandleTextSelection()
     
 </script>
 

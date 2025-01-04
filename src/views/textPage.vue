@@ -15,7 +15,7 @@
                     <p >{{ pageStore.readPage?.tipo }} | {{ pageStore.readPage?.page_to_norma.title }} | {{ pageStore.readPage?.ano }}</p> 
                     <p>Página: {{ pageStore.readPage?.num_page }} </p>
                 </div>
-                <div class="corpo" @mouseup="handleTextSelection()"  style="position: relative;">
+                <div class="corpo" @mouseup="selectionGet()"  style="position: relative;">
                     <p v-html="listPage"></p> 
                     <SelectionSearch 
                         :menuPosition="menuPosition"
@@ -32,6 +32,8 @@
 <script setup>
      import { computed, ref } from "vue"
      import SelectionSearch from '@/components/legislacao/elements/selectionSearch.vue'
+     import { useHandleTextSelection  } from '@/composables/handleTextSelection'
+
      import { usePageStore } from '@/store/PageStore'
      const pageStore = usePageStore()
 
@@ -41,11 +43,6 @@
      import { useRoute, useRouter } from "vue-router"
      const route = useRoute()
      const router = useRouter()
-
-     const menu = ref(false)
-     const menuPosition = ref({ top: 0, left: 0 });
-     const selectedText = ref("")
-
      
 
      pageStore.getPage(route.params.id)
@@ -63,22 +60,7 @@
         router.push("/leges");
      }
 
-     const handleTextSelection = (event) => {
-        const selection = window.getSelection();
-        if (selection && selection.toString().trim()) {
-            selectedText.value = selection.toString().trim();
-
-            const range = selection.getRangeAt(0).getBoundingClientRect();
-            menuPosition.value = {
-                top: range.top + window.scrollY - 50, 
-                left: range.left + window.scrollX,
-            }
-            menu.value = true;
-        } else {
-            menu.value = false;
-            selectedText.value = ""
-        }
-     }
+     const { selectionGet, selectedText, menu, menuPosition } = useHandleTextSelection()
     
 </script>
 

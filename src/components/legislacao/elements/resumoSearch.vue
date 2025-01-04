@@ -1,12 +1,13 @@
 <template>
     <div class="wrapperesumo">
-        <div  @mouseup="handleTextSelection()"  style="position: relative;">
+        <div  @mouseup="selectionGet()"  style="position: relative;">
             <p class="font-weight-light" v-html="extrairLinha">
             </p>
             <SelectionSearch 
                 :menuPosition="menuPosition"
                 :selectedText="selectedText"
                 :menu="menu"
+                :searchP="searchP"
             />
         </div>
         <div class="text-right">
@@ -16,15 +17,12 @@
 </template>
 
 <script setup>
-    import pageDialog from "@/components/legislacao/dialogs/page"
     import { computed, ref } from "vue"
     import { useRoute } from "vue-router"
     const route = useRoute()
+    import { useHandleTextSelection  } from '@/composables/handleTextSelection'
+    import pageDialog from "@/components/legislacao/dialogs/page"
     import SelectionSearch from "./selectionSearch.vue"
-
-    const menu = ref(false)
-    const menuPosition = ref({ top: 0, left: 0 });
-    const selectedText = ref("")
 
     const props = defineProps({
         text: true,
@@ -58,8 +56,7 @@
                 return novo_array.join('<br>');
 
     })
-  
-        
+     
     const markSearch = () => {
         let texto = props.text
         let palavrasChave = route.query.search.split(' ');
@@ -81,23 +78,7 @@
         return resultado;
     }
 
-    const handleTextSelection = (event) => {
-        const selection = window.getSelection();
-        if (selection && selection.toString().trim()) {
-            selectedText.value = selection.toString().trim();
-
-            const range = selection.getRangeAt(0).getBoundingClientRect();
-            menuPosition.value = {
-                top: range.top + window.scrollY, 
-                left: range.left + window.scrollX,
-            }
-            menu.value = true;
-        } else {
-            menu.value = false;
-            selectedText.value = ""
-        }
-    }
-        
+    const { selectionGet, selectedText, menu, menuPosition } = useHandleTextSelection()
 
 </script>
 
