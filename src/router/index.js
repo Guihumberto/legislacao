@@ -1,15 +1,15 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAvaliacaoStore } from '@/store/AvaliacaoStore'
+import { useLoginStore } from '@/store/LoginStore'
 
 
 const requireAuth = async(to, from, next) => {
-    const avaliacaoStore = useAvaliacaoStore()
-    const user = await avaliacaoStore.loginMalha()
+    const loginStore = useLoginStore()
+    const user = await loginStore.loginMalha()
     if(user){
       next()
     } else {
-      next('/avaliacao')
+      next('/leges')
     }
 }
 

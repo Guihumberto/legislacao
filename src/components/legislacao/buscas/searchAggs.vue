@@ -20,77 +20,70 @@
     </div>
 </template>
 
-<script>
+<script setup>
+    import { computed } from 'vue';
     import aggspage from './pageAggs.vue'
 
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore() 
 
-    export default {
-        data(){
-            return{
 
-            }
-        },
-        components:{
-            aggspage
-        },
-        props:{
-            searchResults: Array
-        },
-        computed:{
-            allSearchResultas(){
-                let list = this.searchResults.map(x => x._source)
-                
-                const classificacao = list.reduce((acumulador, item) => {
-                    // Verifica se a categoria já existe no acumulador
-                    const categoriaExistente = acumulador.find(c => c.tipo === item.tipo);
+    const props = defineProps({
+        searchResults: Array
+    })
 
-                    if (categoriaExistente) {
-                        // Se a categoria já existe, verifica se a subcategoria já existe
-                        const subcategoriaExistente = categoriaExistente.subcategorias.find(s => s.parent === item.page_to_norma.parent);
+        
+    const allSearchResultas = computed(() => {
+        let list = props.searchResults.map(x => x._source)
+        
+        const classificacao = list.reduce((acumulador, item) => {
+            // Verifica se a categoria já existe no acumulador
+            const categoriaExistente = acumulador.find(c => c.tipo === item.tipo);
 
-                        if (subcategoriaExistente) {
-                            // Se a subcategoria já existe, adicione o valor
-                            subcategoriaExistente.page.push({page: item.num_page, text: item.text_page});
-                        } else {
-                            // Se a subcategoria não existe, crie uma nova subcategoria
-                            categoriaExistente.subcategorias.push({
-                                ano: item.ano,
-                                parent: item.page_to_norma.parent,
-                                title: item.page_to_norma.title,
-                                page: [{page: item.num_page, text: item.text_page}],
-                            });
-                        }
-                    } else {
-                        // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                        acumulador.push({
-                            tipo: item.tipo,
-                            subcategorias: [{
-                                ano: item.ano,
-                                parent: item.page_to_norma.parent, 
-                                title: item.page_to_norma.title,
-                                page: [{page: item.num_page, text: item.text_page}],
-                            }],
-                        });
-                    }
+            if (categoriaExistente) {
+                // Se a categoria já existe, verifica se a subcategoria já existe
+                const subcategoriaExistente = categoriaExistente.subcategorias.find(s => s.parent === item.page_to_norma.parent);
 
-                    return acumulador;
-                    }, []);
-                    return classificacao
+                if (subcategoriaExistente) {
+                    // Se a subcategoria já existe, adicione o valor
+                    subcategoriaExistente.page.push({page: item.num_page, text: item.text_page});
+                } else {
+                    // Se a subcategoria não existe, crie uma nova subcategoria
+                    categoriaExistente.subcategorias.push({
+                        ano: item.ano,
+                        parent: item.page_to_norma.parent,
+                        title: item.page_to_norma.title,
+                        page: [{page: item.num_page, text: item.text_page}],
+                    });
                 }
-        },
-        methods:{
-            openLaw(item){
-                let link = item.parent
-                window.open(`text/${link}?search=search`, '_blank');
-            },
-            nomeTipo(item){
-                let nome = generalStore.fonteNome(item)
-                return nome
+            } else {
+                // Se a categoria não existe, crie uma nova categoria com a subcategoria
+                acumulador.push({
+                    tipo: item.tipo,
+                    subcategorias: [{
+                        ano: item.ano,
+                        parent: item.page_to_norma.parent, 
+                        title: item.page_to_norma.title,
+                        page: [{page: item.num_page, text: item.text_page}],
+                    }],
+                });
             }
+
+            return acumulador;
+            }, []);
+            return classificacao
+        })
+   
+        const openLaw = (item) => {
+            let link = item.parent
+            window.open(`text/${link}?search=search`, '_blank');
         }
-    }
+
+        const nomeTipo = (item) => {
+            let nome = generalStore.fonteNome(item)
+            return nome
+        }
+       
 </script>
 
 <style lang="scss" scoped>

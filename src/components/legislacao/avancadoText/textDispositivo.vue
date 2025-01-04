@@ -9,8 +9,6 @@
 </template>
 
 <script setup>
-
-
     const props = defineProps({
         dispositivo: Object,
         search: String

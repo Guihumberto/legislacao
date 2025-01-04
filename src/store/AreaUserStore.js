@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
-// const loginStore = useLoginStore()
 
 export const useUserAreaStore = defineStore("userAreaStoe", {
     state: () => ({

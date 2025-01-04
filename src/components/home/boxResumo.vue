@@ -6,30 +6,16 @@
             <small>Total de Consultas:</small>
         </div>
         <div class="ml-5">
-            <small>{{ totalLaw }} </small><br>
-            <small>{{ totalPages }} </small><br>
-            <small> {{ totalConsultas }} </small>
+            <small>{{ consultaStore.readTotalLaws }} </small><br>
+            <small>{{ consultaStore.readTotalPages }} </small><br>
+            <small> {{ consultaStore.readTotalConsulta }} </small>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
     import { useConsultaStore } from '@/store/ConsultaStore'
     const consultaStore = useConsultaStore()  
-
-    export default {
-        computed:{
-            totalLaw(){
-                return consultaStore.readTotalLaws
-            },
-            totalPages(){
-                return consultaStore.readTotalPages
-            },
-            totalConsultas(){
-                return consultaStore.readTotalConsulta
-            }
-        }
-    }
 </script>
 
 <style lang="scss" scoped>

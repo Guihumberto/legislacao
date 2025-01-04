@@ -31,20 +31,6 @@
   </div>
 </template>
 
-<script>
-  // import dialoghorario from '@/components/dialogs/horarios'
-  export default {
-    components:{
-      // dialoghorario
-    },
-    methods:{
-      goTO(item){
-        window.open(item, '_blank');
-      }
-    }
-  }
-</script>
-
 <style lang="scss" scoped>
 .footer{
   display: flex;

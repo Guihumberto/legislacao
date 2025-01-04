@@ -49,26 +49,24 @@
     
 </template>
 
-<script setup>
-    import { ref } from 'vue';
-    
+<script setup>  
     import { useLoginStore } from '../../store/LoginStore'
     const loginStore = useLoginStore()
 
-    const items = ref([
+    const items = [
               { text: 'Início', icon: 'mdi-home', url:'/leges' },
               { text: 'Normas', icon: 'mdi-file-document-multiple', url:'/legesporlei' },
               { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
               { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
               { text: 'Histórico', icon: 'mdi-history', url:'/history' },
               { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' }
-    ])
+    ]
 
-    const adms = ref([
+    const adms = [
               { text: 'Importar', icon: 'mdi-upload', url:'/importar' },
               { text: 'Usuários', icon: 'mdi-account-group', url:'/users' },
               { text: 'Normas', icon: 'mdi-file-document', url:'/laws' },
-    ])
+    ]
 
 </script>
 

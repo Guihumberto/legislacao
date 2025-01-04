@@ -44,6 +44,7 @@
     const dialog = ref(false)
     const confirmacao = ref(false)
 
+    provide('dialog2', dialog2)
     provide('dialog', dialog)
     provide('confirmacao', confirmacao)
     

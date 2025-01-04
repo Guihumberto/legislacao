@@ -3,47 +3,47 @@
     <div class="wrappersubheader">
       <div class="subheader">
         <h6 class="ml-n2">
-          <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2" :disabled="!isLogin" title="Necessário estar logado."></v-app-bar-nav-icon>
+          <v-app-bar-nav-icon density="comfortable" variant="text" @click.stop="drawer2 = !drawer2" :disabled="!loginStore.readLogin.cpf" title="Necessário estar logado."></v-app-bar-nav-icon>
           <!-- <img class="img_flag" src="../../assets/flagma.png" /> -->
           <!-- <v-icon>mdi-script-text</v-icon> -->
           <router-link to="/leges" class="linkinitial">LEGISLAÇÃO</router-link>
         </h6>
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
-          <router-link to="/login" class="mr-2" v-if="!isLogin">ENTRAR</router-link>
-          <a @click="logOut()" class="mr-2 text-orange" v-else>SAIR</a>
+          <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
+          <a @click="loginStore.logOut()" class="mr-2 text-orange" v-else>SAIR</a>
           <v-btn 
             title="ocultar cabeçalho" 
             density="compact" 
             variant="text"
             @click="changeHeaderShow()" 
-            :icon="headerShow ? 'mdi-chevron-down' :'mdi-chevron-right'">
+            :icon="geralStore.readHeaderShow ? 'mdi-chevron-down' :'mdi-chevron-right'">
           </v-btn>
           <!-- <v-icon @click="dark = !dark" size="small">{{ dark ? 'mdi-brightness-3' : 'mdi-brightness-4'}}</v-icon> -->
         </div>
       </div>
     </div>
     <v-expand-transition>
-      <div v-if="headerShow">
+      <div v-if="geralStore.readHeaderShow">
         <div class="container">
           <div class="d-flex justify-center align-center">
-            <v-app-bar-nav-icon :disabled="!resultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <div class="logo" @click="$router.push(titleApp.to)">
-              <small class="text-white">{{titleApp.title}}</small>
+            <v-app-bar-nav-icon :disabled="!generalStore.readResultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <div class="logo" @click="$router.push(geralStore.readTitleApp.to)">
+              <small class="text-white">{{geralStore.readTitleApp.title}}</small>
               <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
             </div>
           </div>
           <nav class="navbar">
             <ul role="list">
-              <li> <router-link :class="routeName == 'Legislacao' ? 'active' : ''" to="/leges">INÍCIO</router-link></li>
+              <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/leges">INÍCIO</router-link></li>
               <li> <a @click.prevent="menu = !menu">INSTITUCIONAL</a></li>
-              <li> <router-link :class="routeName == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
+              <li> <router-link :class="$route.name == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
               <li> <router-link  to="/about">CONTATO</router-link></li>
               <li> <router-link  to="/about">QUEM SOMOS</router-link></li>
             </ul>
           </nav>
           <div class="btn_group">    
-            <loginInfo :isLogin="!isLogin" :flutuante="false" class="gov" />   
+            <loginInfo :isLogin="!loginStore.readLogin.cpf" :flutuante="false" class="gov" />   
             <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
           </div>
         </div>
@@ -61,7 +61,7 @@
       location="left"
       v-model="drawer2"
       color="#ECEFF1"
-      v-if="isLogin"
+      v-if="loginStore.readLogin.cpf"
     >
       <div class="text-right">
         <v-btn variant="text" @click="drawer2 = false">Fechar</v-btn>
@@ -70,7 +70,8 @@
     </v-navigation-drawer>
 </template>
 
-<script>
+<script setup>
+  import { ref, onMounted, onBeforeUnmount } from 'vue'
   import sidebarleft from '@/components/legislacao/sidebar/sideLeft.vue'
   import MenuBar from '@/components/dialogs/menuBar.vue'
   import loginInfo from '@/components/partiaslLayout/userInfoLogin.vue'
@@ -85,76 +86,44 @@
   import { useLoginStore } from '../../store/LoginStore'
   const loginStore = useLoginStore()
 
+  const dark = ref(false) 
+  const menu = ref(false) 
+  const drawer = ref(false) 
+  const drawer2 = ref(false) 
+  
+  const changeHeaderShow = () => {
+      geralStore.changeHeaderShow()
+  }
 
-  export default{
-    data() {
-        return {
-            dark: false,
-            menu: false,
-            drawer: false,
-            drawer2: false
-        };
-    },
-    computed:{
-      resultSearch(){
-          return generalStore.readResultSearch
-      },
-      titleApp(){
-        return geralStore.readTitleApp
-      },
-      headerShow(){
-        return geralStore.readHeaderShow
-      },
-      isLogin(){
-        return !!loginStore.readLogin.cpf
-      },
-        routeName() {
-        return this.$route.name;
-      },
-    },
-    methods: {
-        changeHeaderShow(){
-            geralStore.changeHeaderShow()
-        },
-        isSearch() {
-            geralStore.changeSearch();
-        },
-        scroll (refName) {
-          const element = document.getElementById(refName)
-          element.scrollIntoView({behavior: "smooth"})
-          this.menu = false
-        },
-        linkUrl(item){
-          window.open(item, '_blank');
-        },
-        handleScroll() {
-          if(this.menu){
-            let menu = document.getElementById('menu');
-            menu.style.opacity = 0;
-            
-            setTimeout(() => {
-              this.menu = false
-            }, 1000);
-          }  
-        },
-        logOut(){
-          loginStore.logOut()
-        }
-    },
-    components: { MenuBar, sidebarleft, loginInfo, menuUser},
-    created(){
+  const isSearch = () => {
+      geralStore.changeSearch();
+  }
+
+  const handleScroll = () => {
+    if(menu.value){
+      let menu1 = document.getElementById('menu');
+      menu1.style.opacity = 0;
+      
       setTimeout(() => {
-        this.isSearch()
-      }, 1);
-      loginStore.loadUserData()
-    },
-    mounted() {
-      window.addEventListener('scroll', this.handleScroll);
-    },
-    beforeDestroy() {
-      window.removeEventListener('scroll', this.handleScroll);
-    }
-}
+        menu.value = false
+      }, 1000);
+    }  
+  }
+    
+  setTimeout(() => {
+    isSearch()
+  }, 1)
+
+  loginStore.loadUserData()
+    
+  onMounted(() =>  {
+    window.addEventListener('scroll', handleScroll);
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('scroll', handleScroll);
+  });
+
 </script>
 
 <style>

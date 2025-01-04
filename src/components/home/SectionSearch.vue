@@ -1,18 +1,6 @@
 <template>
-  <section class="search" :class="isSearch ? 'activeSearch' : 'flagmaranhao'">
+  <section class="search" :class="geralStore.readSearch ? 'activeSearch' : 'flagmaranhao'">
     <div class="container">
-      <!-- <v-text-field
-        label="Busca"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        style="max-width: 500px;"
-        color="blue"
-        v-model:focused="search"
-        base-color="blue"
-        bg-color="#96D2FF"
-        clearable
-        @click.prevent="searchOnChanged()"
-      ></v-text-field> -->
       <div class="logo">
         <v-icon size="5rem">mdi-script-text</v-icon>
         <div class="ml-2">
@@ -28,37 +16,16 @@
   </section>
 </template>
 
-<script>
+<script setup>
   import progressLinear from '@/components/legislacao/elements/progressLinear.vue'
   import boxResumo from '@/components/home/boxResumo.vue';
 
   import { useGeralStore } from '@/store/GeralStore'
   const geralStore = useGeralStore()
 
-  export default {
-    data(){
-      return{
-        search: '',
-        searchActive: false
-      }
-    },
-    components:{
-      progressLinear, boxResumo
-    },
-    computed:{
-      isSearch(){
-        return geralStore.readSearch
-      }
-    },
-    methods:{
-      searchOnChanged(){
-        this.searchActive = !this.searchActive
-      }
-    },
-    created(){
-      geralStore.changeTitleApp({title:'Legislação', to:'/'})
-    }
-  }
+  geralStore.changeTitleApp({title:'Legislação', to:'/'})
+    
+  
 </script>
 
 <style lang="scss" scoped>

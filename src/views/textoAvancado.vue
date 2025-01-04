@@ -1,6 +1,6 @@
 <template>
     <section>
-        <div class="sizeLoad" v-if="load">
+        <div class="sizeLoad" v-if="pageStore.readLoad">
             <v-progress-circular
                 :size="50"
                 color="primary"
@@ -8,8 +8,8 @@
             ></v-progress-circular>
         </div>
         <div class="container" v-else>
-            <v-btn variant="tonal" @click="voltar" class="mb-2 btn">Voltar</v-btn>
-            <v-btn variant="tonal" @click="$router.push(`/text/${id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
+            <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>
+            <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
             <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn">ocultar cabeçalho</v-btn>
 
             <div>
@@ -85,472 +85,301 @@
             <Pagination :totalPage="totalPage" :pagination="pagination" />
            
         </div>
-        <v-snackbar
-                v-model="snack.snackbar"
-                :timeout="snack.timeout"
-            >
-                {{ snack.text }}
-                <template v-slot:actions>
-                    <v-btn
-                    color="blue"
-                    variant="text"
-                    @click="snack.snackbar = false"
-                    >
-                    X
-                    </v-btn>
-                </template>
-        </v-snackbar>
     </section>
 </template>
 
-<script>
+<script setup>
+    import { ref, computed, watch } from "vue";
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
-    import { usePageStore } from "@/store/PageStore";
+   0
+   import { usePageStore } from "@/store/PageStore";
     const pageStore = usePageStore()
+   
+    import { useSnackStore } from "@/store/snackStore";
+    const snackStore = useSnackStore()
+   
+    import { useRoute } from "vue-router";
+    const route = useRoute()
 
-    export default {
-        data(){
-            return{
-                id: this.$route.params.id,
-                textLaws: [],
-                art: 0,
-                order: 0,
-                part1: '',
-                keyEstrutura: false,
-                orderEstrutura: 1000,
-                textWork: [],
-                hiddenCabecalho: false,
-                search: null,
-                artsFilterActive: false, 
-                textLaw:{
-                    size: 0
-                },
-                pagination:{
-                    page: 1,
-                    perPage: 15
-                },
-                artIndice: null,
-                artsFilter: [],
-                snack: {
-                    snackbar: false,
-                    text: 'Nova página adicionada ao documento.',
-                    timeout: 2000
-                },
-            }
-        },
-        components:{
-            TextDispositivo, Pagination
-        },
-        watch:{
-            'pagination.perPage': {
-                handler(newVal, oldVal) {
-                    this.pagination.page = 1
-                },
-                deep: true
-            },
-            search(ante, depois) { this.pagination.page = 1 }
-        },
-        computed:{
-            load(){
-                return pageStore.readLoad
-            },
-            textoInicital(){
-                const list = this.textLaws.map(x => x._source)
-                    .sort((a, b) => a.num_page - b.num_page)
-                    .map(x => x.text_page)
-                    .join('\n')
-                    .replaceAll('–', '-')
-                    .split(/(\r\n|\n|\r)/gm)
-                    .filter((i) => i )
-                    .filter(i => i != '\n' )
-                    .map(item => item.trim())
-                
-                const divisorIndex = list.findIndex(str => 
-                    this.divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
-                );
 
-                if (divisorIndex !== -1) {
-                    const textoincial = list.slice(0, divisorIndex);
-                    const legislacao = list.slice(divisorIndex);
+    const textLaws = ref([])
+    const hiddenCabecalho = ref(false)
+    const search = ref(null)
+    const artsFilterActive = ref(false)
+    const pagination = ref({
+        page: 1,
+        perPage: 15
+    })
+    const artIndice = ref(null)
+    const artsFilter = ref([])
 
-                    return { textoincial, legislacao }
+    const divisores = ['art.', 'livro'];
+    
+    const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
+        'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
+        'VII -', 'VIII -', 'IX', 'X', 'X-', 'X - ',
+        'XX', 'XXX', 'XL', 'L -', 'L-', 'LX', 'LI -',  'LI-', 'LII', 'LIV -', 'LIV-', 'LV', 'LIX',
+        'a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)', 'j)', 'k)', 'l)', 'm)', 'n)', 'o)',
+        'p)', 'q)', 'r)', 's)', 't)', 'u)', 'v)', 'x)', 'y)', 'w)', 'z)',
+        '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.',  '11.', '12.', '13.', '14.', '15.', '16.', '17.', '18.', '19.', '20.',  '21.', '22.', '23.', '24.', '25.', '26.', '27.', '28.', '29.', '30.',
+        '1-', '2-','3-', '4-', '5-','6-',  '7-', '8-','9-', '10-', 
+        '1 -', '2 -','3 -', '4 -', '5 -','6 -', '7 -', '8 -','9 -', '10 -'  
+    ]
+    
+    const arrayEstrturaONly =  ['LIVRO ', 'TÍTULO ', 'CAPÍTULO ', 'SEÇÃO ', 'SUBSEÇÃO ']
+
+    const referencias = arrayEstrturaONly.concat(arrayTextLawEstrutura)
+
+    watch(search, (newConfirm) => {
+        pagination.value.page = 1 
+    })
+
+    watch(() => pagination.perPage, (newVal, oldVal) => {
+        pagination.value.page = 1;
+      }, { deep: true }
+    );
+
+    const textoInicital = computed(() => {
+        const list = textLaws.value.map(x => x._source)
+            .sort((a, b) => a.num_page - b.num_page)
+            .map(x => x.text_page)
+            .join('\n')
+            .replaceAll('–', '-')
+            .split(/(\r\n|\n|\r)/gm)
+            .filter((i) => i )
+            .filter(i => i != '\n' )
+            .map(item => item.trim())
+        
+        const divisorIndex = list.findIndex(str => 
+            divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
+        )
+
+        if (divisorIndex !== -1) {
+            const textoincial = list.slice(0, divisorIndex);
+            const legislacao = list.slice(divisorIndex);
+
+            return { textoincial, legislacao }
 ;
+        } else {
+                console.log('Nenhum divisor encontrado');
+        }
+            
+        return list
+    })
+
+    const listPage = computed(() => {
+        const list = textoInicital.value.legislacao
+
+        const novoArray = [];
+        let elementoAtual = '';
+
+        if(Array.isArray(list)) {
+            list.forEach((str, index) => {
+                const eReferencia = referencias.some(ref => str.toLowerCase().startsWith(ref.toLowerCase()));
+    
+                if (eReferencia && elementoAtual) {
+                    // Adiciona o elemento acumulado ao novo array
+                    novoArray.push(elementoAtual.trim());
+                    // Reinicia o acumulador com o elemento atual
+                    elementoAtual = str;
                 } else {
-                        console.log('Nenhum divisor encontrado');
+                    elementoAtual += (elementoAtual ? ' ' : '') + str;
                 }
-                    
-                return list
-            },
-            listPage2(){
-                const list = this.listPage
-
-                list.map(item => {
-                    let count = 0
-                    this.arrayTextLawEstrutura.forEach( i => item.startsWith(i) ? count++ : count)
-                    let value = count > 0  ? false : true
-                    let art = 0
-                    let order = 0
-
-                    if(item.toLowerCase().startsWith('art.')){                   
-                        let test = item.substr(5, 5)                            
-                        let nTest = test.replace(/[^0-9]/g,'').length
-
-                        if(nTest >= 4 ){
-                            art = item.trim().substr(5, 5).replace(/[^0-9]/g,'');
-                            this.art = parseInt(art)
-                            this.order = 10
-                        } else {
-                            art = item.trim().substr(4, 5).replace(/[^0-9]/g,'');
-                            this.art = parseInt(art)
-                            this.order = 10
-                        }
-                    }
-
-                    if(!value && !item.toLowerCase().startsWith('art.') ){
-                        this.order++
-                    }
-
-                    if(value){
-                        this.order = `${this.order}.1`
-                        if(item.toLowerCase().startsWith('livro')){
-                            this.order = 2
-                        }
-                        if(item.toLowerCase().startsWith('título')){
-                            this.order = 3
-                        }
-                        if(item.toLowerCase().startsWith('capítulo')){
-                            this.order = 4
-                        }
-                        if(item.toLowerCase().startsWith('seção')){
-                            this.order = 5
-                        }
-                        if(item.toLowerCase().startsWith('subseção')){
-                            this.order = 6
-                        }
-                        if(value){
-                            let textEstruturaComplete = ""
-                            let artEstrutura = ""
-                            let orderEstrutura = ""
-
-                            this.keyEstrutura ? artEstrutura = this.art : artEstrutura = this.art++
-                            this.keyEstrutura = true
-
-                            if(this.order == 0.1){
-                                textEstruturaComplete = item
-                                artEstrutura = 1
-                                orderEstrutura  = 1
-                            }
-
-                            if(this.order == 2 || this.order == 2.1){
-                                orderEstrutura  = 2
-                                this.order == 2 ? this.part1 = item : ''
-                                this.order == 2.1 ? textEstruturaComplete = this.part1 + ' - ' + item : ''
-                            }
-
-                            if(this.order == 3 || this.order == 3.1){
-                                orderEstrutura  = 3
-                                this.order == 3 ? this.part1 = item : ''
-                                this.order == 3.1 ? textEstruturaComplete = this.part1 + ' - ' + item : ''
-                            }
-
-                            if(this.order == 4 || this.order == 4.1){
-                                orderEstrutura  = 4
-                                this.order == 4 ? this.part1 = item : ''
-                                this.order == 4.1 ? textEstruturaComplete = this.part1 + ' - ' + item : ''
-                            }
-
-                            if(this.order == 5 || this.order == 5.1){
-                                orderEstrutura  = 5
-                                this.order == 5 ? this.part1 = item : ''
-                                this.order == 5.1 ? textEstruturaComplete = this.part1 + ' - ' + item : ''
-                            }
-
-                            if(this.order == 6 || this.order == 6.1){
-                                orderEstrutura  = 6
-                                this.order == 6 ? this.part1 = item : ''
-                                this.order == 6.1 ? textEstruturaComplete = this.part1 + ' - ' + item : ''
-                            }
-                            
-
-
-                            if(!orderEstrutura) {
-                                artEstrutura = this.art--
-                                artEstrutura--
-                                this.keyEstrutura = false
-                                orderEstrutura = this.orderEstrutura++
-                                this.order = orderEstrutura
-                                value = false
-                                textEstruturaComplete = item
-                            }
-
-                            if(textEstruturaComplete){
-                                let text = {
-                                    // id: shortid.generate(),
-                                    art: artEstrutura,
-                                    order: orderEstrutura,
-                                    estrutura:value,
-                                    textLaw: textEstruturaComplete
-                                }
-                                this.textWork.push(text)
-                                this.part1 = ''
-                            }
-
-                        } else {
-                            this.keyEstrutura = false
-                            //salvar texto da lei (caput + dispositivos)
-                            let text = {
-                                // id: shortid.generate(),
-                                art: this.art,
-                                order: this.order,
-                                estrutura:value,
-                                textLaw: item
-                            }
-                            this.textWork.push(text)
-                            this.part1 = ''
-                        }
-
-                    }
-                })
-
-                this.art = 0 
-
-                return list
-            },
-            listPage(){
-                const list = this.textoInicital.legislacao
-
-                const novoArray = [];
-                let elementoAtual = '';
-
-                list.forEach((str, index) => {
-                    const eReferencia = this.referencias.some(ref => str.toLowerCase().startsWith(ref.toLowerCase()));
-
-                    if (eReferencia && elementoAtual) {
-                        // Adiciona o elemento acumulado ao novo array
-                        novoArray.push(elementoAtual.trim());
-                        // Reinicia o acumulador com o elemento atual
-                        elementoAtual = str;
-                    } else {
-                        // Acumula o texto
-                        elementoAtual += (elementoAtual ? ' ' : '') + str;
-                    }
-
-                    // Adiciona o último elemento acumulado ao final do loop
-                    if (index === list.length - 1 && elementoAtual) {
-                        novoArray.push(elementoAtual.trim());
-                    }
-                });
-
-                return novoArray
-            },
-            listFinal(){
-                const strings = this.listPage
-
-                let ultimoArt = null; // Armazena o último artigo encontrado
-
-                const novoArray = strings.map((item, index) => {
-                    const artMatch = item.toLowerCase().startsWith('art.');
-                    const estruturaMatch = this.arrayEstrturaONly.some(ref => item.toUpperCase().startsWith(ref.toUpperCase()));
-
-                    // Determina o próximo artigo subsequente para `estrutura`
-                    if (estruturaMatch) {
-                        const proximoArt = strings
-                        .slice(index + 1) // Pega os elementos subsequentes
-                        .find(str => str.toLowerCase().startsWith('art.')) // Encontra o próximo "art."
-                        ?.slice(4, 12).match(/\d+/)?.[0]; // Extrai o número
-
-                        if (proximoArt) {
-                        ultimoArt = parseInt(proximoArt) || null; // Atualiza o último artigo com o subsequente
-                        }
-                    }
-
-                    // Atualiza o último artigo encontrado diretamente
-                    if (artMatch) {
-                        ultimoArt = parseInt(item.slice(4, 12).match(/\d+/)?.[0]) || null;
-                    }
-
-                    return {
-                        art: ultimoArt, // O último artigo atualizado
-                        order: index + 1, // Ordem no array
-                        estrutura: estruturaMatch, // True se for estrutura
-                        textlaw: item // Texto original
-                    };
-                });
-                return novoArray
-            },
-            listTextLaw(){
-                let list = this.listFinal
-
-                if(this.search){
-                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
-
-                    list = filtro
-                } 
-
-                if(this.artsFilterActive){
-                    let novoFiltro = []
-
-                    if(this.artsFilter.length){
-                        list.forEach(item => {
-                            this.artsFilter.forEach( art => {
-                                if(art == item.art){
-                                    novoFiltro.push(item)
-                                }
-                            })
-                        })
-                    }
-                    list = novoFiltro
+    
+                // Adiciona o último elemento acumulado ao final do loop
+                if (index === list.length - 1 && elementoAtual) {
+                    novoArray.push(elementoAtual.trim());
                 }
+            });
+        }
 
-                let page = this.pagination.page - 1
-                let start = page * this.pagination.perPage
-                let end = start + this.pagination.perPage
+        return novoArray
+    })
 
-                return list.slice(start, end)
+    const listFinal = computed(() => {
+        const strings = listPage.value
 
-            },
-            totalPage(){
-                let total = this.listFinal.length
+        let ultimoArt = null; // Armazena o último artigo encontrado
 
-                if(this.search){
-                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    let filtro =  this.listFinal.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+        const novoArray = strings.map((item, index) => {
+            const artMatch = item.toLowerCase().startsWith('art.');
+            const estruturaMatch = arrayEstrturaONly.some(ref => item.toUpperCase().startsWith(ref.toUpperCase()));
 
-                    total = filtro.length
-                } 
+            // Determina o próximo artigo subsequente para `estrutura`
+            if (estruturaMatch) {
+                const proximoArt = strings
+                .slice(index + 1) // Pega os elementos subsequentes
+                .find(str => str.toLowerCase().startsWith('art.')) // Encontra o próximo "art."
+                ?.slice(4, 12).match(/\d+/)?.[0]; // Extrai o número
 
-                if(this.artsFilterActive){
-                    let novoFiltro = []
-
-                    if(this.artsFilter.length){
-                        this.listFinal.forEach(item => {
-                            this.artsFilter.forEach( art => {
-                                if(art == item.art){
-                                    novoFiltro.push(item)
-                                }
-                            })
-                        })
-                    }
-                    total = novoFiltro.length
+                if (proximoArt) {
+                ultimoArt = parseInt(proximoArt) || null; // Atualiza o último artigo com o subsequente
                 }
-
-                return Math.ceil(total/this.pagination.perPage)
-            },
-            cabecalho(){
-                return this.textoInicital.textoincial.join('<br>')
-            },
-            divisores(){
-                return ['art.', 'livro'];
-            },
-            arrayTextLawEstrutura(){
-                return [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
-                            'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
-                            'VII -', 'VIII -', 'IX', 'X', 'X-', 'X - ',
-                            'XX', 'XXX', 'XL', 'L -', 'L-', 'LX', 'LI -',  'LI-', 'LII', 'LIV -', 'LIV-', 'LV', 'LIX',
-                            'a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)', 'j)', 'k)', 'l)', 'm)', 'n)', 'o)',
-                            'p)', 'q)', 'r)', 's)', 't)', 'u)', 'v)', 'x)', 'y)', 'w)', 'z)',
-                            '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.',  '11.', '12.', '13.', '14.', '15.', '16.', '17.', '18.', '19.', '20.',  '21.', '22.', '23.', '24.', '25.', '26.', '27.', '28.', '29.', '30.',
-                            '1-', '2-','3-', '4-', '5-','6-',  '7-', '8-','9-', '10-', 
-                            '1 -', '2 -','3 -', '4 -', '5 -','6 -', '7 -', '8 -','9 -', '10 -'  
-                        ]
-            },
-            arrayEstrturaONly(){
-                return ['LIVRO ', 'TÍTULO ', 'CAPÍTULO ', 'SEÇÃO ', 'SUBSEÇÃO ']
-            },
-            referencias(){
-                return this.arrayEstrturaONly.concat(this.arrayTextLawEstrutura)
-            },
-            lastArt(){
-                const law = this.listFinal.map(x => x.art)
-                const lastArt = Math.max(...law)
-                return lastArt
-            },
-            suggestArtBtn(){
-                if(this.search){
-                    return !!this.search.replace(/[^0-9]/g,'')
-                }
-                return false
             }
-        },
-        methods:{
-            async getAll(){
-                const resp = await pageStore.getAllPages(this.id)
-                this.textLaws = pageStore.readAllPages
-            },
-            voltar(){
-                this.$router.push("/leges");
-            },
-            filterJustArt(item){
-                const art = item.replace(/[^0-9,]/g,'')
-                const hasComma = art.includes(",");
 
-                if(hasComma && art){   
-                    const list = art.split(",").forEach(x => this.filterArts(x))
-                } else {
-                    this.filterArts(art)
-                }
-            },  
-            filterArts(art){
-                if(art <= this.lastArt){
-                    this.artIndice = ''
-                    this.search = ''
-                    let findArt = this.artsFilter.find( x => x == art ) 
-                    if(!findArt){
-                        art > 0 ? this.artsFilter.push(art) : this.snackAction()
-                    }
-                    
-                    if(this.artsFilter.length > 0) {
-                        this.artsFilterActive = true
-                    } else {
-                        this.artsFilterActive = false
-                    } 
-                } else {
-                    this.snackAction()
-                }
-            },
-            snackAction(){
-                this.snack = {
-                    snackbar: true,
-                    text: 'Artigo nâo encontrado.',
-                    timeout: 2000
-                }
-            },
-            clearAllArtsFilter(){
-                this.artsFilter = []
-                this.artsFilterActive = false
-            },
-            artFilterRemove(art){
-                let artRemove = this.artsFilter.findIndex( i => i == art)
-                this.artsFilter.splice(artRemove, 1)
-                
-                if(!this.artsFilter.length > 0) {
-                    this.artsFilterActive = false
-                }
-            },
-            pageFilter(item){
-                let art = this.artsFilter[0]
-                if(item) {
-                    art == this.lastArt ? art : art++  
-                  
-                } else {
-                  art == 1 ? art : art--
-                }   
-                this.artsFilter = []
-                this.artsFilter.push(art)
-            },
-        },
-        created(){
-            this.getAll()
+            // Atualiza o último artigo encontrado diretamente
+            if (artMatch) {
+                ultimoArt = parseInt(item.slice(4, 12).match(/\d+/)?.[0]) || null;
+            }
+
+            return {
+                art: ultimoArt, // O último artigo atualizado
+                order: index + 1, // Ordem no array
+                estrutura: estruturaMatch, // True se for estrutura
+                textlaw: item // Texto original
+            };
+        });
+        return novoArray
+    })
+
+    const listTextLaw = computed(() => {
+        let list = listFinal.value
+
+        if(search.value){
+            let searchb = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            //retirar caracteres especiais
+            let exp = new RegExp(searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+            //fazer o filtro
+            let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+            list = filtro
+        } 
+
+        if(artsFilterActive.value){
+            let novoFiltro = []
+
+            if(artsFilter.value.length){
+                list.forEach(item => {
+                    artsFilter.value.forEach( art => {
+                        if(art == item.art){
+                            novoFiltro.push(item)
+                        }
+                    })
+                })
+            }
+            list = novoFiltro
+        }
+
+        let page = pagination.value.page - 1
+        let start = page * pagination.value.perPage
+        let end = start + pagination.value.perPage
+
+        return list.slice(start, end)
+
+    })
+
+    const totalPage = computed(() => {
+        let total = listFinal.value.length
+
+        if(search.value){
+            let searchb = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+            //retirar caracteres especiais
+            let exp = new RegExp(searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+            //fazer o filtro
+            let filtro =  listFinal.value.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+            total = filtro.length
+        } 
+
+        if(artsFilterActive.value){
+            let novoFiltro = []
+
+            if(artsFilter.value.length){
+                listFinal.value.forEach(item => {
+                    artsFilter.value.forEach( art => {
+                        if(art == item.art){
+                            novoFiltro.push(item)
+                        }
+                    })
+                })
+            }
+            total = novoFiltro.length
+        }
+
+        return Math.ceil(total/pagination.value.perPage)
+    })
+
+    const cabecalho = computed(() => {
+        return textoInicital.value.textoincial.join('<br>')
+    })
+
+    const lastArt = computed(() => {
+        const law = listFinal.value.map(x => x.art)
+        const lastArt = Math.max(...law)
+        return lastArt
+    })
+
+    const suggestArtBtn = computed(() => {
+        if(search.value){
+            return !!search.value.replace(/[^0-9]/g,'')
+        }
+        return false
+    })
+
+    const getAll = async() => {
+        await pageStore.getAllPages(route.params.id)
+        textLaws.value = pageStore.readAllPages
+    }
+
+    const filterJustArt = (item) => {
+        const art = item.replace(/[^0-9,]/g,'')
+        const hasComma = art.includes(",");
+
+        if(hasComma && art){   
+            const list = art.split(",").forEach(x => filterArts(x))
+        } else {
+            filterArts(art)
         }
     }
+
+    const filterArts = (art) => {
+        if(art <= lastArt.value){
+            artIndice.value = ''
+            search.value = ''
+            let findArt = artsFilter.value.find( x => x == art ) 
+            if(!findArt){
+                art > 0 ? artsFilter.value.push(art) : snackStore.activeSnack("Artigo não encontrado.")
+            }
+            
+            if(artsFilter.value.length > 0) {
+                artsFilterActive.value = true
+            } else {
+                artsFilterActive.value = false
+            } 
+        } else {
+           snackStore.activeSnack("Artigo não encontrado.")
+        }
+    }
+
+    const clearAllArtsFilter = () => {
+        artsFilter.value = []
+        artsFilterActive.value = false
+    }
+
+    const artFilterRemove = (art) => {
+        let artRemove = artsFilter.value.findIndex( i => i == art)
+        artsFilter.value.splice(artRemove, 1)
+        
+        if(!artsFilter.value.length > 0) {
+            artsFilterActive.value = false
+        }
+    }
+
+    const pageFilter = (item) => {
+        let art = artsFilter.value[0]
+        if(item) {
+            art == lastArt.value ? art : art++  
+            
+        } else {
+            art == 1 ? art : art--
+        }   
+        artsFilter.value = []
+        artsFilter.value.push(art)
+    }
+
+    getAll()
+
 </script>
 
 <style lang="scss" scoped>

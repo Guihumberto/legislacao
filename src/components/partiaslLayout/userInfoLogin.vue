@@ -8,13 +8,13 @@
         <template v-slot:activator="{ props }">
           <v-btn
             v-bind="props"
-            :icon="readLogin.cpf ? 'mdi-account-tie': 'mdi-login'"
+            :icon="loginStore.readLogin.cpf ? 'mdi-account-tie': 'mdi-login'"
             class="mr-2"
-            :title="readLogin.cpf ? 'Sair': 'Entrar'"
+            :title="loginStore.readLogin.cpf ? 'Sair': 'Entrar'"
           >
           </v-btn>
         </template>
-        <v-card min-width="300" v-if="readLogin.cpf">
+        <v-card min-width="300" v-if="loginStore.readLogin.cpf">
           <v-list>
             <v-list-item
               prepend-icon="mdi-account-circle"
@@ -50,50 +50,43 @@
       </v-menu>
     </div>
   </template>
-  <script>
-  import { useLoginStore } from '../../store/LoginStore'
-  const loginStore = useLoginStore()
+  <script setup>
+    import { ref, computed } from 'vue'
+    import { useLoginStore } from '../../store/LoginStore'
+    import { useRouter } from 'vue-router'
+    const loginStore = useLoginStore()
+    const router = useRouter()
 
-  // import login from '@/components/avaliacao/login/login.vue'
 
-  export default {
-    // components:{ login },
-    data: () => ({
-      menu: false,
-    }),
-    methods:{
-      logout(){
-        loginStore.logOut()
-        this.menu = false
-        this.$router.push('/avaliacao')
-      },
-      getFirstAndSecondName(fullName) {
-        try {
-          const nameParts = fullName.trim().split(/\s+/);
-          const firstName = nameParts.length > 0 ? nameParts[0] : '';
-          const secondName = nameParts.length > 1 ? nameParts[1] : '';
+    const menu = ref(false)
   
-          const complete = `${firstName} ${secondName} `
-  
-          return complete;
-          
-        } catch (error) {
-           return fullName
-        }
+    const logout = () => {
+      loginStore.logOut()
+      menu.value = false
+      router.push('/leges')
+    }
+
+    const getFirstAndSecondName = (fullName) => {
+      try {
+        const nameParts = fullName.trim().split(/\s+/);
+        const firstName = nameParts.length > 0 ? nameParts[0] : '';
+        const secondName = nameParts.length > 1 ? nameParts[1] : '';
+
+        const complete = `${firstName} ${secondName} `
+
+        return complete;
+        
+      } catch (error) {
+          return fullName
       }
-    },
-    computed:{
-      readUser(){
-        let user = this.readLogin
+    }
+  
+    const readUser = computed(() => {
+        let user = loginStore.readLogin
         let userData = {
-          nome: this.getFirstAndSecondName(user.name),
+          nome: getFirstAndSecondName(user.name),
           cargo: user.cargo,
         }
         return userData
-      },
-      readLogin(){
-        return loginStore.readLogin
-      }
-    }
-  }
+    })
 </script>

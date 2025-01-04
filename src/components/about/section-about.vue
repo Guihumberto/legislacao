@@ -28,9 +28,6 @@
     </section>
 </template>
 
-<script>
-</script>
-
 <style lang="scss" scoped>
 .container{
     min-height: 59vh;

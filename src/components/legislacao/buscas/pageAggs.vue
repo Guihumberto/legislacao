@@ -28,50 +28,43 @@
     </div>
   </template>
 
-<script>
+<script setup>
+  import { computed, ref } from 'vue'
 
-  export default {
-    data () {
-      return {
-        dialog: false,
-      }
-    },
-    props:{
-        page: Array,
-    },
-    computed:{
-      listPage(){
-        let list = this.page
-        let list1 = []
+  const dialog = ref (false)
+ 
+  const props = defineProps({
+      page: Array
+  })
 
-       list.forEach(x => {
-          x.text = x.text.replace(/\n+/g, '<br>');
-          list1.push(x)
-        })
-        return list1
-      }
-    },
-    methods:{
-      markSearch(texto){
-          let palavrasChave = this.searchP.split(' ')
+  
+  const listPage = computed(() => {
+    let list = props.page
+    let list1 = []
 
-          palavrasChave = this.excluirStopWords(palavrasChave)
+    list.forEach(x => {
+      x.text = x.text.replace(/\n+/g, '<br>');
+      list1.push(x)
+    })
+    return list1
+  })
 
-          const escapedKeywords = palavrasChave.map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const markSearch = (texto) => {
+        const palavrasChave = excluirStopWords(palavrasChave)
 
-          const regex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
-          const textoMarcado = texto.replace(regex, '<mark>$1</mark>');
+        const escapedKeywords = palavrasChave.map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
-          return textoMarcado;
-          
-      },
-      excluirStopWords(arrayPrincipal) {
-        const stopWords = ["a", "o", "e", "é", "um", "uma", "com", "de", "do", "da", "para", "por", "em", "os", "as", "isso", "essa", "esse", "isso", "está"];
-        const resultado = arrayPrincipal.filter(palavra => !stopWords.includes(palavra));
+        const regex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
+        const textoMarcado = texto.replace(regex, '<mark>$1</mark>');
 
-        return resultado;
-      }
-    }
+        return textoMarcado;
+  }
+
+  const excluirStopWords = (arrayPrincipal) => {
+      const stopWords = ["a", "o", "e", "é", "um", "uma", "com", "de", "do", "da", "para", "por", "em", "os", "as", "isso", "essa", "esse", "isso", "está"];
+      const resultado = arrayPrincipal.filter(palavra => !stopWords.includes(palavra));
+
+      return resultado;
   }
 </script>
 
