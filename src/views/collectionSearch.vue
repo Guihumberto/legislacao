@@ -1,6 +1,6 @@
 <template>
     <section>
-        <div class="sizeLoad" v-if="load">
+        <div class="sizeLoad" v-if="pageStore.readLoad">
             <v-progress-circular
                 :size="50"
                 color="primary"
@@ -9,7 +9,7 @@
         </div>
         <div class="container" v-else>
             <div>
-                <v-btn variant="tonal" @click="voltar" class="btn mr-2">Voltar</v-btn>
+                <v-btn variant="tonal" @click="$router.go(-1)" class="btn mr-2">Voltar</v-btn>
                 <v-btn :color="avancado ? 'primary': ''" variant="tonal" @click="avancado = !avancado" :prepend-icon="avancado ? 'mdi-text-search':'mdi-close'">MODO AVANÇADO</v-btn>
             </div>
             <div class="border pa-5 mt-2" id="top">
@@ -110,64 +110,70 @@
     </section>
 </template>
 
-<script>
+<script setup>
+    import { ref, computed } from "vue";
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
-    import api from "@/services/api"
     import { useUserAreaStore } from "@/store/AreaUserStore" 
+    import { usePageStore } from "@/store/PageStore";
+    const pageStore = usePageStore()
     const userAreaStore = useUserAreaStore()
 
-    export default {
-        data(){
-            return{
-                id: this.$route.params.id,
-                textLaws: [],
-                selectedLaw: null,
-                load: false,
-                search: null,
-                avancado: false,
-                artsFilterActive: false, 
-                textLaw:{
-                    size: 0
-                },
-                pagination:{
-                    page: 1,
-                    perPage: 15
-                },
-                artIndice: null,
-                artsFilter: [],
-                snack: {
-                    snackbar: false,
-                    text: 'Nova página adicionada ao documento.',
-                    timeout: 2000
-                },
-            }
-        },
-        components: { TextDispositivo, Pagination },
-        computed:{
-            listPage(){
-                let list = this.textLaws.map(x => x._source)
-                let list1 = []
+    import { useSnackStore } from "@/store/snackStore";
+    const snakStore = useSnackStore()
 
-                list.forEach(x => {
-                    x.text_page = x.text_page.replace(/\n+/g, '<br>');
-                    list1.push(x)
-                })
+    const textLaws = ref([])
+    const selectedLaw = ref(null)
+    const search = ref(null)
+    const avancado = ref(false)
+    const artsFilterActive = ref(false)
+    const pagination = ref({
+        page: 1,
+        perPage: 15
+    })
+    const artIndice = ref(null)
+    const artsFilter = ref([])
 
-                return list1.sort((a, b) => a.num_page - b.num_page)?.sort((a, b) => a.page_to_norma.parent.localeCompare(b.page_to_norma.parent))
-            },
-            collectionList(){
-                return userAreaStore.readTempView.law
-            },
-            idLawCollection(){
-                const idList = this.collectionList.map( x => x.id )
-                return idList
-            },
-            separeteLaws(){
+    const divisores = ['art.', 'livro']
+
+    const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
+            'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
+            'VII -', 'VIII -', 'IX', 'X', 'X-', 'X - ',
+            'XX', 'XXX', 'XL', 'L -', 'L-', 'LX', 'LI -',  'LI-', 'LII', 'LIV -', 'LIV-', 'LV', 'LIX',
+            'a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)', 'j)', 'k)', 'l)', 'm)', 'n)', 'o)',
+            'p)', 'q)', 'r)', 's)', 't)', 'u)', 'v)', 'x)', 'y)', 'w)', 'z)',
+            '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.',  '11.', '12.', '13.', '14.', '15.', '16.', '17.', '18.', '19.', '20.',  '21.', '22.', '23.', '24.', '25.', '26.', '27.', '28.', '29.', '30.',
+            '1-', '2-','3-', '4-', '5-','6-',  '7-', '8-','9-', '10-', 
+            '1 -', '2 -','3 -', '4 -', '5 -','6 -', '7 -', '8 -','9 -', '10 -'  
+    ]
+
+    const arrayEstrturaONly =  ['LIVRO ', 'TÍTULO ', 'CAPÍTULO ', 'SEÇÃO ', 'SUBSEÇÃO ']
+        
+    const listPage = computed(() => {
+        let list = textLaws.value.map(x => x._source)
+        let list1 = []
+
+        list.forEach(x => {
+            x.text_page = x.text_page.replace(/\n+/g, '<br>');
+            list1.push(x)
+        })
+
+        return list1.sort((a, b) => a.num_page - b.num_page)?.sort((a, b) => a.page_to_norma.parent.localeCompare(b.page_to_norma.parent))
+    })
+
+    const collectionList = computed(() => {
+            return userAreaStore.readTempView.law
+    })
+    const idLawCollection = computed(() => {
+            const idList = collectionList.value.map( x => x.id )
+            return idList
+    })
+    
+    const separeteLaws = computed(() => {
                 const listNova = []
-                for(let i = 0; i < this.idLawCollection.length; i++){
+                for(let i = 0; i < idLawCollection.value.length; i++){
 
-                    const newlist = this.listPage.filter( x => x.page_to_norma.parent == this.idLawCollection[i])
+                    const newlist = listPage.value.filter( x => x.page_to_norma.parent == idLawCollection.value[i])
                     
                     const objeto = {
                         id: newlist[0]?.page_to_norma.parent,
@@ -185,7 +191,7 @@
                                         .map(item => item.trim())
                     
                     const divisorIndex = list.findIndex(str => 
-                        this.divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
+                        divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
                     );
 
                     if (divisorIndex !== -1) {
@@ -200,286 +206,247 @@
                     }
                 }
                 return listNova
-            },
-            listPage2(){
-                const novoArray = [];
-                let elementoAtual = '';
+    })
 
-                for( let i = 0; i < 2; i++) {
-                    const list = this.separeteLaws[i].texto
+    const listPage2 = computed(() => {
+            const novoArray = [];
+            let elementoAtual = '';
 
-                    const dados = this.separeteLaws[i]
+            for( let i = 0; i < 2; i++) {
+                const list = separeteLaws.value[i].texto
 
-                    list.forEach((str, index) => {
-                        const eReferencia = this.referencias.some(ref => str.toLowerCase().startsWith(ref.toLowerCase()));
-    
-                        if (eReferencia && elementoAtual) {
-                            // Adiciona o elemento acumulado ao novo array
-                            novoArray.push({
-                                    id: dados.id,
-                                    header: dados.header,
-                                    texto: elementoAtual.trim()
-                            });
-                            // Reinicia o acumulador com o elemento atual
-                            elementoAtual = str;
-                        } else {
-                            // Acumula o texto
-                            elementoAtual += (elementoAtual ? ' ' : '') + str;
-                        }
-    
-                        // Adiciona o último elemento acumulado ao final do loop
-                        if (index === list.length - 1 && elementoAtual) {
-                            novoArray.push({
-                                    id: dados.id,
-                                    header: dados.header,
-                                    texto: elementoAtual.trim()
-                            });
-                        }
-                    });
-                }
+                const dados = separeteLaws.value[i]
 
-                return novoArray
-            }, 
-            listFinal(){
-                const strings = this.listPage2
+                list.forEach((str, index) => {
+                    const eReferencia = referencias.value.some(ref => str.toLowerCase().startsWith(ref.toLowerCase()));
 
-                let ultimoArt = null; // Armazena o último artigo encontrado
-
-                const novoArray = strings.map((item, index) => {
-                    const artMatch = item.texto.toLowerCase().startsWith('art.');
-                    const estruturaMatch = this.arrayEstrturaONly.some(ref => item.texto.toUpperCase().startsWith(ref.toUpperCase()));
-
-                    // Determina o próximo artigo subsequente para `estrutura`
-                    if (estruturaMatch) {
-                        const proximoArt = strings
-                            .slice(index + 1) // Pega os elementos subsequentes
-                            .map( y => y.texto)
-                            .find(str => str.toLowerCase().startsWith('art.')) // Encontra o próximo "art."
-                            ?.slice(4, 12).match(/\d+/)?.[0]; // Extrai o número
-                            
-
-                        if (proximoArt) {
-                            ultimoArt = parseInt(proximoArt) || null; // Atualiza o último artigo com o subsequente
-                        }
-                    }
-
-                    // Atualiza o último artigo encontrado diretamente
-                    if (artMatch) {
-                        ultimoArt = parseInt(item.texto.slice(4, 12).match(/\d+/)?.[0]) || null;
-                    }
-
-                    return {
-                        id: item.id,
-                        art: ultimoArt, // O último artigo atualizado
-                        order: index + 1, // Ordem no array
-                        estrutura: estruturaMatch, // True se for estrutura
-                        textlaw: item.texto // Texto original
-                    };
-                });
-                return novoArray
-            },
-            listTextLaw(){
-                let list = this.listFinal
-
-                if(this.search){
-                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
-
-                    list = filtro
-                } 
-
-                if(this.artsFilterActive){
-                    let novoFiltro = []
-
-                    if(this.artsFilter.length){
-                        list.forEach(item => {
-                            this.artsFilter.forEach( art => {
-                                if(art == item.art){
-                                    novoFiltro.push(item)
-                                }
-                            })
-                        })
-                    }
-                    list = novoFiltro
-                }
-
-                let page = this.pagination.page - 1
-                let start = page * this.pagination.perPage
-                let end = start + this.pagination.perPage
-
-                return list //.slice(start, end)
-
-            },
-            totalPage(){
-                let total = this.listFinal.length
-
-                if(this.search){
-                    let search = this.search.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-                    //retirar caracteres especiais
-                    let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-                    //fazer o filtro
-                    let filtro =  this.listFinal.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
-
-                    total = filtro.length
-                } 
-
-                if(this.artsFilterActive){
-                    let novoFiltro = []
-
-                    if(this.artsFilter.length){
-                        this.listFinal.forEach(item => {
-                            this.artsFilter.forEach( art => {
-                                if(art == item.art){
-                                    novoFiltro.push(item)
-                                }
-                            })
-                        })
-                    }
-                    total = novoFiltro.length
-                }
-
-                return Math.ceil(total/this.pagination.perPage)
-            },
-            divisores(){
-                return ['art.', 'livro'];
-            },
-            arrayTextLawEstrutura(){
-                return [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
-                            'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
-                            'VII -', 'VIII -', 'IX', 'X', 'X-', 'X - ',
-                            'XX', 'XXX', 'XL', 'L -', 'L-', 'LX', 'LI -',  'LI-', 'LII', 'LIV -', 'LIV-', 'LV', 'LIX',
-                            'a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)', 'j)', 'k)', 'l)', 'm)', 'n)', 'o)',
-                            'p)', 'q)', 'r)', 's)', 't)', 'u)', 'v)', 'x)', 'y)', 'w)', 'z)',
-                            '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.',  '11.', '12.', '13.', '14.', '15.', '16.', '17.', '18.', '19.', '20.',  '21.', '22.', '23.', '24.', '25.', '26.', '27.', '28.', '29.', '30.',
-                            '1-', '2-','3-', '4-', '5-','6-',  '7-', '8-','9-', '10-', 
-                            '1 -', '2 -','3 -', '4 -', '5 -','6 -', '7 -', '8 -','9 -', '10 -'  
-                        ]
-            },
-            arrayEstrturaONly(){
-                return ['LIVRO ', 'TÍTULO ', 'CAPÍTULO ', 'SEÇÃO ', 'SUBSEÇÃO ']
-            },
-            referencias(){
-                return this.arrayEstrturaONly.concat(this.arrayTextLawEstrutura)
-            },
-            lastArt(){
-                const law = this.listFinal.map(x => x.art)
-                const lastArt = Math.max(...law)
-                return lastArt
-            },
-            suggestArtBtn(){
-                if(this.search){
-                    return !!this.search.replace(/[^0-9]/g,'')
-                }
-                return false
-            },
-            readFilterLaw(){
-                let list = this.collectionList
-                if(this.selectedLaw){
-                    list = list.filter(x => x.id == this.selectedLaw)
-                }
-                return list
-            },
-            readListPage(){
-                let list = this.listPage
-                if(this.selectedLaw){
-                    list = list.filter(x => x.page_to_norma.parent == this.selectedLaw)
-                }
-                return list
-            }
-        },
-        methods:{
-            async getAll(){
-                this.load = true
-                try {
-                    const response = await api.post("pages_v2/_search", {
-                        from: 0,
-                        size: 5000,
-                        "query": {
-                            "bool": {
-                                "must": [
-                                            {
-                                                "terms": {
-                                                    "page_to_norma.parent": this.idLawCollection
-                                                }
-                                            }
-                                ]
-                            }
-                        }
-                    })
-                    this.textLaws = response.data.hits.hits
-                } catch (error) {
-                    console.log("error");
-                }finally{
-                    this.load = false
-                }
-            },
-            filterLaw(id){
-                if(id == this.selectedLaw){
-                    this.selectedLaw = null
-                } else {
-                    this.selectedLaw = id
-                }
-            },
-            voltar(){
-                this.$router.go(-1);
-            },
-            filterJustArt(art){     
-                console.log(this.lastArt);
-                if(art <= this.lastArt){
-                    this.artIndice = ''
-                    this.search = ''
-                    let findArt = this.artsFilter.find( x => x == art ) 
-                    if(!findArt){
-                        art > 0 ? this.artsFilter.push(art) : this.snackAction()
-                    }
-                    
-                    if(this.artsFilter.length > 0) {
-                        this.artsFilterActive = true
+                    if (eReferencia && elementoAtual) {
+                        // Adiciona o elemento acumulado ao novo array
+                        novoArray.push({
+                                id: dados.id,
+                                header: dados.header,
+                                texto: elementoAtual.trim()
+                        });
+                        // Reinicia o acumulador com o elemento atual
+                        elementoAtual = str;
                     } else {
-                        this.artsFilterActive = false
-                    } 
-                } else {
-                    this.snackAction()
+                        // Acumula o texto
+                        elementoAtual += (elementoAtual ? ' ' : '') + str;
+                    }
+
+                    // Adiciona o último elemento acumulado ao final do loop
+                    if (index === list.length - 1 && elementoAtual) {
+                        novoArray.push({
+                                id: dados.id,
+                                header: dados.header,
+                                texto: elementoAtual.trim()
+                        });
+                    }
+                });
+            }
+
+            return novoArray
+    })
+
+    const listFinal = computed(() => {
+        const strings = listPage2.value
+
+        let ultimoArt = null; // Armazena o último artigo encontrado
+
+        const novoArray = strings.map((item, index) => {
+            const artMatch = item.texto.toLowerCase().startsWith('art.');
+            const estruturaMatch = arrayEstrturaONly.some(ref => item.texto.toUpperCase().startsWith(ref.toUpperCase()));
+
+            // Determina o próximo artigo subsequente para `estrutura`
+            if (estruturaMatch) {
+                const proximoArt = strings
+                    .slice(index + 1) // Pega os elementos subsequentes
+                    .map( y => y.texto)
+                    .find(str => str.toLowerCase().startsWith('art.')) // Encontra o próximo "art."
+                    ?.slice(4, 12).match(/\d+/)?.[0]; // Extrai o número
+                    
+
+                if (proximoArt) {
+                    ultimoArt = parseInt(proximoArt) || null; // Atualiza o último artigo com o subsequente
                 }
-            },  
-            snackAction(){
-                this.snack = {
-                    snackbar: true,
-                    text: 'Artigo nâo encontrado.',
-                    timeout: 2000
+            }
+
+            // Atualiza o último artigo encontrado diretamente
+            if (artMatch) {
+                ultimoArt = parseInt(item.texto.slice(4, 12).match(/\d+/)?.[0]) || null;
+            }
+
+            return {
+                id: item.id,
+                art: ultimoArt, // O último artigo atualizado
+                order: index + 1, // Ordem no array
+                estrutura: estruturaMatch, // True se for estrutura
+                textlaw: item.texto // Texto original
+            };
+        });
+        return novoArray
+    })
+
+    const listTextLaw = computed(() => {
+            let list = listFinal.value
+
+            if(search.value){
+                let search_b = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                //retirar caracteres especiais
+                let exp = new RegExp(search_b.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+                //fazer o filtro
+                let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+                list = filtro
+            } 
+
+            if(artsFilterActive.value){
+                let novoFiltro = []
+
+                if(artsFilter.value.length){
+                    list.forEach(item => {
+                        artsFilter.value.forEach( art => {
+                            if(art == item.art){
+                                novoFiltro.push(item)
+                            }
+                        })
+                    })
                 }
-            },
-            clearAllArtsFilter(){
-                this.artsFilter = []
-                this.artsFilterActive = false
-            },
-            artFilterRemove(art){
-                let artRemove = this.artsFilter.findIndex( i => i == art)
-                this.artsFilter.splice(artRemove, 1)
-                
-                if(!this.artsFilter.length > 0) {
-                    this.artsFilterActive = false
+                list = novoFiltro
+            }
+
+            let page = pagination.value.page - 1
+            let start = page * pagination.value.perPage
+            let end = start + pagination.value.perPage
+
+            return list //.slice(start, end)
+
+    })
+
+    const totalPage = computed(() => {
+            let total = listFinal.value.length
+
+            if(search.value){
+                let search = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                //retirar caracteres especiais
+                let exp = new RegExp(search.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+                //fazer o filtro
+                let filtro =  listFinal.value.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+
+                total = filtro.length
+            } 
+
+            if(artsFilterActive.value){
+                let novoFiltro = []
+
+                if(artsFilter.value.length){
+                    listFinal.value.forEach(item => {
+                        artsFilter.value.forEach( art => {
+                            if(art == item.art){
+                                novoFiltro.push(item)
+                            }
+                        })
+                    })
                 }
-            },
-            pageFilter(item){
-                let art = this.artsFilter[0]
-                if(item) {
-                    art == this.lastArt ? art : art++  
-                  
-                } else {
-                  art == 1 ? art : art--
-                }   
-                this.artsFilter = []
-                this.artsFilter.push(art)
-            },
-        },
-        created(){
-            this.getAll()
+                total = novoFiltro.length
+            }
+
+            return Math.ceil(total/pagination.value.perPage)
+    })
+
+    const referencias = computed(() => {
+        return arrayEstrturaONly.concat(arrayTextLawEstrutura)
+    })
+
+    const lastArt = computed(() => {
+            const law = listFinal.value.map(x => x.art)
+            const lastArt = Math.max(...law)
+            return lastArt
+    })
+
+    const suggestArtBtn = computed(() => {
+        if(search.value){
+            return !!search.value.replace(/[^0-9]/g,'')
+        }
+        return false
+    })
+
+    const readFilterLaw = computed(() => {
+        let list = collectionList.value
+        if(selectedLaw.value){
+            list = list.filter(x => x.id == selectedLaw.value)
+        }
+        return list
+    })
+
+    const readListPage = computed(() => {
+        let list = listPage.value
+        if(selectedLaw.value){
+            list = list.filter(x => x.page_to_norma.parent == selectedLaw.value)
+        }
+        return list
+    })
+    
+    const getAll = async () => {
+        const resp = await pageStore.getPagesCollection(idLawCollection.value)
+        textLaws.value = resp
+    }
+
+    const filterLaw = (id) => {
+        if(id == selectedLaw.value){
+            selectedLaw.value = null
+        } else {
+            selectedLaw.value = id
         }
     }
+
+    const filterJustArt = (art) => {     
+        if(art <= lastArt.value){
+            artIndice.value = ''
+            search.value = ''
+            let findArt = artsFilter.value.find( x => x == art ) 
+            if(!findArt){
+                art > 0 ? artsFilter.value.push(art) : snakStore.activeSnack('Artigo não encontrado.')
+            }
+            
+            if(artsFilter.value.length > 0) {
+                artsFilterActive.value = true
+            } else {
+                artsFilterActive.value = false
+            } 
+        } else {
+            snakStore.activeSnack('Artigo não encontrado.')
+        }
+    }
+
+    const clearAllArtsFilter = () => {
+        artsFilter.value = []
+        artsFilterActive.value = false
+    }
+
+    const artFilterRemove = (art) => {
+        let artRemove = artsFilter.value.findIndex( i => i == art)
+        artsFilter.value.splice(artRemove, 1)
+        
+        if(!artsFilter.value.length > 0) {
+            artsFilterActive.value = false
+        }
+    }
+
+    const pageFilter = (item) => {
+        let art = artsFilter.value[0]
+        if(item) {
+            art == lastArt.value ? art : art++  
+            
+        } else {
+            art == 1 ? art : art--
+        }   
+        artsFilter.value = []
+        artsFilter.value.push(art)
+    }
+    
+    getAll()
+        
 </script>
 
 <style lang="scss" scoped>

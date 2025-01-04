@@ -45,7 +45,7 @@
           </v-card-actions>
         </v-card>
         <v-card v-else class="pa-5" min-width="300">
-          <login />
+          <!-- <login /> -->
         </v-card>
       </v-menu>
     </div>
@@ -54,10 +54,10 @@
   import { useLoginStore } from '../../store/LoginStore'
   const loginStore = useLoginStore()
 
-  import login from '@/components/avaliacao/login/login.vue'
+  // import login from '@/components/avaliacao/login/login.vue'
 
   export default {
-    components:{ login },
+    // components:{ login },
     data: () => ({
       menu: false,
     }),

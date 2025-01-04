@@ -23,53 +23,50 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    data() {
-      return {
-        leftWidth: 200, // Largura inicial da sidebar esquerda
-        rightWidth: 200, // Largura inicial da sidebar direita
-        isResizing: false,
-        activeSidebar: null,
-      };
-    },
-    methods: {
-      startResize(side) {
-        this.isResizing = true;
-        this.activeSidebar = side;
-  
-        // Adiciona os eventos de movimento e liberação
-        window.addEventListener("mousemove", this.onResize);
-        window.addEventListener("mouseup", this.stopResize);
-      },
-      onResize(event) {
-        if (this.isResizing && this.activeSidebar) {
+  <script setup>
+    import { ref } from 'vue'
+
+    const leftWidth = ref(200) // Largura inicial da sidebar esquerda
+    const rightWidth = ref(200) // Largura inicial da sidebar direita
+    const isResizing = ref(false)
+    const activeSidebar = ref(null)
+ 
+    const startResize = (side) => {
+      isResizing.value = true;
+      activeSidebar.value = side;
+
+      // Adiciona os eventos de movimento e liberação
+      window.addEventListener("mousemove", onResize);
+      window.addEventListener("mouseup", stopResize);
+    }
+
+    const onResize = (event) => {
+        if (isResizing.value && activeSidebar.value) {
           const containerWidth = document.querySelector(".container").offsetWidth;
   
-          if (this.activeSidebar === "left") {
+          if (activeSidebar.value === "left") {
             // Calcula a nova largura da sidebar esquerda
-            const newLeftWidth = Math.min(Math.max(event.clientX, 100), containerWidth - this.rightWidth - 100);
-            this.leftWidth = newLeftWidth;
-          } else if (this.activeSidebar === "right") {
+            const newLeftWidth = Math.min(Math.max(event.clientX, 100), containerWidth - rightWidth.value - 100);
+            leftWidth.value = newLeftWidth;
+          } else if (activeSidebar.value === "right") {
             // Calcula a nova largura da sidebar direita
             const newRightWidth = Math.min(
               Math.max(containerWidth - event.clientX, 100),
-              containerWidth - this.leftWidth - 100
+              containerWidth - leftWidth.value - 100
             );
-            this.rightWidth = newRightWidth;
+            rightWidth.value = newRightWidth;
           }
         }
-      },
-      stopResize() {
-        this.isResizing = false;
-        this.activeSidebar = null;
-  
-        // Remove os eventos de movimento e liberação
-        window.removeEventListener("mousemove", this.onResize);
-        window.removeEventListener("mouseup", this.stopResize);
-      },
-    },
-  }
+    }
+    
+    const stopResize = () => {
+      isResizing.value = false;
+      activeSidebar.value = null;
+
+      // Remove os eventos de movimento e liberação
+      window.removeEventListener("mousemove", onResize);
+      window.removeEventListener("mouseup", stopResize);
+    }
   </script>
   
   <style scoped>

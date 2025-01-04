@@ -55,5 +55,30 @@ export const usePageStore = defineStore("page", {
                 this.load = false
             }
         },
+        async getPagesCollection(ids){
+            try {
+                this.load = true
+                const response = await api.post("pages_v2/_search", {
+                    from: 0,
+                    size: 5000,
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "page_to_norma.parent": ids
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return response.data.hits.hits
+            } catch (error) {
+                console.log("error");
+            }finally{
+                this.load = false
+            }
+        }
     }
 })

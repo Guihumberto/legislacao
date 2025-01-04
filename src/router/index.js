@@ -126,17 +126,6 @@ const routes = [
     ],
   },
   {
-    path: '/painel',
-    component: () => import('@/layouts/clear/Clear.vue'),
-    children:[
-      {
-        path: '',
-        name: 'Painel',
-        component: () => import('@/views/Test.vue'),
-      },
-    ]
-  },
-  {
     path: '/blog',
     component: () => import('@/layouts/blog/Blog.vue'),
     children:[

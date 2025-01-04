@@ -8,8 +8,7 @@
 </template>
 
 <script setup>
-import Formulario from '@/components/Admin/Indexar/formulario.vue';
-
+    import Formulario from '@/components/Admin/Indexar/formulario.vue';
 
 </script>
 

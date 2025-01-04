@@ -54,7 +54,7 @@
 <script setup>
     import { onMounted, ref, computed } from 'vue';
     import { useLawStore } from '@/store/LawsStore';
-import Menu_popover from './menu_popover.vue';
+    import Menu_popover from './menu_popover.vue';
     const lawStore = useLawStore()
 
     const teste = ref(true)

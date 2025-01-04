@@ -87,14 +87,11 @@
       </v-menu>
 </template>
 <script setup>
+    import { ref } from 'vue';
     import { useLawStore } from '@/store/LawsStore';
     const lawStore = useLawStore()
-
-    import { ref } from 'vue';
-    const fav = ref(true)
+    
     const menu = ref(false)
-    const message = ref(false)
-    const hints = ref(true)
 
     const props = defineProps({
         item: Object
@@ -102,7 +99,6 @@
 
     const deleteLaw = async(item) => {
       await lawStore.deleteLaw(item)
-      console.log(item);
     }
 
   </script>

@@ -32,10 +32,10 @@
 </template>
 
 <script>
-  import dialoghorario from '@/components/dialogs/horarios'
+  // import dialoghorario from '@/components/dialogs/horarios'
   export default {
     components:{
-      dialoghorario
+      // dialoghorario
     },
     methods:{
       goTO(item){

@@ -1,11 +1,11 @@
 <template>
     <section>
         <div class="container">
-            <v-btn variant="outlined" @click="voltar"> <v-icon>mdi-arrow-left</v-icon>Voltar</v-btn>
+            <v-btn variant="text" class="pa-0" @click="$router.push('/leges')"> <v-icon>mdi-home</v-icon>INÍCIO</v-btn>
             <h1 class="mb-5">Sobre</h1>
             <div>
                 <p>A aplicação da Legislação OH-MY-SEARCH é um sistema idealizado e desenvolvido 
-                     por João Humeberto Silva Ribeiro Júnior, sendo projetado para ser uma 
+                     por João Humberto Silva Ribeiro Júnior, sendo projetado para ser uma 
                      ferramenta útil a todos os usuários que desejam um acessso rápido e facilitado da legislação.
                 </p>
                 <br>
@@ -29,13 +29,6 @@
 </template>
 
 <script>
-    export default {
-        methods:{
-            voltar(){
-                this.$router.push('/leges')
-            }
-        }
-    }
 </script>
 
 <style lang="scss" scoped>

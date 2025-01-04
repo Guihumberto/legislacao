@@ -8,15 +8,8 @@
     </section>
   </template>
   
-  <script>
-  export default {
-    name: 'NotFound'
-  }
-  </script>
-  
   <style scoped>
   .container{
     min-height: 70vh;
   }
-  /* Estilos personalizados para a página 404 */
   </style>

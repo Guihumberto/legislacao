@@ -33,7 +33,7 @@
          </v-text-field>
          <v-btn block color="primary" type="submit" :loading="loadLogin">Entrar</v-btn>
          <div class="d-flex justify-center align-center" v-if="flutuante">
-             <relatarErro /> | <about />
+             <!-- <relatarErro /> | <about /> -->
          </div>
          <v-expand-transition>
              <div v-if="readErro">
@@ -48,8 +48,8 @@
 <script setup>
     import { ref, computed, provide } from 'vue';
     import FirstLogin from './firstLogin.vue'
-    import relatarErro from '../avaliacao/parciais/relatarErro.vue';
-    import about from '../avaliacao/parciais/about.vue';
+    // import relatarErro from '../avaliacao/parciais/relatarErro.vue';
+    // import about from '../avaliacao/parciais/about.vue';
     import { mask } from 'vue-the-mask'
 
     import { useRouter } from 'vue-router';
