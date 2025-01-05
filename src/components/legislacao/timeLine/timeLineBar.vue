@@ -30,112 +30,65 @@
     </div>
   </div>
 </template>
-<script>
-  import api from "@/services/api"
+<script setup>
+  import { useOrderBy } from '@/composables/orderBy'
+  import { useLawStore } from '@/store/LawsStore'
+  import { ref, computed } from 'vue'
 
-  export default {
-    data: () => ({
-      years: [
-        {
-          color: 'primary',
-          year: '1960',
-          laws: []
-        },
-        {
-          color: 'primary',
-          year: '1970',
-          laws: []
-        },
-        {
-          color: 'primary',
-          year: '1980',
-          laws: []
-        },
-        {
-          color: 'primary',
-          year: '1990',
-          laws: []
-        },
-        {
-          color: 'primary',
-          year: '2000',
-          laws: []
-        },
-      ],
-      resultsSearch: [],
-      totalDocs: 0,
-      reverse: false,
-      qtdAno: 5
-    }),
-    props:{
-      listLaw: Object
-    },
-    computed:{
-      listLawsId(){
-        let list = this.resultsSearch.map(x => x._source)
+  const lawStore = useLawStore()
 
-        const lawsPorAno = list.reduce((lawsPorAno, lawAtual) => {
-          const anoExiste = lawsPorAno.find( ano => ano.ano == lawAtual.ano)
+  const resultsSearch = ref([])
+  const totalDocs = ref(0)
+  const qtdAno = ref(5)
 
-          if(anoExiste){
-            anoExiste.laws.push(lawAtual)
-          } else {
-            lawsPorAno.push(
-              {
-                ano: lawAtual.ano,
-                laws: [lawAtual]
-              }
-            )
+  const props = defineProps({
+    listLaw: Object
+  })
+
+    
+  const listLawsId = computed(() => {
+    let list = resultsSearch.value.map(x => x._source)
+
+    const lawsPorAno = list.reduce((lawsPorAno, lawAtual) => {
+      const anoExiste = lawsPorAno.find( ano => ano.ano == lawAtual.ano)
+
+      if(anoExiste){
+        anoExiste.laws.push(lawAtual)
+      } else {
+        lawsPorAno.push(
+          {
+            ano: lawAtual.ano,
+            laws: [lawAtual]
           }
-
-          return lawsPorAno
-        }, [])
-
-        return lawsPorAno.sort(this.orderAno).slice(0, this.qtdAno)
+        )
       }
-    },
-    methods:{
-      async getAllLaws(){
-        const listLaw = this.listLaw.idsLawsChanges
-        const response = await api.post("laws_v3/_search", {
-            from: 0,
-            size: 5000,
-            query: {
-                "bool": {
-                    "must": [
-                        {
-                            "terms": {
-                                "id": listLaw
-                            }
-                        },
-                    ]
-                }
-            }
-        })
-        console.log(response);
-        this.resultsSearch = response.data.hits.hits;
-        this.totalDocs = response.data.hits.total.value;
-      },
-      orderAno(a, b){
-          return this.reverse
-              ? a.ano -  b.ano
-              : b.ano -  a.ano
-      },
-      qtdMaisMenos(item){
-        if(item == 5){
-          this.qtdAno = 1000
-        } else {
-          this.qtdAno = 5
-          const element = document.getElementById('topo')
-          element.scrollIntoView({behavior: "smooth"})
 
-        }
-      }
-    },
-    created(){
-      this.getAllLaws()
+      return lawsPorAno
+    }, [])
+
+    return lawsPorAno.sort(useOrderBy('ano')).slice(0, qtdAno.value)
+  })
+
+  
+  const getAllLaws = async() => {
+    const resp = await lawStore.getLawsSelected(props.listLaw.idsLawsChanges)
+    resultsSearch.value = resp.data;
+    totalDocs.value = resp.total;
+  }
+
+  const qtdMaisMenos = (item) => {
+    if(item == 5){
+      qtdAno.value = 1000
+    } else {
+      qtdAno.value = 5
+      const element = document.getElementById('topo')
+      element.scrollIntoView({behavior: "smooth"})
     }
   }
+
+  getAllLaws()
+  
+
 </script>
 
 <style scoped>

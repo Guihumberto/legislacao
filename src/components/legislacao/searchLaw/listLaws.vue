@@ -15,7 +15,7 @@
                 <div class="allLaws">
                     <v-expansion-panels v-if="orgLaws.length">
                         <v-expansion-panel
-                            v-for="tipo, t in orgLaws.sort(orderBy('tipo'))" :key="t"
+                            v-for="tipo, t in orgLaws.sort(useOrderBy('tipo', true))" :key="t"
                         >
                         <v-expansion-panel-title 
                             expand-icon="mdi-plus" collapse-icon="mdi-minus">
@@ -24,11 +24,11 @@
                         <v-expansion-panel-text>
                             <v-expansion-panels variant="popout">
                                 <v-expansion-panel
-                                    v-for="ano, a in tipo.subcategorias.sort(orderBy('ano'))" :key="a" >
+                                    v-for="ano, a in tipo.subcategorias.sort(useOrderBy('ano', false))" :key="a" >
                                     <v-expansion-panel-title>{{ ano.ano }} ({{ ano.norma.length }}) </v-expansion-panel-title>
                                     <v-expansion-panel-text>
                                         <div class="even-columns">
-                                            <div   v-for="law, l in ano.norma.sort(orderBy('tilte'))" :key="l">
+                                            <div   v-for="law, l in ano.norma.sort(useOrderBy('tilte'))" :key="l">
                                                 <a class="openLaw" :href="`text/${law.id}?search=leges`" target="_blank">{{ law.title }}</a>
                                             </div>
                                         </div>
@@ -64,16 +64,15 @@
     import { useConsultaStore } from '@/store/ConsultaStore'
     const consultaStore = useConsultaStore()  
 
+    import { useOrderBy } from '@/composables/orderBy'
+
     const search = ref({
         text: '',
         years: [],
         fonte: []
     })
-
-    const reverse = ref(true)
     const load = ref(false)
     
-
     const orgLaws = computed(() => {
         let list = lawStore.listAllLaws.map(x => x._source)
 
@@ -127,14 +126,6 @@
 
         return classificacao
     })
-
-    const orderBy = (key) => (a, b) => {
-        if (reverse.value) {
-            return a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0;
-        } else {
-            return a[key] < b[key] ? 1 : a[key] > b[key] ? -1 : 0;
-        }
-    };
         
 </script>
 

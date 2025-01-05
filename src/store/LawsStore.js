@@ -136,6 +136,35 @@ export const useLawStore = defineStore("Law", {
             if(!this.search.text && !this.search.fonte.length && this.search.years.length) this.getLawsAdmConfig6()
             if(!this.search.text && this.search.fonte.length && !this.search.years.length) this.getLawsAdmConfig7()
         },
+        async getLawsSelected(ids){
+            try {
+                this.load = true
+                const response = await api.post("laws_v3/_search", {
+                    from: 0,
+                    size: 5000,
+                    query: {
+                        "bool": {
+                            "must": [
+                                {
+                                    "terms": {
+                                        "id": ids
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                })
+
+                return {
+                    data: response.data.hits.hits,
+                    total: response.data.hits.total.value
+                } 
+            } catch (error) {
+                console.log('error laws selected');
+            } finally {
+                this.load = false
+            }
+        },
         async getJustMainLaws(items){
             try {
                 this.load = true

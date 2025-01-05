@@ -59,13 +59,11 @@
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
 
+    import { useOrderBy } from '@/composables/orderBy'
 
     const showBar = ref(true)
     const active = ref([])
     const open = ref([])
-    const reverse = ref(false)
-     
-
     
     const listAnos = computed(() => {
         let list = generalStore.readResultSearch.map( x => x._source)
@@ -97,7 +95,7 @@
         return acumulador;
         }, []);
 
-        return classificacao.sort(order)
+        return classificacao.sort(useOrderBy('title', false))
     })
 
     const listNormas = computed(() => {
@@ -131,7 +129,7 @@
         return acumulador;
         }, []);
 
-        return classificacao.sort(orderTipo)
+        return classificacao.sort(useOrderBy('title'))
     })
 
         
@@ -141,18 +139,6 @@
         if(link){
             window.open(`text/${link}?search=search`, '_blank');
         }
-    }
-
-    const order = (a, b) => {
-            return reverse.value
-                ? a.title -  b.title
-                : b.title -  a.title
-    }
-
-    const orderTipo = (a, b) => {
-        reverse.value
-            ? a.title -  b.title
-            : b.title -  a.title
     }
 
 </script>

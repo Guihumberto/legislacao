@@ -22,7 +22,7 @@
                             @update:model-value="editIdCollection(item)" v-model="item.publish" hide-details label="Publicar">
                         </v-switch>
                     </div>
-                    <small>Criado em : {{ item.dateCreated }}</small>
+                    <small>Criado em: {{ useDateNow(item.dateCreated) }}</small>
                 </div>
                 <v-list>
                     <v-list-item 
@@ -49,6 +49,8 @@
     import { useRouter } from 'vue-router';
     import ComfirmDelete from '../comfirmDelete.vue';
     import { ref, provide, watch } from 'vue';
+    import { useDateNow } from '@/composables/dateFormat';
+    
     const userAreaStore = useUserAreaStore()
     const router = useRouter()
 

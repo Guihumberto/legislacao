@@ -104,9 +104,7 @@
         minfield: (v) => (v||'').length == 11 || "CPF possui 11 dígitos",
     }
 
-
     const loadSearch = ref(false)
-    const reverse = ref(false)
     const resultsSearch = ref([])
     const load = ref(false)
     const searchActive = ref(false)
@@ -130,7 +128,6 @@
             loadSearch.value = false
         }
     }
-    
     
     if(route.query.text_search){
         search.value.text = route.query.text_search

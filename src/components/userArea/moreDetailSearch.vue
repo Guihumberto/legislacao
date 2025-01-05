@@ -24,7 +24,10 @@
         <v-dialog v-model="dialog">
           <div class="d-flex justify-center">
             <v-card width="500">
-              <v-card-title>Detalhes da busca</v-card-title>
+              <v-card-title class="d-flex justify-space-between align-center bg-primary mb-5">
+                Detalhes da busca
+                <v-btn variant="text" @click="dialog = false" icon="mdi-close"></v-btn>
+              </v-card-title>
               <v-card-text>
                 Campo de busca: {{ search.text_search }} <br>
                 <span v-if="search.years.length"> Período: {{ search.years }} <br></span> 
