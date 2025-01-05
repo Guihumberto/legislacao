@@ -57,12 +57,10 @@
       </v-dialog>
   </template>
   <script setup>
-    import { useUserAreaStore } from '@/store/AreaUserStore';
-    const userAreaStore = useUserAreaStore()
-
     import { ref } from 'vue';
 
-
+    import { useUserAreaStore } from '@/store/AreaUserStore';
+    const userAreaStore = useUserAreaStore()
 
     const dialog = ref(false)
     const form = ref(null)
@@ -71,7 +69,6 @@
     const props = defineProps({
       document: Array
     })
-
 
     const emit = defineEmits(['fecharDoc'])
 
@@ -93,5 +90,4 @@
                emit("fecharDoc")
             }
     }
-    
   </script>

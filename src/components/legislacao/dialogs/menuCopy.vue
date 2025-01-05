@@ -23,24 +23,23 @@
     </v-menu>
 </template>
 
-<script>
-  export default {
-    data: () => ({
-      items: [
+<script setup>
+
+    const  items = [
         { title: 'Copiar Link' }
-      ],
-    }),
-    props:{
+      ]
+    const props = defineProps({
       page: String
-    },
-    methods:{
-      copyLink(){
-        const text =`https://legislacao.estudodalei.com.br/textpage/${this.page}`
-        navigator.clipboard.writeText(text);
-        this.$emit('copyLink', text);
-      } 
-    }
-  }
+    })
+
+    const emits = defineEmits(['copyLink'])
+    
+    const copyLink = () => {
+      const text =`https://legislacao.estudodalei.com.br/textpage/${props.page}`
+      navigator.clipboard.writeText(text);
+      emits('copyLink', text);
+    } 
+    
 </script>
 
 <style lang="scss" scoped>

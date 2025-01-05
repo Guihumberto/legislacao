@@ -1,16 +1,16 @@
 <template>
     <div class="contentWrapper">
-        <div class="d-flex justify-end w-100" v-if="!showBar && listSearchs.length" @click="showBar = true">
+        <div class="d-flex justify-end w-100" v-if="!showBar && generalStore.readListStore.length" @click="showBar = true">
             <v-btn variant="text" 
             class="btnHidden ma-1" color="black" icon="mdi-chevron-left"></v-btn>
         </div>
-        <div class="sideRight w-100" v-if="showBar && listSearchs.length">
+        <div class="sideRight w-100" v-if="showBar && generalStore.readListStore.length">
             <h3 class="d-flex justify-space-between align-center"> 
                 Histórico
                 <v-btn variant="text"  @click="showBar = false" class="btnHidden mb-2" color="grey">Ocultar</v-btn>
             </h3>
             <div>
-                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
+                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="generalStore.removeAll()" color="red" variant="text">Apagar tudo</v-btn>
                 <div class="content">
                     <v-card 
                         elevation="0" 
@@ -22,7 +22,7 @@
                                 {{ item.text }}
                                 <v-icon size="small" color="success" v-if="item.precision" title="precisão">mdi-check</v-icon>
                             </div>
-                            <v-icon @click.stop="removeSearch(i)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
+                            <v-icon @click.stop="generalStore.removeListSearch(i)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
                         </v-card-text>
                         <v-tooltip
                             activator="parent"
@@ -44,45 +44,33 @@
         </div>
     </div>
 </template>
-<script>
+<script setup>
+    import { ref, computed } from 'vue'
+    import { useRouter } from 'vue-router'
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
 
-    export default{
-        data(){
-            return{
-                showBar: true
-            }
-        },
-        computed:{
-            listSearchs(){
-                return generalStore.readListStore
-            },
-            listSearchReduzida(){
-                const list = this.listSearchs
+    const router = useRouter()
+    const showBar =  ref(true)
 
-                const uniqueList = list.filter((item, index, self) => 
-                    index === self.findIndex((t) => (
-                        t.text === item.text && t.precision === item.precision && t.fonte === item.fonte && t.years === item.years & t.termo === item.termo
-                    ))
-                );
+    
+       
+    const listSearchReduzida = computed(() => {
+            const list = generalStore.readListStore
+            const uniqueList = list.filter((item, index, self) => 
+                index === self.findIndex((t) => (
+                    t.text === item.text && t.precision === item.precision && t.fonte === item.fonte && t.years === item.years & t.termo === item.termo
+                ))
+            );
 
-                return uniqueList
-            }
-        },
-        methods:{
-            searchAgain(item, i){
-                generalStore.reqChange(true, i)
-                this.$router.push(`leges?search=${item.text}&years=${item.years}&fonte=${item.fonte}&termo=${item.termo}&precision=${item.precision}`)
-            },
-            removeSearch(item){
-                generalStore.removeListSearch(item)
-            },
-            removeAll(){
-                generalStore.removeAll()
-            }
-        }
+            return uniqueList
+    })
+    
+    const searchAgain = (item, i) => {
+        generalStore.reqChange(true, i)
+        router.push(`leges?search=${item.text}&years=${item.years}&fonte=${item.fonte}&termo=${item.termo}&precision=${item.precision}`)
     }
+        
 </script>
 <style scoped>
 .sideRight{

@@ -79,6 +79,27 @@ export const usePageStore = defineStore("page", {
             }finally{
                 this.load = false
             }
+        },
+        async fetchSuggestions(item){
+            try {
+                this.load = true
+                const response = await api.post("pages_v2/_search", {
+                    query: {
+                        "match_phrase_prefix": {
+                            "text_page": {
+                                "query": item,
+                                "slop" : 10
+                            }
+                        }
+                    }
+                });
+                return response.data.hits.hits;
+            } catch (error) {
+                console.error('Erro ao buscar sugestões:', error);
+            } finally {
+                this.load = false
+            }
+            
         }
     }
 })

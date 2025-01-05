@@ -11,26 +11,14 @@
             <p>{{ item._source.ano }}</p>
         </div>
     </div>
-    <!-- <div class="text-center mt-5" v-else>
-        <v-progress-circular
-            :size="50"
-            color="primary"
-            indeterminate
-        ></v-progress-circular>
-    </div> -->
 </template>
 
-<script>
-    export default {
-        data(){
-            return{
+<script setup>
 
-            }
-        },
-        props:{
-            listSearch: Array
-        }
-    }
+    const props = defineProps({
+        listSearch: Array
+    })
+
 </script>
 
 <style lang="scss" scoped>

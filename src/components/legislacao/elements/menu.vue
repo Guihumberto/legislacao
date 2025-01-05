@@ -17,16 +17,10 @@
     </v-menu>
 </template>
 
-<script>
-    export default {
-        data(){
-            return{
-                items: [
-                    { title: 'Sobre', url: '/about'}
-                ],
-            }
-        }
-    }
+<script setup>
+    const items =  [
+        { title: 'Sobre', url: '/about'}
+    ] 
 </script>
 
 <style lang="scss" scoped>

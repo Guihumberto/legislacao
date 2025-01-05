@@ -11,11 +11,11 @@
             ></v-toolbar>
             <v-card-text class="px-10">
               <ul>
-                <li>Texto resumo nos resultados da pesquisa.</li>
-                <li>Botão de ocultar o texto resumo.</li>
-                <li>Seção de "normas adicionadas recentemente" (busca por lei).</li>
-                <li>Agregar por norma todos os resultados</li>
-                <li>Botão de ajuda</li>
+                <li>Coleção de Normas.</li>
+                <li>Buscar a partir do texto.</li>
+                <li>Favoritar normas e páginas.</li>
+                <li>Salvar documentos.</li>
+                <li>Criação de Posts.</li>
               </ul>
             </v-card-text>
             <v-card-actions>
@@ -33,43 +33,34 @@
     </v-dialog>
 </template>
 
-<script>
+<script setup>
+    import { ref, computed } from 'vue'
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()  
-    export default {
-        data(){
-            return{
-                dialog: false,
-                noShow: false
-            }
-        },
-        computed:{
-            show(){
-                return generalStore.readShowNews
-            },
-            ShowTotal(){
-                if(this.show && this.dialog){
-                    return true
-                } else {
-                    return false
-                }
-            }
-        },
-        methods:{
-            naoMostrar(){
-                generalStore.changeShowsNews(false)
-            },
-            activeDialog(){
-              setTimeout(()=>{
-                this.dialog = true
-              }, 2000)
-            }
-        },
-        created(){
-          this.activeDialog()
-        }
 
+    const dialog = ref(false)
+    const noShow = ref(false)
+   
+    const ShowTotal = computed(() => {
+        if(generalStore.readShowNews && dialog.value){
+            return true
+        } else {
+            return false
+        }
+    })
+      
+    const naoMostrar = () => {
+        generalStore.changeShowsNews(false)
     }
+
+    const activeDialog = () => {
+      setTimeout(()=>{
+        dialog.value = true
+      }, 2000)
+    }
+      
+    activeDialog()
+
 </script>
 
 <style lang="scss" scoped>

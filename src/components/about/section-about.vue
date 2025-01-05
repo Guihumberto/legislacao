@@ -30,6 +30,6 @@
 
 <style lang="scss" scoped>
 .container{
-    min-height: 59vh;
+    min-height: 69vh;
 }
 </style>

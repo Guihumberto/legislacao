@@ -65,31 +65,27 @@
     </div>
   </template>
 
-<script>
-    export default {
-        data(){
-            return{
-                dialog: false,
-                tela: false
-            }
-        },
-        props:{
-            docs: Array
-        },
-        methods:{
-            textPage(item){
-                let text = item
-                text = text.replace(/\n+/g, '<br>');
-                return text
-            },
-            findPage(item){
-                const element = document.getElementById(item)
-                element.scrollIntoView({behavior: "smooth"})
-                this.tela = true
-                if(item == 'top'){
-                  this.tela = false
-                }
-            },
+<script setup>
+    import { ref } from 'vue'
+   
+    const dialog = ref(false)
+    const tela = ref(false)
+ 
+    const props = defineProps({
+        docs: Array
+    })
+        
+    const textPage = (item) => {
+        let text = item
+        text = text.replace(/\n+/g, '<br>');
+        return text
+    }
+    const findPage = (item) => {
+        const element = document.getElementById(item)
+        element.scrollIntoView({behavior: "smooth"})
+        tela.value = true
+        if(item == 'top'){
+          tela.value = false
         }
     }
 </script>

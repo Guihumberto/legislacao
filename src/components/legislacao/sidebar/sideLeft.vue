@@ -1,14 +1,14 @@
 <template>
-    <div v-if="resultSearch.length" class="sidebarWrapper">
-        <v-btn variant="text" v-if="!showBar && resultSearch.length" 
+    <div v-if="generalStore.readResultSearch.length" class="sidebarWrapper">
+        <v-btn variant="text" v-if="!showBar && generalStore.readResultSearch.length" 
         @click="showBar = true" class="btnHidden ma-1" color="black" icon="mdi-chevron-right"></v-btn>
         <v-expand-x-transition>
-            <div class="sidebar" v-if="showBar && resultSearch.length">
+            <div class="sidebar" v-if="showBar && generalStore.readResultSearch.length">
                 <div class="d-flex justify-space-between align-baseline">
                     <h3>Filtros</h3>
                     <div>
                         <v-btn class="btnocultar" variant="text" color="grey" @click="showBar = !showBar">ocultar</v-btn>
-                        <v-icon class="arrowbtn" @click="large_sidebar()">mdi-arrow-left-right</v-icon>
+                        <v-icon class="arrowbtn" @click="$emit('large')">mdi-arrow-left-right</v-icon>
                     </div>
                 </div>
                 <div class="box">
@@ -54,119 +54,107 @@
        
     </div>
 </template>
-<script>
+<script setup>
+    import { ref, computed } from 'vue'
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
 
-    export default{
-        data(){
-            return{
-                showBar: true,
-                active: [],
-                open: [],
-                reverse: false
-            }
-        },
-        computed:{
-            listSearchs(){
-                return generalStore.readListStore
-            },
-            resultSearch(){
-                return generalStore.readResultSearch
-            },
-            listAnos(){
-                let list = this.resultSearch.map( x => x._source)
 
-                const classificacao = list.reduce((acumulador, item) => {
-                // Verifica se a categoria já existe no acumulador
-                    const categoriaExistente = acumulador.find(c => c.title == item.ano);
+    const showBar = ref(true)
+    const active = ref([])
+    const open = ref([])
+    const reverse = ref(false)
+     
 
-                    if (categoriaExistente) {
-                        const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
+    
+    const listAnos = computed(() => {
+        let list = generalStore.readResultSearch.map( x => x._source)
 
-                        if (!subcategoriaExistente) {
-                            categoriaExistente.children.push({
-                                id: item.page_to_norma.parent,
-                                title:  item.page_to_norma.title.toLowerCase()
-                            });
-                        }
-                    } else {
-                        // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                        acumulador.push({
-                            title: item.ano.toString(),
-                            children: [{
-                                id: item.page_to_norma.parent,
-                                title:  item.page_to_norma.title.toLowerCase()
-                            }],
-                        });
-                    }
+        const classificacao = list.reduce((acumulador, item) => {
+        // Verifica se a categoria já existe no acumulador
+            const categoriaExistente = acumulador.find(c => c.title == item.ano);
 
-                return acumulador;
-                }, []);
+            if (categoriaExistente) {
+                const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
 
-                return classificacao.sort(this.order)
-            },
-            listNormas(){
-                let list = this.resultSearch.map( x => x._source)
-
-                const classificacao = list.reduce((acumulador, item) => {
-                // Verifica se a categoria já existe no acumulador
-                    const categoriaExistente = acumulador.find(c => c.title === this.nomeTipo(item.tipo));
-
-                    if (categoriaExistente) {
-                        const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
-
-                        if (!subcategoriaExistente) {
-                            categoriaExistente.children.push({
-                                id: item.page_to_norma.parent,
-                                title:  item.page_to_norma.title.toLowerCase()
-                            });
-                        }
-                    } else {
-                        // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                        acumulador.push({
-                            title: this.nomeTipo(item.tipo),
-                            open: 0,
-                            children: [{
-                                id: item.page_to_norma.parent,
-                                title:  item.page_to_norma.title.toLowerCase()
-                            }],
-                        });
-                    }
-
-                return acumulador;
-                }, []);
-
-                return classificacao.sort(this.orderTipo)
-            }
-        },
-        methods:{
-            lawOpen(){
-                console.log("", this.active)
-                let link = this.active[0]
-                if(link){
-                    window.open(`text/${link}?search=search`, '_blank');
+                if (!subcategoriaExistente) {
+                    categoriaExistente.children.push({
+                        id: item.page_to_norma.parent,
+                        title:  item.page_to_norma.title.toLowerCase()
+                    });
                 }
-            },
-            order(a, b){
-                    return this.reverse
-                        ? a.title -  b.title
-                        : b.title -  a.title
-            },
-            orderTipo(a, b){
-                return this.reverse
-                    ? a.title -  b.title
-                    : b.title -  a.title
-            },
-            large_sidebar(){
-                this.$emit('large')
-            },
-            nomeTipo(item){
-                let nome = generalStore.fonteNome(item)
-                return nome.mudar
-            },
+            } else {
+                // Se a categoria não existe, crie uma nova categoria com a subcategoria
+                acumulador.push({
+                    title: item.ano.toString(),
+                    children: [{
+                        id: item.page_to_norma.parent,
+                        title:  item.page_to_norma.title.toLowerCase()
+                    }],
+                });
+            }
+
+        return acumulador;
+        }, []);
+
+        return classificacao.sort(order)
+    })
+
+    const listNormas = computed(() => {
+        let list = generalStore.readResultSearch.map( x => x._source)
+
+        const classificacao = list.reduce((acumulador, item) => {
+        // Verifica se a categoria já existe no acumulador
+            const categoriaExistente = acumulador.find(c => c.title === generalStore.fonteNome(item.tipo).mudar);
+
+            if (categoriaExistente) {
+                const subcategoriaExistente = categoriaExistente.children.find(s => s.id === item.page_to_norma.parent);
+
+                if (!subcategoriaExistente) {
+                    categoriaExistente.children.push({
+                        id: item.page_to_norma.parent,
+                        title:  item.page_to_norma.title.toLowerCase()
+                    });
+                }
+            } else {
+                // Se a categoria não existe, crie uma nova categoria com a subcategoria
+                acumulador.push({
+                    title: generalStore.fonteNome(item.tipo).mudar,
+                    open: 0,
+                    children: [{
+                        id: item.page_to_norma.parent,
+                        title:  item.page_to_norma.title.toLowerCase()
+                    }],
+                });
+            }
+
+        return acumulador;
+        }, []);
+
+        return classificacao.sort(orderTipo)
+    })
+
+        
+    const lawOpen = () => {
+        console.log("", active.value)
+        let link = active.value[0]
+        if(link){
+            window.open(`text/${link}?search=search`, '_blank');
         }
     }
+
+    const order = (a, b) => {
+            return reverse.value
+                ? a.title -  b.title
+                : b.title -  a.title
+    }
+
+    const orderTipo = (a, b) => {
+        reverse.value
+            ? a.title -  b.title
+            : b.title -  a.title
+    }
+
 </script>
 <style scoped>
 .sidebar{

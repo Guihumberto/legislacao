@@ -1,7 +1,7 @@
 <template>
     <section class="bg-black">
         <div class="container">
-            <v-btn variant="text" class="mb-10" @click="voltar">Voltar</v-btn>
+            <v-btn variant="text" class="pa-0 mb-10" @click="$router.push('/leges')" prepend-icon="mdi-home">INÍCIO</v-btn>
             <h2>Busca Legislação</h2>
             <div class="my-5 w-50">
                 <h3 class="mb-2">Insira sua consulta</h3>
@@ -18,7 +18,7 @@
                     <v-btn variant="outlined">Buscar</v-btn>
                 </v-form>
             </div>
-            <div>
+            <div v-if="suggestions.length">
                 Total Páginas: {{ suggestions.length }}
                 <ul v-if="suggestions.length">
                     <li v-for="suggestion in suggestions" :key="suggestion._id">
@@ -30,43 +30,23 @@
     </section>
 </template>
 
-<script>
-    import api from "@/services/api"
+<script setup>
+    import { usePageStore } from '@/store/PageStore';
+    const pageStore = usePageStore()
+    import { ref } from 'vue';
 
-    export default {
-        data() {
-            return {
-                query: '',
-                suggestions: []
-            };
-        },
-        methods:{
-            voltar(){
-                this.$router.push('/leges')
-            },
-            async fetchSuggestions() {
-                if (this.query.length > 2) {
-                    try {
-                        const response = await api.post("pages_v2/_search", {
-                            query: {
-                                "match_phrase_prefix": {
-                                    "text_page": {
-                                        "query": this.query,
-                                        "slop" : 10
-                                    }
-                                }
-                            }
-                        });
-                        this.suggestions = response.data.hits.hits;
-                    } catch (error) {
-                        console.error('Erro ao buscar sugestões:', error);
-                    }
-                } else {
-                    this.suggestions = [];
-                }
-            }
-        },
-    }   
+    const query = ref('')
+    const suggestions = ref([])
+      
+    const fetchSuggestions = async () => {
+        
+        if (query.value.length > 2) {
+            const resp = await pageStore.fetchSuggestions(query.value)
+            suggestions.value = resp
+        } else {
+            suggestions.value = [];
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

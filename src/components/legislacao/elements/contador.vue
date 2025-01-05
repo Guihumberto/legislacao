@@ -5,48 +5,35 @@
     </div>
 </template>
 
-<script>
+<script setup>
+    import { ref } from 'vue'
     import { useConsultaStore } from '@/store/ConsultaStore'
     const consultaStore = useConsultaStore()  
     
-    export default {
-        data(){
-            return{
-                resultsSearch: [],
-                totalDocs: 0,
-                counter: 1,
-                isGrowing: false,
+    const counter = ref(1)
+    const isGrowing = ref(false)
+
+    const startCounting = async() => {
+        const interval = await setInterval(() => {
+            if(consultaStore.readTotalConsulta > 4){
+                if (counter.value < consultaStore.readTotalConsulta) {
+                    counter.value++;
+                } else {
+                    clearInterval(interval);
+                    animateFinal();
+                }
             }
-        },
-        computed:{
-            totalNum(){
-                return consultaStore.readTotalConsulta
-            }
-        },
-        methods: {
-            async startCounting() {
-                const interval = await setInterval(() => {
-                    if(this.totalNum > 4){
-                        if (this.counter < this.totalNum) {
-                            this.counter++;
-                        } else {
-                            clearInterval(interval);
-                            this.animateFinal();
-                        }
-                    }
-                }, 1); // Ajuste o intervalo conforme necessário
-            },
-            animateFinal() {
-                this.isGrowing = true;
-                setTimeout(() => {
-                    this.isGrowing = false;
-                }, 1000); // Duração da animação final
-            }
-        },
-        mounted() {
-            this.startCounting();
-        }
+        }, 1); 
     }
+
+    const animateFinal = () => {
+        isGrowing.value = true;
+        setTimeout(() => {
+            isGrowing.value = false;
+        }, 1000); 
+    }
+    
+    startCounting();
 </script>
 
 <style lang="scss" scoped>
