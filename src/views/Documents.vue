@@ -30,7 +30,4 @@
 </script>
 
 <style scoped>
-    section .container{
-        min-height: calc(100vh - 400px);
-    }
 </style>

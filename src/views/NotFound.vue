@@ -9,7 +9,4 @@
   </template>
   
   <style scoped>
-  .container{
-    min-height: 70vh;
-  }
   </style>

@@ -72,7 +72,7 @@
   <style scoped>
   .container {
     display: flex;
-    height: 100vh;
+    min-height: calc(100vh - 600px);
     width: 100%;
     overflow: hidden;
   }

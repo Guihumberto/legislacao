@@ -152,6 +152,7 @@ section{
 section .container{
   width: min(90vw, 1000px);
   margin-inline: auto;
+  min-height: calc(100vh - 600px);
 }
 
 @media (max-width: 500px){

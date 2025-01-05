@@ -16,7 +16,7 @@
 
 <style lang="scss" scoped>
     section{
-        min-height: calc(100vh - 466px);
+        min-height: calc(100vh - 600px);
         width: min(1080px, 100%);
         margin-inline: auto;
     }

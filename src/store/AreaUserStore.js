@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
+import { useGeneralStore } from "./GeneralStore";
 
 export const useUserAreaStore = defineStore("userAreaStoe", {
     state: () => ({
@@ -10,7 +11,15 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         documentos: [],
         collection: [],
         load: false,
-        temp: {}
+        temp: {},
+        pagination:{
+            page: 1, 
+            start: 1, 
+            end: 15,
+            perPage: 15
+        },
+        totalHistorico: 0,
+        loadHistorico: false,
     }),
     getters: {
         readFavoritos(){
@@ -18,6 +27,14 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         },
         readHistorico(){
             return this.historico
+        },
+        readLoadHistorico(){
+            return this.loadHistorico
+        },
+        readHistoricoComplete(){
+            return this.totalHistorico <= this.readHistorico.length
+            ? true
+            : false
         },
         readHistoricoFormatdo(){
             const formatado = this.readHistorico.reduce((acc, item) => {
@@ -146,31 +163,109 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }
         },
         async getAllHistórico(){
+            const generalStore = useGeneralStore()
             const loginStore = useLoginStore()
             this.historico = []
             this.load = true
             try {
                 const resp = await api.post('searchs_todo/_search', {
                     from: 0,
-                    size: 2000,
+                    size: 15,
                     "query":{
                         match:{
                             usuario: loginStore.readLogin.cpf
                         }
-                    }
+                    },
+                    sort: [
+                        {
+                            date: {
+                                order: "desc", // Ordena pelos IDs em ordem decrescente
+                            },
+                        }
+                    ]
                 })
 
                 const  data = resp.data.hits.hits
+                this.totalHistorico = resp.data.hits.total.value
 
-                data.forEach(x => {
-                    let dados = {}
-                    dados = { ...x._source }
-                    dados.idu = x._id
-                    this.historico.push(dados)
+                this.historico = data.map(x => ({idu: x._id, ...x._source}))
+                this.historico.forEach(x => {
+                    const search = {
+                        text: x.text_search,
+                        years: x.years,
+                        fonte: x.sources,
+                        termo: x.termos,
+                        precision: x.precision
+                    }
+                    generalStore.addListSearch(search);
                 })
                 
             } catch (error) {
                 console.log('erro get historico');
+            } finally {
+                this.load = false
+            }
+        },
+        async getAllHistóricoPlus(){
+            const loginStore = useLoginStore()
+            this.loadHistorico = true
+            try {
+                const resp = await api.post('searchs_todo/_search', {
+                    from: this.pagination.page * this.pagination.start - 1,
+                    size: this.pagination.perPage,
+                    "query":{
+                        match:{
+                            usuario: loginStore.readLogin.cpf
+                        }
+                    },
+                    sort: [
+                        {
+                            date: {
+                                order: "desc", // Ordena pelos IDs em ordem decrescente
+                            },
+                        }
+                    ]
+                })
+
+                const  data = resp.data.hits.hits
+                const novo = data.map(x => ({idu: x._id, ...x._source}))
+                this.historico = this.historico.concat(novo)
+            } catch (error) {
+                console.log('erro get historico');
+            } finally {
+                this.loadHistorico = false
+            }
+        },
+        loadPlusHistory(){
+            this.pagination.page++
+            this.getAllHistóricoPlus()
+        },
+        async searchHistory(item){
+            const loginStore = useLoginStore()
+            try {
+                this.load = true
+                const resp = await api.post('searchs_todo/_search', {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                "match": {
+                                    "text_search": item 
+                                    }
+                                },
+                                {
+                                "match": {
+                                    "usuario": loginStore.readLogin.cpf
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                const  data = resp.data.hits.hits
+                this.historico = data.map(x => ({idu: x._id, ...x._source}))
+            } catch (error) {
+                console.log('error history search');
             } finally {
                 this.load = false
             }

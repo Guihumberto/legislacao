@@ -27,9 +27,3 @@
         </div>
     </section>
 </template>
-
-<style lang="scss" scoped>
-.container{
-    min-height: 69vh;
-}
-</style>

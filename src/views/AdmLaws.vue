@@ -18,9 +18,6 @@ import Pagination from '@/components/Admin/Normas/pagination.vue';
 </script>
 
 <style scoped>
-    section .container{
-        min-height: calc(100vh - 400px);
-    }
     .listFolder{
         display: flex;
         flex-direction: column;

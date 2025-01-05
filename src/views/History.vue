@@ -11,10 +11,10 @@
                     clearable
                     class="my-5"
                     v-model="search"
-                    :rules="[rules.required]"
+                    :rules="[rules.required, rules.minfield]"
                 ></v-text-field>
             </v-form>
-            <v-alert v-if="areaUserStore.readLoad">Aguarde....</v-alert>
+            <v-alert v-if="areaUserStore.readLoad || loginStore.readLoad">Aguarde....</v-alert>
             <div v-else>
                 <v-card v-if="areaUserStore.readHistoricoFormatdo.length">
                     <v-list>
@@ -31,9 +31,21 @@
                         </v-list-item>
                     </v-list>
                 </v-card>
-                <v-alert v-else type="warning" variant="outlined" text="Não há histórico salvo no momento."></v-alert>
+                <v-alert v-if="!areaUserStore.readHistorico.length" type="warning" variant="outlined" :text="modeSearch ? 'Não há resultados para sua busca' : 'Não há histórico salvo no momento.'">
+                    <template v-slot:append>
+                        <v-btn @click="goBackHistory" variant="text" prepend-icon="mdi-update">Voltar ao histórico</v-btn>
+                    </template>
+                </v-alert>
+                <div class="d-flex justify-center mt-5">
+                    <v-btn 
+                        v-if="!modeSearch"
+                        :loading="areaUserStore.readLoadHistorico"
+                        :disabled="areaUserStore.readHistoricoComplete"
+                        variant="text" append-icon="mdi-plus" @click="loadPlusHistory()"
+                        >Carregar</v-btn>
+                    <v-btn v-else @click="goBackHistory" variant="text" prepend-icon="mdi-update">Voltar ao histórico</v-btn>
+                </div>
             </div>
-            
         </div>
     </section>
 </template>
@@ -46,8 +58,9 @@
 
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
-
-    areaUserStore.getAllHistórico()
+    
+    import { useLoginStore } from '@/store/LoginStore';
+    const loginStore = useLoginStore()
 
     import { useRouter } from 'vue-router';
     const router = useRouter()
@@ -55,12 +68,14 @@
     import MoreDetailSearch from '@/components/userArea/moreDetailSearch.vue';
 
     const search = ref(null)
+    const modeSearch = ref(false)
     const form = ref(null)
 
     const searchGo = async () => {
             const { valid } = await form.value.validate()
             if(valid){
-                console.log(search.value)
+                modeSearch.value = true
+                areaUserStore.searchHistory(search.value)
             }
     }
 
@@ -98,12 +113,18 @@
         return formato
     }
 
+    const loadPlusHistory = () => {
+        areaUserStore.loadPlusHistory()
+    }
+
+    const goBackHistory = async () => {
+        await areaUserStore.getAllHistórico()
+        modeSearch.value = false
+    }
+
         
 
 </script>
 
 <style scoped>
-    section .container{
-        min-height: calc(100vh - 400px);
-    }
 </style>

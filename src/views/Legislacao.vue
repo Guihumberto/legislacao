@@ -35,7 +35,7 @@
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    min-height: calc(100vh - 466px);
+    min-height: calc(100vh - 600px);
 }
 .sidebar-left, .sidebar-right{
     width: 250px;

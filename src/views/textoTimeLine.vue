@@ -257,7 +257,7 @@
 
 <style lang="scss" scoped>
 .sizeLoad{
-    height: 55vh;
+    min-height: calc(100vh - 600px);
     display: flex;
     justify-content: center;
     align-items: center;

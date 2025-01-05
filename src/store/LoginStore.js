@@ -44,22 +44,30 @@ export const useLoginStore = defineStore("loginStore", {
     },
     actions:{
         async loginSSO(item){
-            const userAreaStore = useUserAreaStore()
-            const cpf = this.apenasNumeros(item.login)
-            const user = await this.findUserElastic(cpf)
-            if(user._source.cpf == cpf && user._source.password == item.password){
-                this.login = { id: user._id, ...user._source }
-                this.login.last_login = Date.now()
-                await this.editUser(this.login)
-                if(!user._source?.first_login){
-                    this.login.first_login = Date.now()
+            try {
+                this.load = true
+                const userAreaStore = useUserAreaStore()
+                const cpf = this.apenasNumeros(item.login)
+                const user = await this.findUserElastic(cpf)
+                if(user._source.cpf == cpf && user._source.password == item.password){
+                    this.login = { id: user._id, ...user._source }
+                    this.login.last_login = Date.now()
                     await this.editUser(this.login)
+                    if(!user._source?.first_login){
+                        this.login.first_login = Date.now()
+                        await this.editUser(this.login)
+                    }
+                    this.saveUserData()
+                    userAreaStore.getAllFavoritos()
+                    userAreaStore.getAllHistórico()
+                    return this.login
+                } else {
+                    return false
                 }
-                this.saveUserData()
-                userAreaStore.getAllFavoritos()
-                return this.login
-            } else {
-                return false
+            } catch (error) {
+                console.log("erro login");
+            } finally {
+                this.load = false
             }
         },
         logOut(){
@@ -227,8 +235,6 @@ export const useLoginStore = defineStore("loginStore", {
                 }
             } catch (error) {
                 console.log('erro storage load data');
-            } finally {
-                this.load = false
             }
         },
         async loginMalha(){
