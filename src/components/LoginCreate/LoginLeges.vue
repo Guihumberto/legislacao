@@ -1,6 +1,6 @@
 <template>
   <div :class=" flutuante ? 'loginFlutanteWrapper' : 'loginwrapper'">
-      <v-form :class="flutuante ? 'loginFlutuante' : 'login'" ref="form" @submit.prevent="login()">
+      <v-form :class="flutuante ? 'loginFlutuante' : 'login'" ref="form" @submit.prevent="login()" v-if="!loginStore.readLogin.cpf">
          <div class="mb-3">
              <h3 class="destaque px-2" v-if="flutuante">Entre com seu CPF e senha</h3>
              <p v-else class="destaque px-2">Login</p>
@@ -41,6 +41,11 @@
              </div>
          </v-expand-transition>
      </v-form>
+     <div v-else class="text-center">
+         <v-icon class="mb-5" size="5rem" color="primary"> mdi-flash</v-icon>
+         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: login ${loginStore.readLogin.cpf} - ${loginStore.readLogin.nickname}`"></v-alert>
+         <v-btn variant="flat" color="primary" @click="$router.push('/leges')" class="mt-5" append-icon="mdi-magnify">Iniciar busca</v-btn>
+        </div>
      <FirstLogin :dialog="dialog" />
  </div>
 </template>

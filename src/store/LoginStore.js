@@ -6,6 +6,7 @@ import { useUserAreaStore } from "./AreaUserStore";
 export const useLoginStore = defineStore("loginStore", {
     state: () => ({
         login:{
+            cpf: null,
             login: null,
             name: null,
             apelido: null,
@@ -241,33 +242,6 @@ export const useLoginStore = defineStore("loginStore", {
             } catch (error) {
                 console.log('erro storage load data');
             }
-        },
-        async loginMalha(){
-            const data = await sessionStorage.getItem('userData');
-    
-            if (data) {
-                const login = {
-                   login: JSON.parse(data).cpf,
-                   dn: JSON.parse(data).password
-                } 
-                if(login.login) {
-                    
-                    try {
-                        const user = (await this.findUserElastic(parseInt(login.cpf))).data._source
-    
-                        if(user.cpf == login.login && user.password == login.dn){
-                            await this.setEquipe(login.login)
-                            this.login = user  
-                            this.saveUserData()
-                            return await this.login
-                        }
-                    }catch{
-                        console.log('error local storage');
-                    }
-    
-                }
-           }
-            
         },
     }
 })

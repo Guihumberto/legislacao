@@ -28,21 +28,22 @@
 
             <v-list-item-title v-text="item.text"></v-list-item-title>
           </v-list-item>
-          <div class="my-5"></div>
-          <v-list-subheader>Administração</v-list-subheader>
-          <v-list-item
-            v-for="(item, i) in adms"
-            :key="i"
-            :value="item"
-            color="primary"
-            :to="item.url"
-          >
-            <template v-slot:prepend>
-              <v-icon :icon="item.icon"></v-icon>
-            </template>
-
-            <v-list-item-title v-text="item.text"></v-list-item-title>
-          </v-list-item>
+          <div class="my-5" v-if="loginStore.readLogin.admin">
+            <v-list-subheader>Administração</v-list-subheader>
+            <v-list-item
+              v-for="(item, i) in adms"
+              :key="i"
+              :value="item"
+              color="primary"
+              :to="item.url"
+            >
+              <template v-slot:prepend>
+                <v-icon :icon="item.icon"></v-icon>
+              </template>
+  
+              <v-list-item-title v-text="item.text"></v-list-item-title>
+            </v-list-item>
+          </div>
         </v-list>
       </v-card>        
     </div>
