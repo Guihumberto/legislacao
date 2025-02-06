@@ -2,6 +2,27 @@
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
             <v-btn variant="text" class="ml-n4" @click="$router.push('/leges')" color="grey"> <v-icon>mdi-home</v-icon>INÍCIO</v-btn>
+           
+            <v-img 
+                class="bg-grey-lighten-2"
+                cover
+                lazy-src="/leges.png" src="/leges.png" alt="imagem de um livro" 
+                aspect-ratio="16/9" max-width="1000"  height="300px"
+            >
+                <template v-slot:placeholder>
+                    <v-row
+                        align="center"
+                        class="fill-height ma-0"
+                        justify="center"
+                    >
+                        <v-progress-circular
+                        color="grey-lighten-5"
+                        indeterminate
+                        ></v-progress-circular>
+                    </v-row>
+                </template>
+            </v-img>
+            
             <h1 class="mb-5 text-h4 mt-5">Sobre a Aplicação</h1>
             <div class="content">
                 <p>A aplicação de busca na Legislação OH-MY-SEARCH é um sistema idealizado e desenvolvido 
@@ -36,5 +57,6 @@
 .content{
     animation: aparecer 1s ease-in forwards;
     transition: 1s ease;
+    margin-bottom: 5rem;
 }
 </style>
