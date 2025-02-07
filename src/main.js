@@ -6,6 +6,7 @@
 
 // Plugins
 import { registerPlugins } from '@/plugins'
+import 'shepherd.js/dist/css/shepherd.css'
 
 // Components
 import App from './App.vue'

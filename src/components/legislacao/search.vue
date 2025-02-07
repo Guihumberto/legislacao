@@ -2,7 +2,7 @@
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'" id="container" ref="targetSection">   
             <HeaderSearch  />
-            <div class="content">
+            <div class="content" ref="el1">
                 <v-form @submit.prevent="searchEnv(1)" ref="form">
                     <div class="line1">
                         <v-text-field
@@ -60,12 +60,16 @@
                         <!-- <boxAutoSuggestion :search="search.text" :autosuggestion="getAutosuggestion" @close="autosuggestion = []" /> -->
                     </div>
                     <div class="d-flex justify-end align-center mb-2">
-                        <v-btn @click="filtrosavacados = !filtrosavacados" 
-                            title="Filtro por fonte e período"
-                            variant="text" class="pa-0 mr-2 text-capitalize btn-hover" color="grey"
-                            density="compact"> <v-icon>mdi-filter-outline</v-icon>{{ reqRead }}
-                        </v-btn>
-                        <ConfigSearch />
+                        <div ref="el2">
+                            <v-btn @click="filtrosavacados = !filtrosavacados" 
+                                title="Filtro por fonte e período"
+                                variant="text" class="pa-0 mr-2 text-capitalize btn-hover" color="grey"
+                                density="compact"> <v-icon>mdi-filter-outline</v-icon>{{ reqRead }}
+                            </v-btn>
+                        </div>
+                        <div ref="el3">
+                            <ConfigSearch />
+                        </div>
                     </div>
                     <v-expand-transition>
                         <div v-if="filtrosavacados">
@@ -157,27 +161,26 @@
                                     </div>
                                 </v-radio-group>
                             </div> -->
-                            <!-- <div class="radios">
-                                <v-radio-group inline :color="color" v-model="search.semantic" class="radiosGroup">
-                                    <div class="border px-2 py-2 radioDiv">
-                                        <v-radio 
-                                            density="compact"
-                                            class="mr-2"
-                                            label="Sigiloso" value="item.ida">
-                                        </v-radio>
-                                        <v-radio 
-                                            density="compact"
-                                            class="mr-2"
-                                            label="Revogado" value="item.ido">
-                                        </v-radio>
-                                        <v-radio 
-                                            density="compact"
-                                            class="mr-2"
-                                            label="Eficaz" value="item.ide">
-                                        </v-radio>
-                                    </div>
+                            <div class="radios">
+                                <v-radio-group :color="color" class="radiosGroup">
+                                    <v-tooltip text="Faça login para utilizar estes filtros"  location="top">
+                                        <template v-slot:activator="{ props }">
+                                            <div class="border px-2 py-2 radioDiv" v-bind="props">
+                                                <v-radio 
+                                                    density="compact"
+                                                    :disabled="!loginStore.readLogin.cpf"
+                                                    label="Incluir normas revogadas" value="item.ido">
+                                                </v-radio>
+                                                <v-radio 
+                                                    density="compact"
+                                                    :disabled="!loginStore.readLogin.cpf"
+                                                    label="Incluir normas não Eficaz" value="item.ide">
+                                                </v-radio>
+                                            </div>
+                                        </template>
+                                    </v-tooltip>
                                 </v-radio-group>
-                            </div> -->
+                            </div>
                         </div>
                     </v-expand-transition>
                     <div class="text-center">
@@ -939,6 +942,13 @@
         snackStore.activeSnack('Documento Salvo', 'success')
     }
 
+    import { useMeuScript } from "@/composables/tutorialSearch";
+
+    const el1 = ref(null);
+    const el2 = ref(null);
+    const el3 = ref(null);
+    useMeuScript(el1, el2, el3);
+
     onMounted(() => {
         console.log("Versão 3");
         if(route.query.search){
@@ -984,6 +994,9 @@ section{
 }
 .radioDiv{
     width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 .autocompletes{
     display: flex;
@@ -1077,9 +1090,7 @@ section{
         padding: .5rem 0;
     }
     .radioDiv{
-        display: flex;
-        margin-left: 0;
-        width: 760px;
+        flex-direction: column;
     }
     .checkboxx{
         margin: -.5rem 0 0 0;
