@@ -9,7 +9,6 @@
           <v-btn
             v-bind="props"
             :icon="loginStore.readLogin.cpf ? 'mdi-account-tie': 'mdi-login'"
-            class="mr-2"
             :title="loginStore.readLogin.cpf ? 'Sair': 'Entrar'"
           >
           </v-btn>

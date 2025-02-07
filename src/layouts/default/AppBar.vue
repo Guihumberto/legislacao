@@ -25,7 +25,10 @@
       <div v-if="geralStore.readHeaderShow">
         <div class="container">
           <div class="d-flex justify-center align-center">
-            <v-app-bar-nav-icon :disabled="!generalStore.readResultSearch.length" class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon 
+              :disabled="!generalStore.readResultSearch.length" 
+              v-if="generalStore.readResultSearch.length"
+              class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <div class="logo" @click="$router.push(geralStore.readTitleApp.to)">
               <small class="text-white">{{geralStore.readTitleApp.title}}</small>
               <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
@@ -41,8 +44,8 @@
             </ul>
           </nav>
           <div class="btn_group">    
-            <loginInfo :isLogin="!loginStore.readLogin.cpf" :flutuante="false" class="gov" />   
-            <v-btn title="E-MAIL" icon="mdi-email"></v-btn>
+            <v-btn variant="flat" title="E-MAIL" icon="mdi-email" class="gov mr-2"></v-btn>
+            <loginInfo :isLogin="!loginStore.readLogin.cpf" :flutuante="false" />   
           </div>
         </div>
       </div>
