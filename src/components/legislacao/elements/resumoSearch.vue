@@ -1,21 +1,24 @@
 <template>
     <div class="wrapperesumo" ref="targetSection">
-        <div  @mouseup="selectionGet()"  style="position: relative;">
-            <v-expand-transition>
-                <p class="font-weight-light" v-html="extrairLinha" v-if="pageComplete">
-                </p>
-                <p class="font-weight-light" v-html="newTexto" v-else></p>
-            </v-expand-transition>
-            <SelectionSearch 
-                :menuPosition="menuPosition"
-                :selectedText="selectedText"
-                :menu="menu"
-                :searchP="searchP"
-                :page="page"
-            />
-        </div>
+        <v-expand-transition>
+            <div  @mouseup="selectionGet()"  style="position: relative;" v-if="hidden">
+                <v-expand-transition>
+                    <p class="font-weight-light" v-html="extrairLinha" v-if="pageComplete">
+                    </p>
+                    <p class="font-weight-light" v-html="newTexto" v-else></p>
+                </v-expand-transition>
+                <SelectionSearch 
+                    :menuPosition="menuPosition"
+                    :selectedText="selectedText"
+                    :menu="menu"
+                    :searchP="searchP"
+                    :page="page"
+                />
+            </div>
+        </v-expand-transition>
         <div class="d-flex align-center justify-end">
-            <v-btn color="grey" size="small" variant="text" title="Ver a página" @click="pageComplete = !pageComplete" :prepend-icon="pageComplete ? 'mdi-plus' : 'mdi-minus'">{{ pageComplete ? 'expandir' : 'recolher' }}</v-btn>
+            <v-btn title="ocultar/mostrar prévia da página" :icon="hidden ? 'mdi-eye' : 'mdi-eye-off'" color="grey" variant="text" @click="hidden = !hidden"></v-btn>
+            <v-btn color="grey" size="small" variant="text" title="Ver a página" @click="pageComplete = !pageComplete, hidden = true" :prepend-icon="pageComplete ? 'mdi-plus' : 'mdi-minus'">{{ pageComplete ? 'expandir' : 'recolher' }}</v-btn>
             <pageDialog :id="id" :page="page" :searchP="searchP" />
             <ResumoIA :text="text" />
         </div>
@@ -31,6 +34,8 @@
     import SelectionSearch from "./selectionSearch.vue"
     import ResumoIA from "../dialogs/resumoIA.vue"
 
+    const hidden = ref(true)
+
     const props = defineProps({
         text: true,
         page: Object,
@@ -38,10 +43,9 @@
         id: String
     })
 
-    const pageComplete = ref(true)
+    const pageComplete = ref(false)
 
     const extrairLinha = computed(()=> {
-                
                 let texto = markSearch()
                 let regex = /<b>.*?<\/b>/;
 
@@ -93,7 +97,10 @@
 
     const newTexto = computed(() => {
         let textoMark = markSearch()
-        const textNovo = textoMark.replace(/\n+/g, '<br>');
+        const textNovo = textoMark.replace(/\.\n/g, '.<br><br>')
+                                  .replace(/\;\n/g, ';<br><br>')
+                                  .replace(/\n+/g, ' '); //.replace(/\n\;/g, '<br> kkkkk<br>')
+                                
         return textNovo
     })
 

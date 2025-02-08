@@ -120,7 +120,9 @@
 
   const textePage = computed(() => {
         // let text = highlightUppercaseWords(props.page.text_page)
-        const text = props.page.text_page.replace(/\n+/g, '<br>');
+        const text = props.page.text_page.replace(/\.\n/g, '.<br><br>')
+                                          .replace(/\;\n/g, ';<br><br>')
+                                          .replace(/\n+/g, '<br>');
         return text
   })
 

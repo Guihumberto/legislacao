@@ -60,7 +60,7 @@
             await areaUserStore.saveFavoritos(favorite.value)
 
             const text = favorite.value.fav ? 'Página adicionada aos favoritos.' : 'Página removida dos favoritos.'
-            const color = favorite.value.fav ? 'success.' : 'error.'
+            const color = favorite.value.fav ? 'success' : 'error'
             snackStore.activeSnack(text, color)
             
         } else {

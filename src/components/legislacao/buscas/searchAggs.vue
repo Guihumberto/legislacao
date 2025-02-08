@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Resultados Agregados</h2>  
+        <h2 class="text-h5 mb-10">Resultados Agregados</h2>  
         <div class="mb-5">
             <div v-for="item, i in allSearchResultas" :key="i" class="mb-2">
                 <div>

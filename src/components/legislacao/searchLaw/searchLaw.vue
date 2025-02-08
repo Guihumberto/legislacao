@@ -87,7 +87,7 @@
             </v-list>
         </div>
         <v-alert v-else-if="!load && !resultsSearch?.total?.value && searchActive" type="warning" variant="outlined" class="mb-5">
-            não foi encontrado resultados para essa busca
+            não foram encontrados resultados para essa busca
         </v-alert>
     </v-expand-transition>
     <div v-if="document.length" class="fixed-element">
