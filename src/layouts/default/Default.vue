@@ -207,4 +207,14 @@ section .container2{
     opacity: 1;
   }
 }
+/* shepherf */
+.shepherd-content {
+  word-wrap: break-word;
+  white-space: normal;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+
 </style>

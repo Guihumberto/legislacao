@@ -1,7 +1,7 @@
 import { ref, onMounted } from 'vue'
 import { useShepherd } from 'vue-shepherd'
 
-export function searchInitial(ref1, ref2, ref3) {
+export function tutorialSearchActive(ref1, ref2, ref3) {
 
     const showTutorial = ref(false);
 
@@ -30,7 +30,7 @@ export function searchInitial(ref1, ref2, ref3) {
         tour.addStep({
             attachTo: { element: ref2.value, on: 'top' },
             title: 'Filtros',
-            text: 'É possível fazer filtros por perídos ou fontes da norma.',
+            text: 'É possível fazer filtros por perídoo ou fonte da norma.',
             buttons: [
                 {
                   classes: "shepherd-button-secondary",
@@ -46,7 +46,6 @@ export function searchInitial(ref1, ref2, ref3) {
 
         tour.addStep({
             attachTo: { element: ref3.value, on: 'top' },
-            title: 'Filtros',
             title: 'Configuração da busca',
             text: 'Aqui você pode configurar a assertividade da busca.',
             buttons: [
@@ -56,34 +55,25 @@ export function searchInitial(ref1, ref2, ref3) {
                   action: tour.back
                 },
                 {
-                  text: 'Próximo',
-                  action: tour.next
+                  text: 'Finalizar',
+                  action: tour.complete
                 }
               ]
         });
 
-        tour.addStep({
-          title: 'Completo',
-          text: 'Agora você pode realizar sua busca!',
-          buttons: [
-            {
-              text: 'Finalizar',
-              action: tour.complete
-            }
-          ]
-        });
+        // if (!localStorage.getItem('tutorial_done_activesearch')) {
 
-        if (!localStorage.getItem('tutorial_done')) {
+        //     setTimeout(() => {
+        //         tour.start();
 
-            setTimeout(() => {
-                tour.start();
+        //     }, 2000)
 
-            }, 2000)
-
-            showTutorial.value = true;
-            localStorage.setItem('tutorial_done', 'true');
+        //     showTutorial.value = true;
+        //     localStorage.setItem('tutorial_done_activesearch', 'true');
  
-        } 
+        // } 
+
+        tour.start();
 
     });
 }

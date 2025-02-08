@@ -942,12 +942,12 @@
         snackStore.activeSnack('Documento Salvo', 'success')
     }
 
-    import { useMeuScript } from "@/composables/tutorialSearch";
+    import { searchInitial } from "@/composables/tutorialSearch";
 
     const el1 = ref(null);
     const el2 = ref(null);
     const el3 = ref(null);
-    useMeuScript(el1, el2, el3);
+    searchInitial(el1, el2, el3);
 
     onMounted(() => {
         console.log("Versão 3");
