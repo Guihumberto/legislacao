@@ -176,9 +176,5 @@
 .item-laws label p:first-letter {
     text-transform: capitalize;
 }
-@media (max-width: 1670px) {
-    .arrowbtn, .btnocultar{
-        display: none;
-    }
-}
+
 </style>

@@ -184,7 +184,7 @@
                         </div>
                     </v-expand-transition>
                     <div class="text-center">
-                        <v-btn width="250px" class="text-capitalize" flat  type="submit" :color="color">Pesquisar</v-btn>
+                        <v-btn width="250px" class="text-capitalize" flat  type="submit" :color="color" :loading="load" :disabled="load">Pesquisar</v-btn>
                     </div>
                 </v-form>
             </div>
@@ -1121,6 +1121,7 @@ section{
         justify-content: center;
         align-items: center;
         gap: .5rem;
+        margin-top: 1rem;
     }
     .oneresult{
         flex-direction: column;

@@ -1,10 +1,10 @@
 <template>
-     <v-col cols="3">
+     <v-col :cols=" xs ? 5 : 3">
         <div class="text-left pa-3 bg-grey">
             {{ fonte.key }} ({{ fonte.doc_count }})
         </div>
     </v-col>
-    <v-col cols="4">
+    <v-col :cols=" xs ? 4 : 4">
         <v-text-field
             label="Nome na lista"
             variant="outlined"
@@ -15,7 +15,7 @@
             clearable
         ></v-text-field>
     </v-col>
-    <v-col cols="2">
+    <v-col :cols=" xs ? 3 : 2">
         <v-text-field
             label="Sigla"
             variant="outlined"
@@ -30,7 +30,7 @@
         <v-btn 
             :loading="generalStore.readLoad" variant="flat" color="success" @click="salvar(fonte.key)" :disabled="!form.sigla || !form.mudar">Salvar</v-btn>
     </v-col>
-    <v-col cols="3" v-else>
+    <v-col cols="3" v-else :class="xs ? 'd-none':''">
         <div v-if="!idEdit">
               <v-tooltip text="Editar Fonte">
                 <template v-slot:activator="{ props }">
@@ -61,6 +61,9 @@
 
 <script setup>
     import { onMounted, ref, computed } from 'vue';
+
+    import { useDisplay } from 'vuetify'
+    const { xs } = useDisplay()
 
     import { useGeneralStore } from '@/store/GeneralStore';
     const generalStore = useGeneralStore()

@@ -1,9 +1,9 @@
 <template>
     <div class="legesWrapper">
-        <div class="sidebar-left" id="sidebar-left">
+        <div class="sidebar-left pr-2" id="sidebar-left">
             <sideLeft @large="largeSidebar()" />
         </div>
-        <section-search class="pl-2" />
+        <section-search/>
         <div class="sidebar-right">
             <side-right />
         </div>

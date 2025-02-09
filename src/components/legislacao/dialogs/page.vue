@@ -25,6 +25,7 @@
                     {{ page.tipo }} | Ano: {{ page.ano }} | Pág: {{ page.num_page }} de {{ pageStore.readTotalPages }}<br>
                     {{ page.path }}
                     <div class="navigation">
+                      <v-progress-circular indeterminate v-if="pageStore.readLoad"></v-progress-circular>
                       <v-btn v-if="navigationPerPage" @click="navigationPerPage = false, num_page = page.num_page" color="warning" variant="text" class="mr-5">Voltar a página da busca</v-btn>
                       <v-btn-toggle
                         density="compact"
@@ -229,7 +230,7 @@
   margin-top: 2rem;
 }
 .load{
-  background: rgb(133, 121, 121);
+  background: rgb(231, 226, 226);
   transition: 1s ease;
 }
 .texto{

@@ -124,7 +124,6 @@
     background: rgb(235, 233, 233);
     padding: .5rem;
     transition: 1s ease;
-    
 }
 .sideRight h3{
     font-size: 1.2rem;

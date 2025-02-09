@@ -11,7 +11,7 @@
             </template>
             <v-list-item-title>{{ item.title }}</v-list-item-title>    
             <v-list-item-subtitle>{{ item.subtitle }}</v-list-item-subtitle>    
-            <template v-slot:append>
+            <template v-slot:append v-if="!xs">
                 <div v-if="postStore.readLoad">
                     Aguarde...
                 </div>
@@ -35,7 +35,10 @@
 
 <script setup>
     import router from '@/router';
-import Pagination from './pagination.vue';
+    import Pagination from './pagination.vue';
+
+    import { useDisplay } from 'vuetify'
+    const { xs } = useDisplay()
 
     import { usePostStore } from '@/store/PostStore';
     const postStore = usePostStore()

@@ -128,6 +128,9 @@
 </script>
 
 <style>
+body{
+  padding-top: 28px; 
+}
 header{
   background-image: linear-gradient(90deg, #020024 0%, #090979 35%, #00d4ff 100%);
 }
@@ -152,6 +155,13 @@ header h1{
 .wrappersubheader{
   background: var(--primary-color);
   color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--primary-color);
+  color: white;
+  z-index: 1000; /* Para garantir que fique sobre outros elementos */
 }
 .subheader{
   display: flex;

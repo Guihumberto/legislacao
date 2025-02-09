@@ -43,7 +43,7 @@
         id: String
     })
 
-    const pageComplete = ref(false)
+    const pageComplete = ref(true)
 
     const extrairLinha = computed(()=> {
                 let texto = markSearch()

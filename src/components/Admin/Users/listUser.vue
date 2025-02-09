@@ -13,7 +13,7 @@
                     <v-icon v-if="!loginStore.readLoad">mdi-account</v-icon>
                     <v-btn v-else loading="true"></v-btn>
                 </template>
-                <template v-slot:append>
+                <template v-slot:append v-if="!xs">
                     <v-select
                         label="Perfil"
                         density="compact"
@@ -47,6 +47,9 @@
 
 <script setup>
     import Pagination from './pagination.vue';
+
+    import { useDisplay } from 'vuetify'
+    const { xs } = useDisplay()
 
     import { useLoginStore } from '@/store/LoginStore';
     const loginStore = useLoginStore()
