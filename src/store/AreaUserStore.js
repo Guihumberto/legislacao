@@ -365,7 +365,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
 
             try {
                 const resp = await api.post('documents/_doc', doc)
-                this.documentos.push(doc)
+                this.documentos.push({ id:resp.data._id, ...doc } )
             } catch (error) {
                 console.log('erro ao salvar o documento');
             } finally { 
@@ -437,7 +437,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
 
             try {
                 const resp = await api.post('collection/_doc', doc)
-                this.collection.push(doc)
+                this.collection.push({id: resp.data._id, ...doc})
             } catch (error) {
                 console.log('erro ao salvar a colecao');
             } finally { 

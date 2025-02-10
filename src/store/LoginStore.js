@@ -121,7 +121,7 @@ export const useLoginStore = defineStore("loginStore", {
                 this.user.date_created = Date.now()
 
                 const resp = await api.post('users/_doc', this.user)
-                this.listUsers.push( {...this.user} )
+                this.listUsers.push( {id: resp.data._id, ...this.user} )
                 this.clearUser()
                 return false
             } catch (error) {
