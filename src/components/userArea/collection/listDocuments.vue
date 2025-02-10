@@ -2,9 +2,9 @@
     <v-card class="mt-5 card" variant="flat">
             <loading v-if="userAreaStore.readLoad" />
             <v-list lines="two" class="pa-0" density="compact" v-else>
-                <v-list-subheader v-if="userAreaStore.readDocumentos.length">Quantidade de documentos: {{ userAreaStore.readTotalDocuments }}</v-list-subheader>
+                <v-list-subheader v-if="userAreaStore.readDocumentos.length">Quantidade de documentos: {{ userAreaStore.readTotalDocuments || userAreaStore.readDocumentos.length }}</v-list-subheader>
                 <v-list-item 
-                    v-if="userAreaStore.readTotalDocuments"
+                    v-if="userAreaStore.readTotalDocuments || userAreaStore.readDocumentos.length"
                     :title="item.title" 
                     link
                     :subtitle="resumo(item.pages)"
