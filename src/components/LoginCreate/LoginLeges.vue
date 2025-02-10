@@ -43,7 +43,7 @@
      </v-form>
      <div v-else class="text-center">
          <v-icon class="mb-5" size="5rem" color="primary"> mdi-flash</v-icon>
-         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: login ${loginStore.readLogin.cpf} - ${loginStore.readLogin.nickname}`"></v-alert>
+         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: ${loginStore.readLogin.cpf + ' -'} ${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''} `"></v-alert>
          <v-btn variant="flat" color="primary" @click="$router.push('/leges')" class="mt-5" append-icon="mdi-magnify">Iniciar busca</v-btn>
         </div>
      <FirstLogin :dialog="dialog" />

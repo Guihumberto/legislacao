@@ -52,10 +52,11 @@ export const useLoginStore = defineStore("loginStore", {
                 const user = await this.findUserElastic(cpf)
                 if(user._source.cpf == cpf && user._source.password == item.password){
                     this.login = { id: user._id, ...user._source }
-                    this.login.last_login = Date.now()
+                    const date_now = Date.now()
+                    this.login.last_login = date_now
                     await this.editUser(this.login)
                     if(!user._source?.first_login){
-                        this.login.first_login = Date.now()
+                        this.login.first_login = date_now
                         await this.editUser(this.login)
                     }
                     this.saveUserData()
@@ -63,6 +64,7 @@ export const useLoginStore = defineStore("loginStore", {
                     await userAreaStore.getAllHistórico()
                     await userAreaStore.getCollection()
                     await userAreaStore.getDocs()
+                    
                     
                     return this.login
                 } else {
@@ -133,9 +135,13 @@ export const useLoginStore = defineStore("loginStore", {
             const objeto = (({ id, ...rest }) => rest)(user);
             try {
                 const resp = await api.post(`users/_doc/${user.id}`, objeto)
-                const updatedData = this.listUsers.map(item =>
+                this.listUsers = this.listUsers.map(item =>
                     item.id === user.id ? {...user } : item
                 );
+                this.login.name = user.name
+                this.login.nickname = user.nickname
+                this.login.setor = user.setor
+                
             } catch (error) {
                 console.log('erro ao edit user');
             } finally {

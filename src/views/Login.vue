@@ -30,10 +30,16 @@
         justify-content: space-between;
         align-items: center;
         height: 100%;
+        transition: 1s ease;
     }
     @media (max-width: 1000px) {
         .container, .container2 .login{
             justify-content: center;
+        }
+    }
+    @media (max-width: 600px) {
+        .login {
+            padding-bottom: 15rem;
         }
     }
 </style>
