@@ -13,7 +13,7 @@
        </v-tooltip>
        <v-tooltip width="200" text="Filtrar por norma">
             <template v-slot:activator="{ props }">
-                <v-btn @click="filterLaw"  v-bind="props" density="compact" :color="isFilterLaw() ? 'primary' : 'grey'" variant="text" icon="mdi-filter"></v-btn>
+                <v-btn class="filter-btn" @click="filterLaw"  v-bind="props" density="compact" :color="isFilterLaw() ? 'primary' : 'grey'" variant="text" icon="mdi-filter"></v-btn>
             </template>
        </v-tooltip>
     </div>
@@ -101,12 +101,21 @@
 }
 .destaqueTitle{
     transition: .4s ease-in-out;
-    padding: 1px 5px;
+    padding: 5px 10px;
     border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 .destaqueTitle:hover{
     background: rgb(164, 212, 227);
+}
+.filter-btn {
+ 
+    margin-left: .5rem;
+}
+    
+.filter-btn:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 @keyframes aumentar {
     from{

@@ -97,8 +97,11 @@
 
     const newTexto = computed(() => {
         let textoMark = markSearch()
-        const textNovo = textoMark.replace(/\.\n/g, '.<br><br>')
+        const textNovo = textoMark.replace(/(?:\s|\n)Art\. /g, '<br><br>Art. ')
+                                  .replace(/\.\n/g, '.<br><br>')
+                                  .replace(/\:\n/g, ':<br><br>')
                                   .replace(/\;\n/g, ';<br><br>')
+                                  .replace(/MARANHÃO\n\s*/g, 'MARANHÃO<br><br>')
                                   .replace(/\n+/g, ' '); //.replace(/\n\;/g, '<br> kkkkk<br>')
                                 
         return textNovo

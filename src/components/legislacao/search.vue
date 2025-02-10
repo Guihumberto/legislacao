@@ -395,7 +395,7 @@
                                             </div>
                                             <div class="resulttitle">
                                                 <FavLaws :law="res" @filter-law="filterlawActive" />
-                                                <small class="ml-1">Pág: {{ res._source.num_page }} | {{ generalStore.fonteNome(res._source.tipo).mudar }} | {{ res._source.ano }} | <v-icon :color="useRelevancia(res._score).color" :icon="useRelevancia(res._score).icon" :title="`${useRelevancia(res._score).title} - ${res._score}`" /> </small>
+                                                <small class="ml-2">Pág: {{ res._source.num_page }} | {{ generalStore.fonteNome(res._source.tipo).mudar }} | {{ res._source.ano }} | <v-icon :color="useRelevancia(res._score).color" :icon="useRelevancia(res._score).icon" :title="`${useRelevancia(res._score).title} - ${res._score}`" /> </small>
                                             </div>
                                         </div>   
                                         <div class="btns pr-1">
