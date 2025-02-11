@@ -30,7 +30,7 @@
                                     <v-expansion-panel-title>{{ ano.ano }} ({{ ano.norma.length }}) </v-expansion-panel-title>
                                     <v-expansion-panel-text>
                                         <div class="even-columns">
-                                            <div   v-for="law, l in ano.norma.sort(useOrderBy('tilte'))" :key="l">
+                                            <div v-for="law, l in ano.norma.sort(useOrderBy('title'))" :key="l">
                                                 <a class="openLaw" :href="`text/${law.id}?search=leges`" target="_blank">{{ law.title }}</a>
                                             </div>
                                         </div>
@@ -160,8 +160,8 @@ div h5 {
     align-items: center;
 }
 .even-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+    column-count: 2;
+    column-gap: 5rem;
 }
 .openLaw{
     color: grey;
@@ -213,6 +213,7 @@ div h5 {
     .even-columns {
         display: grid;
         grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
     .contador{
         display: none;

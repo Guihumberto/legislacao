@@ -44,7 +44,7 @@ export const useLoginStore = defineStore("loginStore", {
         }
     },
     actions:{
-        async loginSSO(item){
+        async loginSSO(item, connected = false){
             try {
                 this.load = true
                 const userAreaStore = useUserAreaStore()
@@ -59,7 +59,9 @@ export const useLoginStore = defineStore("loginStore", {
                         this.login.first_login = date_now
                         await this.editUser(this.login)
                     }
-                    this.saveUserData()
+
+                    this.saveUserData(connected)
+
                     await userAreaStore.getAllFavoritos()
                     await userAreaStore.getAllHistórico()
                     await userAreaStore.getCollection()
@@ -76,10 +78,11 @@ export const useLoginStore = defineStore("loginStore", {
                 this.load = false
             }
         },
-        logOut(){
+        logOut(router){
             this.clearLogin()
-            window.location.href = '/'
-            this.saveUserData()
+            router.push('/leges')
+            sessionStorage.removeItem('userData')
+            localStorage.removeItem('userData');
         },
         clearLogin(){
             this.login = {
@@ -229,13 +232,17 @@ export const useLoginStore = defineStore("loginStore", {
             // Verifica se os dígitos calculados conferem com os dígitos informados
             return (digito1 === parseInt(cpf.charAt(9)) && digito2 === parseInt(cpf.charAt(10)));
         },
-        saveUserData() {
-            sessionStorage.setItem('userData', JSON.stringify(this.readLogin));
+        saveUserData(connected) {
+            if(connected){
+                localStorage.setItem('userData', JSON.stringify(this.readLogin));
+            } else {
+                sessionStorage.setItem('userData', JSON.stringify(this.readLogin));
+            }
         },
         loadUserData() {
             try {
                 this.load = true
-                const data = sessionStorage.getItem('userData');
+                const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
                 if (data) {
                     const login = {
                         login: JSON.parse(data).cpf,

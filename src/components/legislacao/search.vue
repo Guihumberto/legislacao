@@ -354,7 +354,7 @@
                                                 ><v-icon>{{viewPreview ?'mdi-eye-outline':'mdi-eye-off-outline'}}</v-icon> </v-btn>
                                             </template>
                                         </v-tooltip>
-                                        <v-tooltip text="altera para uma página ou para todas as páginas agregadas por norma">
+                                        <v-tooltip max-width="250" :text=" viewsAggs ? 'Altera para visualização de uma página' : 'Alterar para visualização das páginas agregadas por norma'">
                                             <template v-slot:activator="{ props }">
                                                 <v-btn
                                                     v-bind="props"

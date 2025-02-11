@@ -9,7 +9,7 @@
         <div class="rigthSubheader">
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
           <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
-          <a @click="loginStore.logOut()" class="mr-2 text-orange" v-else>SAIR</a>
+          <a @click="loginStore.logOut($router)" class="mr-2 text-orange" v-else>SAIR</a>
           <v-btn 
             title="ocultar cabeçalho" 
             density="compact" 

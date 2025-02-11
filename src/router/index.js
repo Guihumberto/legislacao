@@ -35,11 +35,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const authStore = useLoginStore();
-  const userRole = authStore.login.admin
-  if (to.meta.requiresAuth && !authStore.login.cpf) {
+  const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+  const cpf = JSON.parse(data)?.cpf
+  const role = JSON.parse(data)?.admin
+
+  if (to.meta.requiresAuth && !cpf) {
     next('/login');
-  } else if (to.meta.role && to.meta.role !== userRole) {
+  } else if (to.meta.role && to.meta.role !== role) {
     next('/restricted');
   } else {
     next();

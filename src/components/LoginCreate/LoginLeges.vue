@@ -32,12 +32,15 @@
          >
          </v-text-field>
          <v-btn block color="primary" type="submit" :loading="loadLogin">Entrar</v-btn>
+         <div class="d-flex justify-center">
+             <v-checkbox color="success" label="Manter conectado" v-model="keepConnected" hide-details></v-checkbox>
+         </div>
          <div class="d-flex justify-center align-center" v-if="flutuante">
              <!-- <relatarErro /> | <about /> -->
          </div>
          <v-expand-transition>
-             <div v-if="readErro">
-                 <p class="text-error" >{{ readErro }} <v-icon @click="limparErro()">mdi-close</v-icon></p>
+             <div v-if="readErro" class="text-center mt-2">
+                 <v-btn variant="outlined" color="error" @click="limparErro()"  append-icon="mdi-close" > {{ readErro }}</v-btn>
              </div>
          </v-expand-transition>
      </v-form>
@@ -80,6 +83,10 @@
         password: null
     })
 
+    const keepConnected = ref(false)
+
+
+
     const form = ref(null)
     const showPassword = ref(true)
     const dialog = ref(false)
@@ -96,7 +103,7 @@
              const { valid } = await form.value.validate()
              if(valid){
                  loadLogin.value = true
-                 const login = await loginStore.loginSSO(userLogin.value)
+                 const login = await loginStore.loginSSO(userLogin.value, keepConnected.value)
                  loadLogin.value = false
 
                  if(!login) {
