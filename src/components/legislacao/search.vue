@@ -62,7 +62,6 @@
                     <div class="d-flex justify-end align-center mb-2">
                         <div ref="el2">
                             <v-btn @click="filtrosavacados = !filtrosavacados" 
-                                title="Filtro por fonte e período"
                                 variant="text" class="pa-0 mr-2 text-capitalize btn-hover" color="grey"
                                 density="compact"> <v-icon>mdi-filter-outline</v-icon>{{ reqRead }}
                             </v-btn>
@@ -251,6 +250,15 @@
                                             ></v-chip>
                                         </v-chip-group>
                                     </div>
+                                    
+                                    <v-expand-transition>
+                                        <v-btn 
+                                            v-if="facetas.fonte.length || facetas.ano.length" 
+                                            variant="outlined" color="primary" class="text-lowercase" 
+                                            @click="searchForFacetas()"
+                                            density="compact">Utilizar Facetas selecionadas como filtro</v-btn>
+                                    </v-expand-transition>
+                                  
                                     <v-select
                                         v-model="facetas.norma"
                                         :items="resultSearchNorma"
@@ -620,6 +628,14 @@
             }
          
         }
+    }
+
+    const searchForFacetas = () => {
+        filtrosavacados.value = true
+
+        search.value.fonte = facetas.value.fonte
+        search.value.years = facetas.value.ano
+        deslocarTela()
     }
 
     const reqRead = computed(() => {

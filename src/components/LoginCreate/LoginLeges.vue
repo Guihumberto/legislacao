@@ -1,6 +1,7 @@
 <template>
   <div :class=" flutuante ? 'loginFlutanteWrapper' : 'loginwrapper'">
       <v-form :class="flutuante ? 'loginFlutuante' : 'login'" ref="form" @submit.prevent="login()" v-if="!loginStore.readLogin.cpf">
+        <v-img v-if="!flutuante && xs" class="mx-auto mb-5" src="../../assets/logo_leges.svg" max-width="100"></v-img>
          <div class="mb-3">
              <h3 class="destaque px-2" v-if="flutuante">Entre com seu CPF e senha</h3>
              <p v-else class="destaque px-2">Login</p>
@@ -63,6 +64,9 @@
 
     import { useLoginStore } from '../../store/LoginStore'
     const loginStore = useLoginStore()
+
+    import { useDisplay } from 'vuetify'
+    const { xs } = useDisplay()
 
     const props = defineProps({
         flutuante: {

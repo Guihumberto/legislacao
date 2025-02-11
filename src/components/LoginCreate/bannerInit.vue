@@ -2,7 +2,7 @@
     <div class="bannerleges">
         <div>
             <div>
-                <v-icon size="4rem" class="mb-2" color="#030231">mdi-text-search</v-icon>
+                <v-img src="../../assets/logo_leges.svg" max-width="100"></v-img>
                 <h1>OH-MY-SEARCH</h1>
                 <h2>Legislação</h2>
             </div>
