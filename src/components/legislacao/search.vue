@@ -101,6 +101,8 @@
                                 </v-autocomplete>
                                 
                                 <v-autocomplete
+                                    v-model="search.years"
+                                    @update:modelValue="toggleAllYears"
                                     class="periodoSearch"
                                     density="compact"
                                     clearable
@@ -109,20 +111,19 @@
                                     :items="computedYears"
                                     multiple
                                     variant="outlined"
-                                    v-model="search.years"
                                     closable-chips
                                     placeholder="Todo o período"
-                                    @update:modelValue="toggleAllYears"
                                 >
-                                    <!-- <template v-slot:item="{ props, item }">
+                                    <template v-slot:item="{ props, item }">
                                         <v-list-item v-bind="props">
-                                            <template v-if="item.value !== 'Desmarcar Todos'" v-slot:prepend>
+                                            <template v-if="!computedListOptions.includes(item.value)" v-slot:prepend>
                                                 <v-checkbox 
-                                                    color="primary" class="px-2" hide-details v-model="search.years"  :value="item.value" density="compact">
+                                                    color="primary" class="px-2" 
+                                                    hide-details v-model="search.years" :value="item.value" density="compact">
                                                 </v-checkbox>
                                             </template>
                                         </v-list-item>
-                                    </template> -->
+                                    </template>
                             </v-autocomplete>
                             </div>
                             <div v-if="search.fonte == 'diario'">
@@ -618,6 +619,10 @@
         };
     });
 
+    const computedListOptions = computed(() => {
+        return ['Desmarcar Todos', 'Selecionar Todos']
+    })
+
     const computedFontes = computed(() => {
         return [ computedAllOption.value, ...generalStore.readTiposRestrict ]
     })
@@ -633,6 +638,7 @@
         return [ cumputedAllYears.value, ...generalStore.readPeriodo]
     })
 
+
     const toggleAllFontes = (value) => {
         if (value.includes('all')) {
             if( value.length === 1  || value.length < generalStore.readTiposRestrict.length + 1){
@@ -643,15 +649,21 @@
          } 
     }
 
-    const toggleAllYears = (value) => {
-        if (value.includes('Selecionar Todos')) {
-            if(value.length === 1 || value.length < generalStore.readPeriodo.length + 1){
-                search.value.years = generalStore.readPeriodo
+    const toggleAllYears = (selectedYear) => {
+        if (selectedYear.includes('Selecionar Todos')) {
+            if(selectedYear.length === 1 || selectedYear.length < computedYears.value.length + 1){
+                search.value.years = [...generalStore.readPeriodo];
             } else {
                 search.value.years = []
             }
-        } else {
+        } else if (selectedYear.includes('Desmarcar Todos')) {
             search.value.years = []
+        } else {
+            if (selectedYear.length === computedYears.value.length) {
+                search.value.years = [...selectedYear, 'Selecionar tudo'];
+            } else {
+                search.value.years = selectedYear;
+            }
         } 
     }
 
