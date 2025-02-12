@@ -88,7 +88,17 @@
                                     closable-chips
                                     placeholder="Todas as fontes"
                                     @update:modelValue="toggleAllFontes"
-                                ></v-autocomplete>
+                                >
+                                    <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props">
+                                            <template v-if="item.raw.nome !== 'all'" v-slot:prepend>
+                                                <v-checkbox 
+                                                    color="primary" class="px-2" hide-details v-model="search.fonte" :value="item.raw.nome" density="compact">
+                                                </v-checkbox>
+                                            </template>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
                                 
                                 <v-autocomplete
                                     class="periodoSearch"
@@ -103,7 +113,17 @@
                                     closable-chips
                                     placeholder="Todo o período"
                                     @update:modelValue="toggleAllYears"
-                                ></v-autocomplete>
+                                >
+                                    <!-- <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props">
+                                            <template v-if="item.value !== 'Desmarcar Todos'" v-slot:prepend>
+                                                <v-checkbox 
+                                                    color="primary" class="px-2" hide-details v-model="search.years"  :value="item.value" density="compact">
+                                                </v-checkbox>
+                                            </template>
+                                        </v-list-item>
+                                    </template> -->
+                            </v-autocomplete>
                             </div>
                             <div v-if="search.fonte == 'diario'">
                                 <div class="autocompletes">
