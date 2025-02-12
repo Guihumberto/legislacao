@@ -79,7 +79,7 @@
                                     clearable
                                     chips
                                     label="Fonte da norma"
-                                    :items="generalStore.readTiposRestrict"
+                                    :items="computedFontes"
                                     item-value="nome"
                                     item-title="mudar"
                                     multiple
@@ -87,19 +87,22 @@
                                     v-model="search.fonte"
                                     closable-chips
                                     placeholder="Todas as fontes"
+                                    @update:modelValue="toggleAllFontes"
                                 ></v-autocomplete>
+                                
                                 <v-autocomplete
                                     class="periodoSearch"
                                     density="compact"
                                     clearable
                                     chips
                                     label="Período"
-                                    :items="generalStore.readPeriodo"
+                                    :items="computedYears"
                                     multiple
                                     variant="outlined"
                                     v-model="search.years"
                                     closable-chips
                                     placeholder="Todo o período"
+                                    @update:modelValue="toggleAllYears"
                                 ></v-autocomplete>
                             </div>
                             <div v-if="search.fonte == 'diario'">
@@ -584,6 +587,56 @@
             }
         }, { deep: true }
     )
+
+    //Fontes e anos auto complete
+
+    const computedAllOption = computed(() => {
+        const allSelected = search.value.fonte.length === generalStore.readTiposRestrict.length;
+        return {
+            nome: 'all',
+            mudar: allSelected ? 'Desmarcar Todos' : 'Selecionar Todos',
+        };
+    });
+
+    const computedFontes = computed(() => {
+        return [ computedAllOption.value, ...generalStore.readTiposRestrict ]
+    })
+
+    const cumputedAllYears = computed(() => {
+        const allSelected = search.value.years.length === generalStore.readPeriodo.length;
+        return allSelected 
+               ? 'Desmarcar Todos' 
+               : 'Selecionar Todos'
+    })
+
+    const computedYears = computed(() => {
+        return [ cumputedAllYears.value, ...generalStore.readPeriodo]
+    })
+
+    const toggleAllFontes = (value) => {
+        if (value.includes('all')) {
+            if( value.length === 1  || value.length < generalStore.readTiposRestrict.length + 1){
+                search.value.fonte =  generalStore.readTiposRestrict.map((item) => item.nome)
+            } else {
+                search.value.fonte = []
+            }
+         } 
+    }
+
+    const toggleAllYears = (value) => {
+        if (value.includes('Selecionar Todos')) {
+            if(value.length === 1 || value.length < generalStore.readPeriodo.length + 1){
+                search.value.years = generalStore.readPeriodo
+            } else {
+                search.value.years = []
+            }
+        } else {
+            search.value.years = []
+        } 
+    }
+
+
+    //Seartch in to Search
 
     const searchInToSearch = ref(false)
     const erroSearchInToSearch = ref(null)
