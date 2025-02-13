@@ -8,7 +8,12 @@ export const useAggsStore = defineStore("aggsStore", {
         load: false
     }),
     getters: {
-        readAggsTermsSearch: (state) => state.aggsTermsSearch.filter(x => x.key.length > 2),
+        readAggsTermsSearch(){
+            const regexNumero = /^[\d.]+$/;
+            const list = this.aggsTermsSearch.filter(x => x.key.length > 2)
+                             .filter(item => !regexNumero.test(item.key));
+            return list
+        },
         readAggsTermsLaw: (state) => state.aggsTermsLaw,
         readLoad: (state) => state.load
     },

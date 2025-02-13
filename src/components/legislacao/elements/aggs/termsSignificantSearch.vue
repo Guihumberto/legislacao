@@ -7,42 +7,32 @@
             v-if="!aggsStore.readLoad && termsSignificantes.length"
         >
             <v-sheet
-            class="py-1 px-5 bg-primary text-left"
+            class="py-1 px-5 bg-blue-lighten-2 text-left d-flex justify-space-between align-center"
             rounded="t-xl"
-            > <h1 class="text-overline">Termos Relevantes relacionados a pesquisa</h1>
+            > 
+                <h1 class="text-overline text-white">Termos Relevantes relacionados a pesquisa</h1>
+                <v-btn color="white" variant="text" :icon="hidden ? 'mdi-window-minimize' : 'mdi-window-maximize'" @click="hidden = !hidden"></v-btn>
             </v-sheet>
-
-            <div class="pa-4">
-            <v-chip-group
-                selected-class="text-primary"
-                column multiple
-                v-model="listSelect"
-            >
-                <v-chip
-                    filter
-                    v-for="item, i in termsSignificantes" :key="i"
-                    @click="addSearch(item.key)"
-                >
-                {{ item.key }}
-                </v-chip>
-            </v-chip-group>
-            </div>
+            <v-expand-transition>
+                <div v-if="hidden">
+                    <div class="pa-4">
+                        <v-chip-group
+                            selected-class="text-primary"
+                            column multiple
+                            v-model="listSelect"
+                        >
+                            <v-chip
+                                filter
+                                v-for="item, i in termsSignificantes" :key="i"
+                                @click="addSearch(item.key)"
+                            >
+                            {{ item.key }}
+                            </v-chip>
+                        </v-chip-group>
+                    </div>
+                </div>
+            </v-expand-transition>
         </v-sheet>
-        <!-- <v-card variant="flat" v-if="!aggsStore.readLoad">
-            <v-card-title>
-                <h1 class="text-overline">Termos Relevantes relacionados a pesquisa</h1>
-            </v-card-title>
-                <v-card-text>
-                    <v-col cols="auto">
-                        <v-chip 
-                            density="comfortable"
-                            color="grey-lighten-2"  variant="elevated"
-                            @click="addSearch(item.key)" class="mr-1 mb-1" v-for="item, i in termsSignificantes" :key="i">
-                            <v-icon icon="mdi-magnify" start></v-icon>
-                            {{item.key}}</v-chip>
-                    </v-col>
-                </v-card-text>
-        </v-card> -->
     </v-expand-transition>
 </template>
 
@@ -52,6 +42,7 @@
     import { useAggsStore } from '@/store/AggsStores';
     const aggsStore = useAggsStore()
 
+    const hidden = ref(false)   
     const listSelect = ref([])
     const listSelectText = ref([])
 
@@ -67,11 +58,16 @@
     })
 
     const termsSignificantes = computed(() => {
-        const list = aggsStore.readAggsTermsSearch.filter(item => item.key !== props.firstSearch)
-        return list
+        if(props.firstSearch.includes(' ')){
+            const list_words = props.firstSearch.split(' ')
+            return aggsStore.readAggsTermsSearch.filter( x => !list_words.some( y => y == x.key))
+        }
+    
+        return aggsStore.readAggsTermsSearch.filter(item => item.key !== props.firstSearch)
+       t
     })
     
-    const emits = defineEmits(['addSearch'])
+    const emits = defineEmits(['addSearch', 'renewSearchText'])
 
     onMounted( async() => {
         await aggsStore.getAggsTermsSearch(props.terms)
@@ -79,10 +75,9 @@
 
     const addSearch =(item) => {
         if(itemExiste(item)){
-            console.log('item', termsAddSearch.value);
-            // const newTerms = props.terms.split(' ').filter(item => item !== item).join(' ')
-            // console.log('teste', props.terms);
-            // emits('addSearch', newTerms)
+            const newTerms = termsAddSearch.value.filter(x => x !== item).join(' ')
+            emits('renewSearchText', newTerms)
+            listSelectText.value = listSelectText.value.filter(x => x !== item)
             return
         }  
         listSelectText.value.push(item)

@@ -232,7 +232,7 @@
                         ></v-progress-circular>
                     </div>
                     <div v-else>
-                        <TermsSignificantSearch :terms="search.text" :firstSearch="firstSearch" @addSearch="addSearch" />
+                        <TermsSignificantSearch :terms="search.text" :firstSearch="firstSearch" @addSearch="addSearch" @renewSearchText="renewSearchText" />
                         <v-card variant="flat" class="border my-5"  v-if="resultsSearch.length"> 
                             <v-card-text>
                                 <div class="facetas">
@@ -557,6 +557,10 @@
             if(search.value.text) search.value.text = search.value.text + ' ' + value
         }
     } 
+
+    const renewSearchText = (value) => {
+        search.value.text = value
+    }
 
     const tab = ref('Páginas')
     const tab_name = ['Páginas', 'Normas']
