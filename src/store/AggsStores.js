@@ -34,8 +34,6 @@ export const useAggsStore = defineStore("aggsStore", {
                 })
 
                 this.aggsTermsSearch = resp.data.aggregations.popular_in_terms.buckets
-                console.log('aggsTeste', this.aggsTermsSearch);
-
             } catch (error) {
                 console.log('error aggs search', error);
             } finally {

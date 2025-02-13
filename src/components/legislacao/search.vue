@@ -232,9 +232,9 @@
                         ></v-progress-circular>
                     </div>
                     <div v-else>
+                        <TermsSignificantSearch :terms="search.text" :firstSearch="firstSearch" @addSearch="addSearch" />
                         <v-card variant="flat" class="border my-5"  v-if="resultsSearch.length"> 
                             <v-card-text>
-                                <TermsSignificantSearch :terms="search.text" @addSearch="addSearch" />
                                 <div class="facetas">
                                     <div class="d-flex align-center">
                                         Fonte:
@@ -543,12 +543,20 @@
         enableFuzzy:true
     })
 
+    const firstSearch = ref('')
+
     const searchRestrit = ref(null)
     const formRestrit = ref(null)
 
     provide('search', search)
 
-    const addSearch =(value) => search.value.text = search.value.text + ' ' + value
+    const addSearch =(value) => {   
+        if(!search.value.text){
+            search.value.text = value
+        } else {
+            if(search.value.text) search.value.text = search.value.text + ' ' + value
+        }
+    } 
 
     const tab = ref('Páginas')
     const tab_name = ['Páginas', 'Normas']
@@ -953,6 +961,7 @@
                     generalStore.copyResults(resultsSearch.value)
                     showAutosuggest.value = false
                     searchForLaw()
+                    firstSearch.value = search.value.text
                 }
             } else if (search.value.semantic == 2){
                 load.value = false
@@ -1049,7 +1058,7 @@
     }
 
     import { searchInitial } from "@/composables/tutorialSearch";
-import TermsSignificantSearch from './elements/aggs/termsSignificantSearch.vue'
+    import TermsSignificantSearch from './elements/aggs/termsSignificantSearch.vue'
 
     const el1 = ref(null);
     const el2 = ref(null);
