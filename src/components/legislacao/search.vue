@@ -234,6 +234,7 @@
                     <div v-else>
                         <v-card variant="flat" class="border my-5"  v-if="resultsSearch.length"> 
                             <v-card-text>
+                                <TermsSignificantSearch :terms="search.text" @addSearch="addSearch" />
                                 <div class="facetas">
                                     <div class="d-flex align-center">
                                         Fonte:
@@ -371,6 +372,7 @@
                                                 class="ml-1"
                                             >Limpar</v-btn>
                                     </div>
+                                   
                                     <div class="btns2">
                                         <v-tooltip text="Ativar/desativar a visualização da página">
                                             <template v-slot:activator="{ props }">
@@ -401,6 +403,7 @@
                                         </v-tooltip>                                
                                     </div>
                                 </div>
+                               
                             </v-card-text>
                         </v-card>
                         <div v-if="resultsSearchFilter.length" class="searchResult">
@@ -544,6 +547,8 @@
     const formRestrit = ref(null)
 
     provide('search', search)
+
+    const addSearch =(value) => search.value.text = search.value.text + ' ' + value
 
     const tab = ref('Páginas')
     const tab_name = ['Páginas', 'Normas']
@@ -1044,6 +1049,7 @@
     }
 
     import { searchInitial } from "@/composables/tutorialSearch";
+import TermsSignificantSearch from './elements/aggs/termsSignificantSearch.vue'
 
     const el1 = ref(null);
     const el2 = ref(null);
