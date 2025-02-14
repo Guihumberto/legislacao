@@ -42,7 +42,7 @@
     import { useAggsStore } from '@/store/AggsStores';
     const aggsStore = useAggsStore()
 
-    const hidden = ref(false)   
+    const hidden = ref(true)   
     const listSelect = ref([])
     const listSelectText = ref([])
 
