@@ -28,6 +28,8 @@
                             v-model="importForm.year"
                             class="autocomplete"
                             :rules="[rules.required]"
+                            :auto-select-first="false"
+                           @keydown.enter.prevent="handleCustomInput"
                         ></v-autocomplete>
                      </div>
                      <div class="checkbox">
@@ -149,6 +151,13 @@
         revogado: false,
         fav_law: false
     })
+
+    const handleCustomInput = (value) => {
+        const inputValue = event.target.value;
+        if (inputValue) {
+            importForm.value.year = inputValue; // Define o valor digitado no v-model
+        }
+    };
 
     const clearimportForm = () => {
         importForm.value = {
