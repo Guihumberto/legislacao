@@ -17,7 +17,7 @@
 
                     <v-alert type="error" variant="outlined" v-if="erros" class="my-5">
                         <div v-if="erros == 503">
-                            <p >Aguarde enquanto o modelo é está sendo carregado...</p>
+                            <p>Aguarde enquanto o modelo é está sendo carregado...</p>
                             <p v-if="timeLeft > 0">Tempo restante: {{ timeLeft }} segundos</p>
                             <p @click="fetchSuggestions" v-else>Pronto!!</p>
                         </div>
@@ -65,6 +65,9 @@
     import { ref, computed, onUnmounted } from 'vue';
     import api from '@/services/api_hf'
 
+    import * as sw from "stopword";
+
+
     const dialog = ref(false)
     const load = ref(false)
     const erros = ref(null)
@@ -75,13 +78,50 @@
     const timeLeft = ref(20); // Tempo inicial
     const timerRunning = ref(false); // Controle do estado do cronômetro
 
+    const props = defineProps({
+        text: String
+    })
+
+    const removerStopWords = (texto) => {
+        const palavras = texto.split(" "); // Quebra o texto em palavras
+        const filtrado = sw.removeStopwords(palavras, sw.pt); // Remove stop words em português
+        return filtrado.join(" ");
+    }
+
+    const contarTokens = (texto) => {
+        const palavras = texto.split(/\s+/); // Divide por espaços
+        return Math.round(palavras.length * 1.33); // Aproximadamente 1,33 tokens por palavra em português
+    }
+
+    const dividirTexto = (texto, limite = 500) => {
+        const palavras = texto.split(" ");
+        let partes = [];
+        let atual = [];
+
+        let contador = 0;
+        for (let palavra of palavras) {
+            contador += Math.round(palavra.length / 4); // Aproximação: 1 token ≈ 4 caracteres
+            if (contador > limite) {
+            partes.push(atual.join(" "));
+            atual = [];
+            contador = 0;
+            }
+            atual.push(palavra);
+        }
+        if (atual.length > 0) partes.push(atual.join(" "));
+
+        return partes;
+    }
+
+
     const startTimer = () => {
       if (timerRunning.value) return; // Evita múltiplas execuções
+
       timerRunning.value = true;
-      timeLeft.value = 20; // Reinicia o tempo
+
       let intervalId = setInterval(() => {
         if (timeLeft.value > 0) {
-          timeLeft.value -= 1; // Decrementa o tempo
+          timeLeft.value--; // Decrementa o tempo
         } else {
           clearInterval(intervalId); // Para o cronômetro
           timerRunning.value = false;
@@ -89,34 +129,60 @@
       }, 1000); // Atualiza a cada 1 segundo
     };
     
-    const props = defineProps({
-        text: String
-    })
-
     const fetchSuggestions = async () => {
         erros.value = null
         try {
             load.value = true
-            const resp = await api.post('facebook/bart-large-cnn', {
-                inputs: props.text
-            })
-             summary.value = resp.data[0].summary_text
+            const textoSw = removerStopWords(props.text)
 
-             const sumRep = await api.post('dslim/bert-base-NER', {
-                inputs: props.text
-             })
-             console.log(sumRep);
-             keywords.value = sumRep.data
+            if (contarTokens(textoSw) <= 500) {
+                const resp = await api.post('facebook/bart-large-cnn', {
+                    inputs: textoSw
+                })
+                summary.value = resp.data[0].summary_text
+
+                //palavras chaves
+                
+                const sumRep = await api.post('dslim/bert-base-NER', {
+                    inputs: textoSw
+                })
+                keywords.value = sumRep.data
+                return
+            }
+
+            const partes = dividirTexto(textoSw, 500);
+            let resumos = [];
+
+            for (let parte of partes) {
+                try {
+                    const resp = await api.post('facebook/bart-large-cnn', {
+                        inputs: parte
+                    })
+                    resumos.push(resp.data[0].summary_text || "");
+
+                    const sumRep = await api.post('dslim/bert-base-NER', {
+                        inputs: parte
+                    })
+                    keywords.value.push(...sumRep.data) 
+       
+                } catch (erro) {
+                    console.error("Erro na requisição:", erro);
+                    resumos.push("[Erro ao processar parte do texto]");
+                }
+            }
+
+            summary.value = resumos.join("<br>")
 
         } catch (error) {
             if (error.response) {
                 erros.value = error.response.status
-                if(erros.valeu == 503) startTimer()
                 console.log('Código de status:', error.response.status);
                 console.log('Dados do erro:', error.response.data);
+                timeLeft.value = error.response.data.estimated_time
                 console.log('Cabeçalhos do erro:', error.response.headers);
+                if(erros.value == 503) startTimer()
             } else if (error.request) {
-                erros.value = error.request
+                erros.value = error.request.status
                 console.log('Nenhuma resposta recebida:', error.request);
             } else {
                 erros.value = error.message

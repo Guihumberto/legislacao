@@ -38,7 +38,7 @@ export const useGeneralStore = defineStore("General", {
             return this.periodo
         },
         readTipos(){
-            return this.tipos
+            return this.tipos.sort(useOrderBy('nome', true))
         },
         readShowNews(){
             return this.noShowNews
