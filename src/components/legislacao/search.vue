@@ -420,9 +420,8 @@
                                                     <template v-slot:activator="{ props }">
                                                         <v-btn 
                                                             :color="docExiste(res._id)?'red':'green'" variant="plain" 
-                                                            :icon="docExiste(res._id)?'mdi-delete':'mdi-plus-circle'" 
+                                                            :icon="docExiste(res._id)?'mdi-minus-circle':'mdi-plus-circle'" 
                                                             :title="docExiste(res._id)?'excluir página': 'adicionar página'"
-                                                            class="ml-n1 mr-n2"
                                                             @click="inserirDoc(res)"
                                                         ></v-btn>
                                                     </template>

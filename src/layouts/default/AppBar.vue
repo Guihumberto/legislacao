@@ -1,5 +1,5 @@
 <template>
-  <header class="primary-header" id="pri-hea">
+  <header class="primary-header" id="pri-hea" ref="header">
     <div class="wrappersubheader">
       <div class="subheader">
         <h6 class="d-flex align-center">
@@ -91,9 +91,16 @@
   const menu = ref(false) 
   const drawer = ref(false) 
   const drawer2 = ref(false) 
+
+  const header = ref(null)
   
   const changeHeaderShow = () => {
+      deslocarTela()
       geralStore.changeHeaderShow()
+  }
+
+  const deslocarTela = () => {
+    header.value.scrollIntoView({behavior: "smooth"})
   }
 
   const isSearch = () => {

@@ -53,7 +53,7 @@
                 <v-list-subheader v-if="type != 'search'"><v-icon>mdi-magnify</v-icon>Resultado da Busca</v-list-subheader>
                 <v-list-item 
                     v-for="item, i in resultsSearchFilter" :key="i"
-                    link class="py-3"
+                    link class="py-3 bg-grey-lighten-4"
                     @click.stop="router.push(`text/${item.id}?search=${type}`)"
                 >
                 {{ item.title }} <br>
@@ -64,9 +64,8 @@
                         <template v-slot:activator="{ props }">
                             <v-btn 
                                 :color="docExiste(item.id)?'red':'green'" variant="plain" 
-                                :icon="docExiste(item.id)?'mdi-delete':'mdi-plus-circle'" 
+                                :icon="docExiste(item.id)?'mdi-minus-circle':'mdi-plus-circle'" 
                                 :title="docExiste(item.id)?'excluir norma': 'adicionar norma'"
-                                class="ml-n1 mr-n2"
                                 @click.stop="inserirDoc(item)"
                                 :disabled="!loginStore.readLogin.cpf"
                             ></v-btn>

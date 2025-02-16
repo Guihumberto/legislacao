@@ -20,7 +20,7 @@
             <v-btn title="ocultar/mostrar prévia da página" :icon="hidden ? 'mdi-eye' : 'mdi-eye-off'" color="grey" variant="text" @click="hidden = !hidden"></v-btn>
             <v-btn color="grey" size="small" variant="text" title="Ver a página" @click="pageComplete = !pageComplete, hidden = true" :prepend-icon="pageComplete ? 'mdi-plus' : 'mdi-minus'">{{ pageComplete ? 'expandir' : 'recolher' }}</v-btn>
             <pageDialog :id="id" :page="page" :searchP="searchP" />
-            <ResumoIA :text="text" />
+            <ResumoIA :text="text" :page="page" />
         </div>
     </div>
 </template>

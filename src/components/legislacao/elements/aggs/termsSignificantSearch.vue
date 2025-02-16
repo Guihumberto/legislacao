@@ -57,13 +57,17 @@
         : []
     })
 
+    const normalizarTexto = (texto) => {
+        return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
     const termsSignificantes = computed(() => {
         if(props.firstSearch.includes(' ')){
             const list_words = props.firstSearch.split(' ')
-            return aggsStore.readAggsTermsSearch.filter( x => !list_words.some( y => y == x.key))
+            return aggsStore.readAggsTermsSearch.filter( x => !list_words.some( y => normalizarTexto(y) == normalizarTexto(x.key)))
         }
     
-        return aggsStore.readAggsTermsSearch.filter(item => item.key !== props.firstSearch)
+        return aggsStore.readAggsTermsSearch.filter(item => normalizarTexto(item.key) !== normalizarTexto(props.firstSearch))
        t
     })
     

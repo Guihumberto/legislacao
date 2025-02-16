@@ -10,6 +10,7 @@
                     <v-btn icon="mdi-close" variant="text" @click="dialog=false"></v-btn>
                 </v-card-title>
                 <v-card-text class="text-center">
+                    pág. {{ page.num_page }} - {{ page.page_to_norma.title }}
                     <div v-if="!summary">
                         <v-alert text="Crie um resumo a partir da página selecionada com uma lista de palavras-chaves." type="info" variant="text"></v-alert>
                         <v-btn @click="fetchSuggestions" color="info" prepend-icon="mdi-robot" :loading="load" :disabled="load">Criar resumo IA</v-btn>
@@ -79,7 +80,8 @@
     const timerRunning = ref(false); // Controle do estado do cronômetro
 
     const props = defineProps({
-        text: String
+        text: String,
+        page: Object
     })
 
     const removerStopWords = (texto) => {
@@ -121,12 +123,13 @@
 
       let intervalId = setInterval(() => {
         if (timeLeft.value > 0) {
-          timeLeft.value--; // Decrementa o tempo
+          timeLeft.value--
         } else {
-          clearInterval(intervalId); // Para o cronômetro
-          timerRunning.value = false;
+          clearInterval(intervalId)
+          timerRunning.value = false
+          fetchSuggestions()
         }
-      }, 1000); // Atualiza a cada 1 segundo
+      }, 1000);
     };
     
     const fetchSuggestions = async () => {
@@ -136,7 +139,7 @@
             const textoSw = removerStopWords(props.text)
 
             if (contarTokens(textoSw) <= 500) {
-                const resp = await api.post('facebook/bart-large-cnn', {
+                const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {
                     inputs: textoSw
                 })
                 summary.value = resp.data[0].summary_text
@@ -155,7 +158,7 @@
 
             for (let parte of partes) {
                 try {
-                    const resp = await api.post('facebook/bart-large-cnn', {
+                    const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {   //facebook/bart-large-cnn
                         inputs: parte
                     })
                     resumos.push(resp.data[0].summary_text || "");
@@ -171,14 +174,14 @@
                 }
             }
 
-            summary.value = resumos.join("<br>")
+            summary.value = resumos.join(" ")
 
         } catch (error) {
             if (error.response) {
                 erros.value = error.response.status
                 console.log('Código de status:', error.response.status);
                 console.log('Dados do erro:', error.response.data);
-                timeLeft.value = error.response.data.estimated_time
+                timeLeft.value = Math.ceil(error.response.data.estimated_time)
                 console.log('Cabeçalhos do erro:', error.response.headers);
                 if(erros.value == 503) startTimer()
             } else if (error.request) {
@@ -204,13 +207,12 @@
                 )
             ).map(word => ({ word }))
 
-            return uniqueWordsArray
+            return uniqueWordsArray.filter(x => !x.word.startsWith("##"))
 
         } catch (error) {
             return []
         }
     })
-
 </script>
 
 <style lang="scss" scoped>
