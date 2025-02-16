@@ -10,7 +10,11 @@
                     <v-btn icon="mdi-close" variant="text" @click="dialog=false"></v-btn>
                 </v-card-title>
                 <v-card-text class="text-center">
-                    pág. {{ page.num_page }} - {{ page.page_to_norma.title }}
+                    pág. {{ page.num_page }} - {{ page.page_to_norma.title }} <br>
+                    <v-sheet class="pa-2 border-1 border-red-lighten-2" v-if="relevantTermsLaw.length">
+                        <p class="font-weight-bold mb-2">Termos relevantes da Norma</p>
+                        <v-chip class="mr-1 mb-1" v-for="item, i in relevantTermsLaw" :key="i">{{ item.key }}</v-chip>
+                    </v-sheet>
                     <div v-if="!summary">
                         <v-alert text="Crie um resumo a partir da página selecionada com uma lista de palavras-chaves." type="info" variant="text"></v-alert>
                         <v-btn @click="fetchSuggestions" color="info" prepend-icon="mdi-robot" :loading="load" :disabled="load">Criar resumo IA</v-btn>
@@ -67,7 +71,10 @@
     import api from '@/services/api_hf'
 
     import * as sw from "stopword";
-
+    
+    import { useAggsStore } from '@/store/AggsStores';
+    const aggsStore = useAggsStore()
+    
 
     const dialog = ref(false)
     const load = ref(false)
@@ -75,6 +82,7 @@
 
     const summary = ref(null)
     const keywords = ref([])
+    const relevantTermsLaw = ref([])
 
     const timeLeft = ref(20); // Tempo inicial
     const timerRunning = ref(false); // Controle do estado do cronômetro
@@ -83,6 +91,11 @@
         text: String,
         page: Object
     })
+
+    const termsRelevantLaw = async() => {
+        await aggsStore.getAggsTermsLaw(props.page.page_to_norma.parent)
+        relevantTermsLaw.value = aggsStore.readAggsTermsLaw
+    }
 
     const removerStopWords = (texto) => {
         const palavras = texto.split(" "); // Quebra o texto em palavras
@@ -133,6 +146,7 @@
     };
     
     const fetchSuggestions = async () => {
+        await termsRelevantLaw()
         erros.value = null
         try {
             load.value = true
