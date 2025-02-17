@@ -158,6 +158,11 @@ const routes = [
         name: 'Blog Arcádio',
         component: () => import('@/views/Blog.vue'),
       },
+      {
+        path: '/chatNew',
+        name: 'BlogTeste',
+        component: () => import('@/views/LegislacaoChatClone.vue'),
+      },
     ]
   }
 ]

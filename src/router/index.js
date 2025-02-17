@@ -26,6 +26,17 @@ const routes = [
         component: () => import('@/views/Blog.vue'),
       },
     ]
+  },
+  {
+    path: '/chatarcadio',
+    component: () => import('@/layouts/chat/Chat.vue'),
+    children:[
+      {
+        path: '',
+        name: 'Chat Arcádio',
+        component: () => import('@/views/Chatarcadio.vue'),
+      },
+    ]
   }
 ]
 
