@@ -41,6 +41,15 @@ export const useCollectionStore = defineStore("collection", {
             } finally {
                 this.load = false
             }
+        },
+        async getChatWithCollection(item){
+            try {
+                this.load = true
+            } catch (error) {
+                console.log('Erro ao carregar coleções do chatbot',);
+            } finally {
+                this.load = false
+            }
         }
-    }
+    },
 })

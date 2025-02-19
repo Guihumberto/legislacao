@@ -33,6 +33,10 @@
 
     const copyText = (id) => {
         if(id == 4){
+            if(isSpeaking.value){
+                stop()
+                return
+            } 
             speak()
             return
         }
@@ -44,52 +48,50 @@
     const isSpeaking = ref(false);
     let speechSynthesisUtterance = null;
 
-    // Função para iniciar a leitura
     const speak = () => {
-    if ('speechSynthesis' in window) {
-        if (speechSynthesisUtterance) {
-        window.speechSynthesis.cancel(); // Para qualquer fala em andamento
+        if ('speechSynthesis' in window) {
+            
+            if (speechSynthesisUtterance) {
+                window.speechSynthesis.cancel(); // Para qualquer fala em andamento
+            }
+
+            speechSynthesisUtterance = new SpeechSynthesisUtterance(props.msg.content);
+            speechSynthesisUtterance.lang = 'pt-BR';
+            speechSynthesisUtterance.rate = 1; // Velocidade da fala (1 é normal)
+            speechSynthesisUtterance.pitch = 1; // Tom da fala
+
+            speechSynthesisUtterance.onstart = () => {
+                isSpeaking.value = true;
+            };
+            
+            speechSynthesisUtterance.onend = () => {
+                isSpeaking.value = false;
+            };
+
+            window.speechSynthesis.speak(speechSynthesisUtterance);
+        } else {
+            alert('Seu navegador não suporta a síntese de voz.');
         }
-
-        speechSynthesisUtterance = new SpeechSynthesisUtterance(props.msg.content);
-        speechSynthesisUtterance.lang = 'pt-BR';
-        speechSynthesisUtterance.rate = 1; // Velocidade da fala (1 é normal)
-        speechSynthesisUtterance.pitch = 1; // Tom da fala
-
-        speechSynthesisUtterance.onstart = () => {
-            isSpeaking.value = true;
-        };
-        
-        speechSynthesisUtterance.onend = () => {
-            isSpeaking.value = false;
-        };
-
-        window.speechSynthesis.speak(speechSynthesisUtterance);
-    } else {
-        alert('Seu navegador não suporta a síntese de voz.');
-    }
     };
 
-    // Função para pausar a leitura
     const pause = () => {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.pause();
-    }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.pause();
+        }
     };
 
-    // Função para retomar a leitura
+
     const resume = () => {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.resume();
-    }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.resume();
+        }
     };
 
-    // Função para parar a leitura
     const stop = () => {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        isSpeaking.value = false;
-    }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            isSpeaking.value = false;
+        }
     };
 
 </script>

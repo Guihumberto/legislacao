@@ -20,7 +20,8 @@ export const useSearchStore = defineStore("searchStore", {
         async search(search){
             try {
                 this.load = true
-                const resp = await api.get('pages_v2/_search', {
+                this.results = []
+                const resp = await api.post('pages_v2/_search', {
                     query: {
                         "match": {
                             "text_page": search

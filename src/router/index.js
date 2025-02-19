@@ -36,6 +36,11 @@ const routes = [
         name: 'Chat Arcádio',
         component: () => import('@/views/Chatarcadio.vue'),
       },
+      {
+        path: '/chatarcadio/:id',
+        name: 'Chat',
+        component: () => import('@/views/Chatarcadio.vue'),
+      },
     ]
   }
 ]

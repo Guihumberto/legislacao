@@ -1,12 +1,12 @@
 <template>
     <v-system-bar app>
-      <v-btn variant="text" icon="mdi-menu" @click="drawer = !drawer"></v-btn>
+      <v-btn density="compact" variant="text" icon="mdi-menu" @click="drawer = !drawer"></v-btn>
         <v-spacer></v-spacer>
 
         <span class="font-weight-bold mr-2">Chat Arcádio</span>
         <v-icon>mdi-forum</v-icon>
 
-        <v-btn variant="text" @click="activeModDark" :icon="themeIcon"></v-btn>
+        <v-btn class="ml-5" density="compact" variant="text" @click="activeModDark" :icon="themeIcon"></v-btn>
     </v-system-bar>
     <v-navigation-drawer v-model="drawer" app>
       <v-sheet
