@@ -38,6 +38,11 @@ export const useDocumetStore = defineStore("document", {
                                         "active": true
                                     }
                                 },
+                                {
+                                    "term": {
+                                        "created_by": "01791743390"
+                                    }
+                                }
                             ]
                         }
                     }
