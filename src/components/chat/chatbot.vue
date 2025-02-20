@@ -1,32 +1,34 @@
 <template>
+    <div>
+        <h1 class="text-center text-h5">{{ $route.query.title }}</h1>
+    </div>
     <v-card class="chat-container" variant="outlined">
         <v-card-text class="chat-content" ref="chatContent">
-        <div
-            v-for="(msg, index) in messages"
-            :key="index"
-            :class="['message', msg.user === 'assistant' ? 'assistant' : 'user']"
-        >
-            <v-menu
-            open-on-hover
-            location="bottom"
+            <div
+                v-for="(msg, index) in messages"
+                :key="index"
+                :class="['message', msg.user === 'assistant' ? 'assistant' : 'user']"
             >
-            <template v-slot:activator="{ props }">
-                <div 
-                v-bind="props"
-                class="message-content" v-html="msg.content"></div>
-            </template>
-            <MenuUser :msg="msg" />
-            </v-menu>
-        </div>
-        <div v-if="load">
-            <v-skeleton-loader
-                :loading="load"
-                type="list-item-two-line"
-                width="500"
-            >
-            </v-skeleton-loader>
-        </div>
-        
+                <v-menu
+                open-on-hover
+                location="bottom"
+                >
+                <template v-slot:activator="{ props }">
+                    <div 
+                    v-bind="props"
+                    class="message-content" v-html="msg.content"></div>
+                </template>
+                <MenuUser :msg="msg" />
+                </v-menu>
+            </div>
+            <div v-if="searchStore.readLoad">
+                <v-skeleton-loader
+                    :loading="searchStore.readLoad"
+                    type="list-item-two-line"
+                    width="400"
+                >
+                </v-skeleton-loader>
+            </div>
         </v-card-text>
         
         <v-divider></v-divider>
@@ -51,7 +53,7 @@
 </template>
 
 <script setup>
-    import { ref, inject } from 'vue'
+    import { ref, inject, onMounted } from 'vue'
 
     import api from '@/services/api_hf'
 
@@ -59,6 +61,9 @@
     
     import { useSearchStore } from '@/store/SearchStore';
     const searchStore = useSearchStore()
+    
+    import { useRoute } from 'vue-router';
+    const route = useRoute()
 
     const theme = inject('theme')
     const load = ref(false)
@@ -76,25 +81,37 @@
     }
     
     const messages = ref([
-        { user: 'assistant', content: 'Olá! Como posso ajudar com a legislação hoje?' }
+        { user: '', content: '' }
     ])
 
+    onMounted(async () => {
+        const init = await searchStore.searchChatInit()
+        messages.value.push({ user: 'assistant', content: init })
+    })
+
     const newMessage = ref('')
-
-    const sendMessage = async () => {
-        if (newMessage.value.trim() !== '') {
-            messages.value.push({ user: 'user', content: newMessage.value })
-
-            const resp = await searchStore.search(newMessage.value)
-            const ask = newMessage.value
-            newMessage.value = ''
-            await chatArcadio(ask, resp.text_page)
-        }
-    }
+    const idChat = route.params?.id || null
 
     const contarTokens = (texto) => {
         const palavras = texto.split(/\s+/); // Divide por espaços
         return Math.round(palavras.length * 1.33); // Aproximadamente 1,33 tokens por palavra em português
+    }
+
+    const sendMessage = async () => {
+        if (newMessage.value.trim() !== '') {
+
+            messages.value.push({ user: 'user', content: newMessage.value })
+            const ask = newMessage.value
+            newMessage.value = ''
+
+            const resp = await searchStore.searchChatApi(ask, idChat)
+           
+            messages.value.push({ user: 'assistant', content: resp || "Sem resposta" }) //resp.data?.[0].generated_text 
+            nextTick()
+
+            // const resp = await searchStore.searchDirect(ask, idChat)
+            // await chatArcadio(ask, resp)
+        }
     }
 
     const chatArcadio = async (pergunta, contexto) => {
@@ -104,7 +121,8 @@
         if (contarTokens(contexto) <= 500) {
 
             const resp = await api.post('meta-llama/Meta-Llama-3-8B-Instruct', {
-                inputs: `Você é um assistente útil. Use o contexto abaixo para responder à pergunta do usuário de forma clara e objetiva. Contexto: ${contexto}\n\nPergunta: ${pergunta}\n\nResposta:`,
+                inputs: `Você é um assistente útil. Use o contexto abaixo para 
+                responder à pergunta do usuário de forma clara e objetiva. Contexto: ${contexto}\n\nPergunta: ${pergunta}\n\nResposta:`,
                 parameters: {
                   "max_new_tokens": 200,
                   "temperature": 0.5,
@@ -130,9 +148,9 @@
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 130px); /* Adjust based on toolbar height */
+    height: calc(100vh - 170px); /* Adjust based on toolbar height */
     width: 800px;
-    margin-top: 1rem;
+    margin: 1rem 0;
     transition: 1s ease;
     animation: fadeIn 1s ease-in-out forwards;
     opacity: 0;

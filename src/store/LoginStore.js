@@ -95,7 +95,10 @@ export const useLoginStore = defineStore("loginStore", {
             this.load = true
             this.listUsers = []
             try {
-                const response = await api.post('users/_search')
+                const response = await api.post('users/_search', {
+                    from: 0,
+                    size: 2000
+                })
                 const resp = response.data.hits.hits
                 const users = resp.map(x => ({
                         id: x._id,

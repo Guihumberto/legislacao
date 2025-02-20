@@ -11,6 +11,9 @@
 
     import { useCollectionStore } from '@/store/CollectionStore';
     const collectionStore = useCollectionStore()
+    
+    import { useDocumetStore } from '@/store/DocumentStore';
+    const documentStore = useDocumetStore()
 
 
     import { computed, onMounted, watch } from 'vue';
@@ -22,8 +25,9 @@
         return route.params.id
     })
 
-    onMounted(()=> {
-        if(collectionSelected.value) loadCollection()
+    onMounted(async ()=> {
+        await documentStore.getListDocuments()
+        if(collectionSelected.value) await loadCollection()
     })
 
     const loadCollection = async ()=> await collectionStore.getChatWithCollection(collectionSelected.value)
@@ -31,6 +35,8 @@
     watch(collectionSelected, (newValue, oldValue ) => {
         if(newValue) loadCollection()
     })
+
+
 </script>
 
 <style scoped>

@@ -1,30 +1,35 @@
 <template>
-     <h1 class="my-4 text-h5 text-center text-red">Escolha uma coleção para fazer perguntas</h1>
-     <div id="cards">
-      <div class="card" v-for="item, i in list" :key="i" @click="$router.push(`/chatarcadio/${item.id}`)">
+     <Loading v-if="documetStore.readLoad" />
+     <h1 v-else class="title text-h5">Escolha uma coleção para fazer perguntas</h1>
+     <div id="cards" v-if="!documetStore.readLoad">
+      <div class="card" v-for="item, i in documetStore.readDocuments" :key="i" @click="$router.push(`/chatarcadio/${item.id}?title=${item.title}`)">
         <div class="card-border"></div>
         <div class="card-content" :class="theme == 'dark' ? '': 'bg-white border'">
           <div class="img">
-            <v-icon color="grey" size="80">{{item.icon}}</v-icon>
+            <v-icon color="grey" size="80">mdi-link-variant</v-icon>
           </div>
           <div class="wrappercontent">
             <div class="mt-3 text-center w-100">
-              <h3 class="d-flex justify-center align-center">
-                  {{item.name}}
+              <h3 class="d-flex justify-center align-center mb-1">
+                  {{item.title}}
               </h3>
-              <p class="font-weight-thin text-grey">{{ item.text }}</p>
+              <p class="font-weight-thin text-grey">{{ item.pages[0].name_law.toLowerCase() }} e mais</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="mt-5 mb-15">
+    <div class="mt-5 mb-15 title" v-if="!documetStore.readLoad" >
       <v-btn>Ver Mais</v-btn>
     </div>
 </template>
 
 <script setup>
     import { onMounted, ref, inject } from 'vue';
+    
+    import { useDocumetStore } from '@/store/DocumentStore';
+    import Loading from './loading.vue';
+    const documetStore = useDocumetStore()
 
     const theme = inject('theme')
 
@@ -53,6 +58,14 @@
 </script>
 
 <style lang="scss" scoped>
+.title{
+  margin: 1rem 0;
+  text-align: center;
+  color: red;
+  transition: 1s ease;
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+}
 #cards{
   width: min(100%, 916px);
   margin-inline: auto;
@@ -62,6 +75,7 @@
   gap: .5rem;
   transition: 1s ease;
   animation: fadeIn 1s ease-in-out forwards;
+  animation-delay: 1s;
   opacity: 0;
 }
 

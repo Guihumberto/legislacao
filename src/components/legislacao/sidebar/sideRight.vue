@@ -18,7 +18,7 @@
                 </v-tabs>
             </h3>
             <div v-if="tab == 1">
-                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="generalStore.removeAll()" color="red" variant="text">Apagar tudo</v-btn>
+                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
                 <div class="content">
                     <v-card 
                         elevation="0" 
@@ -67,6 +67,30 @@
             </div>
         </div>
     </div>
+    <v-dialog
+        v-model="dialog"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-delete"
+          text="Isso excluíra todos os registros da sua busca desde o início."
+          title="Excluir tudo"
+        >
+          <template v-slot:actions>
+            <div class="d-flex justify-end w-100 ga-2">
+                <v-btn  @click="dialog = false">cancelar</v-btn>
+                <v-btn
+                  variant="tonal"
+                  color="red"
+                  text="Excluir"
+                  @click="confirmRemoveAll()"
+                ></v-btn>
+            </div>
+          </template>
+        </v-card>
+      </v-dialog>
+
 </template>
 <script setup>
     import { ref, computed, watch } from 'vue'
@@ -82,7 +106,7 @@
 
     const tab = ref(1)
 
-    
+    const dialog = ref(false)
 
     const listSearchReduzida = computed(() => {
             const list = generalStore.readListStore
@@ -116,6 +140,15 @@
     const copyText = (item) => {
         navigator.clipboard.writeText(item.texto_selected);
         snackStore.activeSnack('Texto copiado', 'primary')
+    }
+
+    const removeAll = () => {
+        dialog.value = true
+    }
+
+    const confirmRemoveAll = () => {
+        generalStore.removeAll()
+        dialog.value = false
     }
         
 </script>
