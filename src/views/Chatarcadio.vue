@@ -45,8 +45,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    max-width: 1080px;
+    width: 100%;
+    height: calc(100vh - 140px);
     margin-inline: auto;
 }
-
 </style>

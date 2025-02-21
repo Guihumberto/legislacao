@@ -5,19 +5,30 @@
         </div>
         <section-search/>
         <div class="sidebar-right">
-            <side-right />
+            <side-right type="screen" />
         </div>
+        <v-navigation-drawer 
+            location="right"
+            v-model="geralStore.readDrawerHistory"
+            temporary
+        >
+            <side-right type="drawer" />
+        </v-navigation-drawer>
     </div>
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, inject } from 'vue'
 
     import SectionSearch from '@/components/legislacao/search.vue';
     import sideLeft from '@/components/legislacao/sidebar/sideLeft'
     import sideRight from '@/components/legislacao/sidebar/sideRight'
+    
+    import { useGeralStore } from '@/store/GeralStore';
+    const geralStore = useGeralStore()
 
     const large = ref(true)
+    const drawerHistory = inject('drawerHistory')
 
     const largeSidebar = () => {
         large.value = !large.value

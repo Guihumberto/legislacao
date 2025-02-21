@@ -18,6 +18,7 @@
             :icon="geralStore.readHeaderShow ? 'mdi-chevron-down' :'mdi-chevron-right'">
           </v-btn>
           <!-- <v-icon @click="dark = !dark" size="small">{{ dark ? 'mdi-brightness-3' : 'mdi-brightness-4'}}</v-icon> -->
+          <v-app-bar-nav-icon class="historico" density="compact" variant="text" @click.stop="geralStore.changeDrawerHistory"></v-app-bar-nav-icon>
         </div>
       </div>
     </div>
@@ -72,7 +73,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, onBeforeUnmount } from 'vue'
+  import { ref, onMounted, onBeforeUnmount, provide } from 'vue'
   import sidebarleft from '@/components/legislacao/sidebar/sideLeft.vue'
   import MenuBar from '@/components/dialogs/menuBar.vue'
   import loginInfo from '@/components/partiaslLayout/userInfoLogin.vue'
@@ -90,7 +91,8 @@
   const dark = ref(false) 
   const menu = ref(false) 
   const drawer = ref(false) 
-  const drawer2 = ref(false) 
+  const drawer2 = ref(false)   
+  
   
   const changeHeaderShow = () => {
       deslocarTela()
@@ -277,6 +279,9 @@ header .container {
 .search.activeSearch{
   transform: scaleY(1);
 }
+.historico{
+  display: none;
+}
 @media (max-width:500px) {
   .gov{
     display: none;
@@ -301,6 +306,9 @@ header .container {
 @media (max-width: 1600px){
     .btn-side-bar{
       display: flex;
+    }
+    .historico{
+      display: block;
     }
 }
 

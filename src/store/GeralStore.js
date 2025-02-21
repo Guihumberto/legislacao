@@ -5,6 +5,7 @@ export const useGeralStore = defineStore("geral", {
     search: false,
     menuSide: false,
     headerShow: true,
+    drawerHistory: false,
     titleApp: {title:'Legislação', to: '/' }
   }),
   getters: {
@@ -19,6 +20,9 @@ export const useGeralStore = defineStore("geral", {
     },
     readHeaderShow(){
       return this.headerShow
+    },
+    readDrawerHistory(){
+      return this.drawerHistory
     }
   },
   actions:{
@@ -39,6 +43,9 @@ export const useGeralStore = defineStore("geral", {
     },
     changeHeaderNoShow(value){
       this.headerShow = value
+    },
+    changeDrawerHistory(value){
+      this.drawerHistory = !this.drawerHistory
     }
   }
 });

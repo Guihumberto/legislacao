@@ -4,8 +4,9 @@
             <v-btn variant="text" 
             class="btnHidden ma-1" color="black" icon="mdi-chevron-left"></v-btn>
         </div>
-        <div class="sideRight w-100" v-if="showBar && generalStore.readListStore.length">
-            <v-btn variant="text"  @click="showBar = false" class="btnHidden mb-2" color="grey">Ocultar</v-btn>
+        <div class="w-100" :class="type == 'screen' ? 'sideRight':'sideRightD'" v-if="showBar && generalStore.readListStore.length">
+            <v-btn variant="text"  @click="showBar = false" class="btnHidden mb-2" color="grey" v-if="type == 'screen'">Ocultar</v-btn>
+            <v-btn variant="text"  @click="geralStore.drawerHistory = false" class="btnHidden mb-2" color="grey" v-if="type == 'drawer'">Fechar</v-btn>
             <h3 class="d-flex justify-space-between align-center"> 
                 <v-tabs
                     v-model="tab"
@@ -89,7 +90,7 @@
             </div>
           </template>
         </v-card>
-      </v-dialog>
+    </v-dialog>
 
 </template>
 <script setup>
@@ -100,6 +101,13 @@
 
     import { useSnackStore } from '@/store/snackStore';
     const snackStore = useSnackStore()
+    
+    import { useGeralStore } from '@/store/GeralStore';
+    const geralStore = useGeralStore()
+
+    const props = defineProps({
+        type: String
+    })
 
     const router = useRouter()
     const showBar =  ref(true)
@@ -153,7 +161,7 @@
         
 </script>
 <style scoped>
-.sideRight{
+.sideRight, .sideRightD{
     background: rgb(235, 233, 233);
     padding: .5rem;
     transition: 1s ease;
@@ -165,7 +173,7 @@
 }
 .content{
     overflow-y: auto;
-    height: 75vh;
+    height: 100vh;
 }
 @keyframes slideLeft {
     0%{
