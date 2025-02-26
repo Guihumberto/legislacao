@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="mt-5 mb-15 title" v-if="!documetStore.readLoad" >
-      <v-btn>Ver Mais</v-btn>
+      <v-btn disabled>Ver Mais</v-btn>
     </div>
 </template>
 

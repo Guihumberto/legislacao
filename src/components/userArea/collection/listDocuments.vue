@@ -8,7 +8,9 @@
                     :title="item.title" 
                     link
                     :subtitle="resumo(item.pages)"
-                    v-for="item, i in userAreaStore.readDocumentos" :key="i">
+                    v-for="item, i in userAreaStore.readDocumentos" :key="i"
+                    class="border-b"
+                >
                     <template v-slot:prepend>
                         <v-icon>
                             mdi-text-box-multiple-outline
@@ -18,6 +20,16 @@
                     <template v-slot:append>
                         <OptionsDoc :document="item" />
                     </template>
+                    <div class="ml-3">
+                        <v-switch
+                            label="Publicar"
+                            hide-details
+                            color="success"
+                            v-model="item.publish"
+                            @update:model-value="pusblishDocument(item)"
+                            density="compact"
+                        ></v-switch>
+                    </div>
                 </v-list-item>
                 <v-alert v-else type="warning" variant="outlined" text="Não há documentos salvos."></v-alert>
                 <v-pagination
@@ -34,6 +46,9 @@
 <script setup>
     import { onMounted, watch } from 'vue';
 
+    import { useDocumetStore } from '@/store/DocumentStore';
+    const documentStore = useDocumetStore()
+
     import { useRoute, useRouter } from 'vue-router';
     const router = useRouter()
     const route = useRoute()
@@ -42,11 +57,16 @@
     import loading from './../load.vue';
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
+
     const userAreaStore = useUserAreaStore()
 
     const resumo = (item) => {
         const res = item.map(x => x.name_law)
         return res.join(", ")
+    }
+
+    const pusblishDocument = async (item) => {
+        await documentStore.publishDocument(item)
     }
 
     watch(

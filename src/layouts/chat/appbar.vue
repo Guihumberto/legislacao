@@ -30,6 +30,7 @@
           :prepend-icon="icon"
           :title="text"
           link
+          to="/"
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -56,7 +57,7 @@
   })
 
   const links = [
-    ['mdi-inbox-arrow-down', 'Histórico'],
+    ['mdi-arrow-left', 'Legisação',],
   ]
 </script>
 

@@ -5,6 +5,7 @@
               <!-- index das paginas -->
                 <div class="border pa-5 mt-2" id="top">
                   <h2> {{ docs.title }}</h2>
+                  <small>id: {{ docs.id }}</small>
                   <div class="py-5">
                     <v-list>
                       <v-list-item 

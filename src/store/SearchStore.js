@@ -101,7 +101,6 @@ export const useSearchStore = defineStore("searchStore", {
             } finally {
                 this.load = false
             }
-           
         }
     }
 })

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import api from "@/services/api";
+import apiChat from "@/services/api_chat"
 
 export const useDocumetStore = defineStore("document", {
     state: () => ({
@@ -39,8 +40,13 @@ export const useDocumetStore = defineStore("document", {
                                     }
                                 },
                                 {
+                                    "terms": {
+                                        "created_by": ["01791743390", "04634958457"]
+                                    }
+                                },
+                                {
                                     "term": {
-                                        "created_by": "01791743390"
+                                        "publish": true
                                     }
                                 }
                             ]
@@ -62,6 +68,56 @@ export const useDocumetStore = defineStore("document", {
                 console.log('Erro ao carregar coleções do chatbot',);
             } finally {
                 this.load = false
+            }
+        },
+        async publishDocument(item){
+            try {
+                this.load = true
+
+                if(item.publish){
+                    const exist = await this.isEmbeddingExist(item.id)
+                    if(!exist) this.saveEmbeddings(item.id)
+                }
+                    
+                const response = await api.post(`documents/_update/${item.id}`, {
+                    "doc":{
+                        publish: item.publish
+                    }
+                })
+                console.log('salvo', response.data);
+            } catch (error) {
+                console.log('Erro ao salvar e publicar',);
+            } finally {
+                this.load = false
+            }
+        },
+        async isEmbeddingExist(id){
+            try {
+                this.load = true
+                const response = await api.post('document_embeddings/_search', {
+                    query:{
+                        match:{
+                            id: id
+                        }
+                    }
+                })
+                const resp = response.data.hits.total.value
+               return resp
+            } catch (error) {
+                console.log('Erro ao verificar a existencia do embedding',);
+            } finally {
+                this.load = false
+            }
+        },
+        async saveEmbeddings(id){
+            try {
+                const resp = await apiChat.post('save-embeddings', {
+                    id: id
+                })
+                return resp.data
+
+            } catch (error) {
+                console.log('erro ao criar embeddings');
             }
         }
     },

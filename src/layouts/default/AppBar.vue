@@ -45,7 +45,7 @@
             </ul>
           </nav>
           <div class="btn_group">    
-            <v-btn variant="flat" title="E-MAIL" icon="mdi-email" class="gov mr-2"></v-btn>
+            <v-btn variant="flat" title="chat arcadio" icon="mdi-chat" class="mr-1" @click="linkTo()"></v-btn>
             <loginInfo :isLogin="!loginStore.readLogin.cpf" :flutuante="false" />   
           </div>
         </div>
@@ -116,6 +116,10 @@
         menu.value = false
       }, 1000);
     }  
+  }
+
+  const linkTo = () => {
+    window.open('https://legislacao.estudodalei.com.br/chatarcadio', '_blank');
   }
     
   setTimeout(() => {
