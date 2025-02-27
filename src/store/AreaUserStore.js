@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import abackapi from "@/services/abackapi";
+import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "./LoginStore";
 import { useGeneralStore } from "./GeneralStore";
@@ -15,6 +16,8 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         documentos: [],
         collection: [],
         load: false,
+        loadLocal: false,
+        loadSaveEmbbeding: false,
         temp: {},
         pagination:{
             page: 1, 
@@ -80,6 +83,12 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
         },
         readLoad(){
             return this.load
+        },
+        readLoadLocal(){
+            return this.loadLocal
+        },
+        readLoadSaveEmbbeding(){
+            return this.loadSaveEmbbeding
         },
         readPagination(){
             return this.pagination
@@ -445,8 +454,14 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             }           
         },
         async editCollection(item){
-            this.load = true
-            const objeto = (({ id, ...rest }) => rest)(item);
+            this.loadLocal = true
+            const objeto = (({ id, ...rest }) => rest)(item)
+
+            if (item.publish) {
+                const isExistEmbedding = await this.isEmbeddingExist(item.id)
+                if(!isExistEmbedding) this.saveEmbbedings(item);
+            }
+
             try {
                 const response = await api.post(`collection/_doc/${item.id}`, objeto)
                 this.collection = this.collection.filter(x =>
@@ -456,7 +471,40 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
             } catch (error) {
                 console.log('erro ao editar collection');
             } finally {
-                this.load = false
+                this.loadLocal = false
+            }
+        },
+        async isEmbeddingExist(id){
+            try {
+                const response = await api.post('document_embeddings/_search', {
+                    query:{
+                        match:{
+                            id: id
+                        }
+                    }
+                })
+                const resp = response.data.hits.total.value
+                return resp
+            } catch (error) {
+                console.log('Erro ao verificar a existencia do embedding',);
+            }
+        },
+        async saveEmbbedings(item){
+           this.loadSaveEmbbedings = true
+            const ids =item.laws.map(x => x.id)
+            try {
+                const resp = await apiChat.post('save-collection-embeddings', {
+                    ids: ids,
+                    title: item.title,
+                    id: item.id
+                })
+                if(resp.data){
+                    console.log('Embedding criado com sucesso', resp.data);
+                    this.loadSaveEmbbedings = false
+                }
+                return resp.data
+            } catch (error) {
+                console.log('erro ao criar embeddings');
             }
         },
         async getCollection(){

@@ -26,6 +26,7 @@
                                     <v-switch 
                                         v-bind="props"
                                         color="success" 
+                                        :loading="userAreaStore.readLoadLocal"
                                         @update:model-value="editIdCollection(item)" v-model="item.publish" hide-details label="Publicar">
                                     </v-switch>
                                 </template>
@@ -79,6 +80,7 @@
                  v-if="userAreaStore.readCollection.length"
         ></v-pagination>
         <v-alert class="mt-5" v-if="!userAreaStore.readCollection.length" type="warning" variant="outlined" text="Não há coleção de normas salvas."></v-alert> 
+        <LoadEmbbedings />
     </div>
 </template>
 <script setup>   
@@ -88,6 +90,7 @@
     import { useDateNow } from '@/composables/dateFormat';
 
     import loading from './../load.vue';
+    import LoadEmbbedings from './loadEmbbedings.vue';
     
     const userAreaStore = useUserAreaStore()
     const router = useRouter()
@@ -136,6 +139,10 @@
             // userAreaStore.getCollection()
         }
     })
+
+    
+
+    provide('dialog', userAreaStore.readLoadSaveEmbbeding)
 
 </script>
 <style scoped>

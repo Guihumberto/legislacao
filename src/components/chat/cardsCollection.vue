@@ -1,19 +1,17 @@
 <template>
-     <Loading v-if="documetStore.readLoad" />
-     <h1 v-else class="title text-h5">Escolha um tema para fazer perguntas</h1>
-     <div id="cards" v-if="!documetStore.readLoad">
-      <div class="card" v-for="item, i in documetStore.readDocuments" :key="i" @click="$router.push(`/chatarcadio/${item.id}?title=${item.title}`)">
+     <div id="cards" v-if="!collectionStore.readLoad" class="mt-2">
+      <div class="card" v-for="item, i in collectionStore.readCollections" :key="i" @click="$router.push(`/chatarcadio/${item.id}?title=${item.title}`)">
         <div class="card-border"></div>
         <div class="card-content" :class="theme == 'dark' ? '': 'bg-white border'">
           <div class="img">
-            <v-icon color="grey" size="80">mdi-link-variant</v-icon>
+            <v-icon color="grey" size="80" class="mt-2">mdi-text-box-multiple</v-icon>
           </div>
           <div class="wrappercontent">
             <div class="mt-3 text-center w-100">
               <h3 class="d-flex justify-center align-center mb-1">
                   {{item.title}}
               </h3>
-              <p class="font-weight-thin text-grey">{{ item.pages[0].name_law.toLowerCase() }} e mais</p>
+              <!-- <p class="font-weight-thin text-grey">{{ item.pages[0].name_law.toLowerCase() }} e mais</p> -->
             </div>
           </div>
         </div>
@@ -22,11 +20,10 @@
 </template>
 
 <script setup>
-    import { onMounted, inject } from 'vue';
-    
-    import { useDocumetStore } from '@/store/DocumentStore';
-    import Loading from './loading.vue';
-    const documetStore = useDocumetStore()
+    import { onMounted, ref, inject } from 'vue';
+
+    import { useCollectionStore } from '@/store/CollectionStore';
+    const collectionStore = useCollectionStore()
 
     const theme = inject('theme')
 
@@ -42,6 +39,7 @@
             };
         }
     })
+
 
 </script>
 

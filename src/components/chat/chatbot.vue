@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <h1 class="text-center text-h5">{{ $route.query.title }}</h1>
-    </div>
     <section>
+        <div class="d-flex justify-space-between align-center w-100">
+            <v-btn variant="text" @click="$router.push('/chatarcadio')" icon="mdi-arrow-left"></v-btn>
+            <h1 class="text-center text-h5">{{ $route.query.title }}</h1>
+            <v-btn disabled variant="text" icon="mdi-information"></v-btn>
+        </div>
         <v-card class="chat-container" variant="outlined">
             <v-card-text class="chat-content" ref="chatContent">
                 <div
@@ -153,7 +155,7 @@
 <style scoped>
 section{
     width: min(1080px, 100%);
-    height: 100%;
+    height: 90%;
     margin-inline: auto;
 }
 .chat-container {

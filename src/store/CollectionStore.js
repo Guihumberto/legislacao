@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import abackapi from "@/services/abackapi";
+import api from "@/services/api";
 
 export const useCollectionStore = defineStore("collection", {
     state: () => ({
@@ -42,11 +43,33 @@ export const useCollectionStore = defineStore("collection", {
                 this.load = false
             }
         },
-        async getChatWithCollection(item){
+        async getChatWithCollection(){
             try {
                 this.load = true
+                const response = await api.post('collection/_search', {
+                    from: this.pagination.start,
+                    size: this.pagination.perPage,
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    "term": {
+                                        "active": true
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "publish": true
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                const resp = response.data.hits.hits
+                this.collections = resp.map( x => ({id: x._id, ...x._source}))
             } catch (error) {
-                console.log('Erro ao carregar coleções do chatbot',);
+                console.log('Erro ao carregar documents activs',);
             } finally {
                 this.load = false
             }

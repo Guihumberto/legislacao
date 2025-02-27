@@ -40,11 +40,6 @@ export const useDocumetStore = defineStore("document", {
                                     }
                                 },
                                 {
-                                    "terms": {
-                                        "created_by": ["01791743390", "04634958457"]
-                                    }
-                                },
-                                {
                                     "term": {
                                         "publish": true
                                     }
@@ -93,7 +88,6 @@ export const useDocumetStore = defineStore("document", {
         },
         async isEmbeddingExist(id){
             try {
-                this.load = true
                 const response = await api.post('document_embeddings/_search', {
                     query:{
                         match:{
@@ -105,8 +99,6 @@ export const useDocumetStore = defineStore("document", {
                return resp
             } catch (error) {
                 console.log('Erro ao verificar a existencia do embedding',);
-            } finally {
-                this.load = false
             }
         },
         async saveEmbeddings(id){

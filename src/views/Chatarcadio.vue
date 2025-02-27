@@ -1,12 +1,16 @@
 <template>
     <div class="container">
-        <Cards v-if="!collectionSelected" />
+        <div  v-if="!collectionSelected" >
+            <Cards />
+            <CardsCollection />
+        </div>
         <Chatbot v-else />
     </div>
 </template>
 
 <script setup>
     import Cards from '@/components/chat/cards.vue';
+    import CardsCollection from '@/components/chat/cardsCollection.vue';
     import Chatbot from '@/components/chat/chatbot.vue';
 
     import { useCollectionStore } from '@/store/CollectionStore';
@@ -27,6 +31,7 @@
 
     onMounted(async ()=> {
         await documentStore.getListDocuments()
+        await collectionStore.getChatWithCollection()
         if(collectionSelected.value) await loadCollection()
     })
 
@@ -46,7 +51,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: calc(100vh - 140px);
+    min-height: calc(100vh - 140px);
     margin-inline: auto;
 }
 </style>

@@ -18,19 +18,19 @@
           size="64"
         ></v-avatar>
 
-        <div>leges.estudo@gmail.com</div>
+        <div>Chat Arcádio</div>
       </v-sheet>
 
       <v-divider></v-divider>
 
       <v-list>
         <v-list-item
-          v-for="[icon, text] in links"
+          v-for="[icon, text, link] in links"
           :key="icon"
           :prepend-icon="icon"
           :title="text"
           link
-          to="/"
+          :to="link"
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -57,7 +57,8 @@
   })
 
   const links = [
-    ['mdi-arrow-left', 'Legisação',],
+    ['mdi-home', 'Início', '/chatarcadio'],
+    ['mdi-text-box', 'Legisação', '/'],
   ]
 </script>
 
