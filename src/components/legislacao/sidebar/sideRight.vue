@@ -21,14 +21,45 @@
             <div v-if="tab == 1">
                 <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
                 <div class="content">
-                    <v-card 
+                    <div v-for="item, i in listSearchReduzida" :key="i" class="mb-2">
+                        <small>{{ i }}</small>
+                        <v-card 
+                            elevation="0" 
+                            v-for="search, x in item" :key="x"
+                            hover
+                            class="mb-1"
+                            @click="searchAgain(search, x)"
+                        >
+                            
+                            <v-card-text class="pa-2 d-flex align-center justify-space-between">
+                                {{ search.text }}
+                                <v-icon @click.stop="generalStore.removeListSearch(x)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
+                            </v-card-text>
+                            <v-tooltip
+                                activator="parent"
+                                location="start"
+                                width="200"
+                            >
+                                Texto: {{search.text}} <br>
+                                <div v-if="search.termo" v-text="search.termo == 1 ? 'Termo: Frase Exata':'Termo: Qualquer palavra'"></div>
+                                <v-chip-group>
+                                    <v-chip v-if="search.years.length" v-for="ano, a in search.years" :key="a">{{ano}}</v-chip>
+                                </v-chip-group>
+                                <v-chip-group>
+                                    <v-chip v-if="search.fonte.length" v-for="fonte, f in search.fonte" :key="f">{{fonte}}</v-chip>
+                                </v-chip-group>
+                            </v-tooltip>
+                        </v-card>
+                    </div>
+        
+                    <!-- <v-card 
                         elevation="0" 
                         v-for="item, i in listSearchReduzida" :key="i" 
                         class="mb-1" hover 
                         @click="searchAgain(item, i)">
                         <v-card-text class="pa-2 d-flex align-center justify-space-between">
                             <div>
-                                {{ item.text }}
+                                {{ item.text }} {{ useDateNow(item.date) }}
                                 <v-icon size="small" color="success" v-if="item.precision" title="precisão">mdi-check</v-icon>
                             </div>
                             <v-icon @click.stop="generalStore.removeListSearch(i)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
@@ -47,7 +78,8 @@
                         </v-chip-group>
                         <div v-if="item.precision">com precisão</div>
                     </v-tooltip>
-                    </v-card>
+                    </v-card> -->
+                    
                 </div>
             </div>
             <div v-if="tab == 2">
@@ -99,6 +131,7 @@
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
 
+   
     import { useSnackStore } from '@/store/snackStore';
     const snackStore = useSnackStore()
     
@@ -124,8 +157,35 @@
                 ))
             );
 
-            return uniqueList
+            return groupByDate(uniqueList)
     })
+
+    const groupByDate = (history) => {
+        const today = new Date().toISOString().split('T')[0]; // Data de hoje em "YYYY-MM-DD"
+
+        const grouped = history.reduce((acc, item) => {
+        const date = new Date(item.date);
+        const formattedDate = date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+        const label = formattedDate === today ? "Hoje" : formattedDate.split('-').reverse().join('/'); // "DD/MM/YYYY"
+
+        if (!acc[label]) {
+            acc[label] = [];
+        }
+
+        acc[label].push(item);
+        return acc;
+        }, {});
+
+        // Ordena as chaves, mantendo "Hoje" no topo se existir
+        return Object.fromEntries(
+            Object.entries(grouped).sort(([a], [b]) => {
+                if (a === "Hoje") return -1;
+                if (b === "Hoje") return 1;
+                return b.localeCompare(a); // Ordena do mais recente para o mais antigo
+            })
+        );
+    }
 
     const areadeTransferencia = computed(() => {
         const list = generalStore.readAreaTransferencia.map(x => x)
@@ -141,8 +201,7 @@
     });
     
     const searchAgain = (item, i) => {
-        generalStore.reqChange(true, i)
-        router.push(`leges?search=${item.text}&years=${item.years}&fonte=${item.fonte}&termo=${item.termo}&precision=${item.precision}`)
+        generalStore.reqChange(true, i, item)
     }
 
     const copyText = (item) => {
@@ -173,7 +232,7 @@
 }
 .content{
     overflow-y: auto;
-    height: 100vh;
+    height: 70vh;
 }
 @keyframes slideLeft {
     0%{

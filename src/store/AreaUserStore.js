@@ -265,7 +265,8 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                         years: x.years,
                         fonte: x.sources,
                         termo: x.termos,
-                        precision: x.precision
+                        precision: x.precision,
+                        date: x.date
                     }
                     generalStore.addListSearch(search);
                 })

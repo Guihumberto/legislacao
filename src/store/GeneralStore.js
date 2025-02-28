@@ -21,7 +21,7 @@ export const useGeneralStore = defineStore("General", {
     }),
     getters: {
         readListStore(){
-            return this.listSearch
+            return this.listSearch.sort(useOrderBy('date', false))
         },
         readListReduzida(){
             const list = this.listSearch.map(x => x.text)
@@ -72,13 +72,17 @@ export const useGeneralStore = defineStore("General", {
     },
     actions:{
         addListSearch(item){
+            if(!item?.date) item.date = Date.now()
             let search = { ...item }
             this.listSearch.unshift(search)
         },
-        reqChange(item, i){
+        reqChange(item, i, search = null){
             this.req = item
-            this.search = this.listSearch[i]
-
+            if(search){
+                this.search = search
+            } else {
+                this.search = this.listSearch[i]
+            }     
         },
         reqChangeFromSelectSearch(item, i){
             const objeto = {

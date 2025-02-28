@@ -30,7 +30,7 @@
                                             v-if="!getAutosuggestion.length"
                                             :active="i == focusedIndex"
                                              @click="includeTextSearchAutoSuggest(item)"
-                                             density="compact" link v-for="item, i in generalStore.readListReduzida" :key="item"
+                                             density="compact" link v-for="item, i in generalStore.readListReduzida.slice(0, 5)" :key="item"
                                         >
                                             <template v-slot:prepend>
                                                 <v-icon>
