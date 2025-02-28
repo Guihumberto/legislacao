@@ -11,8 +11,8 @@
         <v-card
           max-width="400"
           prepend-icon="mdi-update"
-          text="Isso excluíra definiticamente este registro da sua busca."
-          title="Excluir Registro"
+          text="Isso excluíra todos os registros da sua busca desde o início."
+          title="Excluir tudo"
         >
           <template v-slot:actions>
             <v-btn @click="dialog = false">cancelar</v-btn>

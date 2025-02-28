@@ -261,6 +261,7 @@ export const useUserAreaStore = defineStore("userAreaStoe", {
                 this.historico = data.map(x => ({idu: x._id, ...x._source}))
                 this.historico.forEach(x => {
                     const search = {
+                        id: x.idu,
                         text: x.text_search,
                         years: x.years,
                         fonte: x.sources,

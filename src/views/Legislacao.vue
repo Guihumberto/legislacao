@@ -28,7 +28,7 @@
     const geralStore = useGeralStore()
 
     const large = ref(true)
-    const drawerHistory = inject('drawerHistory')
+    // const drawerHistory = inject('drawerHistory')
 
     const largeSidebar = () => {
         large.value = !large.value

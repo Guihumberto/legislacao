@@ -19,7 +19,8 @@
                 </v-tabs>
             </h3>
             <div v-if="tab == 1">
-                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida.length > 1" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
+                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
+                <!-- {{ Object.keys(listSearchReduzida).length }} -->
                 <div class="content">
                     <div v-for="item, i in listSearchReduzida" :key="i" class="mb-2">
                         <small>{{ i }}</small>
@@ -33,7 +34,7 @@
                             
                             <v-card-text class="pa-2 d-flex align-center justify-space-between">
                                 {{ search.text }}
-                                <v-icon @click.stop="generalStore.removeListSearch(x)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
+                                <v-btn @click.stop="removeItem(search)" density="compact" variant="text" color="red" icon="mdi-delete"></v-btn> 
                             </v-card-text>
                             <v-tooltip
                                 activator="parent"
@@ -100,6 +101,7 @@
             </div>
         </div>
     </div>
+
     <v-dialog
         v-model="dialog"
         width="auto"
@@ -110,14 +112,50 @@
           text="Isso excluíra todos os registros da sua busca desde o início."
           title="Excluir tudo"
         >
+        <v-alert type="warning" class="mx-2" text="Não é possível reverter a operação."></v-alert>
+        <div class="ml-6 mb-5" v-if="historyStore.readLoad">
+            Aguarde...
+        </div>
           <template v-slot:actions>
-            <div class="d-flex justify-end w-100 ga-2">
+            <div class="d-flex justify-end w-100 ga-2 mt-5">
                 <v-btn  @click="dialog = false">cancelar</v-btn>
                 <v-btn
                   variant="tonal"
                   color="red"
                   text="Excluir"
                   @click="confirmRemoveAll()"
+                  :disabled="historyStore.readLoad"
+                  :loading="historyStore.readLoad"
+                ></v-btn>
+            </div>
+          </template>
+        </v-card>
+    </v-dialog>
+
+    <!-- remover item -->
+    <v-dialog
+        v-model="dialogItem"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          prepend-icon="mdi-delete"
+          text="Desja excluir o registro abaixo do seu histórico definitivamente."
+          title="Excluir Registro"
+        >
+            <div class="ml-6 mb-5">
+                <p class="font-weight-bold" v-html="itemRemove.text"></p>
+            </div>
+          <template v-slot:actions>
+            <div class="d-flex justify-end w-100 ga-2">
+                <v-btn  @click="dialogItem = false">cancelar</v-btn>
+                <v-btn
+                  variant="tonal"
+                  color="red"
+                  text="Excluir"
+                  @click="confirmRemoveItem()"
+                  :disabled="historyStore.readLoad"
+                  :loading="historyStore.readLoad"
                 ></v-btn>
             </div>
           </template>
@@ -131,11 +169,15 @@
     import { useGeneralStore } from '@/store/GeneralStore'
     const generalStore = useGeneralStore()
 
+    import { useHistoryStore } from '@/store/HistoryStore'
+    const historyStore = useHistoryStore()
+
    
     import { useSnackStore } from '@/store/snackStore';
     const snackStore = useSnackStore()
     
     import { useGeralStore } from '@/store/GeralStore';
+
     const geralStore = useGeralStore()
 
     const props = defineProps({
@@ -148,6 +190,8 @@
     const tab = ref(1)
 
     const dialog = ref(false)
+    const dialogItem = ref(false)
+    const itemRemove = ref(null)
 
     const listSearchReduzida = computed(() => {
             const list = generalStore.readListStore
@@ -210,12 +254,26 @@
     }
 
     const removeAll = () => {
+        dialogItem.value = false
         dialog.value = true
     }
 
-    const confirmRemoveAll = () => {
+    const confirmRemoveAll = async () => {
+        await historyStore.removeAll()
         generalStore.removeAll()
         dialog.value = false
+    }
+
+    const removeItem = (item) => {
+        itemRemove.value = {...item}
+        dialog.value = false
+        dialogItem.value = true
+    }
+
+    const confirmRemoveItem = async () => {
+        await historyStore.removeItem(itemRemove.value)
+        generalStore.removeListSearch(itemRemove.value.id)
+        dialogItem.value = false
     }
         
 </script>

@@ -109,7 +109,7 @@ export const useGeneralStore = defineStore("General", {
             this.search = objeto
         },
         removeListSearch(item){
-            this.listSearch.splice(item, 1)
+            this.listSearch = this.listSearch.filter(x => x.id != item)
         },
         removeAll(){
             this.listSearch = []
