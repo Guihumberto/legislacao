@@ -131,7 +131,7 @@ export const usePageStore = defineStore("page", {
                     }
                 })
                 const resp = response.data.hits.hits
-                return { total_pages: response.data.hits.total.value,  data: resp.map( x => x._source)}
+                return { total_pages: response.data.hits.total.value,  data: resp.map( x => ({ id: x._id, ...x._source}))}
             } catch (error) {
                 console.log('error');
             } finally {

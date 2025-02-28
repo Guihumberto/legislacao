@@ -440,8 +440,8 @@
                                     </div>
                                     <v-expand-transition>
                                         <resumoSearch 
-                                        v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="res._source" 
-                                        :searchP="search.text"  />
+                                            v-if="viewPreview" :id="res._id" :text="res._source.text_page" :page="{ id: res._id, ...res._source}" 
+                                            :searchP="search.text"  />
                                     </v-expand-transition>
                                 </div>
                                 <div class="pagination" v-if="!facetas.ano.length && !facetas.fonte.length && !facetas.norma.length">
@@ -983,6 +983,9 @@
             resultsSearchNormas.value = []
         } 
     }
+
+    //document
+    provide('document', document)
 
     const inserirDoc = (item) => {
         const res = docExiste(item._id)

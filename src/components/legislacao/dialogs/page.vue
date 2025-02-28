@@ -35,7 +35,9 @@
                           <span class="hidden-sm-and-down">Anterior</span>
                         </v-btn>
 
-                        <v-btn disabled>
+                        <v-btn 
+                          :title="docExiste(idNavegation) ? 'Remover página do documento criado' : 'Adicionar página ao documento criado'"
+                          :append-icon="docExiste(idNavegation) ? 'mdi-minus-circle' : 'mdi-plus-circle'" :class="docExiste(idNavegation) ? 'bg-error' : 'bg-success'" @click="addPageDocument()">
                           Pág. <span v-if="!navigationPerPage">{{ page.num_page }}</span>
                                <span v-else>{{ num_page }} </span>
                         </v-btn>
@@ -98,7 +100,7 @@
   </template>
 
 <script setup>
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
   import SelectionSearch from '../elements/selectionSearch.vue';
   import { useHandleTextSelection  } from '@/composables/handleTextSelection'
   
@@ -107,10 +109,26 @@
 
   const dialog = ref(false)
 
+  const document = inject('document')
+
+  const docExiste = (item) => {
+      let ids = document.value.map(x => x.id)
+      let find = ids.find(x => x == item)
+      return !!find
+      ? find
+      : false
+  }
+
   watch(dialog, (newValue) => {
     if(dialog.value){
       pageStore.getAllPages(props.page.page_to_norma.parent)
     }
+  })
+
+  const idNavegation = computed(() => {
+    return !navigationPerPage.value
+      ? props.page.id
+      : objetopagesNavigation.value.id
   })
 
   const props = defineProps({
@@ -179,6 +197,7 @@
   const navigationPerPage = ref(false)
   const num_page = ref(null)
   const pagesNavigation = ref(null)
+  const objetopagesNavigation = ref(null)
 
   const backPage = async () => {
     if(num_page.value > 1) {
@@ -190,6 +209,7 @@
         num_page: num_page.value
       }
       const resp = await pageStore.getPageNorma(objeto)
+      objetopagesNavigation.value = resp.data[0]
       pagesNavigation.value = resp.data[0].text_page
     }
   }
@@ -205,7 +225,36 @@
       }
       const resp = await pageStore.getPageNorma(objeto)
       pagesNavigation.value = resp.data[0].text_page
+      objetopagesNavigation.value = resp.data[0]
     }
+  }
+
+  const addPageDocument = () => {
+    if(navigationPerPage.value){
+      inserirDoc(objetopagesNavigation.value);
+    } else {
+      inserirDoc(props.page);
+    }
+  }
+
+  const inserirDoc = (item) => {
+        const res = docExiste(item.id)
+        if(res){
+            document.value = document.value.filter(x => x.id != res)
+        }else {
+            const objeto = {
+                id: item.id,
+                id_law: item.page_to_norma.parent,
+                name_law: item.page_to_norma.title,
+                text_page: item.text_page,
+                ano: item.ano,
+                tipo: item.tipo,
+                num_page: item.num_page,
+                revogado: item.revogado,
+                sigiloso: item.sigiloso
+            }
+            document.value.push(objeto)
+        }
   }
 
   onMounted(() => {
