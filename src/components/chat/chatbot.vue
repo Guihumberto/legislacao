@@ -24,15 +24,7 @@
                     <MenuUser :msg="msg" />
                     </v-menu>
                 </div>
-                <Loading v-if="load" />
-                <div v-if="searchStore.readLoad">
-                    <v-skeleton-loader
-                        :loading="searchStore.readLoad"
-                        type="list-item-two-line"
-                        width="400"
-                    >
-                    </v-skeleton-loader>
-                </div>
+                <Loading v-if="load || searchStore.readLoad" />
             </v-card-text>
             
             <v-divider></v-divider>
@@ -58,7 +50,7 @@
 </template>
 
 <script setup>
-    import { ref, inject, onMounted } from 'vue'
+    import { ref, inject, onMounted, watch } from 'vue'
 
     import api from '@/services/api_hf'
 
@@ -67,9 +59,18 @@
     
     import { useSearchStore } from '@/store/SearchStore';
     const searchStore = useSearchStore()
+
+    import { useChatStore } from '@/store/ChatStore';
+    const chatStore = useChatStore()
+
+    import { useLoginStore } from '@/store/LoginStore';
+    const loginStore = useLoginStore()
     
     import { useRoute } from 'vue-router';
     const route = useRoute()
+    
+    import { storeToRefs } from 'pinia';
+    const { readLogin } = storeToRefs(loginStore)
 
     const theme = inject('theme')
     const load = ref(false)
@@ -87,14 +88,24 @@
     }
     
     const messages = ref([
-        { user: '', content: '' }
+        { user: '', content: '', idCollection: null }
     ])
 
     onMounted(async () => {
         load.value = true
         const init = await searchStore.searchChatInit()
+        await chatStore.getChat(route.params?.id)
+        messages.value = [...chatStore.readChat]
         load.value = false
         messages.value.push({ user: 'assistant', content: init })
+    })
+
+
+    watch(readLogin, (newValue, oldValue) => {
+            setTimeout(() => {
+               messages.value = [...chatStore.readChat]
+            }, 2000)
+        
     })
 
     const newMessage = ref('')
@@ -106,15 +117,28 @@
     }
 
     const sendMessage = async () => {
+        if(!newMessage.value) return
+
         if (newMessage.value.trim() !== '') {
 
-            messages.value.push({ user: 'user', content: newMessage.value })
+            const msg = {
+                user: 'user', content: newMessage.value, idCollection: route.params?.id || null 
+            }
+
+            messages.value.push({...msg})
+            chatStore.saveChat(msg)
+
             const ask = newMessage.value
             newMessage.value = ''
 
             const resp = await searchStore.searchChatApi(ask, idChat)
+
+            const assistent = {
+                user: 'assistant', content: resp || "Sem resposta", idCollection: route.params?.id || null 
+            }
            
-            messages.value.push({ user: 'assistant', content: resp || "Sem resposta" }) //resp.data?.[0].generated_text 
+            messages.value.push({ ...assistent }) //resp.data?.[0].generated_text 
+            chatStore.saveChat(assistent)
             nextTick()
 
             // const resp = await searchStore.searchDirect(ask, idChat)

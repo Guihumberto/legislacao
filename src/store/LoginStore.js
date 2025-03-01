@@ -78,9 +78,14 @@ export const useLoginStore = defineStore("loginStore", {
                 this.load = false
             }
         },
-        logOut(router){
+        logOut(router, link = null){
+            console.log('logOut', link);
             this.clearLogin()
-            router.push('/leges')
+            if(link){
+                router.push(link)
+            } else {
+                router.push('/leges')
+            }
             sessionStorage.removeItem('userData')
             localStorage.removeItem('userData');
         },
