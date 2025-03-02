@@ -19,7 +19,12 @@
                     <template v-slot:activator="{ props }">
                         <div 
                         v-bind="props"
-                        class="message-content" v-html="msg.content"></div>
+                        class="message-content">
+                            <p v-html="msg.content"></p>
+                            <div class="text-right">
+                                <small v-if="msg?.date">{{ useDateNow(msg.date) }}</small>
+                            </div>
+                        </div>
                     </template>
                     <MenuUser :msg="msg" />
                     </v-menu>
@@ -68,6 +73,8 @@
     
     import { useRoute } from 'vue-router';
     const route = useRoute()
+   
+    import { useDateNow } from '@/composables/dateFormat';
     
     import { storeToRefs } from 'pinia';
     const { readLogin } = storeToRefs(loginStore)
@@ -97,7 +104,7 @@
         await chatStore.getChat(route.params?.id)
         messages.value = [...chatStore.readChat]
         load.value = false
-        messages.value.push({ user: 'assistant', content: init })
+        messages.value.push({ user: 'assistant', content: init, date: Date.now() })
     })
 
 
@@ -105,7 +112,6 @@
             setTimeout(() => {
                messages.value = [...chatStore.readChat]
             }, 2000)
-        
     })
 
     const newMessage = ref('')

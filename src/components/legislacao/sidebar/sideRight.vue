@@ -1,12 +1,13 @@
 <template>
     <div class="contentWrapper">
+        <v-btn variant="text"  @click="geralStore.drawerHistory = false" class=" mb-2" color="grey" v-if="!generalStore.readListStore.length">Fechar</v-btn>
         <div class="d-flex justify-end w-100" v-if="!showBar && generalStore.readListStore.length" @click="showBar = true">
             <v-btn variant="text" 
             class="btnHidden ma-1" color="black" icon="mdi-chevron-left"></v-btn>
         </div>
         <div class="w-100" :class="type == 'screen' ? 'sideRight':'sideRightD'" v-if="showBar && generalStore.readListStore.length">
             <v-btn variant="text"  @click="showBar = false" class="btnHidden mb-2" color="grey" v-if="type == 'screen'">Ocultar</v-btn>
-            <v-btn variant="text"  @click="geralStore.drawerHistory = false" class="btnHidden mb-2" color="grey" v-if="type == 'drawer'">Fechar</v-btn>
+            <v-btn variant="text"  @click="geralStore.drawerHistory = false" class=" mb-2" color="grey" v-if="type == 'drawer'">Fechar</v-btn>
             <h3 class="d-flex justify-space-between align-center"> 
                 <v-tabs
                     v-model="tab"
