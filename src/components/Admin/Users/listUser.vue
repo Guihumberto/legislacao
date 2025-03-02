@@ -21,11 +21,12 @@
                         item-title="name"
                         item-value="id"
                         hide-details
-                        variant="outlined"
+                        variant="filled"
                         class="mr-5"
-                        style="width: 110px;"
+                        style="max-width: 150px;"
                         v-model="item.perfil"
                         @update:model-value="updateUser(item)"
+                        :disabled="load"
                     ></v-select>
                     <v-switch
                         label="Adm"
@@ -34,6 +35,7 @@
                         color="success"
                         v-model="item.admin"
                         @update:model-value="updateUser(item)"
+                        :disabled="load"
                     ></v-switch>
                 </template>
                 <div>
@@ -41,12 +43,17 @@
                 </div>
             </v-list-item>
         </transition-group>
-        <Pagination />
+        <v-pagination 
+            :length="Math.ceil(loginStore.readTotalPages/loginStore.readPagination.perPage)"
+            v-model="loginStore.pagination.page"
+            density="compact"
+            class="mt-5"
+        ></v-pagination>
     </v-list>
 </template>
 
 <script setup>
-    import Pagination from './pagination.vue';
+    import { onMounted, ref, watch } from 'vue';
 
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
@@ -54,33 +61,52 @@
     import { useLoginStore } from '@/store/LoginStore';
     const loginStore = useLoginStore()
 
-    loginStore.getUsers()
+    import { useRouter, useRoute } from 'vue-router';
+    const router = useRouter()
+    const route = useRoute()
 
+    onMounted(async() => {
+        if(route.query?.page) loginStore.pagination.page = Number(route.query.page)
+        await loginStore.getUsers()   
+    })
+
+    const load = ref(false)
     const perfis = [
         {id: 1, name: 'Básico'},
         {id: 2, name: 'Amplo'},
     ]
 
-    const updateUser = (item) => {
-        loginStore.editUser(item)
+    const updateUser = async (item) => {
+        load.value = true
+        await loginStore.editUser(item)
+        load.value = false
     }
+
+    watch(
+        () => loginStore.pagination.page,
+            (newValue, oldValue) => {
+                loginStore.pagination.start = loginStore.pagination.page * loginStore.readPagination.perPage - loginStore.readPagination.perPage
+                loginStore.getUsers()
+                router.push(`users?page=${loginStore.pagination.page}`)
+            }
+    )
 
 </script>
 
 <style lang="scss" scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.4s, transform 0.4s;
-}
+    .fade-enter-active,
+    .fade-leave-active {
+     transition: opacity 0.4s, transform 0.4s;
+    }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
-}
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
 
-.list{
-    animation: aparecer 2s ease;
-    transition: 1s ease;
-}
+    .list{
+        animation: aparecer 2s ease;
+        transition: 1s ease;
+    }
 </style>

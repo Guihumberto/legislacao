@@ -30,7 +30,14 @@ export const useLoginStore = defineStore("loginStore", {
             date_created: null
         },
         listUsers: [],
-        load: false
+        load: false,
+        pagination:{
+            page: 1, 
+            start: 0, 
+            end: 10,
+            perPage: 10
+        },
+        totalPages: 0
     }),
     getters: {
         readLogin(){
@@ -41,6 +48,12 @@ export const useLoginStore = defineStore("loginStore", {
         },
         readLoad(){
             return this.load
+        },
+        readPagination(){
+            return this.pagination
+        },
+        readTotalPages(){
+            return this.totalPages
         }
     },
     actions:{
@@ -101,21 +114,70 @@ export const useLoginStore = defineStore("loginStore", {
             this.listUsers = []
             try {
                 const response = await api.post('users/_search', {
-                    from: 0,
-                    size: 2000
+                    from: this.readPagination.start,
+                    size: this.readPagination.perPage
                 })
                 const resp = response.data.hits.hits
-                const users = resp.map(x => ({
-                        id: x._id,
-                        ...x._source
-                    })
-                )
+                const users = resp.map(x => ({ id: x._id, ...x._source }) )
                 this.listUsers = [ ...users ]
-                
+                this.totalPages = response.data.hits.total.value
             } catch (error) {
                 console.log('erro ao carregar usuários');
             } finally {
                 this.load = false
+            }
+        },
+        async searchUsers(search){
+            this.listUsers = []
+
+            let mustClauses = [];
+
+            if(search.name){
+                 mustClauses.push({
+                    match: { name: search.name }
+                });
+            }
+
+            if(search.cpf){
+                mustClauses.push({
+                   match: { cpf: search.cpf }
+               });
+            }
+
+            if(search.lotacao){
+                mustClauses.push({
+                   match: { setor: search.lotacao }
+               });
+            }
+
+            if(search.perfil){
+                mustClauses.push({
+                   match: { perfil: search.perfil }
+               });
+            }
+
+            if(search.perfilAdm){
+                mustClauses.push({
+                   match: { admin: search.perfilAdm }
+               });
+            }
+
+            try {
+                const response = await api.post('users/_search', {
+                    from: this.readPagination.start,
+                    size: this.readPagination.perPage,
+                    query: {
+                        bool: {
+                            must: mustClauses.length > 0 ? mustClauses : [{ match_all: {} }]
+                        }
+                    }
+                })
+                const resp = response.data.hits.hits
+                const users = resp.map(x => ({ id: x._id, ...x._source }) )
+                this.listUsers = [ ...users ]
+                this.totalPages = response.data.hits.total.value
+            } catch (error) {
+                console.log('erro ao buscar usuários');
             }
         },
         async addUser(item){
@@ -142,7 +204,6 @@ export const useLoginStore = defineStore("loginStore", {
             }
         },
         async editUser(user){
-            this.load = true
             const objeto = (({ id, ...rest }) => rest)(user);
             try {
                 const resp = await api.post(`users/_doc/${user.id}`, objeto)
@@ -155,9 +216,7 @@ export const useLoginStore = defineStore("loginStore", {
                 
             } catch (error) {
                 console.log('erro ao edit user');
-            } finally {
-                this.load = false
-            }
+            } 
         },
         clearUser(){
             this.user = {

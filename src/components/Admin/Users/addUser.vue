@@ -20,9 +20,10 @@
     import { ref, computed  } from 'vue';
 
     import { useLoginStore } from '@/store/LoginStore';
+    const loginStore = useLoginStore()
+    
     import { useSnackStore } from '@/store/snackStore';
     const snackStore = useSnackStore()
-    const loginStore = useLoginStore()
 
     const cpf = ref(null)
     const form = ref(null)

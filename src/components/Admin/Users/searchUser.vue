@@ -1,6 +1,6 @@
 <template>
     <div class="my-5 text-right">
-        <v-btn @click="showbuscar = !showbuscar" icon="mdi-magnify"></v-btn>
+        <v-btn @click="showbuscar = !showbuscar" append-icon="mdi-magnify" variant="text">Buscar Usuários</v-btn>
         <v-expand-transition>     
             <v-card v-if="showbuscar" class="mt-5">
                 <v-card-text class="text-left">
@@ -44,7 +44,11 @@
                                     hide-details
                                     variant="outlined"
                                     class="mr-5"
-                                    style="width: 110px;"
+                                    style="width: 150px;"
+                                    :items="perfis"
+                                    item-title="name"
+                                    item-value="id"
+                                    v-model="search.perfil"
                                 ></v-select>
                                 <v-switch
                                     label="Administrador"
@@ -54,7 +58,10 @@
                                     hide-details
                                 ></v-switch>
                             </div>
-                            <v-btn color="primary" type="submit" variant="flat" prepend-icon="mdi-magnify">Buscar</v-btn>
+                            <div>
+                                <v-btn variant="text" class="mr-2" color="grey" @click="clear">limpar</v-btn>
+                                <v-btn color="primary" type="submit" variant="flat" prepend-icon="mdi-magnify">Buscar</v-btn>
+                            </div>
                         </div>
                     </v-form>
                 </v-card-text>
@@ -66,17 +73,44 @@
 <script setup>
     import { ref } from 'vue';
 
+    import { useLoginStore } from '@/store/LoginStore';
+    const loginStore = useLoginStore()
+
+    import { useRouter, useRoute } from 'vue-router';
+    const router = useRouter()
+
     const showbuscar = ref(false)
 
     const search = ref({
         name: null, 
         cpf: null, 
         lotacao: null,
+        perfil: null,
         perfilAdm: false
     })
 
-    const searchElastic = () => {
-        console.log('buscar');
+    const load = ref(false)
+
+    const perfis = [
+        {id: 1, name: 'Básico'},
+        {id: 2, name: 'Amplo'},
+    ]
+
+    const clear = () => {
+        search.value = {
+            name: null,
+            cpf: null,
+            lotacao: null,
+            perfilAdm: false
+        }
+    }
+
+    const searchElastic = async () => {
+        load.value = true
+        loginStore.pagination.page = 1
+        await loginStore.searchUsers(search.value)
+        load.value = false
+        router.push(`users?page=${loginStore.pagination.page}`)
     }
 
 </script>

@@ -93,6 +93,7 @@
     import LoadEmbbedings from './loadEmbbedings.vue';
     
     const userAreaStore = useUserAreaStore()
+    
     const router = useRouter()
     const route = useRoute()
 
