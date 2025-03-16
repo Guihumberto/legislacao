@@ -5,6 +5,7 @@
         size="small"
         variant="text"
         title="Ver a página"
+        @click="$emit('last_accessed')"
       >
         Ver Pág. {{ page.num_page }}
         <v-dialog

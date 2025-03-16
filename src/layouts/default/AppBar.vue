@@ -18,7 +18,7 @@
             :icon="geralStore.readHeaderShow ? 'mdi-chevron-down' :'mdi-chevron-right'">
           </v-btn>
           <!-- <v-icon @click="dark = !dark" size="small">{{ dark ? 'mdi-brightness-3' : 'mdi-brightness-4'}}</v-icon> -->
-          <v-app-bar-nav-icon class="historico" density="compact" variant="text" @click.stop="geralStore.changeDrawerHistory"></v-app-bar-nav-icon>
+          <v-app-bar-nav-icon icon="mdi-history" class="historico" density="compact" variant="text" @click.stop="geralStore.changeDrawerHistory" v-if="generalStore.readListStore.length"></v-app-bar-nav-icon>
         </div>
       </div>
     </div>

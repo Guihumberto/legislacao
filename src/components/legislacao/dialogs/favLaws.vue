@@ -6,7 +6,7 @@
                    <p 
                        @dblclick.stop="saveFavoritos()"
                        class="d-flex align-center"> <span class="destaqueTitle">{{ law._source.page_to_norma.title }} </span>
-                       <v-icon class="favoritar" v-if="isFav.exist" color="primary">mdi-star</v-icon>
+                       <v-icon class="ml-1 favoritar" v-if="isFav.exist" color="primary">mdi-star</v-icon>
                    </p> 
                </div>
            </template>

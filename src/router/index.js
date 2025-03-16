@@ -5,6 +5,7 @@ import { useLoginStore } from '@/store/LoginStore'
 import adminRoutes from '@/router/admin'
 import publicRoutes from '@/router/public'
 import userRoutes from '@/router/user'
+import managerialRoutes from '@/router/managerial'
 
 const routes = [
   {
@@ -14,6 +15,7 @@ const routes = [
       ...adminRoutes,
       ...publicRoutes,
       ...userRoutes,
+      ...managerialRoutes
     ],
   },
   {

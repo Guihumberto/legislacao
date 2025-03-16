@@ -165,7 +165,7 @@ export const useGeneralStore = defineStore("General", {
                 })
                 const response = resp.data.aggregations.by_year.buckets
                 if(response.length){
-                    this. periodo = response.map(x => x.key).sort((a, b) => b - a)
+                    this.periodo = response.map(x => x.key).sort((a, b) => b - a)
                 }
                 
             } catch (error) {

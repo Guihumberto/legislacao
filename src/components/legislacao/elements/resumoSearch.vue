@@ -17,9 +17,22 @@
             </div>
         </v-expand-transition>
         <div class="d-flex align-center justify-end">
-            <v-btn title="ocultar/mostrar prévia da página" :icon="hidden ? 'mdi-eye' : 'mdi-eye-off'" color="grey" variant="text" @click="hidden = !hidden"></v-btn>
-            <v-btn color="grey" size="small" variant="text" title="Ver a página" @click="pageComplete = !pageComplete, hidden = true" :prepend-icon="pageComplete ? 'mdi-plus' : 'mdi-minus'">{{ pageComplete ? 'expandir' : 'recolher' }}</v-btn>
-            <pageDialog :id="id" :page="page" :searchP="searchP" />
+            <transition name="fade">
+                <div v-if="accessed_at">
+                    <v-tooltip width="150" :text="`Último acesso em ${ useDateNow(accessed_at) }`">
+                        <template v-slot:activator="{ props }">
+                            <v-icon color="blue-accent-1" v-bind="props">mdi-check-all</v-icon>
+                        </template>
+                    </v-tooltip>
+                </div>
+            </transition>
+            <v-btn 
+                :title="hidden ? 'ocultar prévia da página' : 'mostrar prévia da página'" 
+                :icon="hidden ? 'mdi-eye' : 'mdi-eye-off'" color="grey" variant="text" @click="hidden = !hidden"></v-btn>
+            <v-btn 
+                color="grey" size="small" variant="text" title="Ver a página" 
+                @click="expandAction" :prepend-icon="pageComplete ? 'mdi-plus' : 'mdi-minus'">{{ pageComplete ? 'expandir' : 'recolher' }}</v-btn>
+            <pageDialog :id="id" :page="page" :searchP="searchP" @last_accessed="last_accessed" />
             <ResumoIA :text="text" :page="page" />
         </div>
     </div>
@@ -27,14 +40,22 @@
 
 <script setup>
     import { computed, ref, watch } from "vue"
+    import { useDateNow } from "@/composables/dateFormat"
+
+    import { useAccessedNormsStore } from "@/store/NormsAccessedStore"
+    const accessedStore =useAccessedNormsStore()
+
     import { useRoute } from "vue-router"
     const route = useRoute()
+  
     import { useHandleTextSelection  } from '@/composables/handleTextSelection'
     import pageDialog from "@/components/legislacao/dialogs/page"
     import SelectionSearch from "./selectionSearch.vue"
     import ResumoIA from "../dialogs/resumoIA.vue"
 
     const hidden = ref(true)
+
+    const accessed_at = ref(null)
 
     const props = defineProps({
         text: true,
@@ -107,7 +128,6 @@
         return textNovo
     })
 
-
     const excluirStopWords = (arrayPrincipal) => {
         const stopWords = ["a", "o", "e", "é", "um", "uma", "com", "de", "do", "da", "para", "por", "em", "os", "as", "isso", "essa", "esse", "isso", "está"];
         const resultado = arrayPrincipal.filter(palavra => !stopWords.includes(palavra));
@@ -122,10 +142,33 @@
         targetSection.value.scrollIntoView({behavior: "smooth"})
     }
 
+    const expandAction = () => {
+        pageComplete.value = !pageComplete.value
+        hidden.value = true
+        if(!pageComplete.value) last_accessed()
+    }
+
+    const last_accessed = () => {
+        accessed_at.value = Date.now()
+        const objeto = {
+            id: props.page.id,
+            name: props.page.page_to_norma.title,
+            num_page: props.page.num_page
+        }
+        accessedStore.saveAccess(objeto, 'page')
+    }
+
 </script>
 
 <style lang="scss" scoped>
 .wrapperesumo{
     padding: .5rem .2rem;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

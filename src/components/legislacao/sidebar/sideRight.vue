@@ -1,6 +1,6 @@
 <template>
     <div class="contentWrapper">
-        <v-btn variant="text"  @click="geralStore.drawerHistory = false" class=" mb-2" color="grey" v-if="!generalStore.readListStore.length">Fechar</v-btn>
+        <v-btn variant="text"  @click="geralStore.drawerHistory = false" class=" mb-2" color="grey" v-if="type == 'drawer' && !generalStore.readListStore.length">Fechar</v-btn>
         <div class="d-flex justify-end w-100" v-if="!showBar && generalStore.readListStore.length" @click="showBar = true">
             <v-btn variant="text" 
             class="btnHidden ma-1" color="black" icon="mdi-chevron-left"></v-btn>

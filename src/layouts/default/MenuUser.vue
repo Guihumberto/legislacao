@@ -29,6 +29,22 @@
             <v-list-item-title v-text="item.text"></v-list-item-title>
           </v-list-item>
           <div class="my-5" v-if="loginStore.readLogin.admin">
+            <v-list-subheader>Gerencial</v-list-subheader>
+            <v-list-item
+              v-for="(item, i) in managerial"
+              :key="i"
+              :value="item"
+              color="primary"
+              :to="item.url"
+            >
+              <template v-slot:prepend>
+                <v-icon :icon="item.icon"></v-icon>
+              </template>
+  
+              <v-list-item-title :title="item.text" v-text="item.text"></v-list-item-title>
+            </v-list-item>
+          </div>
+          <div class="my-5" v-if="loginStore.readLogin.admin">
             <v-list-subheader>Administração</v-list-subheader>
             <v-list-item
               v-for="(item, i) in adms"
@@ -61,6 +77,11 @@
               { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
               { text: 'Histórico', icon: 'mdi-history', url:'/history' },
               { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' }
+    ]
+
+    const managerial = [
+              { text: 'Normas mais acessadas', icon: 'mdi-book', url:'/gerencial/normas' },
+              { text: 'Termos mais buscados ', icon: 'mdi-magnify', url:'/gerencial/search' }
     ]
 
     const adms = [
