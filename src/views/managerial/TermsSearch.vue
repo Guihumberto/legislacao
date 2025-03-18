@@ -10,6 +10,7 @@
                         v-for="item, i in historyStore.readAggsHistory"
                         :key="i" link
                         :title="item"
+                        :to="`../leges?search=${item}`"
                     >
                         <template v-slot:prepend>
                             <v-icon>mdi-text-search</v-icon>

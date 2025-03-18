@@ -18,8 +18,17 @@
         </v-expand-transition>
         <div class="d-flex align-center justify-end">
             <transition name="fade">
+                <div v-if="last_access">
+                    <v-tooltip width="100" :text="`Visto ${last_access}x `">
+                        <template v-slot:activator="{ props }">
+                            <v-icon color="grey" v-bind="props">mdi-check</v-icon>
+                        </template>
+                    </v-tooltip>
+                </div>
+            </transition>
+            <transition name="fade">
                 <div v-if="accessed_at">
-                    <v-tooltip width="150" :text="`Último acesso em ${ useDateNow(accessed_at) }`">
+                    <v-tooltip width="120" :text="`Visto agora ${ useDateNow(accessed_at, false, true) }`">
                         <template v-slot:activator="{ props }">
                             <v-icon color="blue-accent-1" v-bind="props">mdi-check-all</v-icon>
                         </template>
@@ -43,7 +52,7 @@
     import { useDateNow } from "@/composables/dateFormat"
 
     import { useAccessedNormsStore } from "@/store/NormsAccessedStore"
-    const accessedStore =useAccessedNormsStore()
+    const accessedStore = useAccessedNormsStore()
 
     import { useRoute } from "vue-router"
     const route = useRoute()
@@ -57,11 +66,22 @@
 
     const accessed_at = ref(null)
 
+
     const props = defineProps({
         text: true,
         page: Object,
         searchP: String,
         id: String
+    })
+
+    const last_access = computed(() => {
+        if(accessedStore.readAccessed.length){
+            if(accessedStore.readAccessed.map(x=> x.id).includes(props.page.id)){
+                return accessedStore.readAccessed.filter(x=> x.id == props.page.id).length
+            }
+            return false
+        }
+        return false
     })
 
     const pageComplete = ref(true)

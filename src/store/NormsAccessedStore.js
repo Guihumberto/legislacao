@@ -33,22 +33,22 @@ export const useAccessedNormsStore = defineStore("accessedNorms", {
                     "aggs": {
                         "by_access": {
                             "terms": {
-                                "field": "title.keyword",
+                                "field": "id",
                                 "size": 10
                             }
                         }
                     }
                 })
                 const response = resp.data.aggregations.by_access.buckets
-                console.log('response', response);
-                this.aggsAccessed =  response.map(x => x.key)
+                const pages = await this.getPageLaws(response.map(x => x.key))
+                this.aggsAccessed = pages
             } catch (error) {
                 console.log('error aggs normas');
             } finally {
                 this.load = false
             }
         },
-        async getAccessUser(){
+        async getAccessUser(ids){
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             try {
@@ -57,17 +57,22 @@ export const useAccessedNormsStore = defineStore("accessedNorms", {
                     from: 0,
                     size: 20,
                     query: {
-                       match:{
-                            user: loginStore.readLogin.cpf,
-                       }
-                    },
-                    sort: [
-                        {
-                            date_accessed: {
-                                order: "desc"
-                            },
+                        "bool": {
+                            "must": [
+                                {
+                                    "term": {
+                                        "user": loginStore.readLogin.cpf
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "id":  ids
+                                    }
+                                },
+                            ]
                         }
-                    ]
+                    },
+
                 })
                 this.accessced = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
 
@@ -96,6 +101,20 @@ export const useAccessedNormsStore = defineStore("accessedNorms", {
                 console.log('error ao acessar');
             } finally {
                 this.load = false
+            }
+        },
+        async getPageLaws(ids){
+            try {
+                const resp = await api.post('pages_v2/_search', {
+                    query:{
+                        terms:{
+                            "_id": ids
+                        }
+                    }
+                })
+                return resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+            } catch (error) {
+                console.log('error ao get page');
             }
         }
     }

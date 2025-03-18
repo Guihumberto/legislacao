@@ -1,4 +1,4 @@
-export function useDateNow(timestamp, type = false) {
+export function useDateNow(timestamp, type = false, hour = false) {
 
     const data = new Date(timestamp); // Cria um objeto Date com o timestamp
 
@@ -7,6 +7,8 @@ export function useDateNow(timestamp, type = false) {
     const ano = data.getFullYear(); // Obtém o ano
     const horas = String(data.getHours()).padStart(2, '0'); // Obtém as horas
     const minutos = String(data.getMinutes()).padStart(2, '0'); // Obtém os minutos
+
+    if (hour)  return `${horas}:${minutos}`; // Retorna a data formatada
 
     if (type)  return `${dia}/${mes}/${ano}`; // Retorna a data formatada
     

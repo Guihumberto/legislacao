@@ -513,6 +513,9 @@
     import { useSnackStore } from "@/store/snackStore"
     const snackStore = useSnackStore()
 
+    import { useAccessedNormsStore } from "@/store/NormsAccessedStore"
+    const accessedStore = useAccessedNormsStore()
+
     import { useGeneralStore } from '@/store/GeneralStore'
     import { useGeralStore } from '@/store/GeralStore'
     import { useLawStore } from "@/store/LawsStore"
@@ -965,6 +968,7 @@
                     showAutosuggest.value = false
                     searchForLaw()
                     firstSearch.value = search.value.text
+                    if(totalDocs.value) accessedStore.getAccessUser(resultsSearch.value.map( x => x._id))
                 }
             } else if (search.value.semantic == 2){
                 load.value = false

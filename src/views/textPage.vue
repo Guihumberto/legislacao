@@ -17,12 +17,12 @@
                 </div>
                 <div class="corpo" @mouseup="selectionGet()"  style="position: relative;">
                     <p v-html="listPage"></p> 
-                    <SelectionSearch 
+                    <!-- <SelectionSearch 
                         :menuPosition="menuPosition"
                         :selectedText="selectedText"
                         :menu="menu"
                         :direct="true"
-                    />
+                    /> -->
                 </div>
             </div>
         </div>
@@ -46,7 +46,6 @@
      import { useRoute, useRouter } from "vue-router"
      const route = useRoute()
      const router = useRouter()
-     
 
      pageStore.getPage(route.params.id)
 
@@ -60,7 +59,11 @@
         router.push(`/text/${pageStore.readPage.page_to_norma.parent}?idpage=${route.params.id}`)
      }
      const voltar = () => {
-        router.push("/leges");
+        if(route.query.page == 'norms'){
+            router.push("/gerencial/normas");
+        } else {
+            router.push("/leges");
+        }
      }
 
      const { selectionGet, selectedText, menu, menuPosition } = useHandleTextSelection()
