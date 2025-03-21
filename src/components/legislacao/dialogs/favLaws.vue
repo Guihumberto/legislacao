@@ -1,15 +1,17 @@
 <template>
     <div class="d-flex align-center">
         <v-tooltip width="200" :text="isFav.exist ? 'Dê dois cliques para desfavoritar a Norma' : 'Dê dois cliques para favoritar a Norma'">
-           <template v-slot:activator="{ props }">
-               <div  v-bind="props">
-                   <p 
-                       @dblclick.stop="saveFavoritos()"
-                       class="d-flex align-center"> <span class="destaqueTitle">{{ law._source.page_to_norma.title }} </span>
-                       <v-icon class="ml-1 favoritar" v-if="isFav.exist" color="primary">mdi-star</v-icon>
-                   </p> 
-               </div>
-           </template>
+            <template v-slot:activator="{ props }">
+                <div  v-bind="props">
+                    <p 
+                        @dblclick.stop="saveFavoritos()"
+                        class="d-flex align-center"> <span class="destaqueTitle">{{ law._source.page_to_norma.title }} </span>
+                        <transition name="fade">
+                            <v-icon class="ml-1 favoritar" v-if="isFav.exist" color="primary">mdi-star</v-icon>
+                        </transition>
+                    </p> 
+                </div>
+            </template>
        </v-tooltip>
        <v-tooltip width="200" text="Filtrar por norma">
             <template v-slot:activator="{ props }">
@@ -22,8 +24,8 @@
 <script setup>
     import { computed, ref, inject } from 'vue';
     
-    import { useUserAreaStore } from '@/store/AreaUserStore'
-    const areaUserStore = useUserAreaStore()
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
 
     import { useLoginStore } from '@/store/LoginStore'
     const loginStore = useLoginStore()
@@ -37,7 +39,7 @@
 
     const isFav = computed(() => {
         if(loginStore.readLogin.cpf) {
-            const isFind = areaUserStore.readFavoritos
+            const isFind = favStore.readFavoritos
                             .find(x => x.id == props.law._source.page_to_norma.parent)
             return { exist: !!isFind, item: isFind}
         } else {
@@ -46,13 +48,14 @@
     })
 
     const saveFavoritos = async () => {
-        if(loginStore.readLogin.cpf && !areaUserStore.readLoad) {
+        if(loginStore.readLogin.cpf) { //&& !favStore.readLoad
+
             if(isFav.value.exist){
-                areaUserStore.deleteFav(isFav.value.item.idU)
+                favStore.deleteFav(isFav.value.item.idU)
                 snackStore.activeSnack('Norma removida dos favoritos.', 'error')
                 return
             }
-
+       
             const lawFav = {
                 fav: true,
                 section: 'law',
@@ -66,7 +69,8 @@
                 revogado: props.law._source.revogado,
                 sigiloso: props.law._source.sigiloso
             }
-            await areaUserStore.saveFavoritos(lawFav)
+
+            await favStore.saveFavoritos(lawFav)
             snackStore.activeSnack('Norma adicionada aos favoritos', 'success')
 
         } else {

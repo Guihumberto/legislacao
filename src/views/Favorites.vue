@@ -66,8 +66,8 @@
 <script setup>
     import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-    import { useUserAreaStore } from '@/store/AreaUserStore'
-    const areaUserStore = useUserAreaStore()
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
 
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
@@ -78,7 +78,7 @@
 
 
     import AddFolder from '@/components/userArea/addFolder.vue';
-    import RemoveFav from '@/components/userArea/removeFav.vue';
+    import RemoveFav from '@/components/userArea/favorites/removeFav.vue';
     import ListFavNormas from '@/components/userArea/favorites/listFavNormas.vue';
     import ListFavPages from '@/components/userArea/favorites/listFavPages.vue';
 
@@ -91,7 +91,7 @@
 
     onMounted(()=>{
         if(route.query.tab) tab.value = route.query.tab
-        if(!route.query.page) areaUserStore.pagination.page = 1
+        if(!route.query.page) favStore.pagination.page = 1
     })
 
     const move = ref(false)
@@ -111,7 +111,7 @@
     const moverDocs = async () => {
         await listMove.value.forEach( x => {
           x.folder = folder.value
-          areaUserStore.editFav(x)
+          favStore.editFav(x)
         } )
         listMove.value = []
         move.value = false
@@ -128,9 +128,9 @@
 
     const onDrop = (folder) => {
       if (draggedItem.value) {
-        const find = areaUserStore.readFavoritos.find(x => x.id == draggedItem.value) 
+        const find = favStore.readFavoritos.find(x => x.id == draggedItem.value) 
         find.folder = folder
-        areaUserStore.editFav(find)
+        favStore.editFav(find)
       }
     };
 
@@ -142,7 +142,7 @@
     }
 
     onUnmounted(() => {
-        areaUserStore.pagination.page = 1
+        favStore.pagination.page = 1
     })
 
 </script>

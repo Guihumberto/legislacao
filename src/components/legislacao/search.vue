@@ -501,6 +501,7 @@
     
     import menuCopy from '@/components/legislacao/dialogs/menuCopy.vue'
     import resumoSearch from '@/components/legislacao/elements/resumoSearch'
+    import HeaderSearch from "./elements/headerSearch.vue"
    
     import resultSemantic from "@/components/legislacao/elements/resultSemantic.vue"
     import DocumentSave from "./dialogs/documentSave.vue"
@@ -516,13 +517,15 @@
     import { useAccessedNormsStore } from "@/store/NormsAccessedStore"
     const accessedStore = useAccessedNormsStore()
 
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
+
     import { useGeneralStore } from '@/store/GeneralStore'
     import { useGeralStore } from '@/store/GeralStore'
     import { useLawStore } from "@/store/LawsStore"
     import { useLoginStore } from '@/store/LoginStore'
     import { useAutoSuggestionStore } from "@/store/AutoSuggestions"
     import { useUserAreaStore } from "@/store/AreaUserStore"
-    import HeaderSearch from "./elements/headerSearch.vue"
     const generalStore = useGeneralStore()  
     const geralStore = useGeralStore()
     const lawStore = useLawStore()
@@ -969,6 +972,7 @@
                     searchForLaw()
                     firstSearch.value = search.value.text
                     if(totalDocs.value) accessedStore.getAccessUser(resultsSearch.value.map( x => x._id))
+                    if(totalDocs.value) favStore.getAllFavoritos(resultsSearch.value)
                 }
             } else if (search.value.semantic == 2){
                 load.value = false

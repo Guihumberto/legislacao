@@ -75,7 +75,7 @@ export const useLoginStore = defineStore("loginStore", {
 
                     this.saveUserData(connected)
 
-                    await userAreaStore.getAllFavoritos()
+                    // await userAreaStore.getAllFavoritos()
                     await userAreaStore.getAllHistórico()
                     await userAreaStore.getCollection()
                     await userAreaStore.getDocs()

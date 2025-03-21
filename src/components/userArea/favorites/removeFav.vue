@@ -15,8 +15,10 @@
             v-for="(item, index) in items"
             :key="index"
             :value="index"
-            @click="removeFav()"
+            @click="actionBtn(item.id)"
           >
+            <template v-slot:prepend
+            > <v-icon>{{ item.icon }}</v-icon> </template>
             <v-list-item-title> {{ item.title }} </v-list-item-title>
           </v-list-item>
         </v-list>
@@ -27,13 +29,17 @@
   <script setup>
     import { provide, ref, watch } from 'vue';
     
-    import ComfirmDelete from './comfirmDelete.vue';
+    import ComfirmDelete from '../comfirmDelete.vue';
 
-    import { useUserAreaStore } from '@/store/AreaUserStore';
-    const userAreaStore = useUserAreaStore()
+    import { useFavStore } from '@/store/FavStore';
+    const favStore = useFavStore()
+
+    import { useSnackStore } from '@/store/snackStore';
+    const snackStore = useSnackStore()
   
     const items = ([
-         { title: 'Excluir' }
+         { id: 1, title: 'Copiar Link', icon: 'mdi-content-copy' },
+         { id: 2, title: 'Excluir', icon: 'mdi-delete' }
     ])
 
     const dialog = ref(false)
@@ -46,15 +52,25 @@
         id: Object
     })
 
+    const actionBtn = (id) => {
+      if(id == 1) copyLink()
+      if(id == 2) removeFav()
+    }
+
+    const copyLink = () => {
+      let section = props.id.section == 'law' ? 'text' : 'textpage'
+      navigator.clipboard.writeText(`https://legislacao.estudodalei.com.br/${section}/${props.id.id}`)
+      snackStore.activeSnack('Link copiado', 'success')
+    }
+
     const removeFav = () => {
         dialog.value = true
     } 
 
-    watch(confirmacao, (newConfirm) => {
-       props.id.fav = false
-       userAreaStore.deleteFav(props.id.idU)
+    watch(confirmacao, async (newConfirm) => {
+      await favStore.deleteFav(props.id.idU)
+      props.id.fav = false
     })
-
 
   </script>
   

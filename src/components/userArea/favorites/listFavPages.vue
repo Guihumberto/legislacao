@@ -1,6 +1,6 @@
 <template>
     <v-card variant="flat" class="card">
-            <div v-if="areaUserStore.readLoad" class="load">
+            <div v-if="favStore.readLoad" class="load">
                 <v-progress-circular
                         :size="50"
                         color="primary"
@@ -30,10 +30,10 @@
                         <small class="text-overline">{{ item.name_law }}</small> {{ item.folder }}
                     </v-list-item>
                 </transition-group>
-                <v-alert type="warning" variant="outlined" class="mx-4 my-5" density="compact" v-if="!areaUserStore.readLoad && !listFav?.total?.value">
+                <v-alert type="warning" variant="outlined" class="mx-4 my-5" density="compact" v-if="!favStore.readLoad && !listFav?.total?.value">
                     Não há páginas favoritadas.
                     <template v-slot:append>
-                        <v-btn variant="text" @click="areaUserStore.getListFavPages('page')">Recarregar</v-btn>
+                        <v-btn variant="text" @click="favStore.getListFavPages('page')">Recarregar</v-btn>
                     </template>
                 </v-alert>
                 <Pagination :section="'page'" v-if="listFav?.total?.value" :totalDocs="listFav?.total?.value"  />
@@ -42,28 +42,27 @@
 </template>
 
 <script setup>
-    import { onMounted, ref } from 'vue';
+    import { onMounted, computed } from 'vue';
     import { useDateNow } from '@/composables/dateFormat'
-    import { useUserAreaStore } from '@/store/AreaUserStore'
-    const areaUserStore = useUserAreaStore()
+   
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
 
-    import RemoveFav from '@/components/userArea/removeFav.vue';
-    import Pagination from '@/components/legislacao/elements/pagination.vue';
-    import { computed } from 'vue';
-
+    import RemoveFav from '@/components/userArea/favorites/removeFav.vue'
+    import Pagination from '@/components/userArea/favorites/pagination.vue'
+ 
     const goTo = (item) => {
         if(item.section == 'page') window.open(`/textpage/${item.id}?search=favs`, '_blank');
         if(item.section == 'law') window.open(`/text/${item.id}?search=favs`, '_blank');
     }
 
-
     onMounted(async ()=> {
-        await areaUserStore.getListFavPages('page')
-        areaUserStore.pagination.page = 1
+        await favStore.getListFavPages('page')
+        favStore.pagination.page = 1
     })
 
     const listFav = computed(() => {
-        return areaUserStore.readFavPages
+        return favStore.readFavPages
     })
 
 </script>

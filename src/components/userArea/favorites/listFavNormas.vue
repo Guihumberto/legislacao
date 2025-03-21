@@ -1,13 +1,13 @@
 <template>
     <v-card variant="flat" class="card">
-            <div v-if="areaUserStore.readLoad" class="load">
+            <div v-if="favStore.readLoad" class="load">
                 <v-progress-circular
                         :size="50"
                         color="primary"
                         indeterminate
                 ></v-progress-circular>
             </div>
-            <v-list class="pa-0" v-if="listFav?.total?.value && !areaUserStore.readLoad">
+            <v-list class="pa-0" v-if="listFav?.total?.value && !favStore.readLoad">
                 <v-list-subheader>Quantidade de documentos: {{ listFav?.total?.value }}</v-list-subheader>
                 <transition-group name="fade">
                     <v-list-item 
@@ -44,10 +44,10 @@
                 </transition-group>
                 <Pagination :section="'law'" v-if="listFav?.total?.value" :totalDocs="listFav?.total?.value"  />
             </v-list>
-            <v-alert type="warning" variant="outlined" class="mx-4 my-5" density="compact" v-if="!areaUserStore.readLoad && !listFav?.total?.value">
+            <v-alert type="warning" variant="outlined" class="mx-4 my-5" density="compact" v-if="!favStore.readLoad && !listFav?.total?.value">
                 Não há normas favoritadas.
                 <template v-slot:append>
-                    <v-btn variant="text" @click="areaUserStore.getListFavPages('law')">Recarregar</v-btn>
+                    <v-btn variant="text" @click="favStore.getListFavPages('law')">Recarregar</v-btn>
                 </template>
             </v-alert>
     </v-card>
@@ -55,15 +55,17 @@
 
 <script setup>
     import { ref, onMounted, computed } from 'vue';
+
     import { useRoute } from 'vue-router';
     const route = useRoute()
 
     import { useDateNow } from '@/composables/dateFormat'
-    import { useUserAreaStore } from '@/store/AreaUserStore'
-    const areaUserStore = useUserAreaStore()
 
-    import RemoveFav from '@/components/userArea/removeFav.vue';
-    import Pagination from '@/components/legislacao/elements/pagination.vue';
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
+
+    import RemoveFav from '@/components/userArea/favorites/removeFav.vue';
+    import Pagination from '@/components/userArea/favorites/pagination.vue'
 
     const move = ref(false)
     const listMove = ref([])
@@ -84,12 +86,12 @@
     }
 
     onMounted(async ()=> {
-        areaUserStore.pagination.page = 1
-        await areaUserStore.getListFavPages('law')
+        favStore.pagination.page = 1
+        await favStore.getListFavPages('law')
     })
 
     const listFav = computed(() => {
-        return areaUserStore.readFavPages
+        return favStore.readFavPages
     })
 
 </script>

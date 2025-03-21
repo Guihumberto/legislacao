@@ -2,8 +2,10 @@ import { defineStore } from "pinia";
 import api from "@/services/api";
 
 import { useLoginStore } from "./LoginStore";
+let data = sessionStorage.getItem('userData')
+if(data) data = JSON.parse(data).cpf
 
-export const useCollectionStore = defineStore("collection", {
+export const useFavStore = defineStore("favStore", {
     state: () => ({
         favoritos: [],
         favPages: [],
@@ -30,22 +32,43 @@ export const useCollectionStore = defineStore("collection", {
         },
     },
     actions:{
-        async getAllFavoritos(){
+        async getAllFavoritos(items){
+
+            const idsLaw = items.map(x => x._source.page_to_norma.parent);
+            const idsPage = items.map(x => x._id)
+
+            const ids = idsPage.concat(idsLaw)
+
             const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
             try {
                 this.load = true
                 this.favoritos = []
-                const requestBody = {
-                    createdby: loginStore.readLogin.cpf
-                }
-                console.log("Json getAllFavoritos: ", JSON.stringify(requestBody, null, 2));
-                const response = await abackapi.post("/favoritos/search", requestBody, {
-                    headers: {
-                        "Content-Type": "application/json"
+                
+                const response = await api.post('favorites/_search', {
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    terms:{
+                                        id: ids
+                                    }
+                                },
+                                {
+                                    match: {
+                                        created_by: cpf
+                                    }
+                                }
+                            ]
+                        }
                     }
-                });
+                })
+
                 const resp = response.data.hits.hits
                 this.favoritos = resp.map( x => ({ idU: x._id, ...x._source}))
+                console.log('resp ids', resp);
+
             } catch (error) {
                 console.log('erro ao recuperar a pilha de FAVORITOS');
             } finally{
@@ -53,10 +76,9 @@ export const useCollectionStore = defineStore("collection", {
             }
         },
         async getListFavPages(section = 'law'){
-            const loginStore = await useLoginStore()
-            const cpf = loginStore.readLogin.cpf
+            const cpf = data || false
             if(!cpf){
-                console.log('nao carregado o usuário');//pegar este erro para recarregar
+                console.log('nao carregado o usuário'); 
                 return
             }
             try {
@@ -87,6 +109,7 @@ export const useCollectionStore = defineStore("collection", {
             const isFavExist = await this.isFavExist(item)
 
             if(!isFavExist.length){
+                console.log('nao existe');
                 const doc = { ...item, dateCreated: Date.now(), created_by: loginStore.readLogin.cpf }
                 try {
                     const resp = await api.post('favorites/_doc/', doc) 
@@ -97,6 +120,7 @@ export const useCollectionStore = defineStore("collection", {
                     this.load = false
                 }    
             } else {
+                console.log('existe');
                 try {
                     const doc_update = isFavExist[0]._source
                     const resp = await api.post(`favorites/_doc/${isFavExist[0]._id}`, item) 
@@ -112,19 +136,30 @@ export const useCollectionStore = defineStore("collection", {
         },
         async isFavExist(item){
             const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
             try {
-                this.load = true
-                const requestBody = {
-                    idItem: item.id,
-                    createdby: loginStore.readLogin.cpf
-                }
-                console.log("Json isFavExist: ", JSON.stringify(requestBody, null, 2));
-                const response = await abackapi.post("/favoritos/search", requestBody, {
-                    headers: {
-                        "Content-Type": "application/json"
+                const resp = await api.post('favorites/_search', {
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    term: {
+                                        created_by: cpf
+                                    }
+                                },
+                                {
+                                    term:{
+                                        id: item.id
+                                    }
+                                }
+                            ]
+                        }
                     }
-                });
-                return response.data.hits.hits
+                })
+                
+                const response = resp.data.hits.hits
+                return response
             } catch (error) {
                 console.log('erro procura isfav');
             }
@@ -145,18 +180,14 @@ export const useCollectionStore = defineStore("collection", {
         },
         async deleteFav(id){
             try {
-                this.load = true
                 const resp = await api.delete(`favorites/_doc/${id}`)
-                this.favoritos = this.favoritos.filter(x => x.idU != id)
-
+    
+                this.favoritos = this.favoritos.filter(x => x.idU != id);
                 this.favPages.hits = this.favPages.hits.filter( x => x._id != id)
+
                 this.favPages.total.value--
-
-
             } catch (error) {
                 console.log('error delete fav');
-            } finally {
-                this.load = false
             }
         },
     },

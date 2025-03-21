@@ -1,21 +1,21 @@
 <template>
-    <v-tooltip :text="favorite.fav ? 'Desfavoritar a Página' : 'Favoritar a Página'">
+    <v-tooltip :text="isFav.exist ? 'Desfavoritar a página' : 'Favoritar a página'">
         <template v-slot:activator="{ props }">
             <v-btn 
                 @click="saveFavorite()" v-bind="props" variant="text" 
-                :disabled="areaUserStore.readload"
+                :disabled="favStore.readload"
                 icon="mdi-star" 
-                :color="favorite.fav ? 'yellow-darken-1' : 'grey'"
+                :color="isFav.exist ? 'yellow-darken-1' : 'grey'"
             ></v-btn>
         </template>
     </v-tooltip>
 </template>
 
 <script setup>
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, computed } from 'vue';
 
-    import { useUserAreaStore } from '@/store/AreaUserStore'
-    const areaUserStore = useUserAreaStore()
+    import { useFavStore } from '@/store/FavStore'
+    const favStore = useFavStore()
 
     import { useLoginStore } from '@/store/LoginStore'
     const loginStore = useLoginStore()
@@ -28,19 +28,19 @@
     })
 
     const favorite = ref({})
-    const isExist = ref(false)
 
-    const isFav = () => {
-        if(loginStore.readLogin.cpf && !areaUserStore.readLoad) {
-            isExist.value = areaUserStore.readFavoritos
+    const isFav = computed(() => {
+        if(loginStore.readLogin.cpf) {
+            const isFind = favStore.readFavoritos
                             .find(x => x.id == props.page._id)
+            return { exist: !!isFind, item: isFind}
+        } else {
+            return { exist: false, item: false }
         }
-    }
+    })
 
     onMounted(() => {
-        isFav()
         favorite.value = {
-            fav: !!isExist.value,
             section: 'page',
             folder: null,
             ano: props.page._source.ano,
@@ -56,13 +56,17 @@
 
     const saveFavorite = async() =>{
         if(loginStore.readLogin.cpf) {
-            favorite.value.fav = !favorite.value.fav
-            await areaUserStore.saveFavoritos(favorite.value)
 
-            const text = favorite.value.fav ? 'Página adicionada aos favoritos.' : 'Página removida dos favoritos.'
-            const color = favorite.value.fav ? 'success' : 'error'
-            snackStore.activeSnack(text, color)
-            
+            if(isFav.value.exist){
+                favStore.deleteFav(isFav.value.item.idU)
+                snackStore.activeSnack('Página removida dos favoritos.', 'error')
+                return
+            }
+
+            favorite.value.fav = true
+
+            await favStore.saveFavoritos(favorite.value)
+            snackStore.activeSnack('Página adicionada aos favoritos.', 'success')
         } else {
             snackStore.activeSnack('Necessário estar logado para usar esta funcionalidade.', 'error')
         }

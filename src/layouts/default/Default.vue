@@ -215,6 +215,14 @@ section .container2{
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 
 
 </style>
