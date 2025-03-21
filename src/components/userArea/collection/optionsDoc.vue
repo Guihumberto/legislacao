@@ -17,6 +17,8 @@
             :value="index"
             @click="actions(item.id)"
           >
+            <template v-slot:prepend
+            > <v-icon>{{ item.icon }}</v-icon> </template>
             <v-list-item-title> {{ item.title }} </v-list-item-title>
           </v-list-item>
         </v-list>
@@ -36,8 +38,11 @@
 
     import { useUserAreaStore } from '@/store/AreaUserStore';
     import DocumentOpen from './documentOpen.vue';
-    import ComfirmDelete from './comfirmDelete.vue';
+    import ComfirmDelete from './../comfirmDelete.vue';
     const userAreaStore = useUserAreaStore()
+
+    import { useSnackStore } from '@/store/snackStore';
+    const snackStore = useSnackStore()
 
     const dialog3 = ref(false)
     const dialog2 = ref(false)
@@ -49,9 +54,9 @@
     provide('confirmacao', confirmacao)
     
     const items = ([
-         {id:1, title: 'Abrir Documento' },
-        //  {id:3, title: 'Publicar' },
-         {id:2, title: 'Excluir' }
+         { id:1, title: 'Abrir Documento', icon: 'mdi-open-in-new' },
+         { id: 2, title: 'Copiar Link', icon: 'mdi-content-copy' },
+         { id:3, title: 'Excluir', icon: 'mdi-delete' }
     ])
 
     const props = defineProps({
@@ -59,10 +64,16 @@
     })
 
     const actions = (action) => {
-        if(action == 2) dialog.value = true
+        if(action == 3) dialog.value = true
+        if(action == 2) copyLink()
         if(action == 1) dialog2.value = true
         if(action == 3) dialog3.value = true
     } 
+
+    const copyLink = () => {
+      navigator.clipboard.writeText(`https://legislacao.estudodalei.com.br/document/${props.document.id}`)
+      snackStore.activeSnack('Link copiado', 'success')
+    }
 
     watch(confirmacao, (newConfirm) => {
       props.document.active = false

@@ -18,6 +18,12 @@ export default [
         meta: { requiresAuth: true } 
       },
       {
+        path: '/documents/:id',
+        name: 'Documento',
+        component: () => import('@/views/documents/document.vue'),
+        meta: { requiresAuth: true } 
+      },
+      {
         path: '/myposts',
         name: 'Meus Posts',
         component: () => import('@/views/MyPosts.vue'),

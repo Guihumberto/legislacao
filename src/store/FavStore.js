@@ -2,8 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/services/api";
 
 import { useLoginStore } from "./LoginStore";
-let data = sessionStorage.getItem('userData')
-if(data) data = JSON.parse(data).cpf
+
 
 export const useFavStore = defineStore("favStore", {
     state: () => ({
@@ -76,9 +75,12 @@ export const useFavStore = defineStore("favStore", {
             }
         },
         async getListFavPages(section = 'law'){
-            const cpf = data || false
+            let data = sessionStorage.getItem('userData')
+            if(data) data = JSON.parse(data).cpf
+            let cpf = data || false
             if(!cpf){
                 console.log('nao carregado o usuário'); 
+                console.log('data', data);
                 return
             }
             try {

@@ -53,7 +53,7 @@
     const router = useRouter()
     const route = useRoute()
     
-    import OptionsDoc from './../optionsDoc.vue';
+    import OptionsDoc from './optionsDoc.vue';
     import loading from './../load.vue';
 
     import { useUserAreaStore } from '@/store/AreaUserStore';

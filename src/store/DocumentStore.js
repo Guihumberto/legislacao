@@ -4,6 +4,7 @@ import apiChat from "@/services/api_chat"
 
 export const useDocumetStore = defineStore("document", {
     state: () => ({
+        doc: null,
         documents: [],
         load: false, 
         pagination:{
@@ -14,6 +15,9 @@ export const useDocumetStore = defineStore("document", {
         },
     }),
     getters: {
+        readDoc(){
+            return this.doc
+        },
         readDocuments(){
             return this.documents
         },
@@ -25,6 +29,19 @@ export const useDocumetStore = defineStore("document", {
         }
     },
     actions:{
+        async getDoc(id){
+            try {
+                this.load = true
+                this.doc = null
+                const response = await api.get(`documents/_doc/${id}`)
+                this.doc = response.data?._source
+            } catch (error) {
+                console.log('erro ao recuperar documento');
+                this.doc = null
+            } finally{
+                this.load = false
+            }
+        },
         async getListDocuments(){
             try {
                 this.load = true
