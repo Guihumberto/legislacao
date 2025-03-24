@@ -228,6 +228,6 @@ export const useAdminStore = defineStore("admin", {
             } catch (error) {
                 console.log('error law exist');
             } 
-        }
+        },
     }
 })

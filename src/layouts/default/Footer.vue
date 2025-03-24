@@ -1,8 +1,7 @@
 <template>
   <div class="footer">
-      <div class="container">
+      <!-- <div class="container">
         <div class="datasefaz">
-          <!-- <img class="mb-2" src="https://www.transparencia.ma.gov.br/assets/images/v2/img/governo2-removebg-preview.png" alt=""> -->
           <h3>OH-MY-SEARCH</h3>
           <p>CNPJ:</p>
           <p> Av. Gen. Arthur Carvalho, 500 <br> CEP 65066-320, São Luís - MA</p>
@@ -26,13 +25,13 @@
             <contador class="contador" />
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="subfooter">
         <h3>© {{ new Date().getFullYear() }} - OH-MY-SEARCH</h3>
         <p class="text-center">Desenvolvido e idealizado por <br class="off"> JOÃO HUMBERTO S R JR.</p>
       </div>
       <div class="py-4 w-100 text-center info">
-        Informações adicionais
+        <contador class="contador" />
       </div>
   </div>
 </template>

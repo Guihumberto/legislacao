@@ -63,7 +63,7 @@
   const allLaw = ref(false)
 
   onMounted(async() => {
-      const resp = await LawsStore.asyncGetLastLawsAdd()
+      const resp = await LawsStore.getLastLawsAdd()
       allLaw.value = resp
   })
  

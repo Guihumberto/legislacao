@@ -114,13 +114,42 @@ export const useLawStore = defineStore("Law", {
                 this.load = false
             }
         },
-        async asyncGetLastLawsAdd(){
+        async getLastLawsAdd(search = false){
+
+            let mustClauses = [];
+
+            if(search?.tipo || search?.ano){
+                if(search?.tipo && search?.ano == 'null'){
+                    mustClauses.push({
+                        term: { tipo: search.tipo }
+                   });
+                }
+    
+                if(search?.ano && !search?.tipo == 'null'){
+                    mustClauses.push({
+                        term: { ano: search.ano }
+                    });
+                }
+    
+                if(search?.tipo != 'null' && search?.ano != 'null'){
+                    mustClauses.push({
+                        term: { tipo: search.tipo }
+                    });
+                    mustClauses.push({
+                        term: { ano: search.ano }
+                    });
+                }
+                if(search?.tipo == 'null' && search?.ano == 'null') mustClauses = [];
+            }
+
             try {
                 this.load = true
                 const response = await api.post("laws_v3/_search", {
                   size: 10,
                   query: {
-                    match_all: {}, // Retorna todos os documentos
+                    bool: {
+                        must: mustClauses.length > 0 ? mustClauses : [{ match_all: {} }]
+                    }
                   },
                   sort: [
                     {
@@ -131,6 +160,7 @@ export const useLawStore = defineStore("Law", {
                   ],
                   })
                 return response.data.hits.hits
+
             } catch (error) {
                 console.log("error");
             }finally{

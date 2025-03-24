@@ -119,13 +119,17 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, watch } from 'vue';
+
+    import { useRouter } from 'vue-router';
+    const router = useRouter()
 
     import { extractTextFromPdf } from "@/composables/pdfExtractor"; 
     import PdfViewer from './pdfViewer.vue';
 
     import { useGeneralStore } from '@/store/GeneralStore';
     const generalStore = useGeneralStore()
+    
 
     import { useAdminStore } from '@/store/AdminStore';
     import PublishNews from './publishNews.vue';
@@ -151,6 +155,11 @@
         revogado: false,
         fav_law: false
     })
+
+    watch(() => ({ year: importForm.value.year, source: importForm.value.source }), (newVal, oldVal) => {
+        router.push(`importar?source=${importForm.value.source}&year=${importForm.value.year}`)
+        }, { deep: true }
+    )
 
     const handleCustomInput = (value) => {
         const inputValue = event.target.value;

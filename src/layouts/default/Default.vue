@@ -163,7 +163,7 @@ section .container{
   width: min(90vw, 1000px);
   margin-inline: auto;
   /* margin-bottom: 1rem; */
-  min-height: calc(100vh - 498px);
+  min-height: calc(100vh - 228px);
   padding: 1rem 0 .1rem;
   transition: 1s ease;
 }
@@ -172,7 +172,7 @@ section .container2{
   width: min(90vw, 1000px);
   margin-inline: auto;
   /* margin-bottom: 1rem; */
-  min-height: calc(100vh - 377px);
+  min-height: calc(100vh - 100px);
   padding: 1rem 0 .1rem;
   transition: 1s ease;
 }
