@@ -1,11 +1,18 @@
 <template>
- <section-search />
+     <section>
+        <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+            <section-search />
+        </div>
+     </section>
 </template>
 
 <script setup>
     import { onMounted } from 'vue'
     import { useRouter } from 'vue-router'
     const router = useRouter()
+
+    import { useGeralStore } from '@/store/GeralStore';
+    const geralStore = useGeralStore()
 
     import SectionSearch from '@/components/home/SectionSearch.vue';
 
