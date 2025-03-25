@@ -3,7 +3,7 @@
         <div v-if="load">Carregando...</div>
     </transition>
     <transition name="fade">
-        <v-list class="pa-0 mb-5" v-if="!load">
+        <v-list class="pa-0 mb-5" v-if="!load && imporType == 'pdf'">
             <v-list-subheader>Últimas normas adicionadas</v-list-subheader>
             <v-list-item link v-for="item, i in list" :key="i"
                 :title="item.title"
@@ -49,6 +49,10 @@
             load.value = false
         }, {deep: true} 
     )
+
+    const props = defineProps({
+        imporType: String
+    })
 
 </script>
 

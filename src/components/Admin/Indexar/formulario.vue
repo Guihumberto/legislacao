@@ -1,5 +1,9 @@
 <template>
     <v-card class="my-5 card" variant="flat">
+        <v-card-text>
+            <v-btn  variant="flat" @click="importType = 'pdf'" class="mr-2" :color="importType == 'pdf' ? 'success': 'grey'">PDF</v-btn>
+            <v-btn :disabled="importForm.file" variant="flat" @click="selectImport()" :color="importType == 'copy-content' ? 'success': 'grey'">Copia e cola</v-btn>
+        </v-card-text>
         <v-card-text v-if="!confirm">
             <div>
                 <v-form @submit.prevent="indexarLaws()" ref="form">
@@ -38,21 +42,49 @@
                         <v-checkbox label="Revogado" v-model="importForm.revogado" color="error" hide-details></v-checkbox>
                         <v-checkbox v-model="importForm.fav_law" color="amber" label="Incluir nos Destaques" hide-details></v-checkbox>
                     </div>
-                    <v-file-input 
-                        label="Selecione a norma"
-                        v-model="importForm.file"
-                        variant="outlined"
-                        density="compact"
-                        prepend-inner-icon="mdi-folder"
-                        :rules="[rules.required, rules.onlyPdf]"
-                    ></v-file-input>
-                    <div class="text-right">
-                        <v-btn 
-                            variant="flat" color="success"
-                            :disabled="!importForm.file"
-                            type="submit"
-                        >Avançar</v-btn>
-                    </div>
+                    <Transition name="fade">
+                        <div v-if="importType == 'pdf'">
+                            <v-file-input 
+                                label="Selecione a norma"
+                                v-model="importForm.file"
+                                variant="outlined"
+                                density="compact"
+                                prepend-inner-icon="mdi-folder"
+                                :rules="[rules.required, rules.onlyPdf]"
+                            ></v-file-input>
+                            <div class="text-right">
+                                <v-btn 
+                                    variant="flat" color="success"
+                                    :disabled="!importForm.file"
+                                    type="submit"
+                                >Avançar</v-btn>
+                            </div>
+                        </div>
+                    </Transition>
+                    <Transition name="fade">
+                        <div v-if="importType == 'copy-content'" class="text-right">
+                            <v-text-field
+                                label="Nome da norma"
+                                variant="outlined"
+                                density="compact"
+                                :rules="[rules.required]"
+                                v-model="importForm.name"
+                            ></v-text-field>
+                            <v-textarea
+                                label="Texto"
+                                variant="outlined"
+                                density="compact"
+                                :rules="[rules.required]"
+                                v-model="texto"
+                                clearable
+                            ></v-textarea>
+                            <div class="d-flex ga-2 justify-end mt-2">
+                                <v-btn variant="text" color="grey" @click="clear">Limpar</v-btn>
+                                <v-btn v-if="!importForm.text.length" color="primary" @click="importarLaw()">Importar</v-btn>
+                                <v-btn :loading="adminStore.readLoad" v-else color="success" @click="saveNormaCopyContent">Salvar</v-btn>
+                            </div>
+                        </div>
+                    </Transition>
                 </v-form>
             </div>
         </v-card-text>
@@ -115,6 +147,7 @@
                 
             </div>
         </v-card-text>
+        <SpeelsLawText v-if="importType == 'copy-content'" :form="importForm" />
     </v-card>
 </template>
 
@@ -134,10 +167,14 @@
     import { useAdminStore } from '@/store/AdminStore';
     import PublishNews from './publishNews.vue';
     const adminStore = useAdminStore()
+    
+    import SpeelsLawText from './speelsLawText.vue';
 
     const confirm = ref(false)
     const lawData = ref({})
     const form = ref(null)
+
+    const importType = ref('pdf')
 
     const rules = {
         required: value => !!value || "campo obrigatório", 
@@ -146,14 +183,15 @@
     }
 
     const importForm = ref({
-        year: 2025,
+        year: 1966,
         source: null,
         name: null,
         file: null,
         eficaz: true,
         sigiloso: false,  
         revogado: false,
-        fav_law: false
+        fav_law: false,
+        text: []
     })
 
     watch(() => ({ year: importForm.value.year, source: importForm.value.source }), (newVal, oldVal) => {
@@ -177,7 +215,9 @@
             eficaz: true,
             sigiloso: false,  
             revogado: false,
-            fav_law: false
+            fav_law: false,
+            name: null, 
+            text: []
         }
     }
 
@@ -194,6 +234,7 @@
         clearimportForm()
         confirm.value = false
         lawSave.value = ref(null)
+        texto.value = null
     }
 
     const extractedText = ref("");
@@ -241,6 +282,74 @@
 
         const resp = await adminStore.indexarNorma(law, extractedText.value);
         lawSave.value = resp
+    }
+
+    const emits = defineEmits(['importType'])
+
+    const selectImport = () => {
+        importType.value = 'copy-content'
+        emits('importType', importType.value)
+    }
+
+    const texto = ref(null)
+    const limit = 2550
+
+    const importarLaw = () => {
+        const text = dividirTextoParaPaginas(texto.value, limit)
+        importForm.value.text = text
+    }
+
+    const dividirTextoParaPaginas = (texto, limiteCaracteres) => {
+        const linhas = texto.split("\n");
+        let paginas = [];
+        let paginaAtual = "";
+        let caracteresNaPagina = 0;
+        let numeroPagina = 1;
+
+        for (let linha of linhas) {
+            if (caracteresNaPagina + linha.length > limiteCaracteres) {
+                paginas.push({ num_page: numeroPagina, text: paginaAtual.trim() });
+                numeroPagina++;
+                paginaAtual = ""; // Reinicia a página
+                caracteresNaPagina = 0;
+            }
+
+            // Adiciona a linha à página atual
+            paginaAtual += linha + "\n";
+            caracteresNaPagina += linha.length;
+        }
+
+        // Adiciona a última página se houver conteúdo restante
+        if (paginaAtual.trim().length > 0) {
+            paginas.push({ num_page: numeroPagina, text: paginaAtual.trim() });
+        }
+
+        return paginas;
+    }
+
+    const saveNormaCopyContent = async () => {
+        const law = {
+            tipo: importForm.value.source,
+            ano: importForm.value.year,
+            sigiloso: importForm.value.sigiloso,
+            revogado: importForm.value.revogado,
+            fonte: 'web',
+            description_norm: importForm.value.text[0].text,
+            total_pages: importForm.value.text.length,
+            eficaz: importForm.value.eficaz,
+            id: Date.now(),
+            path: `./legislacao/${importForm.value.source}/${importForm.value.year}/${importForm.value.name}.pdf`,
+            page_to_norma: { name : "norma"},
+            title: importForm.value.name,
+            data_include: formatDate.value
+        }
+
+        lawData.value = { ...law }
+
+        const resp = await adminStore.indexarNorma(law, importForm.value.text);
+        lawSave.value = resp
+        console.log('salvo');
+        clear()
     }
 
 
