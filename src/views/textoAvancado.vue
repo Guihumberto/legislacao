@@ -88,15 +88,33 @@
                 </div>
             </div>
         </section>
-        <div class="chat"  :style="{ width: rightWidth + 'px' }">
+        <div class="chat"  :style="{ width: rightWidth + 'px' }" v-if="!xs">
             <div class="resizer" @mousedown="startResize('right')"></div>
             <ChatLawComplete :idLaw="idLaw" />
         </div>
+        <v-bottom-sheet v-model="sheet">
+            <template v-slot:activator="{ props: activatorProps }" v-if="xs">
+            <div class="fixed">
+                <v-btn
+                v-bind="activatorProps"
+                color="purple"
+                text="Abrir Arcádio Chat IA"
+                prepend-icon="mdi-robot"
+                ></v-btn>
+            </div>
+            </template>
+            <v-card class="text-center">
+                <ChatLawComplete :idLaw="idLaw" />
+            </v-card>
+        </v-bottom-sheet>
     </div>
 </template>
 
 <script setup>
     import { ref, computed, watch, onMounted } from "vue";
+    import { useDisplay } from 'vuetify'
+    const { xs } = useDisplay()
+
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
    
@@ -440,6 +458,9 @@
       window.removeEventListener("mouseup", stopResize);
     }
 
+    import { shallowRef } from 'vue'
+
+    const sheet = shallowRef(false)
 
 </script>
 
@@ -494,6 +515,16 @@
 }
 .form{
     width: 50%;
+}
+.fixed {
+  position: fixed;
+  background: purple;
+  width: 100%;
+  text-align: center;
+  bottom: 0; /* Ajuste conforme necessário */
+  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
+  animation: slideTopDocument .5s ease-in;
+  transition: 1s ease;
 }
 @media (max-width:900px){
     .form{
