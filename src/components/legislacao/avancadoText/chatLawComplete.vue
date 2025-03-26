@@ -106,8 +106,8 @@
             geralStore.changeHeaderNoShow(false)
             load.value = true
             const init = await searchStore.searchChatInit()
-            // await chatStore.getChat(route.params?.id)
-            // messages.value = [...chatStore.readChat]
+            await chatStore.getChat(route.params?.id)
+            messages.value = [...chatStore.readChat]
             load.value = false
             messages.value.push({ user: 'assistant', content: init, date: Date.now() })
         } 
