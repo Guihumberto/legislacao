@@ -1,5 +1,5 @@
 <template>
-  <div class="footer">
+  <div class="footer" :class="$route.name == 'Avancado' ? 'noneFooter':''">
       <!-- <div class="container">
         <div class="datasefaz">
           <h3>OH-MY-SEARCH</h3>
@@ -125,5 +125,8 @@
     .footer {
         display: none;
     }
+}
+.noneFooter{
+    display: none;
 }
 </style>
