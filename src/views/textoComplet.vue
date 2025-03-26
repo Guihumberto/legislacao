@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { computed } from 'vue';
     import SelectionSearch from '@/components/legislacao/elements/selectionSearch.vue'
     import { useHandleTextSelection  } from '@/composables/handleTextSelection'
     import { useRoute, useRouter } from 'vue-router';

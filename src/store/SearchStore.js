@@ -7,7 +7,8 @@ import { useLoginStore } from "./LoginStore";
 export const useSearchStore = defineStore("searchStore", {
     state: () => ({
         results: [],
-        load: false
+        load: false,
+        loadSaveEmbbedings: false
     }),
     getters: {
         reasResults(){
@@ -15,6 +16,9 @@ export const useSearchStore = defineStore("searchStore", {
         },
         readLoad(){
             return this.load
+        },
+        readLoadSaveEmbbedings(){
+            return this.loadSaveEmbbedings
         }
     },
     actions:{
@@ -101,6 +105,40 @@ export const useSearchStore = defineStore("searchStore", {
             } finally {
                 this.load = false
             }
-        }
+        },
+        async isEmbeddingExist(id){
+            try {
+                const response = await api.post('document_embeddings/_search', {
+                    query:{
+                        match:{
+                            id: id
+                        }
+                    }
+                })
+                const resp = response.data.hits.total.value
+                return resp
+            } catch (error) {
+                console.log('Erro ao verificar a existencia do embedding',);
+            }
+        },
+        async saveEmbbedings(item){
+            this.loadSaveEmbbedings = true
+             try {
+                 const resp = await apiChat.post('save-collection-embeddings', {
+                     ids: [item.parent],
+                     title: item.title,
+                     id: item.parent
+                 })
+                 if(resp.data){
+                     console.log('Embedding criado com sucesso', resp.data);
+                     this.loadSaveEmbbedings = false
+                 }
+                 return resp.data
+             } catch (error) {
+                 console.log('erro ao criar embeddings');
+             } finally {
+                this.loadSaveEmbbedings = false
+             }
+         },
     }
 })

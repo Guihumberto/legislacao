@@ -19,7 +19,6 @@
     import { useDocumetStore } from '@/store/DocumentStore';
     const documentStore = useDocumetStore()
 
-
     import { computed, onMounted, watch } from 'vue';
     
     import { useRoute } from 'vue-router';

@@ -13,20 +13,20 @@
                     :class="['message', msg.user === 'assistant' ? 'assistant' : 'user']"
                 >
                     <v-menu
-                    open-on-hover
-                    location="bottom"
+                        open-on-hover
+                        location="bottom"
                     >
-                    <template v-slot:activator="{ props }">
-                        <div 
-                        v-bind="props"
-                        class="message-content">
-                            <p v-html="msg.content"></p>
-                            <div class="text-right">
-                                <small v-if="msg?.date">{{ useDateNow(msg.date) }}</small>
+                        <template v-slot:activator="{ props }">
+                            <div 
+                                v-bind="props"
+                                class="message-content">
+                                <p v-html="msg.content"></p>
+                                <div class="text-right">
+                                    <small v-if="msg?.date">{{ useDateNow(msg.date) }}</small>
+                                </div>
                             </div>
-                        </div>
-                    </template>
-                    <MenuUser :msg="msg" />
+                        </template>
+                        <MenuUser :msg="msg" />
                     </v-menu>
                 </div>
                 <Loading v-if="load || searchStore.readLoad" />

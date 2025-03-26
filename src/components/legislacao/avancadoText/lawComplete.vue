@@ -1,105 +1,98 @@
 <template>
-    <div class="wrapper">
-        <section class="conteudo">
-            <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-                <div class="sizeLoad" v-if="pageStore.readLoad">
-                    <v-progress-circular
-                        :size="50"
-                        color="primary"
-                        indeterminate
-                    ></v-progress-circular>
-                </div>
-                <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>
-                    <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
-                    <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
-        
+    <section>
+        <div :class="geralStore.readHeaderShow ? 'container sizeLoad': 'container2 sizeLoad'" v-if="pageStore.readLoad">
+            <v-progress-circular
+                :size="50"
+                color="primary"
+                indeterminate
+            ></v-progress-circular>
+        </div>
+        <div :class="geralStore.readHeaderShow ? 'container': 'container2'" v-else>
+            <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>
+            <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">MODO TEXTO</v-btn>
+            <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn">ocultar cabeçalho</v-btn>
+
+            <div>
+                <v-expand-transition>
+                    <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
+                        <p v-html="cabecalho"></p>
+                    </div>
+                </v-expand-transition>
+            </div>
+
+            <v-card class="my-5">
+                <v-card-text>
+                    <div class="form">
+                        <v-text-field
+                            variant="outlined"
+                            density="compact"
+                            label="Busca"
+                            append-inner-icon="mdi-magnify"
+                            v-model.trim="search"
+                            @keydown.enter="filterJustArt(search)"
+                            :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                            clearable
+                        ></v-text-field>
+                    </div>
+                    <div v-if="suggestArtBtn">
+                        <v-chip 
+                            @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                            >
+                            Art. {{search.replace(/[^0-9]/g,'')}}
+                        </v-chip>
+                    </div>
                     <div>
-                        <v-expand-transition>
-                            <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
-                                <p v-html="cabecalho"></p>
-                            </div>
-                        </v-expand-transition>
-                    </div>
-        
-                    <v-card class="my-5" :title="idLaw?.title">
-                        <v-card-text>
-                            <div class="form">
-                                <v-text-field
-                                    variant="outlined"
-                                    density="compact"
-                                    label="Busca"
-                                    append-inner-icon="mdi-magnify"
-                                    v-model.trim="search"
-                                    @keydown.enter="filterJustArt(search)"
-                                    :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
-                                    clearable
-                                ></v-text-field>
-                            </div>
-                            <div v-if="suggestArtBtn">
-                                <v-chip 
-                                    @click="filterJustArt(search.replace(/[^0-9]/g,''))"
-                                    >
-                                    Art. {{search.replace(/[^0-9]/g,'')}}
-                                </v-chip>
-                            </div>
-                            <div>
-                                <v-chip-group
-                                    v-if="artsFilterActive"
+                        <v-chip-group
+                            v-if="artsFilterActive"
+                        >
+                            <v-chip 
+                                @click="pageFilter(false)" 
+                                variant="text" v-if="artsFilter.length == 1"
+                                exact-active-class="0"
+                            >
+                                <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+                            </v-chip>
+                            <v-chip
+                                v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
+                                @click:close="artFilterRemove(tag)"
+                                closable
                                 >
-                                    <v-chip 
-                                        @click="pageFilter(false)" 
-                                        variant="text" v-if="artsFilter.length == 1"
-                                        exact-active-class="0"
-                                    >
-                                        <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                    <v-chip
-                                        v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
-                                        @click:close="artFilterRemove(tag)"
-                                        closable
-                                        >
-                                            art. {{tag}}
-                                    </v-chip>
-                                    <v-btn 
-                                        variant="text" 
-                                        @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
-                                        Limpar Filtro
-                                    </v-btn>
-                                    <v-chip 
-                                        @click="pageFilter(true)" 
-                                        variant="text" v-if="artsFilter.length == 1">
-                                            <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                </v-chip-group>
-                            </div>
-                        </v-card-text>
-                    </v-card>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
-        
-                    <div class="bg-white">
-                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
-                                <TextDispositivo :dispositivo="item" :search="search" />
-                        </div>
+                                    art. {{tag}}
+                            </v-chip>
+                            <v-btn 
+                                variant="text" 
+                                @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                Limpar Filtro
+                            </v-btn>
+                            <v-chip 
+                                @click="pageFilter(true)" 
+                                variant="text" v-if="artsFilter.length == 1">
+                                    <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+                            </v-chip>
+                        </v-chip-group>
                     </div>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
+                </v-card-text>
+            </v-card>
+
+            <Pagination :totalPage="totalPage" :pagination="pagination" />
+
+            <div class="bg-white">
+                <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
+                        <TextDispositivo :dispositivo="item" :search="search" />
                 </div>
             </div>
-        </section>
-        <div class="chat"  :style="{ width: rightWidth + 'px' }">
-            <div class="resizer" @mousedown="startResize('right')"></div>
-            <ChatLawComplete :idLaw="idLaw" />
+
+            <Pagination :totalPage="totalPage" :pagination="pagination" />
+           
         </div>
-    </div>
+    </section>
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted } from "vue";
+    import { ref, computed, watch } from "vue";
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
-   
+   0
     import { usePageStore } from "@/store/PageStore";
     const pageStore = usePageStore()
    
@@ -112,7 +105,6 @@
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
 
-    import ChatLawComplete from "@/components/legislacao/avancadoText/chatLawComplete.vue";
 
     const textLaws = ref([])
     const hiddenCabecalho = ref(false)
@@ -333,11 +325,6 @@
         textLaws.value = pageStore.readAllPages
     }
 
-    const idLaw = computed(() => {
-        const resp = textLaws.value[0]?._source.page_to_norma
-        return resp
-    })
-
     const filterJustArt = (item) => {
         const art = item.replace(/[^0-9,]/g,'')
         const hasComma = art.includes(",");
@@ -394,98 +381,15 @@
         artsFilter.value.push(art)
     }
 
-    onMounted(() => {
-        getAll()
-    })
-
-    const leftWidth = ref(200) // Largura inicial da sidebar esquerda
-    const rightWidth = ref(350) // Largura inicial da sidebar direita
-    const isResizing = ref(false)
-    const activeSidebar = ref(null)
- 
-    const startResize = (side) => {
-      isResizing.value = true;
-      activeSidebar.value = side;
-
-      // Adiciona os eventos de movimento e liberação
-      window.addEventListener("mousemove", onResize);
-      window.addEventListener("mouseup", stopResize);
-    }
-
-    const onResize = (event) => {
-        if (isResizing.value && activeSidebar.value) {
-          const containerWidth = document.querySelector(".container").offsetWidth;
-  
-          if (activeSidebar.value === "left") {
-            // Calcula a nova largura da sidebar esquerda
-            const newLeftWidth = Math.min(Math.max(event.clientX, 100), containerWidth - rightWidth.value - 100);
-            leftWidth.value = newLeftWidth;
-          } else if (activeSidebar.value === "right") {
-            // Calcula a nova largura da sidebar direita
-            const newRightWidth = Math.min(
-              Math.max(containerWidth - event.clientX, 100),
-              containerWidth - leftWidth.value - 100
-            );
-            rightWidth.value = newRightWidth;
-          }
-        }
-    }
-    
-    const stopResize = () => {
-      isResizing.value = false;
-      activeSidebar.value = null;
-
-      // Remove os eventos de movimento e liberação
-      window.removeEventListener("mousemove", onResize);
-      window.removeEventListener("mouseup", stopResize);
-    }
-
+    getAll()
 
 </script>
 
 <style lang="scss" scoped>
-.wrapper{
-    display: flex;
-    height: calc(100vh - 100px);
-    font-family: Arial, sans-serif;
-}
-.conteudo {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #f4f4f4;
-}
-
-.chat {
-    width: 300px;
-    background-color: #fff;
-    border-left: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    position: relative;
-}
-
-.chat.right {
-    border-left: 1px solid #ddd;
-}
-.resizer {
-    width: 5px;
-    cursor: ew-resize;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: #ccc;
-  }
-.chat.right .resizer {
-    left: 0;
-}
-
 .sizeLoad{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
 }
 .corpo{
     margin: 2rem;
@@ -509,20 +413,11 @@
         height: 285mm;
         margin: 0;
     }
-    // .pagina .header{
-    //     height: 10mm;
-    //     margin-bottom: 2rem;
-    // }
 
     .content {
         box-shadow: none;
         margin: 0;
     }
 }
-
-
-
-
-
 
 </style>
