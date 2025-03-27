@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <section class="conteudo">
+        <section class="conteudo" ref="topUp">
             <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
                 <div class="sizeLoad" v-if="pageStore.readLoad">
                     <v-progress-circular
@@ -143,7 +143,9 @@
     const artIndice = ref(null)
     const artsFilter = ref([])
 
-    const divisores = ['art.', 'livro'];
+    const topUp = ref(null)
+
+    const divisores = ['art.', 'livro', 'título', 'titulo'];
     
     const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
         'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
@@ -168,6 +170,15 @@
         pagination.value.page = 1;
       }, { deep: true }
     );
+
+    watch(() => pagination.value.page, (newPage, oldPage) => {
+        if (topUp.value) {
+            topUp.value.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Rolagem suave
+            });
+        }
+    });
 
     const textoInicital = computed(() => {
         const list = textLaws.value.map(x => x._source)

@@ -7,9 +7,9 @@
                     </template>
                 </v-alert>
             </div>
-            <div class="middle ">
-                <active v-if="!isEmbeddingExist" />
-                <Suggesntions v-if="isEmbeddingExist && messages.length <= 5" @question="goQuestion" />
+            <div class="middle" ref="middle">
+                <active v-if="!isEmbeddingExist" :loading="loadInit || searchStore.readLoadSaveEmbbedings" @ativar="activeChat()" />
+                <Suggesntions v-if="isEmbeddingExist && messages.length <= 3" @question="goQuestion" />
                 <v-card-text class="chat-content" ref="chatContent">
                     <div
                         v-for="(msg, index) in messages"
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
     import { useDateNow } from '@/composables/dateFormat';
 
     import { useRoute } from 'vue-router';
@@ -91,28 +91,22 @@
     const load = ref(false)
     const newMessage = ref('')
     const chatContent = ref(null);
+    const middle = ref(null);
 
-    onMounted(async () => {
-        loadInit.value = true
-        const resp = await searchStore.isEmbeddingExist(idChat)
-        isEmbeddingExist.value = resp
-        loadInit.value = false
-        if(isEmbeddingExist.value) {
-            geralStore.changeHeaderNoShow(false)
-            load.value = true
-            const init = await searchStore.searchChatInit()
-            await chatStore.getChat(route.params?.id)
-            messages.value = [...chatStore.readChat]
-            load.value = false
-            messages.value.push({ user: 'assistant', content: init, date: Date.now() })
-        } 
-    })
 
     const goQuestion = (msg) => {
         newMessage.value = msg.title
         sendMessage()
     }
 
+    const scrollToBottom  = () => {
+        if (middle.value) {
+            middle.value.scrollTo({
+                top: middle.value.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+    }
 
     const sendMessage = async () => {
         if(!newMessage.value) return
@@ -139,18 +133,17 @@
             chatStore.saveChat(assistent)
             nextTick()
         }
-    }
+    } 
 
     const nextTick = () => {
       setTimeout(() => {
-        if (chatContent.value) {
-          chatContent.value.$el.scrollTo({
-            top: chatContent.value.$el.scrollHeight,
-            behavior: "smooth"
-          });
-        }
+        scrollToBottom()
       }, 1000)
     }
+
+    watch(messages, () => {
+        nextTick() 
+    }, { deep: true });
 
     const activeChat = async () => {
         await searchStore.saveEmbbedings(props.idLaw)
@@ -158,6 +151,21 @@
         isEmbeddingExist.value = 1
     }
 
+    onMounted(async () => {
+        loadInit.value = true
+        const resp = await searchStore.isEmbeddingExist(idChat)
+        isEmbeddingExist.value = resp
+        loadInit.value = false
+        if(isEmbeddingExist.value) {
+            geralStore.changeHeaderNoShow(false)
+            load.value = true
+            const init = await searchStore.searchChatInit()
+            await chatStore.getChat(route.params?.id)
+            messages.value = [...chatStore.readChat]
+            load.value = false
+            messages.value.push({ user: 'assistant', content: init, date: Date.now() })
+        } 
+    })
 </script>
 
 <style scoped>
