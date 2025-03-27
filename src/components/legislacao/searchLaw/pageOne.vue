@@ -31,7 +31,7 @@
     const pageOne = ref(null)
 
     const divisores = computed(() => {
-        return ['art.', 'livro']
+        return ['art.', 'livro', 'título']
     })
 
     const arrayTextLawEstrutura = computed(() => {

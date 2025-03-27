@@ -12,7 +12,13 @@
                 <div v-else>
                     <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>
                     <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
-                    <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
+                    <div class="d-flex justify-space-between align-center">
+                        <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
+                        <div>
+                            <v-btn disabled prepend-icon="mdi-forum" variant="text" class="text-lowercase">Abrir Discussão</v-btn>
+                            <ForumInfo />
+                        </div>
+                    </div>
         
                     <div>
                         <v-expand-transition>
@@ -470,6 +476,7 @@
     }
 
     import { shallowRef } from 'vue'
+import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
 
     const sheet = shallowRef(false)
 
