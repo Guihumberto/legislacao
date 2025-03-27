@@ -120,13 +120,13 @@
   .off{
     display: block;
   }
+  .noneFooter{
+    display: none;
+}
 }
 @media print {
     .footer {
         display: none;
     }
-}
-.noneFooter{
-    display: none;
 }
 </style>

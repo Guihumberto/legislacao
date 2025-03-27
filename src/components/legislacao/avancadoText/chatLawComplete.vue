@@ -8,6 +8,8 @@
                 </v-alert>
             </div>
             <div class="middle ">
+                <active v-if="!isEmbeddingExist" />
+                <Suggesntions v-if="isEmbeddingExist && messages.length <= 5" @question="goQuestion" />
                 <v-card-text class="chat-content" ref="chatContent">
                     <div
                         v-for="(msg, index) in messages"
@@ -17,6 +19,7 @@
                         <v-menu
                             open-on-hover
                             location="bottom"
+                            attach=".chat-content"
                         >
                             <template v-slot:activator="{ props }">
                                 <div 
@@ -34,16 +37,6 @@
                     <Loading v-if="load || searchStore.readLoad" />
                 </v-card-text>
             </div>
-            <Transition name="fade">
-                <v-sheet
-                    v-if="isEmbeddingExist && messages.length == 1"
-                    class="d-flex pa-2 rounded"
-                    color="success"
-                    min-height="50"
-                >
-                    <v-chip> Sugestão de pesquisa</v-chip>
-                </v-sheet>
-            </Transition>
             <div class="bottom">
                 <v-form>
                     <v-textarea
@@ -52,7 +45,7 @@
                         placeholder="Faça uma pergunta ou solicitação"
                         @keyup.enter="sendMessage"
                         v-model="newMessage"
-                        :disabled="!isEmbeddingExist"
+                        :disabled="!isEmbeddingExist || load || searchStore.readLoad"
                         clearable
                     ></v-textarea>
                 </v-form>
@@ -72,6 +65,8 @@
 
     import MenuUser from '@/components/chat/menuUser.vue';
     import Loading from '../../chat/loading.vue';
+    import active from './active.vue';
+    import Suggesntions from './suggesntions.vue';
 
     import { useSearchStore } from '@/store/SearchStore';
     const searchStore = useSearchStore()
@@ -91,7 +86,7 @@
     })
 
     const messages = ref([
-        { user: '', content: '', idCollection: null }
+        // { user: '', content: '', idCollection: null }
     ])
     const load = ref(false)
     const newMessage = ref('')
@@ -112,6 +107,11 @@
             messages.value.push({ user: 'assistant', content: init, date: Date.now() })
         } 
     })
+
+    const goQuestion = (msg) => {
+        newMessage.value = msg.title
+        sendMessage()
+    }
 
 
     const sendMessage = async () => {
@@ -163,7 +163,9 @@
 <style scoped>
 .wrapperChat{
     position: relative;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 135px);
     margin: 1rem;
     animation: aparecer 1s ease-in forwards ;
 }
@@ -180,21 +182,23 @@
     flex-grow: 1; /* Ocupa o espaço restante */
     overflow-y: auto; /* Adiciona scroll vertical se necessário */
     padding: 1rem;
-    margin: 1rem 0;
     border-radius: 8px;
-    max-height: 60vh;
 }
 .chat-content {
+    contain: layout paint; /* Impede que elementos dentro ultrapassem os limites */
+    position: relative; /* Certifica-se de que elementos filhos respeitem essa div */
     overflow-y: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start; 
 }
+.chat-content .v-overlay {
+    z-index: 1 !important; /* Define um z-index menor para que o menu fique abaixo de outros elementos */
+}
 .bottom{
-    position: absolute;
-    bottom: 0;
-    z-index: 5;
+    position: relative;
+    flex-shrink: 0;
     background: white;
 }
 .message {
