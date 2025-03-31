@@ -2,7 +2,7 @@
     <div class="wrapper">
         <section class="conteudo" ref="topUp">
             <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-                <div class="sizeLoad" v-if="pageStore.readLoad">
+                <div class="sizeLoad" v-if="forumStore.readLoad">
                     <v-progress-circular
                         :size="50"
                         color="primary"
@@ -10,22 +10,9 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>
-                    <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mb-2 mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
-                    <div class="d-flex justify-space-between align-center">
-                        <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
-                        <ForumInfo :title="idLaw?.title" />
-                    </div>
+                    <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>        
         
-                    <div>
-                        <v-expand-transition>
-                            <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
-                                <p v-html="cabecalho"></p>
-                            </div>
-                        </v-expand-transition>
-                    </div>
-        
-                    <v-card class="my-5" :title="idLaw?.title">
+                    <v-card class="my-5">
                         <v-card-text>
                             <div class="form">
                                 <v-text-field
@@ -80,6 +67,7 @@
                     </v-card>
         
                     <Pagination :totalPage="totalPage" :pagination="pagination" />
+
         
                     <div class="bg-white">
                         <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
@@ -91,38 +79,18 @@
                 </div>
             </div>
         </section>
-        <div class="chat"  :style="{ width: rightWidth + 'px' }" v-if="!xs">
-            <div class="resizer" @mousedown="startResize('right')"></div>
-            <ChatLawComplete :idLaw="idLaw" />
-        </div>
-        <v-bottom-sheet v-model="sheet">
-            <template v-slot:activator="{ props: activatorProps }" v-if="xs">
-            <div class="fixed">
-                <v-btn
-                v-bind="activatorProps"
-                color="purple"
-                text="Abrir Arcádio Chat IA"
-                prepend-icon="mdi-robot"
-                ></v-btn>
-            </div>
-            </template>
-            <v-card class="text-center">
-                <ChatLawComplete :idLaw="idLaw" />
-            </v-card>
-        </v-bottom-sheet>
+
     </div>
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide } from "vue";
-    import { useDisplay } from 'vuetify'
-    const { xs } = useDisplay()
-
+    import { ref, computed, watch, onMounted } from "vue";
+  
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
-    import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
+    import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
    
-    import { usePageStore } from "@/store/PageStore";
-    const pageStore = usePageStore()
+    import { useForumStore } from "@/store/ForumStore";
+    const forumStore = useForumStore()
    
     import { useSnackStore } from "@/store/snackStore";
     const snackStore = useSnackStore()
@@ -133,10 +101,6 @@
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
 
-    import ChatLawComplete from "@/components/legislacao/avancadoText/chatLawComplete.vue";
-
-    const textLaws = ref([])
-    const hiddenCabecalho = ref(false)
     const search = ref(null)
     const artsFilterActive = ref(false)
     const pagination = ref({
@@ -147,23 +111,6 @@
     const artsFilter = ref([])
 
     const topUp = ref(null)
-
-    const divisores = ['art.', 'livro', 'título', 'titulo'];
-    
-    const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
-        'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
-        'VII -', 'VIII -', 'IX', 'X', 'X-', 'X - ',
-        'XX', 'XXX', 'XL', 'L -', 'L-', 'LX', 'LI -',  'LI-', 'LII', 'LIV -', 'LIV-', 'LV', 'LIX',
-        'a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)', 'j)', 'k)', 'l)', 'm)', 'n)', 'o)',
-        'p)', 'q)', 'r)', 's)', 't)', 'u)', 'v)', 'x)', 'y)', 'w)', 'z)',
-        '1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '10.',  '11.', '12.', '13.', '14.', '15.', '16.', '17.', '18.', '19.', '20.',  '21.', '22.', '23.', '24.', '25.', '26.', '27.', '28.', '29.', '30.',
-        '1-', '2-','3-', '4-', '5-','6-',  '7-', '8-','9-', '10-', 
-        '1 -', '2 -','3 -', '4 -', '5 -','6 -', '7 -', '8 -','9 -', '10 -'  
-    ]
-    
-    const arrayEstrturaONly =  ['LIVRO ', 'TÍTULO ', 'CAPÍTULO ', 'SEÇÃO ', 'SUBSEÇÃO ']
-
-    const referencias = arrayEstrturaONly.concat(arrayTextLawEstrutura)
 
     watch(search, (newConfirm) => {
         pagination.value.page = 1 
@@ -183,100 +130,6 @@
         }
     });
 
-    const textoInicital = computed(() => {
-        const list = textLaws.value.map(x => x._source)
-            .sort((a, b) => a.num_page - b.num_page)
-            .map(x => x.text_page)
-            .join('\n')
-            .replaceAll('–', '-')
-            .split(/(\r\n|\n|\r)/gm)
-            .filter((i) => i )
-            .filter(i => i != '\n' )
-            .map(item => item.trim())
-        
-        const divisorIndex = list.findIndex(str => 
-            divisores.some(divisor => str.toLowerCase().startsWith(divisor.toLowerCase()))
-        )
-
-        if (divisorIndex !== -1) {
-            const textoincial = list.slice(0, divisorIndex);
-            const legislacao = list.slice(divisorIndex);
-
-            return { textoincial, legislacao }
-;
-        } else {
-                console.log('Nenhum divisor encontrado');
-        }
-            
-        return list
-    })
-
-    const listPage = computed(() => {
-        const list = textoInicital.value.legislacao
-
-        const novoArray = [];
-        let elementoAtual = '';
-
-        if(Array.isArray(list)) {
-            list.forEach((str, index) => {
-                const eReferencia = referencias.some(ref => str.toLowerCase().startsWith(ref.toLowerCase()));
-    
-                if (eReferencia && elementoAtual) {
-                    // Adiciona o elemento acumulado ao novo array
-                    novoArray.push(elementoAtual.trim());
-                    // Reinicia o acumulador com o elemento atual
-                    elementoAtual = str;
-                } else {
-                    elementoAtual += (elementoAtual ? ' ' : '') + str;
-                }
-    
-                // Adiciona o último elemento acumulado ao final do loop
-                if (index === list.length - 1 && elementoAtual) {
-                    novoArray.push(elementoAtual.trim());
-                }
-            });
-        }
-
-        return novoArray
-    })
-
-    const listFinal = computed(() => {
-        const strings = listPage.value
-
-        let ultimoArt = null; // Armazena o último artigo encontrado
-
-        const novoArray = strings.map((item, index) => {
-            const artMatch = item.toLowerCase().startsWith('art.');
-            const estruturaMatch = arrayEstrturaONly.some(ref => item.toUpperCase().startsWith(ref.toUpperCase()));
-
-            // Determina o próximo artigo subsequente para `estrutura`
-            if (estruturaMatch) {
-                const proximoArt = strings
-                .slice(index + 1) // Pega os elementos subsequentes
-                .find(str => str.toLowerCase().startsWith('art.')) // Encontra o próximo "art."
-                ?.slice(4, 12).match(/\d+/)?.[0]; // Extrai o número
-
-                if (proximoArt) {
-                ultimoArt = parseInt(proximoArt) || null; // Atualiza o último artigo com o subsequente
-                }
-            }
-
-            // Atualiza o último artigo encontrado diretamente
-            if (artMatch) {
-                ultimoArt = parseInt(item.slice(4, 12).match(/\d+/)?.[0]) || null;
-            }
-
-            return {
-                art: ultimoArt, // O último artigo atualizado
-                order: index + 1, // Ordem no array
-                estrutura: estruturaMatch, // True se for estrutura
-                textlaw: item // Texto original
-            };
-        });
-        return novoArray
-    })
-
-    provide('textlaw', listFinal)
 
     const listTextLaw = computed(() => {
         let list = listFinal.value
@@ -345,10 +198,6 @@
         return Math.ceil(total/pagination.value.perPage)
     })
 
-    const cabecalho = computed(() => {
-        return textoInicital.value.textoincial.join('<br>')
-    })
-
     const lastArt = computed(() => {
         const law = listFinal.value.map(x => x.art)
         const lastArt = Math.max(...law)
@@ -362,15 +211,12 @@
         return false
     })
 
-    const getAll = async() => {
-        await pageStore.getAllPages(route.params.id)
-        textLaws.value = pageStore.readAllPages
-    }
+    const listFinal = ref([])
 
-    const idLaw = computed(() => {
-        const resp = textLaws.value[0]?._source.page_to_norma
-        return resp
-    })
+    const getAll = async() => {
+        await forumStore.getAllPages(route.params.id)
+        listFinal.value = forumStore.readAllPages
+    }
 
     const filterJustArt = (item) => {
         const art = item.replace(/[^0-9,]/g,'')
@@ -431,53 +277,6 @@
     onMounted(() => {
         getAll()
     })
-
-    const leftWidth = ref(200) // Largura inicial da sidebar esquerda
-    const rightWidth = ref(350) // Largura inicial da sidebar direita
-    const isResizing = ref(false)
-    const activeSidebar = ref(null)
- 
-    const startResize = (side) => {
-      isResizing.value = true;
-      activeSidebar.value = side;
-
-      // Adiciona os eventos de movimento e liberação
-      window.addEventListener("mousemove", onResize);
-      window.addEventListener("mouseup", stopResize);
-    }
-
-    const onResize = (event) => {
-        if (isResizing.value && activeSidebar.value) {
-          const containerWidth = document.querySelector(".container").offsetWidth;
-  
-          if (activeSidebar.value === "left") {
-            // Calcula a nova largura da sidebar esquerda
-            const newLeftWidth = Math.min(Math.max(event.clientX, 100), containerWidth - rightWidth.value - 100);
-            leftWidth.value = newLeftWidth;
-          } else if (activeSidebar.value === "right") {
-            // Calcula a nova largura da sidebar direita
-            const newRightWidth = Math.min(
-              Math.max(containerWidth - event.clientX, 100),
-              containerWidth - leftWidth.value - 100
-            );
-            rightWidth.value = newRightWidth;
-          }
-        }
-    }
-    
-    const stopResize = () => {
-      isResizing.value = false;
-      activeSidebar.value = null;
-
-      // Remove os eventos de movimento e liberação
-      window.removeEventListener("mousemove", onResize);
-      window.removeEventListener("mouseup", stopResize);
-    }
-
-    import { shallowRef } from 'vue'
-import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
-
-    const sheet = shallowRef(false)
 
 </script>
 

@@ -116,14 +116,19 @@
                 }
             } else {
                 // Se a categoria não existe, crie uma nova categoria com a subcategoria
-                acumulador.push({
-                    title: generalStore.fonteNome(item.tipo).mudar,
-                    open: 0,
-                    children: [{
-                        id: item.page_to_norma.parent,
-                        title:  item.page_to_norma.title.toLowerCase()
-                    }],
-                });
+                try {
+                    acumulador.push({
+                        title: generalStore.fonteNome(item.tipo).mudar,
+                        open: 0,
+                        children: [{
+                            id: item.page_to_norma.parent,
+                            title:  item.page_to_norma.title.toLowerCase()
+                        }],
+                    });
+                    
+                } catch (error) {
+                    console.log('error side left');
+                }
             }
 
         return acumulador;

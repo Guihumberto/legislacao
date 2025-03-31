@@ -35,4 +35,10 @@ export default [
         component: () => import('@/views/MyPostCreate.vue'),
         meta: { requiresAuth: true } 
       },
+      {
+        path: '/avancado/forumlaw/:id',
+        name: 'Forum Law',
+        component: () => import('@/views/forum/lawforum.vue'),
+        meta: { requiresAuth: true } 
+      },
 ]

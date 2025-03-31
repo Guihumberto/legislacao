@@ -66,8 +66,6 @@ export const useFavStore = defineStore("favStore", {
 
                 const resp = response.data.hits.hits
                 this.favoritos = resp.map( x => ({ idU: x._id, ...x._source}))
-                console.log('resp ids', resp);
-
             } catch (error) {
                 console.log('erro ao recuperar a pilha de FAVORITOS');
             } finally{
