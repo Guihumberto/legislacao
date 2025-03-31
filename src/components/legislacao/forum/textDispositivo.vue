@@ -59,18 +59,6 @@
 </script>
 
 <style scoped>
-.container {
-    display: inline-block;
-    position: relative;
-}
-
-.actions {
-    position: absolute;
-    top: 100%; /* Garante que a segunda div fique abaixo do texto */
-    left: 0;
-    z-index: 10;
-    background: white;
-}
 .estrutura{
     background: rgb(234, 232, 232);
     padding: .5rem;
