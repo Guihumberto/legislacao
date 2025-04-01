@@ -204,23 +204,20 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('error edit comment');
             }
         },
-        async deleteComment(id){
-            this.load = true
+        async deleteComment(id, idDispositivo, listComment){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
 
             try {
                 const resp = await api.delete(`comments/_doc/${id}`)
+                // this.editComment(idDispositivo, listComment)
                 console.log('resp');
             } catch (error) {
                 console.log('error delete comment');
-            } finally {
-                this.load = true
             }
         },
-        async getComments(id){
-            this.load = true
+        async getComments(ids){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
@@ -228,16 +225,14 @@ export const useForumStore = defineStore("forumStore", {
             try {
                 const resp = await api.post('comments/_search', {
                     query:{
-                        match:{
-                            idRef: id
+                        terms:{
+                            _id: ids
                         }
                     }
                 })
-                this.comments = resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+                return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
             } catch (error) {
                 console.log('error getcomment');
-            } finally {
-                this.load = true
             }
         }
     }

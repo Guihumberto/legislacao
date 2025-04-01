@@ -8,40 +8,42 @@
         <v-expand-transition>
             <div class="border rounded mt-2 pt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
                <v-btn density="compact" stacked color="primary" variant="text">
-                    <v-badge color="error" :content="dispositivo.comments.length">
+                    <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
                         <v-btn @click="activeComment = !activeComment">
                             <v-icon>mdi-forum</v-icon>
                         </v-btn>
                     </v-badge>
                </v-btn>
                <transition name="fade">
-                   <v-form v-if="activeComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
-                        <v-select
-                            label="Tipo de Comentário"
-                            density="compact"
-                            :items="types"
-                            item-title="title"
-                            item-value="id"
-                            class="mb-2"
-                            v-model="comment.type"
-                            style="width: 150px;"
-                            hide-details
-                        ></v-select>
-                        <v-textarea
-                            :label="types.find( x => x.id == comment.type).title"
-                            density="compact"
-                            variant="outlined"
-                            v-model="comment.text"
-                            clearable
-                            :rules="[ rules.required ]"
-                        >
-                        </v-textarea>
-                        <div class="d-flex justify-end my-2">
-                            <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
-                        </div>
-                   </v-form>
+                <div v-if="activeComment">
+                    <v-form  class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
+                         <v-select
+                             label="Tipo de Comentário"
+                             density="compact"
+                             :items="types"
+                             item-title="title"
+                             item-value="id"
+                             class="mb-2"
+                             v-model="comment.type"
+                             style="width: 150px;"
+                             hide-details
+                         ></v-select>
+                         <v-textarea
+                             :label="types.find( x => x.id == comment.type).title"
+                             density="compact"
+                             variant="outlined"
+                             v-model="comment.text"
+                             clearable
+                             :rules="[ rules.required ]"
+                         >
+                         </v-textarea>
+                         <div class="d-flex justify-end my-2">
+                             <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
+                         </div>
+                    </v-form>
+                    <Comments :dispositivo="dispositivo" ref="childRef" />
+                </div>
                </transition>
-               <Comments />
                
             </div>
         </v-expand-transition>
@@ -87,10 +89,12 @@
             if(!valid) return
             load.value = true
             await forumStore.saveComment(comment.value)
+            if (childRef.value) childRef.value.adicionarObjeto(comment.value);
             comment.value.text = null
             load.value = false
-        
     }
+
+    const childRef = ref(null);
 
     const highlightText = (text) => {
         if(props.search) {
@@ -128,33 +132,5 @@
     padding: .5rem;
     text-align: center;
     font-weight: 440;
-}
-.comment-box {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    gap: 10px;
-    margin-bottom: .5rem;
-}
-.profile-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: gray;
-}
-.comment-content {
-    flex: 1;
-}
-.username {
-    font-weight: bold;
-}
-.timestamp {
-    color: gray;
-    font-size: 12px;
-}
-.comment-text {
-    margin-top: 5px;
 }
 </style>
