@@ -222,7 +222,7 @@
                         <v-tab v-for="item in tab_name" :value="item" :text="item" :key="item">
                             <template v-slot:append>
                                 <v-expand-transition>
-                                    <v-badge v-if="item == 'Normas' &&  resultsSearchNormas?.total" color="error">
+                                    <v-badge v-if="item == 'Normas' &&  resultsSearchNormas?.total?.value" color="error">
                                         <v-icon icon="mdi-file-document" size="x-large"></v-icon>
                                     </v-badge>
                                 </v-expand-transition>
@@ -981,11 +981,18 @@
                     firstSearch.value = search.value.text
                     if(totalDocs.value) accessedStore.getAccessUser(resultsSearch.value.map( x => x._id))
                     if(totalDocs.value) favStore.getAllFavoritos(resultsSearch.value)
+                    changeTab()
                 }
             } else if (search.value.semantic == 2){
                 load.value = false
                 generalStore.semanticSearch(search.value.text)
             }
+        }
+    }
+
+    const changeTab = () => {
+        if (!resultsSearch.value.length) {
+            tab.value = 'Normas'
         }
     }
 

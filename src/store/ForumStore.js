@@ -142,7 +142,19 @@ export const useForumStore = defineStore("forumStore", {
                         "match": {
                             "idGroup": id
                         }
-                    }
+                    },
+                    "sort": [
+                        {
+                            "_script": {
+                              "type": "number",
+                              "script": {
+                                "source": "Integer.parseInt(doc['order'].value)",
+                                "lang": "painless"
+                              },
+                              "order": "asc"
+                            }
+                          }
+                    ]
                 })
                 const resp = response.data.hits.hits
                 this.allPagesLaw = resp.map( x => ({ ...x._source, id: x._id }))
@@ -167,24 +179,29 @@ export const useForumStore = defineStore("forumStore", {
 
             try {
                 const resp = await api.post('comments/_doc', objeto)
-                console.log('resp save', resp);
+                this.editComment(item.idRef, resp.data._id)
                 this.comments.push(objeto)
             } catch (error) {
-                console.log('error');
+                console.log('error save comment');
             }
         },
-        async editComment(item){
-            this.load = true
+        async editComment(idDispositivo, idComment){
+            this.allPagesLaw.filter( x => x.id === idDispositivo).map(item => {
+                item.comments.push(idComment)
+            })
+            const comment = this.allPagesLaw.find(item => item.id === idDispositivo).comments
+
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
-            const cpf = loginStore.readLogin.cpf
-
-            try {
-                const resp = await api.post(`comments/_doc/${item.id}`, item)
+              try {
+                const resp = await api.post(`law_forum/_update/${idDispositivo}`, {
+                    "doc":{
+                        comments: comment
+                    }
+                })
+                console.log('update', resp.data);
             } catch (error) {
                 console.log('error edit comment');
-            } finally {
-                this.load = true
             }
         },
         async deleteComment(id){

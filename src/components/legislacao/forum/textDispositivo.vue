@@ -19,10 +19,10 @@
                         <v-select
                             label="Tipo de Comentário"
                             density="compact"
-                            variant="text"
                             :items="types"
                             item-title="title"
                             item-value="id"
+                            class="mb-2"
                             v-model="comment.type"
                             style="width: 150px;"
                             hide-details
@@ -32,26 +32,17 @@
                             density="compact"
                             variant="outlined"
                             v-model="comment.text"
+                            clearable
                             :rules="[ rules.required ]"
                         >
-                            <template v-slot:append-inner>
-                                <div class="d-flex align-center h-100">
-                                    <v-btn color="primary" type="submit" :loading="load">Salvar</v-btn>
-                                </div>
-                            </template>
                         </v-textarea>
+                        <div class="d-flex justify-end my-2">
+                            <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
+                        </div>
                    </v-form>
                </transition>
-               <div class="pa-2">
-                    <div class="comment-box" v-for="item, i in forumStore.readComments" :key="i">
-                        <div class="profile-pic"></div>
-                        <div class="comment-content">
-                            <div class="username">{{ item.user_name }}</div>
-                            <div class="timestamp">{{ item.data_include }}</div>
-                            <div class="comment-text">{{ item.text }}</div>
-                        </div>
-                    </div>
-               </div>
+               <Comments />
+               
             </div>
         </v-expand-transition>
     </div>
@@ -60,6 +51,7 @@
 <script setup>
     import { ref } from 'vue';
 
+    import Comments from './comments.vue';
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
 
@@ -91,14 +83,13 @@
     ]
 
     const saveComment = async () => {
-        const { valid } = await form.value.validate()
-
-        if(valid) {
+            const { valid } = await form.value.validate()
+            if(!valid) return
             load.value = true
             await forumStore.saveComment(comment.value)
             comment.value.text = null
             load.value = false
-        }
+        
     }
 
     const highlightText = (text) => {

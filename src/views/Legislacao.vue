@@ -9,7 +9,7 @@
         </div>
         <v-navigation-drawer 
             location="right"
-            v-model="geralStore.readDrawerHistory"
+            v-model="geralStore.drawerHistory"
             temporary
         >
             <side-right type="drawer" />
