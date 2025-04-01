@@ -60,6 +60,23 @@
               <v-list-item-title v-text="item.text"></v-list-item-title>
             </v-list-item>
           </div>
+          <div class="my-5" v-if="forumStore.readMyGroup.length">
+            <v-list-subheader>Meus Foruns</v-list-subheader>
+            <v-list-item
+              v-for="(item, i) in forumStore.readMyGroup"
+              :key="i"
+              color="primary"
+              :to="`/avancado/forumlaw/${item.id}`"
+              prepend-icon="mdi-forum"
+            >
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-list-item-title v-bind="props" v-text="item.title"></v-list-item-title>
+              </template>
+              {{ item.title }}
+            </v-tooltip>
+            </v-list-item>
+          </div>
         </v-list>
       </v-card>        
     </div>
@@ -67,8 +84,17 @@
 </template>
 
 <script setup>  
-    import { useLoginStore } from '../../store/LoginStore'
+    import { onMounted } from 'vue'
+
+    import { useForumStore } from '@/store/ForumStore'
     const loginStore = useLoginStore()
+    
+    import { useLoginStore } from '../../store/LoginStore'
+    const forumStore = useForumStore()
+
+    onMounted(() => {
+      forumStore.getForum()
+    })
 
     const items = [
               { text: 'Início', icon: 'mdi-home', url:'/leges' },

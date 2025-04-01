@@ -130,6 +130,10 @@
         }
     });
 
+    watch(() => route.params.id, (newId, oldId) => {
+       getAll()
+    });
+
 
     const listTextLaw = computed(() => {
         let list = listFinal.value

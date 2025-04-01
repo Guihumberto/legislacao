@@ -20,8 +20,7 @@
                 </v-tabs>
             </h3>
             <div v-if="tab == 1">
-                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="listSearchReduzida" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
-                <!-- {{ Object.keys(listSearchReduzida).length }} -->
+                <v-btn class="texr-center pa-0 ma-0" size="small" v-if="Object.keys(listSearchReduzida).length" @click="removeAll()" color="red" variant="text">Apagar tudo</v-btn>
                 <div class="content">
                     <div v-for="item, i in listSearchReduzida" :key="i" class="mb-2">
                         <small>{{ i }}</small>
@@ -53,35 +52,6 @@
                             </v-tooltip>
                         </v-card>
                     </div>
-        
-                    <!-- <v-card 
-                        elevation="0" 
-                        v-for="item, i in listSearchReduzida" :key="i" 
-                        class="mb-1" hover 
-                        @click="searchAgain(item, i)">
-                        <v-card-text class="pa-2 d-flex align-center justify-space-between">
-                            <div>
-                                {{ item.text }} {{ useDateNow(item.date) }}
-                                <v-icon size="small" color="success" v-if="item.precision" title="precisão">mdi-check</v-icon>
-                            </div>
-                            <v-icon @click.stop="generalStore.removeListSearch(i)" class="pa-0 ma-0" color="red">mdi-delete</v-icon>
-                        </v-card-text>
-                        <v-tooltip
-                            activator="parent"
-                            location="start"
-                        >
-                        Texto: {{item.text}} <br>
-                        <div v-if="item.termo" v-text="item.termo == 1 ? 'Termo: Frase Exata':'Termo: Qualquer palavra'"></div>
-                        <v-chip-group>
-                            <v-chip v-if="item.years.length" v-for="ano, a in item.years" :key="a">{{ano}}</v-chip>
-                        </v-chip-group>
-                        <v-chip-group>
-                            <v-chip v-if="item.fonte.length" v-for="fonte, f in item.fonte" :key="f">{{fonte}}</v-chip>
-                        </v-chip-group>
-                        <div v-if="item.precision">com precisão</div>
-                    </v-tooltip>
-                    </v-card> -->
-                    
                 </div>
             </div>
             <div v-if="tab == 2">
@@ -206,30 +176,35 @@
     })
 
     const groupByDate = (history) => {
-        const today = new Date().toISOString().split('T')[0]; // Data de hoje em "YYYY-MM-DD"
-
-        const grouped = history.reduce((acc, item) => {
-        const date = new Date(item.date);
-        const formattedDate = date.toISOString().split('T')[0]; // "YYYY-MM-DD"
-
-        const label = formattedDate === today ? "Hoje" : formattedDate.split('-').reverse().join('/'); // "DD/MM/YYYY"
-
-        if (!acc[label]) {
-            acc[label] = [];
+        try {
+            const today = new Date().toISOString().split('T')[0]; // Data de hoje em "YYYY-MM-DD"
+    
+            const grouped = history.reduce((acc, item) => {
+            const date = new Date(item.date);
+            const formattedDate = date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    
+            const label = formattedDate === today ? "Hoje" : formattedDate.split('-').reverse().join('/'); // "DD/MM/YYYY"
+    
+            if (!acc[label]) {
+                acc[label] = [];
+            }
+    
+            acc[label].push(item);
+            return acc;
+            }, {});
+    
+            // Ordena as chaves, mantendo "Hoje" no topo se existir
+            return Object.fromEntries(
+                Object.entries(grouped).sort(([a], [b]) => {
+                    if (a === "Hoje") return -1;
+                    if (b === "Hoje") return 1;
+                    return b.localeCompare(a); // Ordena do mais recente para o mais antigo
+                })
+            );
+            
+        } catch (error) {
+            console.log('error sidebar rigth');
         }
-
-        acc[label].push(item);
-        return acc;
-        }, {});
-
-        // Ordena as chaves, mantendo "Hoje" no topo se existir
-        return Object.fromEntries(
-            Object.entries(grouped).sort(([a], [b]) => {
-                if (a === "Hoje") return -1;
-                if (b === "Hoje") return 1;
-                return b.localeCompare(a); // Ordena do mais recente para o mais antigo
-            })
-        );
     }
 
     const areadeTransferencia = computed(() => {

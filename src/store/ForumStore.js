@@ -9,6 +9,7 @@ export const useForumStore = defineStore("forumStore", {
         load: false,
         allPagesLaw: [],
         total_pages: null,
+        myGroup: []
     }),
     getters: {
         readChat(){
@@ -34,6 +35,9 @@ export const useForumStore = defineStore("forumStore", {
         },
         readTotalPages(){
             return this.total_pages
+        },
+        readMyGroup(){
+            return this.myGroup
         }
     },
     actions:{
@@ -76,41 +80,31 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('error createLawForum');
             }
         },
-        async getForum(id){
+        async getForum(){
             this.load = true
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin?.cpf
             try {
-                const resp = await api.post('chat/_search', {
+                const resp = await api.post('group_forum/_search', {
                     from: 0,
                     size: 100,
                     query: {
-                        bool: {
-                            must:[
-                                {
-                                    "match": {
-                                        usuario: loginStore.readLogin.cpf,
-                                    }
-                                },
-                                {
-                                    "match": {
-                                        idCollection: id
-                                    }
-                                }
-                            ]
+                        "term": {
+                            "created_by": cpf
                         }
                     },
                     sort: [
                         {
-                            date: {
-                                order: "asc"
+                            data_include: {
+                                order: "desc"
                             },
                         }
                     ]
                 })
-                this.chat = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+                this.myGroup = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
             } catch (error) {
-                console.log('erro get chat');
+                console.log('erro getForum');
             } finally {
                 this.load = false
             }

@@ -219,7 +219,15 @@
                         align-tabs="end"
                         color="deep-purple-accent-4"
                     >
-                        <v-tab v-for="item in tab_name" :value="item" :text="item" :key="item"></v-tab>
+                        <v-tab v-for="item in tab_name" :value="item" :text="item" :key="item">
+                            <template v-slot:append>
+                                <v-expand-transition>
+                                    <v-badge v-if="item == 'Normas' &&  resultsSearchNormas?.total" color="error">
+                                        <v-icon icon="mdi-file-document" size="x-large"></v-icon>
+                                    </v-badge>
+                                </v-expand-transition>
+                            </template>
+                        </v-tab>
                     </v-tabs>
                 </div>
 
