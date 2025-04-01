@@ -9,7 +9,8 @@ export const useForumStore = defineStore("forumStore", {
         load: false,
         allPagesLaw: [],
         total_pages: null,
-        myGroup: []
+        myGroup: [],
+        comments: []
     }),
     getters: {
         readChat(){
@@ -38,6 +39,9 @@ export const useForumStore = defineStore("forumStore", {
         },
         readMyGroup(){
             return this.myGroup
+        },
+        readComments(){
+            return this.comments
         }
     },
     actions:{
@@ -141,7 +145,7 @@ export const useForumStore = defineStore("forumStore", {
                     }
                 })
                 const resp = response.data.hits.hits
-                this.allPagesLaw = resp.map( x => x._source)
+                this.allPagesLaw = resp.map( x => ({ ...x._source, id: x._id }))
                 this.total_pages = response.data.hits.total.value
             } catch (error) {
                 console.log("error");
@@ -149,5 +153,75 @@ export const useForumStore = defineStore("forumStore", {
                 this.load = false
             }
         },
+        async saveComment(item){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            const objeto = {
+                ...item,
+                user_name: loginStore.readLogin?.nickname || loginStore.readLogin?.name,
+                created_by: cpf,
+                data_include: this.formatDate
+            }
+
+            try {
+                const resp = await api.post('comments/_doc', objeto)
+                console.log('resp save', resp);
+                this.comments.push(objeto)
+            } catch (error) {
+                console.log('error');
+            }
+        },
+        async editComment(item){
+            this.load = true
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post(`comments/_doc/${item.id}`, item)
+            } catch (error) {
+                console.log('error edit comment');
+            } finally {
+                this.load = true
+            }
+        },
+        async deleteComment(id){
+            this.load = true
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.delete(`comments/_doc/${id}`)
+                console.log('resp');
+            } catch (error) {
+                console.log('error delete comment');
+            } finally {
+                this.load = true
+            }
+        },
+        async getComments(id){
+            this.load = true
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post('comments/_search', {
+                    query:{
+                        match:{
+                            idRef: id
+                        }
+                    }
+                })
+                this.comments = resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+            } catch (error) {
+                console.log('error getcomment');
+            } finally {
+                this.load = true
+            }
+        }
     }
 })
