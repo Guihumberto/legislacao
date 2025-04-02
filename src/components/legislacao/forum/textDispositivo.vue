@@ -6,17 +6,15 @@
             v-html="highlightText(dispositivo)">
         </p>
         <v-expand-transition>
-            <div class="border rounded mt-2 pt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
-               <v-btn density="compact" stacked color="primary" variant="text">
+            <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
+               <v-btn class="text-none" stacked variant="text" density="compact" @click="activeComment = !activeComment">
                     <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
-                        <v-btn @click="activeComment = !activeComment">
-                            <v-icon>mdi-forum</v-icon>
-                        </v-btn>
+                        <v-icon>mdi-forum</v-icon>
                     </v-badge>
-               </v-btn>
+                </v-btn>
                <transition name="fade">
                 <div v-if="activeComment">
-                    <v-form  class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
+                    <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                          <v-select
                              label="Tipo de Comentário"
                              density="compact"
@@ -51,16 +49,31 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
 
     import Comments from './comments.vue';
+
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
+
+    import { useLoginStore } from '@/store/LoginStore';
+    const LoginStore = useLoginStore()
 
     const showActions = ref(false);
     const activeComment = ref(false)
     const form = ref(null)
     const load = ref(false)
+
+    const isComment = computed(() => {
+        const cpf = LoginStore.readLogin.cpf
+        const grupo = forumStore.readGroupForum._source
+        const participantes = [ ...grupo.group, grupo.created_by ]
+
+        return grupo.open
+        ? true
+        : !!participantes.find( x => x == cpf)
+
+    })
 
     const props = defineProps({
         dispositivo: Object,
@@ -81,7 +94,6 @@
     const types = [
         {id: 1, title: "Comentário"},
         {id: 2, title: "Pergunta"},
-        {id: 3, title: "Resposta"},
     ]
 
     const saveComment = async () => {

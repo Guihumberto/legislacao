@@ -1,14 +1,13 @@
 <template>
     <div class="loading text-white" >
-        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
-        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
-        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
 </template>
 
 <script setup>
-    import { inject } from 'vue';
-    const theme = inject('theme')
+
 </script>
 
 <style scoped>

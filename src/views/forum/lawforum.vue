@@ -10,7 +10,9 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>        
+                    <v-btn variant="tonal" @click="$router.push('/leges')" class="mb-2 btn">Voltar</v-btn>       
+                    
+                    <DadosGrupo />
         
                     <v-card class="my-5">
                         <v-card-text>
@@ -88,6 +90,7 @@
   
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
+    import DadosGrupo from "@/components/legislacao/forum/dadosGrupo.vue";
    
     import { useForumStore } from "@/store/ForumStore";
     const forumStore = useForumStore()
@@ -131,6 +134,7 @@
     });
 
     watch(() => route.params.id, (newId, oldId) => {
+       getGroup()
        getAll()
     });
 
@@ -217,6 +221,10 @@
 
     const listFinal = ref([])
 
+    const getGroup = async () => {
+        await forumStore.getGroup(route.params.id)
+    }
+
     const getAll = async() => {
         await forumStore.getAllPages(route.params.id)
         listFinal.value = forumStore.readAllPages
@@ -278,7 +286,8 @@
         artsFilter.value.push(art)
     }
 
-    onMounted(() => {
+    onMounted( async () => {
+        await getGroup()
         getAll()
     })
 

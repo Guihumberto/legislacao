@@ -61,21 +61,26 @@
             </v-list-item>
           </div>
           <div class="my-5" v-if="forumStore.readMyGroup.length">
-            <v-list-subheader>Meus Foruns</v-list-subheader>
-            <v-list-item
-              v-for="(item, i) in forumStore.readMyGroup"
-              :key="i"
-              color="primary"
-              :to="`/avancado/forumlaw/${item.id}`"
-              prepend-icon="mdi-forum"
-            >
-            <v-tooltip location="top">
-              <template v-slot:activator="{ props }">
-                <v-list-item-title v-bind="props" v-text="item.title"></v-list-item-title>
-              </template>
-              {{ item.title }}
-            </v-tooltip>
-            </v-list-item>
+            <v-list-subheader class="d-flex justify-space-between align-center">
+              Meus Foruns
+              <ConfigMyGroup :groups="forumStore.readMyGroup" />
+            </v-list-subheader>
+              <transition-group name="fade">
+                <v-list-item
+                  v-for="(item, i) in forumStore.readMyGroup"
+                  :key="i"
+                  color="primary"
+                  :to="`/avancado/forumlaw/${item.id}`"
+                  prepend-icon="mdi-forum"
+                >
+                  <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                      <v-list-item-title v-bind="props" v-text="item.title"></v-list-item-title>
+                    </template>
+                    {{ item.title }}
+                  </v-tooltip>
+                </v-list-item>
+              </transition-group>
           </div>
         </v-list>
       </v-card>        
@@ -90,6 +95,7 @@
     const loginStore = useLoginStore()
     
     import { useLoginStore } from '../../store/LoginStore'
+import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue'
     const forumStore = useForumStore()
 
     onMounted(() => {

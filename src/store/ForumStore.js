@@ -10,7 +10,9 @@ export const useForumStore = defineStore("forumStore", {
         allPagesLaw: [],
         total_pages: null,
         myGroup: [],
-        comments: []
+        comments: [],
+        groupForum: {},
+        solicitations: []
     }),
     getters: {
         readChat(){
@@ -42,9 +44,25 @@ export const useForumStore = defineStore("forumStore", {
         },
         readComments(){
             return this.comments
+        },
+        readGroupForum(){
+            return this.groupForum
+        },
+        readSolicitation(){
+            return this.solicitations
         }
     },
     actions:{
+        async getGroup(id){
+            try {
+                const resp = await api.get(`group_forum/_doc/${id}`)
+                console.log('resp get', resp);
+                this.groupForum = resp.data
+
+            } catch (error) {
+                console.log('error get Group');
+            }
+        },
         async createForum(item, textlaw){
             this.load = true
             const loginStore = await useLoginStore()
@@ -211,10 +229,27 @@ export const useForumStore = defineStore("forumStore", {
 
             try {
                 const resp = await api.delete(`comments/_doc/${id}`)
-                // this.editComment(idDispositivo, listComment)
-                console.log('resp');
+                this.editCommentDeleteForum(idDispositivo, listComment)
             } catch (error) {
                 console.log('error delete comment');
+            }
+        },
+        async editCommentDeleteForum(id, list){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+            
+            try {
+                const resp = await api.post(`law_forum/_update/${id}`, {
+                    "doc":{
+                        comments: list
+                    }
+                })
+                this.allPagesLaw.filter( x => x.id === id).map(item => {
+                    item.comments = list
+                })
+            } catch (error) {
+                console.log('error edit delete forum');
             }
         },
         async getComments(ids){
@@ -233,6 +268,97 @@ export const useForumStore = defineStore("forumStore", {
                 return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
             } catch (error) {
                 console.log('error getcomment');
+            }
+        },
+        async editTextComment(item){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post(`comments/_update/${item.id}`, {
+                    "doc":{
+                        text: item.text,
+                        type: item.type
+                    }
+                })
+            } catch (error) {
+                console.log('error edit delete forum');
+            }
+        },
+        async deleteMygroup(id){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post(`group_forum/_update/${id}`, {
+                    "doc":{
+                        created_by: null,
+                        delete_by: cpf,
+                        date_delete: Date.now()
+                    }
+                })
+                this.myGroup = this.myGroup.filter( x => x.id != id)
+            } catch (error) {
+                console.log('delete mygrupo');
+            }
+        },
+        async sendSolicitation(id, user = true ){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            const objeto = {
+                idGroup: id, 
+                idUser: cpf,
+                admPermission: false, 
+                userPermission: user,
+                date_solicitation: this.formatDate,
+                date_permision: null
+            }
+
+            try {
+                const resp = await api.post('permission_group_forum/_doc', objeto)
+                console.log('resp soli', resp);
+                this.solicitations.push(objeto)
+            } catch (error) {
+                console.log('error send solicitation');
+            }
+        },
+        async getSolicitations(){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                this.solicitations = []
+                const resp = await api.post('permission_group_forum/_search', {
+                    query: {
+                        bool:{
+                            must:[
+                                {
+                                    "term": {
+                                        "idUser": cpf
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "admPermission": false
+                                    }
+                                }
+                            ]
+                        }
+                        
+                    }
+                })
+
+                console.log('solicitation', resp.data);
+
+                this.solicitations = resp.data.hits.hits.map( x => ({ x: x._id, ...x._source }) )
+                
+            } catch (error) {
+                console.log('error get solicitatons');
             }
         }
     }

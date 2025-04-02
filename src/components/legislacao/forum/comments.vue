@@ -1,27 +1,46 @@
 <template>
     <Loading v-if="load" class="my-2 py-2" />
-    <div class="pa-2" v-else>
+    <div class="pa-2 text-left" v-else>
         <transition-group name="fade" tag="div">
             <div class="comment-box" v-for="item, i in comments" :key="item.id">
                 <div class="profile-pic"></div>
                 <div class="comment-content">
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                     <div class="timestamp text-subtitle">{{ item.data_include }}</div>
-                    <div class="comment-text text-body-2">{{ item.text }}</div>
-                    <transition name="fade">
-                        <div class="text-right" v-if="item.id != idDelete && LoginStore.readLogin.cpf == item.created_by">
-                            <v-btn variant="text" class="mr-2" icon="mdi-pencil"></v-btn>
-                            <v-btn variant="text" color="red" icon="mdi-delete" @click="idDelete = item.id"></v-btn>
+                    <div class="comment-text text-body-2">
+                        <p v-if="item.id != idEdit">{{ item.text }}</p>
+                        <div v-else>
+                            <v-form>
+                                <v-textarea
+                                    label="Comentario"
+                                    variant="outlined"
+                                    density="compact"
+                                    v-model="commentEdit"
+                                ></v-textarea>
+                                <div class="text-right">
+                                    <v-btn variant="text" @click="idEdit = null">Cancelar</v-btn>
+                                    <v-btn :loading="loadEdit" class="ml-2" color="warning" @click="editComment(item)">Editar</v-btn>
+                                </div>
+                            </v-form>
                         </div>
-                    </transition>
-                    <transition name="fade">
-                        <div class="d-flex align-center justify-end ga-2" v-if="item.id == idDelete">
-                            Tem certeza que deseja excluir este comentário?
-                            <div>
-                                <v-btn variant="text" class="text-capitalize mr-1" @click="idDelete = null">Cancelar</v-btn><v-btn @click="deleteComment(item.id)" color="red">excluir</v-btn>
+                    </div>
+                    <div class="menu-actions">
+                        <transition name="fade">
+                            <div class="text-right" v-if="item.id != idEdit && item.id != idDelete && LoginStore.readLogin.cpf == item.created_by">
+                                <v-btn variant="text" class="mr-2" icon="mdi-pencil" @click="actionEdit(item)"></v-btn>
+                                <v-btn variant="text" color="red" icon="mdi-delete" @click="idDelete = item.id"></v-btn>
                             </div>
-                        </div>
-                    </transition>
+                        </transition>
+                        <transition name="fade">
+                            <div class="d-flex align-center justify-end ga-2" v-if="item.id == idDelete">
+                                Tem certeza que deseja excluir este comentário?
+                                <div>
+                                    <v-btn variant="text" class="text-capitalize mr-1" @click="idDelete = null">Cancelar</v-btn>
+                                    <v-btn :loading="loadDelete" @click="deleteComment(item.id)" color="red">excluir</v-btn>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
                 </div>
             </div>
         </transition-group>
@@ -29,7 +48,7 @@
 </template>
 
 <script setup>
-        import { onMounted, ref, defineExpose  } from 'vue';
+        import { onMounted, ref, defineExpose, computed  } from 'vue';
         import Loading from './loading.vue';
         
         import { useForumStore } from '@/store/ForumStore';
@@ -43,9 +62,12 @@
         })
 
         const comments = ref([])
+        const commentEdit = ref(null)
         const idDelete = ref(null)
         const idEdit = ref(null)
         const load = ref(false)
+        const loadEdit = ref(false)
+        const loadDelete = ref(false)
 
         onMounted( async () => {
            load.value = true
@@ -60,20 +82,37 @@
             if(item == 3) return { title: "Resposta", color: "orange"}
         }
 
-        
         const adicionarObjeto = (objeto) => {
-            console.log('chamou o filho');
             comments.value.unshift({ ...objeto, id: comments.value.length + 1 });
         };
         
         defineExpose({ adicionarObjeto })
 
         const deleteComment = async (id) => {
-            const setComment = props.dispositivo.comments.filter(item => item != id)
-            await forumStore.deleteComment(id, props.dispositivo.id, setComment)
+            loadDelete.value = true
+            const listIdComment = props.dispositivo.comments.filter(item => item != id)
+            await forumStore.deleteComment(id, props.dispositivo.id, listIdComment)
             comments.value = comments.value.filter(item => item.id != id)
             idDelete.value = null
+            loadDelete = false
         }
+
+        const actionEdit = (item) => {
+            idDelete.value = null
+            idEdit.value = item.id
+            commentEdit.value = item.text
+        }
+
+        const editComment = async (item) => {
+            loadEdit.value = true
+            const editCom = comments.value.find(x => x.id == item.id)
+            editCom.text = commentEdit.value
+            await forumStore.editTextComment(editCom)
+            idEdit.value = null
+            commentEdit.value = null
+            loadEdit.value = false
+        }
+
 </script>
 
 <style scoped>
@@ -105,9 +144,14 @@
 .comment-text {
     margin-top: 5px;
 }
+.menu-actions{
+    position: relative;
+    height: 50px; 
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s, transform 0.4s;
+  position: absolute;
 }
 
 .fade-enter-from,
