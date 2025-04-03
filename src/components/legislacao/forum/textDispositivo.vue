@@ -1,17 +1,21 @@
 <template>
-    <div @mouseover="showActions = true" @mouseleave="showActions = false">
+    <div @mouseover="showActions = true" @mouseleave="showActions = false" class="relativeContainer">
         <p 
             :class="dispositivo.estrutura ? 'estrutura': ''"
             :title="`Artigo ${dispositivo.art}`"
             v-html="highlightText(dispositivo)">
         </p>
         <v-expand-transition>
-            <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
-               <v-btn class="text-none" stacked variant="text" density="compact" @click="activeComment = !activeComment">
+            <div class="action-container" v-if="showActions || activeComment || dispositivo.comments.length > 0">
+                <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeComment = !activeComment">
                     <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
                         <v-icon>mdi-forum</v-icon>
                     </v-badge>
                 </v-btn>
+            </div>
+        </v-expand-transition>
+        <v-expand-transition>
+            <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
                <transition name="fade">
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
@@ -41,8 +45,7 @@
                     </v-form>
                     <Comments :dispositivo="dispositivo" ref="childRef" />
                 </div>
-               </transition>
-               
+               </transition>    
             </div>
         </v-expand-transition>
     </div>
@@ -139,6 +142,24 @@
 </script>
 
 <style scoped>
+.relativeContainer{
+    position: relative;
+    display: inline-block; 
+    width: 100%;
+}
+.action-container {
+    position: absolute;
+    top: 0;
+    right: -50px; /* Ajuste conforme necessário para alinhar ao lado */
+    background: transparent;
+}
+
+.comment-box {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: #f9f9f9;
+}
 .estrutura{
     background: rgb(234, 232, 232);
     padding: .5rem;
