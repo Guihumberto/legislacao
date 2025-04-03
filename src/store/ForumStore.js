@@ -199,6 +199,7 @@ export const useForumStore = defineStore("forumStore", {
                 const resp = await api.post('comments/_doc', objeto)
                 this.editComment(item.idRef, resp.data._id)
                 this.comments.push(objeto)
+                return resp.data._id
             } catch (error) {
                 console.log('error save comment');
             }

@@ -2,7 +2,7 @@
     <Loading v-if="load" class="my-2 py-2" />
     <div class="pa-2 text-left" v-else>
         <transition-group name="fade" tag="div">
-            <div class="comment-box" v-for="item, i in comments" :key="item.id">
+            <div class="comment-box" v-for="item, i in comments" :key="item.id" v-if="comments.length">
                 <div class="profile-pic"></div>
                 <div class="comment-content">
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
@@ -24,11 +24,11 @@
                             </v-form>
                         </div>
                     </div>
-                    <div class="menu-actions">
+                    <div class="menu-actions" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
                         <transition name="fade">
-                            <div class="text-right" v-if="item.id != idEdit && item.id != idDelete && LoginStore.readLogin.cpf == item.created_by">
+                            <div class="text-right" v-if="item.id != idDelete">
                                 <v-btn variant="text" class="mr-2" icon="mdi-pencil" @click="actionEdit(item)"></v-btn>
-                                <v-btn variant="text" color="red" icon="mdi-delete" @click="idDelete = item.id"></v-btn>
+                                <v-btn variant="text" color="red" icon="mdi-delete" @click="idDelete = item.id, loadDelete = false"></v-btn>
                             </div>
                         </transition>
                         <transition name="fade">
@@ -43,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            <v-alert class="appear" v-else type="info" variant="text" text="Não há comentários neste dispositivo."></v-alert>
         </transition-group>
     </div>
 </template>
@@ -82,8 +83,9 @@
             if(item == 3) return { title: "Resposta", color: "orange"}
         }
 
-        const adicionarObjeto = (objeto) => {
-            comments.value.unshift({ ...objeto, id: comments.value.length + 1 });
+        const adicionarObjeto = (objeto, idU) => {
+            objeto.created_by = LoginStore.readLogin.cpf
+            comments.value.unshift({ ...objeto, id: idU });
         };
         
         defineExpose({ adicionarObjeto })
@@ -94,10 +96,11 @@
             await forumStore.deleteComment(id, props.dispositivo.id, listIdComment)
             comments.value = comments.value.filter(item => item.id != id)
             idDelete.value = null
-            loadDelete = false
+            loadDelete.value = false
         }
 
         const actionEdit = (item) => {
+            loadEdit.value = false
             idDelete.value = null
             idEdit.value = item.id
             commentEdit.value = item.text
@@ -105,9 +108,10 @@
 
         const editComment = async (item) => {
             loadEdit.value = true
+            const compare = comments.value.find(x => x.id == item.id).text
             const editCom = comments.value.find(x => x.id == item.id)
             editCom.text = commentEdit.value
-            await forumStore.editTextComment(editCom)
+            if(compare.trim() != commentEdit.value.trim()) await forumStore.editTextComment(editCom)
             idEdit.value = null
             commentEdit.value = null
             loadEdit.value = false
@@ -116,6 +120,9 @@
 </script>
 
 <style scoped>
+.appear{
+    animation: aparecer 1s ease-in-out;
+}
 .comment-box {
     background: white;
     padding: 15px;
@@ -146,12 +153,10 @@
 }
 .menu-actions{
     position: relative;
-    height: 50px; 
 }
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s, transform 0.4s;
-  position: absolute;
 }
 
 .fade-enter-from,

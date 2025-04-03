@@ -1,12 +1,13 @@
 <template>
     <div class="loading text-white" >
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
+        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
+        <div class="dot" :class="theme == 'dark' ? 'dot-black': 'dot-white'"></div>
     </div>
 </template>
 
 <script setup>
+const theme = 'light'
 
 </script>
 

@@ -1,7 +1,7 @@
 <template>
     <div v-if="forumStore.readGroupForum._id" class="mt-5">
         <h1 class="text-h5">Dados Grupo</h1>
-        <div class="border rounded pa-2">
+        <div class="wrapper">
             <b>{{ forumStore.readGroupForum._source.title }}</b> <br>
             {{ forumStore.readGroupForum._source.description }} <br><br>
             <p :class="forumStore.readGroupForum._source.open ? 'text-success' :'text-red'" v-text="forumStore.readGroupForum._source.open ? 'Aberto para comentários':'Fechado comentários para não participantes do grupo'"></p>
@@ -11,7 +11,21 @@
                 <v-list v-for="item, i in forumStore.readGroupForum._source.group"></v-list>
             </v-list>
             
-            <v-btn v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by">Incluir novos participantes</v-btn>
+            <v-btn variant="text" prepend-icon="mdi-account-plus" v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" @click="addParticipante = !addParticipante">Incluir novos participantes</v-btn>
+            <transition name="fade">
+                <div class="mt-2" v-if="addParticipante" ref="form">
+                    <v-form @submit.prevent="addSaveParticipante">
+                        <v-autocomplete
+                            label="Participante"
+                            variant="outlined"
+                            density="compact"
+                            v-model="participante"
+                            :rules="[ rules.required, rules.minfield ]"
+                        ></v-autocomplete>
+                        <v-btn color="primary" type="submit">Adicionar</v-btn>
+                    </v-form>
+                </div>
+            </transition>
             <div v-if="!isComment">
                 <v-btn v-if="!isExistSolicitation" @click="sendSolicitation">Pedir para participar do grupo</v-btn>
                 <v-alert v-else type="info" text="Seu convite foi enviado, aguarde sua liberação pelo administrador do grupo.">
@@ -25,13 +39,22 @@
 </template>
 
 <script setup>
-    import { computed, onMounted } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
 
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
     
     import { useLoginStore } from '@/store/LoginStore';
     const loginStore = useLoginStore()
+
+    const addParticipante = ref(false)
+    const participante = ref(null)
+    const form = ref(null)
+
+    const rules = {
+        required: value => !!value || "campo obrigatório", 
+        minfield: (v) => (v||'').length >= 3 || "Mínimo 4 caracteres",
+    }
 
     onMounted( async () => {
         await forumStore.getSolicitations()
@@ -61,8 +84,20 @@
         console.log('edit', cancelar);
     }
 
+    const addSaveParticipante = async () => {
+        // const { valid } = await form.value.validate()
+     
+          console.log('add participante')
+     
+    }
+
 </script>
 
 <style scoped>
-
+.wrapper{
+    padding: 1rem;
+    border: 1px solid rgb(207, 203, 203);
+    border-radius: 8px;
+    transition: 1s ease;
+}
 </style>

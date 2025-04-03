@@ -100,8 +100,8 @@
             const { valid } = await form.value.validate()
             if(!valid) return
             load.value = true
-            await forumStore.saveComment(comment.value)
-            if (childRef.value) childRef.value.adicionarObjeto(comment.value);
+            const resp = await forumStore.saveComment(comment.value)
+            if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
             comment.value.text = null
             load.value = false
     }
