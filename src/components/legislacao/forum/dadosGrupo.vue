@@ -11,7 +11,12 @@
                 <v-list v-for="item, i in forumStore.readGroupForum._source.group"></v-list>
             </v-list>
             
-            <v-btn variant="text" prepend-icon="mdi-account-plus" v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" @click="addParticipante = !addParticipante">Incluir novos participantes</v-btn>
+            <v-btn 
+                color="success"
+                variant="outlined" prepend-icon="mdi-account-plus" 
+                v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" 
+                @click="getSolipendentes">Incluir novos participantes</v-btn>
+
             <transition name="fade">
                 <div class="mt-2" v-if="addParticipante">
                     <v-form @submit.prevent="addSaveParticipante" ref="form">
@@ -31,6 +36,18 @@
                         />
                         <v-btn class="mt-5" color="primary" type="submit" prepend-icon="mdi-email">Enviar Convite</v-btn>
                     </v-form>
+
+                    <v-list class="pa-0 mt-5" density="compact">
+                        <v-list-subheader>Convites enviados pendentes</v-list-subheader>
+                        <v-list-item link v-for="item, i in forumStore.readSolicitationPendentes" :key="i">
+                            {{ item.idUser }}
+                            <template v-slot:append>
+                                <v-btn variant="text" disabled>
+                                    cancelar
+                                </v-btn>
+                            </template>
+                        </v-list-item>
+                    </v-list>
                 </div>
             </transition>
             <div v-if="!isComment">
@@ -139,6 +156,12 @@
     watch(search, (val) => {
         debouncedFetch(val)
     })
+
+    const getSolipendentes = async () => {
+        addParticipante.value = !addParticipante.value
+        console.log('res');
+        await forumStore.getSolicitationPendentes(forumStore.readGroupForum._id)
+    }
 
 </script>
 

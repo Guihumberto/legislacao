@@ -15,7 +15,8 @@ export const useForumStore = defineStore("forumStore", {
         myGroup: [],
         comments: [],
         groupForum: {},
-        solicitations: []
+        solicitations: [],
+        solictationPendentes: []
     }),
     getters: {
         readChat(){
@@ -53,13 +54,15 @@ export const useForumStore = defineStore("forumStore", {
         },
         readSolicitation(){
             return this.solicitations
-        }
+        },
+        readSolicitationPendentes(){
+            return this.solictationPendentes
+        }   
     },
     actions:{
         async getGroup(id){
             try {
                 const resp = await api.get(`group_forum/_doc/${id}`)
-                console.log('resp get', resp);
                 this.groupForum = resp.data
 
             } catch (error) {
@@ -318,7 +321,7 @@ export const useForumStore = defineStore("forumStore", {
                 const exist = await this.isExistSolicitation(id, idCPF)
                 if(exist) {
                     console.log('exist', exist);
-                    snackStore.activeSnack({text:'Usuário já adicionado', color: 'error' })
+                    snackStore.activeSnack('Usuário já adicionado', 'error')
                     return
                 }
             }
@@ -334,10 +337,11 @@ export const useForumStore = defineStore("forumStore", {
 
             try {
                 const resp = await api.post('permission_group_forum/_doc', objeto)
-                console.log('resp soli', resp);
                 this.solicitations.push(objeto)
 
-                snackStore.activeSnack({text:'Usuário adicionado', color: 'success' })
+                if(idCPF) solictationPendentes.push({ id: resp.data._id,  ...objeto })
+
+                snackStore.activeSnack( 'Usuário adicionado', 'success')
             } catch (error) {
                 console.log('error send solicitation');
             }
@@ -402,6 +406,39 @@ export const useForumStore = defineStore("forumStore", {
 
                 this.solicitations = resp.data.hits.hits.map( x => ({ x: x._id, ...x._source }) )
                 
+            } catch (error) {
+                console.log('error get solicitatons');
+            }
+        },
+        async getSolicitationPendentes(id){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+            try {
+                const resp = await api.post('permission_group_forum/_search', {
+                    query: {
+                        bool:{
+                            must:[
+                                {
+                                    "term": {
+                                        "idGroup": id
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "userPermission": false
+                                    }
+                                }
+                            ]
+                        }
+    
+                    }
+                })
+
+                console.log('solicitation', resp.data);
+                const response = resp.data.hits.hits.map( x => ({ x: x._id, ...x._source }) )
+                this.solictationPendentes = response
+
             } catch (error) {
                 console.log('error get solicitatons');
             }
