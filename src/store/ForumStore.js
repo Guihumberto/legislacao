@@ -3,6 +3,9 @@ import { defineStore } from "pinia";
 import api from "@/services/api"
 import { useLoginStore } from "@/store/LoginStore";
 
+import { useSnackStore } from '@/store/snackStore';
+
+
 export const useForumStore = defineStore("forumStore", {
     state: () => ({
         chat: [],
@@ -305,15 +308,25 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('delete mygrupo');
             }
         },
-        async sendSolicitation(id, user = true ){
+        async sendSolicitation(id, user = true, idCPF = null ){
+            const snackStore = useSnackStore()
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
 
+            if(idCPF){
+                const exist = await this.isExistSolicitation(id, idCPF)
+                if(exist) {
+                    console.log('exist', exist);
+                    snackStore.activeSnack({text:'Usuário já adicionado', color: 'error' })
+                    return
+                }
+            }
+
             const objeto = {
                 idGroup: id, 
-                idUser: cpf,
-                admPermission: false, 
+                idUser: idCPF || cpf,
+                admPermission: !user, 
                 userPermission: user,
                 date_solicitation: this.formatDate,
                 date_permision: null
@@ -323,8 +336,39 @@ export const useForumStore = defineStore("forumStore", {
                 const resp = await api.post('permission_group_forum/_doc', objeto)
                 console.log('resp soli', resp);
                 this.solicitations.push(objeto)
+
+                snackStore.activeSnack({text:'Usuário adicionado', color: 'success' })
             } catch (error) {
                 console.log('error send solicitation');
+            }
+        },
+        async isExistSolicitation(id, idCPF ){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+
+            try {
+                const resp = await api.post('permission_group_forum/_search', {
+                    query: {
+                        bool:{
+                            must:[
+                                {
+                                    "term": {
+                                        "idUser": idCPF
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "idGroup": id
+                                    }
+                                }
+                            ]
+                        }
+                        
+                    }
+                })
+                return resp.data.hits.total.value
+            } catch (error) {
+                console
             }
         },
         async getSolicitations(){

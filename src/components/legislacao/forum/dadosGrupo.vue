@@ -13,21 +13,28 @@
             
             <v-btn variant="text" prepend-icon="mdi-account-plus" v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" @click="addParticipante = !addParticipante">Incluir novos participantes</v-btn>
             <transition name="fade">
-                <div class="mt-2" v-if="addParticipante" ref="form">
-                    <v-form @submit.prevent="addSaveParticipante">
+                <div class="mt-2" v-if="addParticipante">
+                    <v-form @submit.prevent="addSaveParticipante" ref="form">
                         <v-autocomplete
-                            label="Participante"
+                            v-model="selectedUser"
                             variant="outlined"
                             density="compact"
-                            v-model="participante"
+                            :items="userOptions"
+                            :loading="loading"
+                            v-model:search="search"
+                            label="Buscar usuário"
+                            item-title="name"
+                            item-value="cpf"
+                            hide-details
                             :rules="[ rules.required, rules.minfield ]"
-                        ></v-autocomplete>
-                        <v-btn color="primary" type="submit">Adicionar</v-btn>
+                            clearable
+                        />
+                        <v-btn class="mt-5" color="primary" type="submit" prepend-icon="mdi-email">Enviar Convite</v-btn>
                     </v-form>
                 </div>
             </transition>
             <div v-if="!isComment">
-                <v-btn v-if="!isExistSolicitation" @click="sendSolicitation">Pedir para participar do grupo</v-btn>
+                <v-btn variant="flat" prepend-icon="mdi-email" color="success" v-if="!isExistSolicitation" @click="sendSolicitation" :loading="loading" :disabled="loading">Pedir para participar do grupo</v-btn>
                 <v-alert v-else type="info" text="Seu convite foi enviado, aguarde sua liberação pelo administrador do grupo.">
                     <template v-slot:append>
                         <v-btn disabled @click="editSolicitation(false)">Cancelar o pedido</v-btn>
@@ -39,7 +46,9 @@
 </template>
 
 <script setup>
-    import { computed, onMounted, ref } from 'vue';
+    import { computed, onMounted, ref, watch } from 'vue';
+
+    import debounce from 'lodash.debounce'
 
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
@@ -72,7 +81,9 @@
     })
 
     const sendSolicitation = async (cancelar = true) => {
-        await forumStore.sendSolicitation(forumStore.readGroupForum._id, cancelar)
+        loading.value = true
+        await forumStore.sendSolicitation(forumStore.readGroupForum._id, true)
+        loading.value = false
     }
 
     const isExistSolicitation = computed(() => {
@@ -85,11 +96,49 @@
     }
 
     const addSaveParticipante = async () => {
-        // const { valid } = await form.value.validate()
-     
-          console.log('add participante')
-     
+          const { valid } = await form.value.validate()
+
+          if(valid) {
+            await forumStore.sendSolicitation(forumStore.readGroupForum._id, false, selectedUser.value)
+            // addParticipante.value = false
+            search.value = ''
+            selectedUser.value = null
+          }     
     }
+
+    const search = ref('')
+    const selectedUser = ref(null)
+    const userOptions = ref([])
+    const loading = ref(false)
+
+    const fetchUsers = async (query) => {
+        if (!query) {
+            userOptions.value = []
+            return
+        }
+        
+        loading.value = true
+
+        try {
+            const resp = await loginStore.searchTimeRealUser(query)
+            userOptions.value = resp
+        } catch (error) {
+            console.error('Erro ao buscar usuários:', error)
+            userOptions.value = []
+        } finally {
+            loading.value = false
+        }
+    }
+
+    // Usar debounce para evitar chamadas a cada tecla
+    const debouncedFetch = debounce((val) => {
+        fetchUsers(val)
+    }, 300)
+
+    // Assiste mudanças no input de busca
+    watch(search, (val) => {
+        debouncedFetch(val)
+    })
 
 </script>
 

@@ -323,5 +323,22 @@ export const useLoginStore = defineStore("loginStore", {
                 console.log('erro storage load data');
             }
         },
+        async searchTimeRealUser(user){
+            console.log('user', user);  
+            try {
+               const response = await api.post('users/_search', {
+                size: 10,
+                query: {
+                    match_phrase_prefix: {
+                        name: user
+                    }
+                  }
+               })
+               const resp = response.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
+               return resp
+            } catch (error) {
+                console.log('erro search time real user');
+            }
+        }
     }
 })
