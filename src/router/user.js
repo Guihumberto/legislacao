@@ -41,4 +41,10 @@ export default [
         component: () => import('@/views/forum/lawforum.vue'),
         meta: { requiresAuth: true } 
       },
+      {
+        path: '/permissoes',
+        name: 'Permissoes',
+        component: () => import('@/views/forum/permissoes.vue'),
+        meta: { requiresAuth: true } 
+      },
 ]

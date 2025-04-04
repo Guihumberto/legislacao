@@ -74,7 +74,6 @@
     const loginStore = useLoginStore()
 
     const addParticipante = ref(false)
-    const participante = ref(null)
     const form = ref(null)
 
     const rules = {

@@ -140,5 +140,21 @@ export const useSearchStore = defineStore("searchStore", {
                 this.loadSaveEmbbedings = false
              }
          },
+         async resumoPage(texto){
+            try {
+                this.load = true
+
+                const resp = await apiChat.post('resumir', {
+                    texto: texto
+                })
+                return resp.data.resumo
+
+            } catch (error) {
+                console.log('erro search');
+                
+            } finally {
+                this.load = false
+            }
+        },
     }
 })

@@ -75,6 +75,9 @@
     import { useAggsStore } from '@/store/AggsStores';
     const aggsStore = useAggsStore()
     
+    import { useSearchStore } from '@/store/SearchStore';
+    const searchStore = useSearchStore()
+    
 
     const dialog = ref(false)
     const load = ref(false)
@@ -153,10 +156,14 @@
             const textoSw = removerStopWords(props.text)
 
             if (contarTokens(textoSw) <= 500) {
-                const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {
-                    inputs: textoSw
-                })
-                summary.value = resp.data[0].summary_text
+
+                const resp2 = await searchStore.resumoPage(textoSw)
+                summary.value = resp2
+
+                // const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {
+                //     inputs: textoSw
+                // })
+                // summary.value = resp.data[0].summary_text
 
                 //palavras chaves
                 
@@ -172,10 +179,11 @@
 
             for (let parte of partes) {
                 try {
-                    const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {   //facebook/bart-large-cnn
-                        inputs: parte
-                    })
-                    resumos.push(resp.data[0].summary_text || "");
+                    const resp = await searchStore.resumoPage(parte)
+                    // const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {   //facebook/bart-large-cnn
+                    //     inputs: parte
+                    // })
+                    resumos.push(resp || "");
 
                     const sumRep = await api.post('dslim/bert-base-NER', {
                         inputs: parte

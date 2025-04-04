@@ -339,9 +339,9 @@ export const useForumStore = defineStore("forumStore", {
                 const resp = await api.post('permission_group_forum/_doc', objeto)
                 this.solicitations.push(objeto)
 
-                if(idCPF) solictationPendentes.push({ id: resp.data._id,  ...objeto })
-
                 snackStore.activeSnack( 'Usuário adicionado', 'success')
+                
+                if(idCPF) solictationPendentes.push({ id: resp.data._id,  ...objeto })
             } catch (error) {
                 console.log('error send solicitation');
             }

@@ -65,22 +65,33 @@
               Meus Foruns
               <ConfigMyGroup :groups="forumStore.readMyGroup" />
             </v-list-subheader>
-              <transition-group name="fade">
-                <v-list-item
-                  v-for="(item, i) in forumStore.readMyGroup"
-                  :key="i"
-                  color="primary"
-                  :to="`/avancado/forumlaw/${item.id}`"
-                  prepend-icon="mdi-forum"
-                >
-                  <v-tooltip location="top">
-                    <template v-slot:activator="{ props }">
-                      <v-list-item-title v-bind="props" v-text="item.title"></v-list-item-title>
-                    </template>
-                    {{ item.title }}
-                  </v-tooltip>
-                </v-list-item>
-              </transition-group>
+            <transition-group name="fade">
+              <v-list-item
+                v-for="(item, i) in forumStore.readMyGroup"
+                :key="i"
+                color="primary"
+                :to="`/avancado/forumlaw/${item.id}`"
+                prepend-icon="mdi-forum"
+              >
+                <v-tooltip location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-list-item-title v-bind="props" v-text="item.title"></v-list-item-title>
+                  </template>
+                  {{ item.title }}
+                </v-tooltip>
+              </v-list-item>
+            </transition-group>
+            <v-btn 
+              @click="$router.push('/permissoes')"
+              prepend-icon="mdi-check-circle" variant="text" block >Permissões
+              <template v-slot:append>
+                <v-badge
+                  color="info"
+                  :content="totalPermissions"
+                  inline
+                ></v-badge>
+              </template>
+            </v-btn>
           </div>
         </v-list>
       </v-card>        
@@ -89,17 +100,25 @@
 </template>
 
 <script setup>  
-    import { onMounted } from 'vue'
+    import { onMounted, computed } from 'vue'
+    import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue'
 
     import { useForumStore } from '@/store/ForumStore'
     const loginStore = useLoginStore()
     
     import { useLoginStore } from '../../store/LoginStore'
-import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue'
     const forumStore = useForumStore()
+    
+    import { useSolicitationsStore } from '@/store/SolicitationsStore'
+    const solicitationStore = useSolicitationsStore()
 
     onMounted(() => {
       forumStore.getForum()
+    })
+
+    const totalPermissions = computed( () => {
+      solicitationStore.getAvaliations()
+      return solicitationStore.readTotalAvaliations
     })
 
     const items = [

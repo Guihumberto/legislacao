@@ -1,0 +1,30 @@
+<template>
+    <div class="mt-5">
+        <v-list class="pa-0">
+            <v-list-subheader>Solicitações dos meus grupos</v-list-subheader>
+            <v-list-item link v-for="item, i in solicitationStore.readAvaliations" :key="i">
+                user: {{ item.idUser }} -
+                Group:{{ item.idGroup }}
+                <template v-slot:append>
+                    <v-btn variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
+                    <v-btn variant="flat" color="success" class="ml-2" @click="actionAcceptt(item.id)"><v-icon>mdi-check</v-icon></v-btn>
+                </template>
+            </v-list-item>
+        </v-list>
+        <v-alert v-if="!solicitationStore.readAvaliations.length" class="mt-5" type="info" variant="text" text="Não há permissões a serem avaliadas"></v-alert>
+    </div>
+</template>
+
+<script setup>
+    import { useSolicitationsStore } from '@/store/SolicitationsStore';
+    const solicitationStore = useSolicitationsStore()
+
+    const actionAcceptt = async (id) => {
+        await solicitationStore.acceptAvaliations(id)
+    }
+
+</script>
+
+<style scoped>
+
+</style>

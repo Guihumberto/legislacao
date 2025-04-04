@@ -52,15 +52,25 @@
                     clearable
                     v-model="form.title"
                   ></v-text-field>
+
                   <v-autocomplete
                     label="Grupo"
+                    v-model="selectedUser"
+                    :items="userOptions"
+                    item-title="name"
+                    item-value="cpf"
+                    :loading="loading"
+                    v-model:search="search"
                     density="compact"
                     variant="outlined"
                     class="my-2"
                     clearable
                     placeholder="Adicione pessoas ao seus grupo"
-                    v-model="form.group"
+                    multiple
+                    chips
+                    closable-chips
                   ></v-autocomplete>
+
                   <v-textarea
                     label="Descrição do grupo"
                     density="compact"
@@ -108,13 +118,17 @@
       </v-dialog>
   </template>
   <script setup>
-    import { inject, ref } from 'vue'
+    import { inject, ref, watch } from 'vue'
+    import debounce from 'lodash.debounce'
 
     import { useRoute } from 'vue-router'
     const route = useRoute()
 
     import { useForumStore } from '@/store/ForumStore'
     const forumStore = useForumStore()
+
+    import { useLoginStore } from '@/store/LoginStore';
+    const loginStore = useLoginStore()
 
     const textlaw = inject('textlaw')
 
@@ -170,13 +184,58 @@
         showForms.value = false
         confirm.value = true
         const resp = await forumStore.createForum(form.value, textlaw.value)
+        if(selectedUser.value.length) saveGroup(resp.id)
         error.value = resp.code
         idU.value = resp.id
+      }
+    }
+
+    const saveGroup = async (id) => {
+      for (const cpf of selectedUser.value) {
+        await forumStore.sendSolicitation(id, false, cpf);
       }
     }
 
     const solicitationGetIn = (item) => {
       console.log('pedir para participar do grupo');
     }
+
+    const search = ref('')
+    const selectedUser = ref([])
+    const userOptions = ref([])
+    const loading = ref(false)
+
+    const fetchUsers = async (query) => {
+        if (!query) {
+            userOptions.value = []
+            return
+        }
+        
+        loading.value = true
+
+        try {
+            const resp = await loginStore.searchTimeRealUser(query)
+            userOptions.value = resp
+        } catch (error) {
+            console.error('Erro ao buscar usuários:', error)
+            userOptions.value = []
+        } finally {
+            loading.value = false
+        }
+    }
+
+    // Usar debounce para evitar chamadas a cada tecla
+    const debouncedFetch = debounce((val) => {
+        fetchUsers(val)
+    }, 300)
+
+    // Assiste mudanças no input de busca
+    watch(search, (val) => {
+        debouncedFetch(val)
+    })
+
+    watch(selectedUser, (vale) => {
+      search.value = ''
+    })
 
   </script>
