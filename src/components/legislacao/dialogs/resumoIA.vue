@@ -37,7 +37,7 @@
                         elevation="2"
                         max-width="500"
                         rounded="xl"
-                        v-if="readKeywords.length"
+                        v-if="keywords.length"
                     >
                         <v-sheet
                         class="pa-2 border-b bg-pink-lighten-4"
@@ -51,10 +51,10 @@
                                 column
                             >
                                 <v-chip
-                                v-for="tag in readKeywords"
+                                v-for="tag in keywords"
                                 :key="tag"
                                 >
-                                    {{ tag.word }}
+                                    {{ tag }}
                                 </v-chip>
                             </v-chip-group>
                         </div>
@@ -68,8 +68,6 @@
 
 <script setup>
     import { ref, computed, onUnmounted } from 'vue';
-    import api from '@/services/api_hf'
-
     import * as sw from "stopword";
     
     import { useAggsStore } from '@/store/AggsStores';
@@ -167,10 +165,8 @@
 
                 //palavras chaves
                 
-                const sumRep = await api.post('dslim/bert-base-NER', {
-                    inputs: textoSw
-                })
-                keywords.value = sumRep.data
+                const sumRep = await searchStore.palavraChave(textoSw)
+                keywords.value = [ ...sumRep.split(',') ]
                 return
             }
 
@@ -180,15 +176,11 @@
             for (let parte of partes) {
                 try {
                     const resp = await searchStore.resumoPage(parte)
-                    // const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {   //facebook/bart-large-cnn
-                    //     inputs: parte
-                    // })
+
                     resumos.push(resp || "");
 
-                    const sumRep = await api.post('dslim/bert-base-NER', {
-                        inputs: parte
-                    })
-                    keywords.value.push(...sumRep.data) 
+                    const sumRep = await await searchStore.palavraChave(parte)
+                    keywords.value.push( [ ...sumRep.split(',') ] ) 
        
                 } catch (erro) {
                     console.error("Erro na requisição:", erro);
@@ -217,24 +209,6 @@
             load.value = false
         } 
     }
-
-    const readKeywords = computed(() => {
-        try {
-            const list = keywords.value.filter(x => x.score > 0.9)
-            const uniqueWordsArray = Array.from(
-                new Set(
-                    list
-                    .filter(obj => obj.word.length > 2) 
-                    .map(obj => obj.word)
-                )
-            ).map(word => ({ word }))
-
-            return uniqueWordsArray.filter(x => !x.word.startsWith("##"))
-
-        } catch (error) {
-            return []
-        }
-    })
 </script>
 
 <style lang="scss" scoped>
