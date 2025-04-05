@@ -1,5 +1,5 @@
 <template>
-      <v-btn @click="dialog = true" class="text-lowercase" variant="text" prepend-icon="mdi-forum" text="Abrir Discurssão"></v-btn>
+      <v-btn @click="dialog = true" class="text-lowercase" variant="text" prepend-icon="mdi-forum" text="Abrir Discussão"></v-btn>
   
       <v-dialog
         v-model="dialog"

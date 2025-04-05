@@ -7,7 +7,7 @@
                 Group:{{ item.idGroup }}
                 <template v-slot:append>
                     <v-btn variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
-                    <v-btn variant="flat" color="success" class="ml-2" @click="actionAcceptt(item.id)"><v-icon>mdi-check</v-icon></v-btn>
+                    <v-btn variant="flat" color="success" class="ml-2" @click="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
                 </template>
             </v-list-item>
         </v-list>
@@ -19,8 +19,8 @@
     import { useSolicitationsStore } from '@/store/SolicitationsStore';
     const solicitationStore = useSolicitationsStore()
 
-    const actionAcceptt = async (id) => {
-        await solicitationStore.acceptAvaliations(id)
+    const actionAcceptt = async (item) => {
+        await solicitationStore.acceptAvaliations(item)
     }
 
 </script>

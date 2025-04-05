@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
-import { useLoginStore } from "@/store/LoginStore";
 
+import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from '@/store/snackStore';
 
 
@@ -109,6 +109,7 @@ export const useForumStore = defineStore("forumStore", {
             }
         },
         async getForum(){
+            console.log('forum teste');
             this.load = true
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -118,8 +119,20 @@ export const useForumStore = defineStore("forumStore", {
                     from: 0,
                     size: 100,
                     query: {
-                        "term": {
-                            "created_by": cpf
+                        bool:{
+                            should: [
+                                {
+                                    "term": {
+                                        "created_by": cpf
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "group": cpf
+                                    }
+                                }
+                            ],
+                            minimum_should_match: 1
                         }
                     },
                     sort: [

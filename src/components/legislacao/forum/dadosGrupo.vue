@@ -6,9 +6,9 @@
             {{ forumStore.readGroupForum._source.description }} <br><br>
             <p :class="forumStore.readGroupForum._source.open ? 'text-success' :'text-red'" v-text="forumStore.readGroupForum._source.open ? 'Aberto para comentários':'Fechado comentários para não participantes do grupo'"></p>
             <small>Data de Criação do grupo: {{ forumStore.readGroupForum._source.data_include }}</small> <br><br>
-            <v-list v-if="forumStore.readGroupForum._source.group.length">
+            <v-list class="pa-0 border mb-2 bg-transparent" density="compact" v-if="forumStore.readGroupForum._source.group.length">
                 <v-list-subheader>Participantes</v-list-subheader>
-                <v-list v-for="item, i in forumStore.readGroupForum._source.group"></v-list>
+                <v-list-item v-for="item, i in forumStore.readGroupForum._source.group">{{ item }}</v-list-item>
             </v-list>
             
             <v-btn 
@@ -37,7 +37,7 @@
                         <v-btn class="mt-5" color="primary" type="submit" prepend-icon="mdi-email">Enviar Convite</v-btn>
                     </v-form>
 
-                    <v-list class="pa-0 mt-5" density="compact">
+                    <v-list class="pa-0 mt-5" density="compact" v-if="forumStore.readSolicitationPendentes.length">
                         <v-list-subheader>Convites enviados pendentes</v-list-subheader>
                         <v-list-item link v-for="item, i in forumStore.readSolicitationPendentes" :key="i">
                             {{ item.idUser }}

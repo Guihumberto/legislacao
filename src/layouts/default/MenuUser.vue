@@ -93,6 +93,19 @@
               </template>
             </v-btn>
           </div>
+          <div v-else>
+            <v-btn 
+              @click="$router.push('/permissoes')"
+              prepend-icon="mdi-check-circle" variant="text" block >Permissões
+              <template v-slot:append>
+                <v-badge
+                  color="info"
+                  :content="totalPermissions"
+                  inline
+                ></v-badge>
+              </template>
+            </v-btn>
+          </div>
         </v-list>
       </v-card>        
     </div>

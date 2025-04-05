@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
+
 import { useLoginStore } from "@/store/LoginStore";
+import { useSnackStore } from '@/store/snackStore';
+import { useForumStore } from '@/store/ForumStore'
 
 export const useSolicitationsStore = defineStore("solicitationStore", {
     state: () => ({
@@ -175,40 +178,70 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
                 console.log('erro getForum');
             } 
         },
-        async acceptAvaliations(id){
+        async acceptAvaliations(item){
+            const snackStore = useSnackStore()
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
 
             try {
-                const resp = await api.post(`permission_group_forum/_update/${id}`, {
+                const resp = await api.post(`permission_group_forum/_update/${item.id}`, {
                     "doc":{
                         admPermission: true, 
                         date_permision: this.formatDate
                     }
                 })
-               console.log('resp acept', resp);
-               this.avaliations = this.avaliations.filter( x => x.id != id)
+               await this.updateGroupForum(item)
+               this.avaliations = this.avaliations.filter( x => x.id != item.id)
+               
+               snackStore.activeSnack('Usuário autorizado', 'success')
    
             } catch (error) {
                 console.log('error aceitar mygrupo');
+                snackStore.activeSnack('Ocorreu um erro', 'error')
             }
         },
-        async acceptInvites(id){
+        async updateGroupForum(item){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
 
             try {
-                const resp = await api.post(`permission_group_forum/_update/${id}`, {
+                const resp = await api.post(`group_forum/_update/${item.idGroup}`, {
+                    script: {
+                      source: "if (ctx._source.group == null) { ctx._source.group = [params.new_item] } else { ctx._source.group.add(params.new_item) } ctx._source.date_update = params.date_update",
+                      lang: "painless",
+                      params: {
+                        new_item: item.idUser,
+                        date_update: Date.now()
+                      }
+                    }
+                  });
+            } catch (error) {
+                console.log('error update mygrupo');
+            }
+        },
+        async acceptInvites(item){
+            const forumStore = useForumStore()
+            const snackStore = useSnackStore()
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post(`permission_group_forum/_update/${item.id}`, {
                     "doc":{
                         userPermission: true, 
                         date_permision: this.formatDate
                     }
                 })
-               this.invites = this.invites.filter( x => x.id != id)
+                await this.updateGroupForum(item)
+                this.invites = this.invites.filter( x => x.id != item.id)
+                snackStore.activeSnack('Convite aceito', 'success')
+                forumStore.getForum()
             } catch (error) {
                 console.log('error aceitar mygrupo');
+                snackStore.activeSnack('Ocorreu um erro', 'error')
             }
         }
     }

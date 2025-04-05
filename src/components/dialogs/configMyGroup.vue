@@ -11,9 +11,9 @@
                 title="Configurações dos Grupos"
             >
                 <v-card-text>
-                    <v-list class="pa-0">
+                    <v-list class="pa-0" v-if="groupsList.length">
                         <transition-group name="fade">
-                            <v-list-item v-for="item, i in groups" :key="item.id" prepend-icon="mdi-forum" link :class="idDelete == item.id ? 'bg-red' : ''">
+                            <v-list-item v-for="item, i in groupsList" :key="item.id" prepend-icon="mdi-forum" link :class="idDelete == item.id ? 'bg-red' : ''">
                                 {{ item.title }}
                                 <template v-slot:append>
                                     <div v-if="idDelete != item.id">
@@ -27,6 +27,7 @@
                             </v-list-item>
                         </transition-group>
                     </v-list>
+                    <v-alert v-else variant="outlined" type="info" text="Você não administra nenhum grupo."></v-alert>
                 </v-card-text>
                 <template v-slot:actions>
                 <v-btn
@@ -40,7 +41,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const route = useRoute()
@@ -55,6 +56,19 @@
 
   const props = defineProps({
     groups: Array
+  })
+
+  const cpf = ref('')   
+
+  onMounted(() => {
+        const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+        if (data) {
+            cpf.value = JSON.parse(data).cpf
+        }
+    })
+
+  const groupsList = computed(() => {
+        return props.groups.filter( x => x.created_by == cpf.value)
   })
 
 
