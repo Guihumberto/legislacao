@@ -1,12 +1,10 @@
 <template>
-    <Loading v-if="load" class="my-2 py-2" />
-    <div class="pa-2 text-left" v-else>
-        <transition-group name="fade" tag="div">
-            <div class="comment-box" v-for="item, i in comments" :key="item.id" v-if="comments.length">
+    <div class="response-comment">
+            <div class="comment-box" v-for="item, i in 5" :key="item">
                 <div class="profile-pic"></div>
                 <div class="comment-content">
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
-                    <div class="timestamp text-subtitle">{{ item.data_include }}</div>
+                    <!-- <div class="timestamp text-subtitle">{{ item.data_include }}</div>
                     <div class="comment-text text-body-2">
                         <p v-if="item.id != idEdit">{{ item.text }}</p>
                         <div v-else>
@@ -62,88 +60,20 @@
                                 </div>
                             </div>
                         </transition>
-                    </div>
-                    <v-expand-transition>
-                        <CommentResp v-if="showCommentResp" />
-                    </v-expand-transition>
+                    </div> -->
                 </div>
             </div>
-            <v-alert class="appear" v-else type="info" variant="text" text="Não há comentários neste dispositivo."></v-alert>
-        </transition-group>
     </div>
 </template>
 
 <script setup>
-        import { onMounted, ref } from 'vue';
-        
-        import Loading from './loading.vue';
-        import CommentResp from './commentResp.vue';
-        
-        import { useForumStore } from '@/store/ForumStore';
-        const forumStore = useForumStore()
-        
-        import { useLoginStore } from '@/store/LoginStore';
-        const LoginStore = useLoginStore()
 
-        const props = defineProps({
-            dispositivo: Object
-        })
-
-        const comments = ref([])
-        const commentEdit = ref(null)
-        const idDelete = ref(null)
-        const idEdit = ref(null)
-        const load = ref(false)
-        const loadEdit = ref(false)
-        const loadDelete = ref(false)
-        const showCommentResp = ref(false)
-
-        onMounted( async () => {
-           load.value = true
-           const resp = await forumStore.getComments(props.dispositivo.comments)
-           comments.value = resp
-           load.value = false
-        })
-
-        const typeComment = (item) => {
-            if(item == 1) return { title: "Comentário", color: "success"}
-            if(item == 2) return { title: "Pergunta", color: "primary"}
-            if(item == 3) return { title: "Resposta", color: "orange"}
-        }
-
-        const adicionarObjeto = (objeto, idU) => {
-            objeto.created_by = LoginStore.readLogin.cpf
-            comments.value.unshift({ ...objeto, id: idU });
-        };
-        
-        defineExpose({ adicionarObjeto })
-
-        const deleteComment = async (id) => {
-            loadDelete.value = true
-            const listIdComment = props.dispositivo.comments.filter(item => item != id)
-            await forumStore.deleteComment(id, props.dispositivo.id, listIdComment)
-            comments.value = comments.value.filter(item => item.id != id)
-            idDelete.value = null
-            loadDelete.value = false
-        }
-
-        const actionEdit = (item) => {
-            loadEdit.value = false
-            idDelete.value = null
-            idEdit.value = item.id
-            commentEdit.value = item.text
-        }
-
-        const editComment = async (item) => {
-            loadEdit.value = true
-            const compare = comments.value.find(x => x.id == item.id).text
-            const editCom = comments.value.find(x => x.id == item.id)
-            editCom.text = commentEdit.value
-            if(compare.trim() != commentEdit.value.trim()) await forumStore.editTextComment(editCom)
-            idEdit.value = null
-            commentEdit.value = null
-            loadEdit.value = false
-        }
+const typeComment = (item) => {
+    if(item == 1) return { title: "Comentário", color: "success"}
+    if(item == 2) return { title: "Pergunta", color: "primary"}
+    if(item == 3) return { title: "Resposta", color: "orange"}
+    return { title: "Resposta", color: "orange"}
+}
 
 </script>
 
