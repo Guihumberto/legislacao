@@ -3,7 +3,10 @@
             <div class="top">
                 <v-alert type="info" text="Arcádio Chat" class="top" icon="mdi-robot">
                     <template v-slot:append>
-                        <v-btn variant="flat" density="compact" v-if="!isEmbeddingExist" @click="activeChat()" :loading="loadInit || searchStore.readLoadSaveEmbbedings">Ativar</v-btn>
+                        <v-btn 
+                            variant="flat" density="compact" 
+                            v-if="!isEmbeddingExist" @click="activeChat()" 
+                            :loading="loadInit || searchStore.readLoadSaveEmbbedings">Ativar</v-btn>
                     </template>
                 </v-alert>
             </div>

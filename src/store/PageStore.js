@@ -137,6 +137,19 @@ export const usePageStore = defineStore("page", {
             } finally {
                 this.load = false
             }
+        },
+        async saveResumoIA(id, resumo, keywords){
+            try {
+                const resp = await api.post(`pages_v2/_update/${id}`, {
+                    "doc":{
+                        summary: resumo,
+                        keywords: keywords
+                    }
+                })
+                console.log('resumo salvo', resp);
+            } catch (error) {
+                console.log('erro save resumo ia');
+            }
         }
     }
 })

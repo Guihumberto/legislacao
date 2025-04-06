@@ -10,8 +10,8 @@
                     <v-btn icon="mdi-close" variant="text" @click="dialog=false"></v-btn>
                 </v-card-title>
                 <v-card-text class="text-center">
-                    pág. {{ page.num_page }} - {{ page.page_to_norma.title }} <br>
-                    <v-sheet class="pa-2 border-1 border-red-lighten-2" v-if="relevantTermsLaw.length">
+                    <v-chip>pág. {{ page.num_page }} - {{ page.page_to_norma.title }}</v-chip>
+                    <v-sheet class="pa-2 border-1 border-red-lighten-2 mt-5" v-if="relevantTermsLaw.length">
                         <p class="font-weight-bold mb-2">Termos relevantes da Norma</p>
                         <v-chip class="mr-1 mb-1" v-for="item, i in relevantTermsLaw" :key="i">{{ item.key }}</v-chip>
                     </v-sheet>
@@ -29,21 +29,26 @@
                         <p v-else>{{ erros }}</p>
                     </v-alert>
 
-                    <div class="border pa-5 bg-pink-lighten-5" v-if="summary">
-                        <p>{{ summary }}</p>
+                    <!-- resumo -->
+                    <div class="border px-5 pt-5 bg-pink-lighten-5 rounded" v-if="summary">
+                        <h3 class="text-h5 mb-2">Resumo da página</h3>
+                        <p class="text-left">{{ summary }}</p>
+                        <AvaliarResumo />
                     </div>
+
+                    <!-- palavras chaves -->
                     <v-sheet
-                        class="mx-auto mt-5"
+                        class="mx-auto my-5"
                         elevation="2"
-                        max-width="500"
+                        max-width="800"
                         rounded="xl"
                         v-if="keywords.length"
                     >
                         <v-sheet
-                        class="pa-2 border-b bg-pink-lighten-4"
-                        rounded="t-xl"
+                            class="pa-2 border-b bg-pink-lighten-4"
+                            rounded="t-xl"
                         >
-                            Palavras Chaves
+                            Palavras Chaves da Página
                         </v-sheet>
 
                         <div class="pa-1 d-flex justify-center">
@@ -58,6 +63,7 @@
                                 </v-chip>
                             </v-chip-group>
                         </div>
+                        <AvaliarResumo />
                     </v-sheet>
                 </v-card-text>
             </v-card>
@@ -69,12 +75,16 @@
 <script setup>
     import { ref, computed, onUnmounted } from 'vue';
     import * as sw from "stopword";
+    import AvaliarResumo from './avaliarResumo.vue';
     
     import { useAggsStore } from '@/store/AggsStores';
     const aggsStore = useAggsStore()
     
     import { useSearchStore } from '@/store/SearchStore';
     const searchStore = useSearchStore()
+    
+    import { usePageStore } from '@/store/PageStore';
+    const pageStore = usePageStore()
     
 
     const dialog = ref(false)
@@ -149,6 +159,13 @@
     const fetchSuggestions = async () => {
         await termsRelevantLaw()
         erros.value = null
+
+        if(props.page.summary || props.page.keywords) {
+            summary.value = props.page.summary || null
+            keywords.value = props.page.keywords || []
+            return
+        }
+
         try {
             load.value = true
             const textoSw = removerStopWords(props.text)
@@ -157,13 +174,6 @@
 
                 const resp2 = await searchStore.resumoPage(textoSw)
                 summary.value = resp2
-
-                // const resp = await api.post('csebuetnlp/mT5_multilingual_XLSum', {
-                //     inputs: textoSw
-                // })
-                // summary.value = resp.data[0].summary_text
-
-                //palavras chaves
                 
                 const sumRep = await searchStore.palavraChave(textoSw)
                 keywords.value = [ ...sumRep.split(',') ]
@@ -207,8 +217,17 @@
             }
         } finally {
             load.value = false
+
+            if(summary.value || keywords.value.length) {
+                pageStore.saveResumoIA( props.page.id, summary.value, keywords.value )
+            }
         } 
     }
+
+    onUnmounted(() => {
+        keywords.value = []
+        summary.value = null
+    })
 </script>
 
 <style lang="scss" scoped>

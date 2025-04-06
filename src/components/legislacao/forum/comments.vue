@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-        import { onMounted, ref, defineExpose, computed  } from 'vue';
+        import { onMounted, ref, defineExpose } from 'vue';
         import Loading from './loading.vue';
         
         import { useForumStore } from '@/store/ForumStore';

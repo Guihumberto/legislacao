@@ -5,6 +5,18 @@
             :title="`Artigo ${dispositivo.art}`"
             v-html="highlightText(dispositivo)">
         </p>
+
+        <v-expand-transition>
+            <div class="action-art" v-if="isArt && showActions || activeArt">
+                <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeArt = !activeArt">
+                    <v-icon>mdi-forum</v-icon>
+                    <!-- <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
+                        <v-icon>mdi-forum</v-icon>
+                    </v-badge> -->
+                </v-btn>
+            </div>
+        </v-expand-transition>
+
         <v-expand-transition>
             <div class="action-container" v-if="showActions || activeComment || dispositivo.comments.length > 0">
                 <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeComment = !activeComment">
@@ -14,6 +26,7 @@
                 </v-btn>
             </div>
         </v-expand-transition>
+
         <v-expand-transition>
             <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
                <transition name="fade">
@@ -48,12 +61,20 @@
                </transition>    
             </div>
         </v-expand-transition>
+        
+        <v-dialog
+            v-model="activeArt"
+            max-width="700"
+        >
+            <CommentsArt :dispositivo="dispositivo" />
+        </v-dialog>
     </div>
 </template>
 
 <script setup>
     import { ref, computed } from 'vue';
 
+    import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
 
     import { useForumStore } from '@/store/ForumStore';
@@ -64,8 +85,15 @@
 
     const showActions = ref(false);
     const activeComment = ref(false)
+    const activeArt = ref(false)
     const form = ref(null)
     const load = ref(false)
+
+    const isArt = computed(() => {
+        return props.dispositivo.textlaw.startsWith('Art')
+        ? true
+        : false
+    })
 
     const isComment = computed(() => {
         const cpf = LoginStore.readLogin.cpf
@@ -91,7 +119,9 @@
         text: null, 
         type: 1,
         idRef: props.dispositivo.id, 
-        commentRef: null
+        commentRef: null,
+        idGroup: props.dispositivo.idGroup,
+        art: props.dispositivo.art,
     })
 
     const types = [
@@ -147,6 +177,14 @@
     display: inline-block; 
     width: 100%;
 }
+
+.action-art {
+    position: absolute;
+    top: 0;
+    left: -60px; /* Ajuste conforme necessário para alinhar ao lado */
+    background: transparent;
+}
+
 .action-container {
     position: absolute;
     top: 0;

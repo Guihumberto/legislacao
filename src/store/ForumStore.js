@@ -290,6 +290,34 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('error getcomment');
             }
         },
+        async getAllCommentsArt(item){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+     
+            try {
+                const resp = await api.post('comments/_search', {
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    term:{
+                                        art: item.art
+                                    }
+                                },
+                                {
+                                    term:{
+                                        idGroup: item.idGroup
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+            } catch (error) {
+                console.log('error getcomment');
+            }
+        },
         async editTextComment(item){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -415,8 +443,6 @@ export const useForumStore = defineStore("forumStore", {
                     }
                 })
 
-                console.log('solicitation', resp.data);
-
                 this.solicitations = resp.data.hits.hits.map( x => ({ x: x._id, ...x._source }) )
                 
             } catch (error) {
@@ -448,7 +474,6 @@ export const useForumStore = defineStore("forumStore", {
                     }
                 })
 
-                console.log('solicitation', resp.data);
                 const response = resp.data.hits.hits.map( x => ({ x: x._id, ...x._source }) )
                 this.solictationPendentes = response
 
