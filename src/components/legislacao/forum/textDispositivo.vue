@@ -33,7 +33,7 @@
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                          <v-select
-                             label="Tipo de Comentário"
+                             label="Tipo"
                              density="compact"
                              :items="types"
                              item-title="title"

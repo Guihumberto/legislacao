@@ -2,7 +2,7 @@
     <Loading v-if="load" class="my-2 py-2" />
     <div class="pa-2 text-left" v-else>
         <transition-group name="fade" tag="div">
-            <div class="comment-box" v-for="item, i in comments" :key="item.id" v-if="comments.length">
+            <div class="comment-box" v-for="item, i in listComments" :key="item.id" v-if="listComments.length">
                 <div class="profile-pic"></div>
                 <div class="comment-content">
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
@@ -28,29 +28,17 @@
                         <transition name="fade">
                             <div class="d-flex justify-end" v-if="item.id != idDelete">
                                 <div v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
-                                    <v-btn variant="text" class="mr-2" icon="mdi-pencil" @click="actionEdit(item)"></v-btn>
-                                    <v-btn variant="text" color="red" icon="mdi-delete" @click="idDelete = item.id, loadDelete = false"></v-btn>
+                                    <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                                    <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
                                 </div>
-                                <v-btn variant="text" icon="mdi-forum-plus" @click="showCommentResp = !showCommentResp"></v-btn>
+                                <AvaliarComment :comment="item" />
                                 <v-btn 
-                                    prepend-icon="mdi-chevron-up" variant="text" >
-                                    <template v-slot:append>
-                                        <v-badge
-                                        color="info"
-                                        content="0"
-                     
-                                        ></v-badge>
-                                    </template>
+                                    variant="text"
+                                    @click="showCommentResp = !showCommentResp">
+                                    <v-badge 
+                                        :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
+                                    </v-badge>
                                 </v-btn>
-                                <v-btn 
-                                    prepend-icon="mdi-chevron-down" variant="text" >
-                                    <template v-slot:append>
-                                        <v-badge
-                                        color="error"
-                                        content="0"
-                                        ></v-badge>
-                                    </template>
-                                </v-btn>    
                             </div>
                         </transition>
                         <transition name="fade">
@@ -64,7 +52,7 @@
                         </transition>
                     </div>
                     <v-expand-transition>
-                        <CommentResp v-if="showCommentResp" />
+                        <CommentResp v-if="showCommentResp" :dispositivo="dispositivo" :idComment="item.id" />
                     </v-expand-transition>
                 </div>
             </div>
@@ -74,10 +62,11 @@
 </template>
 
 <script setup>
-        import { onMounted, ref } from 'vue';
+        import { onMounted, ref, computed } from 'vue';
         
         import Loading from './loading.vue';
         import CommentResp from './commentResp.vue';
+        import AvaliarComment from './avaliarComment.vue';
         
         import { useForumStore } from '@/store/ForumStore';
         const forumStore = useForumStore()
@@ -101,8 +90,18 @@
         onMounted( async () => {
            load.value = true
            const resp = await forumStore.getComments(props.dispositivo.comments)
+           await forumStore.getAllCommentsArt(props.dispositivo)
            comments.value = resp
            load.value = false
+        })
+
+        const listComments = computed(() => {
+            try {
+                return comments.value.filter(item => !item.commentRef)
+            } catch (error) {
+                comments.value = []
+                return comments.value
+            }
         })
 
         const typeComment = (item) => {
@@ -128,6 +127,7 @@
         }
 
         const actionEdit = (item) => {
+            showCommentResp.value = false
             loadEdit.value = false
             idDelete.value = null
             idEdit.value = item.id

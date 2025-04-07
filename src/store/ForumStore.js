@@ -16,7 +16,8 @@ export const useForumStore = defineStore("forumStore", {
         comments: [],
         groupForum: {},
         solicitations: [],
-        solictationPendentes: []
+        solictationPendentes: [],
+        allComments: []
     }),
     getters: {
         readChat(){
@@ -57,7 +58,10 @@ export const useForumStore = defineStore("forumStore", {
         },
         readSolicitationPendentes(){
             return this.solictationPendentes
-        }   
+        },
+        readAllComments(){
+            return this.allComments
+        }
     },
     actions:{
         async getGroup(id){
@@ -202,7 +206,7 @@ export const useForumStore = defineStore("forumStore", {
                 this.load = false
             }
         },
-        async saveComment(item){
+        async saveComment(item, respComment = false){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
@@ -216,8 +220,12 @@ export const useForumStore = defineStore("forumStore", {
 
             try {
                 const resp = await api.post('comments/_doc', objeto)
-                this.editComment(item.idRef, resp.data._id)
-                this.comments.push(objeto)
+
+                if(!respComment){
+                    this.editComment(item.idRef, resp.data._id)
+                    this.comments.push(objeto)
+                }
+                
                 return resp.data._id
             } catch (error) {
                 console.log('error save comment');
@@ -254,6 +262,17 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('error delete comment');
             }
         },
+        async deleteRespComment(id){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.delete(`comments/_doc/${id}`)
+            } catch (error) {
+                console.log('error delete resp comment');
+            }
+        },
         async editCommentDeleteForum(id, list){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -280,14 +299,39 @@ export const useForumStore = defineStore("forumStore", {
             try {
                 const resp = await api.post('comments/_search', {
                     query:{
-                        terms:{
-                            _id: ids
+                        bool:{
+                            must:[
+                                {
+                                    terms:{
+                                        _id: ids
+                                    }
+                                }
+                            ]
                         }
                     }
                 })
                 return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
             } catch (error) {
                 console.log('error getcomment');
+            }
+        },
+        async getRespComments(id){
+            console.log('get resp comment', id);
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            const cpf = loginStore.readLogin.cpf
+
+            try {
+                const resp = await api.post('comments/_search', {
+                    query:{
+                        term:{
+                            commentRef: id
+                        }
+                    }
+                })
+                return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+            } catch (error) {
+                console.log('error getREspcomment');
             }
         },
         async getAllCommentsArt(item){
@@ -313,10 +357,18 @@ export const useForumStore = defineStore("forumStore", {
                         }
                     }
                 })
-                return resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+                this.allComments = resp.data.hits.hits.map(x => ({ id: x._id, ...x._source }))
+                return this.allComments
             } catch (error) {
                 console.log('error getcomment');
             }
+        },
+        countRespComments(item){
+            const list = this.readAllComments
+            if(list.length){
+                return list.filter(x => x.commentRef === item).length
+            }
+            return 0
         },
         async editTextComment(item){
             const loginStore = await useLoginStore()
