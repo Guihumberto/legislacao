@@ -26,12 +26,12 @@
                     </div>
                     <div class="menu-actions" >
                         <transition name="fade">
-                            <div class="d-flex justify-end" v-if="item.id != idDelete">
+                            <div class="d-flex justify-end align-center" v-if="item.id != idDelete">
                                 <div v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
                                     <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
                                     <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
                                 </div>
-                                <AvaliarComment :comment="item" />
+                                
                                 <v-btn 
                                     variant="text"
                                     @click="showCommentResp = !showCommentResp">
@@ -39,6 +39,7 @@
                                         :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
                                     </v-badge>
                                 </v-btn>
+                                <AvaliarComment :comment="item" />
                             </div>
                         </transition>
                         <transition name="fade">

@@ -4,6 +4,7 @@ import api from "@/services/api"
 
 import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from '@/store/snackStore';
+import { useCommentStore } from "./CommentStore";
 
 
 export const useForumStore = defineStore("forumStore", {
@@ -61,14 +62,18 @@ export const useForumStore = defineStore("forumStore", {
         },
         readAllComments(){
             return this.allComments
+        },
+        readIdsComments(){
+            return this.allComments.map(x => x.id)
         }
     },
     actions:{
         async getGroup(id){
+            const commentStore = await useCommentStore()
             try {
                 const resp = await api.get(`group_forum/_doc/${id}`)
                 this.groupForum = resp.data
-
+                commentStore.getVotoComment(this.groupForum)
             } catch (error) {
                 console.log('error get Group');
             }
@@ -215,6 +220,7 @@ export const useForumStore = defineStore("forumStore", {
                 ...item,
                 user_name: loginStore.readLogin?.nickname || loginStore.readLogin?.name,
                 created_by: cpf,
+                pontos: 0,
                 data_include: this.formatDate
             }
 

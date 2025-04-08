@@ -59,8 +59,9 @@
     import FirstLogin from './firstLogin.vue'
     import { mask } from 'vue-the-mask'
 
-    import { useRouter } from 'vue-router';
+    import { useRouter, useRoute } from 'vue-router';
     const router = useRouter()
+    const route = useRoute()
 
     import { useLoginStore } from '../../store/LoginStore'
     const loginStore = useLoginStore()
@@ -89,8 +90,6 @@
 
     const keepConnected = ref(false)
 
-
-
     const form = ref(null)
     const showPassword = ref(true)
     const dialog = ref(false)
@@ -118,7 +117,8 @@
                  if(!login.name){
                     dialog.value = true
                  } else {
-                    router.push(`/leges`)
+                    const redirectTo = route.query.redirect || '/leges'
+                    router.push(redirectTo)
                  }
              }
     }

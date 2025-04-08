@@ -58,7 +58,10 @@ router.beforeEach((to, from, next) => {
   const role = JSON.parse(data)?.admin
 
   if (to.meta.requiresAuth && !cpf) {
-    next('/login');
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath } // salva onde o usuário queria ir
+    })
   } else if (to.meta.role && to.meta.role !== role) {
     next('/restricted');
   } else {

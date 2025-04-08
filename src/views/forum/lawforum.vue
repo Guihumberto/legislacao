@@ -133,8 +133,8 @@
         }
     });
 
-    watch(() => route.params.id, (newId, oldId) => {
-       getGroup()
+    watch(() => route.params.id, async (newId, oldId) => {
+       await getGroup()
        getAll()
     });
 
