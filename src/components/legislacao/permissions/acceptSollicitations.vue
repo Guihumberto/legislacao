@@ -12,15 +12,34 @@
         </v-list>
         <v-alert v-if="!solicitationStore.readInvites.length" class="mt-5" type="info" variant="text" text="Não há convites a serem avaliados"></v-alert>
     </div>
+    <v-expand-transition>
+        <div v-if="links.length">
+            <v-list class="mt-5 border rounded-lg">
+                <v-list-item v-for="item, i in links" :key="i" :to="`avancado/forumlaw/${item}`">
+                    Abrir grupo {{ item }}
+                </v-list-item>
+            </v-list>
+
+        </div>
+    </v-expand-transition>
 </template>
 
 <script setup>
+    import { ref } from 'vue';
+
     import { useSolicitationsStore } from '@/store/SolicitationsStore';
     const solicitationStore = useSolicitationsStore()
 
     const actionAcceptt = async (item) => {
         await solicitationStore.acceptInvites(item)
+        addLink(item.idGroup)
     }
+
+    const links = ref([])
+
+    const addLink = (item) => [
+        links.value.push(item)
+    ]
 
 </script>
 
