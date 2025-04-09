@@ -441,7 +441,7 @@ export const useForumStore = defineStore("forumStore", {
                 date_solicitation: this.formatDate,
                 date_permision: null,
                 nameGroup: item.title,
-                nameUser: ''
+                nameUser: idCPF ? '' : loginStore.readLogin.name
             }
 
             try {

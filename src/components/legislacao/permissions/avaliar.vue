@@ -3,8 +3,8 @@
         <v-list class="pa-0">
             <v-list-subheader>Solicitações dos meus grupos</v-list-subheader>
             <v-list-item link v-for="item, i in solicitationStore.readAvaliations" :key="i">
-                user: {{ item.idUser }} -
-                Grupo: {{ item.nameGroup }}
+                <b>Grupo: </b>{{ item.nameGroup }} <br>
+                <b>Solicitante: </b>{{ item.nameUser || item.idUser }}
                 <template v-slot:append>
                     <v-btn disabled variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
                     <v-btn variant="flat" color="success" class="mx-2" @click.stop="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>

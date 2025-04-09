@@ -1,63 +1,75 @@
 <template>
     <div v-if="forumStore.readGroupForum._id" class="mt-5">
-        <h1 class="text-h5">Dados Grupo</h1>
         <div class="wrapper">
-            <b>{{ forumStore.readGroupForum._source.title }}</b> <br>
-            {{ forumStore.readGroupForum._source.description }} <br><br>
-            <p :class="forumStore.readGroupForum._source.open ? 'text-success' :'text-red'" v-text="forumStore.readGroupForum._source.open ? 'Aberto para comentários':'Fechado comentários para não participantes do grupo'"></p>
-            <small>Data de Criação do grupo: {{ forumStore.readGroupForum._source.data_include }}</small> <br><br>
-            <v-list class="pa-0 border mb-2 bg-transparent" density="compact" v-if="forumStore.readGroupForum._source.group.length">
-                <v-list-subheader>Participantes</v-list-subheader>
-                <v-list-item v-for="item, i in forumStore.readGroupForum._source.group">{{ item }}</v-list-item>
-            </v-list>
-            
-            <v-btn 
-                color="success"
-                variant="outlined" prepend-icon="mdi-account-plus" 
-                v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" 
-                @click="getSolipendentes">Incluir novos participantes</v-btn>
-
-            <transition name="fade">
-                <div class="mt-2" v-if="addParticipante">
-                    <v-form @submit.prevent="addSaveParticipante" ref="form">
-                        <v-autocomplete
-                            v-model="selectedUser"
-                            variant="outlined"
-                            density="compact"
-                            :items="userOptions"
-                            :loading="loading"
-                            v-model:search="search"
-                            label="Buscar usuário"
-                            item-title="name"
-                            item-value="cpf"
-                            hide-details
-                            :rules="[ rules.required, rules.minfield ]"
-                            clearable
-                        />
-                        <v-btn class="mt-5" color="primary" type="submit" prepend-icon="mdi-email">Enviar Convite</v-btn>
-                    </v-form>
-
-                    <v-list class="pa-0 mt-5" density="compact" v-if="forumStore.readSolicitationPendentes.length">
-                        <v-list-subheader>Convites enviados pendentes</v-list-subheader>
-                        <v-list-item link v-for="item, i in forumStore.readSolicitationPendentes" :key="i">
-                            {{ item.idUser }}
-                            <template v-slot:append>
-                                <v-btn variant="text" disabled>
-                                    cancelar
-                                </v-btn>
-                            </template>
-                        </v-list-item>
-                    </v-list>
+            <div class="d-flex justify-space-between">
+                <div>
+                    <b>{{ forumStore.readGroupForum._source.title }}</b> <br>
+                    {{ forumStore.readGroupForum._source.description }} <br><br>
                 </div>
-            </transition>
-            <div v-if="!isComment">
-                <v-btn variant="flat" prepend-icon="mdi-email" color="success" v-if="!isExistSolicitation" @click="sendSolicitation" :loading="loading" :disabled="loading">Pedir para participar do grupo</v-btn>
-                <v-alert v-else type="info" text="Seu convite foi enviado, aguarde sua liberação pelo administrador do grupo.">
-                    <template v-slot:append>
-                        <v-btn disabled @click="editSolicitation(false)">Cancelar o pedido</v-btn>
-                    </template>
-                </v-alert>
+                <v-btn variant="text" @click="showDet = !showDet" :icon="showDet ? 'mdi-eye' : 'mdi-eye-off'"></v-btn>
             </div>
+            <v-expand-transition>
+                <div v-if="showDet">
+                    <p :class="forumStore.readGroupForum._source.open ? 'text-success' :'text-red'" v-text="forumStore.readGroupForum._source.open ? 'Aberto para comentários':'Fechado comentários para não participantes do grupo'"></p>
+                    <small>Data de Criação do grupo: {{ forumStore.readGroupForum._source.data_include }}</small> <br><br>
+                    <v-list class="pa-0 border mb-2 bg-transparent" density="compact" v-if="forumStore.readGroupForum._source.group.length">
+                        <v-list-subheader>Participantes</v-list-subheader>
+                        <v-list-item v-for="item, i in forumStore.readGroupForum._source.group">{{ item }}</v-list-item>
+                    </v-list>
+                    
+                    <v-btn 
+                        color="success"
+                        variant="outlined" prepend-icon="mdi-account-plus" 
+                        v-if="loginStore.readLogin.cpf == forumStore.readGroupForum._source.created_by" 
+                        @click="getSolipendentes">Incluir novos participantes</v-btn>
+
+                    <transition name="fade">
+                        <div class="mt-2" v-if="addParticipante">
+                            <v-form @submit.prevent="addSaveParticipante" ref="form">
+                                <v-autocomplete
+                                    v-model="selectedUser"
+                                    variant="outlined"
+                                    density="compact"
+                                    :items="userOptions"
+                                    :loading="loading"
+                                    v-model:search="search"
+                                    label="Buscar usuário"
+                                    item-title="name"
+                                    item-value="cpf"
+                                    hide-details
+                                    :rules="[ rules.required, rules.minfield ]"
+                                    clearable
+                                />
+                                <v-btn class="mt-5" color="primary" type="submit" prepend-icon="mdi-email">Enviar Convite</v-btn>
+                            </v-form>
+
+                            <v-list class="pa-0 mt-5" density="compact" v-if="forumStore.readSolicitationPendentes.length">
+                                <v-list-subheader>Convites enviados pendentes</v-list-subheader>
+                                <v-list-item link v-for="item, i in forumStore.readSolicitationPendentes" :key="i">
+                                    {{ item.idUser }}
+                                    <template v-slot:append>
+                                        <v-btn variant="text" disabled>
+                                            cancelar
+                                        </v-btn>
+                                    </template>
+                                </v-list-item>
+                            </v-list>
+                        </div>
+                    </transition>
+                    <div v-if="!isComment">
+                        <v-btn 
+                            variant="flat" 
+                            prepend-icon="mdi-email" color="success" 
+                            v-if="!isExistSolicitation" 
+                            @click="sendSolicitation" :loading="loading" :disabled="loading">Pedir para participar do grupo</v-btn>
+                        <v-alert v-else type="info" text="Seu convite foi enviado, aguarde sua liberação pelo administrador do grupo.">
+                            <template v-slot:append>
+                                <v-btn disabled @click="editSolicitation(false)">Cancelar o pedido</v-btn>
+                            </template>
+                        </v-alert>
+                    </div>
+                </div>
+            </v-expand-transition>
         </div>
     </div>
 </template>
@@ -75,6 +87,7 @@
 
     const addParticipante = ref(false)
     const form = ref(null)
+    const showDet = ref(true)
 
     const rules = {
         required: value => !!value || "campo obrigatório", 
