@@ -87,7 +87,12 @@
               <template v-slot:append>
                 <v-badge
                   color="info"
-                  :content="totalPermissions"
+                  :content="solicitationStore.readTotalAvaliations"
+                  inline
+                ></v-badge>
+                <v-badge
+                  color="success"
+                  :content="solicitationStore.readTotalInvites"
                   inline
                 ></v-badge>
               </template>
@@ -100,7 +105,12 @@
               <template v-slot:append>
                 <v-badge
                   color="info"
-                  :content="totalPermissions"
+                  :content="solicitationStore.readTotalAvaliations"
+                  inline
+                ></v-badge>
+                <v-badge
+                  color="success"
+                  :content="solicitationStore.readTotalInvites"
                   inline
                 ></v-badge>
               </template>
@@ -113,7 +123,7 @@
 </template>
 
 <script setup>  
-    import { onMounted, computed } from 'vue'
+    import { onMounted } from 'vue'
     import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue'
 
     import { useForumStore } from '@/store/ForumStore'
@@ -129,10 +139,7 @@
       forumStore.getForum()
     })
 
-    const totalPermissions = computed( () => {
-      solicitationStore.getAvaliations()
-      return solicitationStore.readTotalAvaliations
-    })
+    solicitationStore.getAll()
 
     const items = [
               { text: 'Início', icon: 'mdi-home', url:'/leges' },

@@ -87,6 +87,7 @@ export const useForumStore = defineStore("forumStore", {
             const objeto = {
                 ...item,
                 created_by: cpf,
+                group: [ cpf ],
                 data_include: this.formatDate
             }
 
@@ -94,6 +95,7 @@ export const useForumStore = defineStore("forumStore", {
                 const resp = await api.post('group_forum/_doc', objeto)
           
                 await this.createLawForum(textlaw, resp.data._id)
+                this.myGroup.push({ id: resp.data._id, ...objeto })
                 return { code: resp.status, id: resp.data._id }
 
             } catch (error) {
@@ -141,7 +143,14 @@ export const useForumStore = defineStore("forumStore", {
                                     }
                                 }
                             ],
-                            minimum_should_match: 1
+                            minimum_should_match: 1,
+                            "filter": [
+                                {
+                                    "term": {
+                                        "active": true
+                                    }
+                                }
+                            ]
                         }
                     },
                     sort: [
@@ -400,9 +409,9 @@ export const useForumStore = defineStore("forumStore", {
             try {
                 const resp = await api.post(`group_forum/_update/${id}`, {
                     "doc":{
-                        created_by: null,
+                        active: false,
                         delete_by: cpf,
-                        date_delete: Date.now()
+                        data_inactice: this.formatDate
                     }
                 })
                 this.myGroup = this.myGroup.filter( x => x.id != id)
@@ -410,28 +419,29 @@ export const useForumStore = defineStore("forumStore", {
                 console.log('delete mygrupo');
             }
         },
-        async sendSolicitation(id, user = true, idCPF = null ){
+        async sendSolicitation(item, user = true, idCPF = null ){
             const snackStore = useSnackStore()
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             const cpf = loginStore.readLogin.cpf
 
             if(idCPF){
-                const exist = await this.isExistSolicitation(id, idCPF)
+                const exist = await this.isExistSolicitation(item.id, idCPF)
                 if(exist) {
-                    console.log('exist', exist);
                     snackStore.activeSnack('Usuário já adicionado', 'error')
                     return
                 }
             }
 
             const objeto = {
-                idGroup: id, 
+                idGroup: item.id, 
                 idUser: idCPF || cpf,
                 admPermission: !user, 
                 userPermission: user,
                 date_solicitation: this.formatDate,
-                date_permision: null
+                date_permision: null,
+                nameGroup: item.title,
+                nameUser: ''
             }
 
             try {

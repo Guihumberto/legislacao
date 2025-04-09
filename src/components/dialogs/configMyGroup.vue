@@ -68,6 +68,7 @@
     })
 
   const groupsList = computed(() => {
+        console.log('teste validacao', cpf.value);
         return props.groups.filter( x => x.created_by == cpf.value)
   })
 

@@ -26,19 +26,20 @@
                     </div>
                     <div class="menu-actions" >
                         <transition name="fade">
-                            <div class="d-flex justify-end align-center" v-if="item.id != idDelete">
-                                <div v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
-                                    <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-                                    <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
+                            <div class="menu-comments" v-if="item.id != idDelete">
+                                <div class="d-flex align-center mr-1">
+                                    <div class="d-flex" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
+                                        <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                                        <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
+                                    </div>    
+                                    <v-btn 
+                                        variant="text"
+                                        @click="showCommentResp = !showCommentResp">
+                                        <v-badge 
+                                            :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
+                                        </v-badge>
+                                    </v-btn>
                                 </div>
-                                
-                                <v-btn 
-                                    variant="text"
-                                    @click="showCommentResp = !showCommentResp">
-                                    <v-badge 
-                                        :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
-                                    </v-badge>
-                                </v-btn>
                                 <AvaliarComment :comment="item" />
                             </div>
                         </transition>
@@ -183,6 +184,11 @@
 .menu-actions{
     position: relative;
 }
+.menu-comments{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s, transform 0.4s;
@@ -192,6 +198,12 @@
 .fade-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+@media (max-width: 600px) {
+    .menu-comments {
+        flex-direction: column;
+    }    
 }
 
 </style>

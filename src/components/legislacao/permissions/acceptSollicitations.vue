@@ -3,10 +3,11 @@
         <v-list class="pa-0">
             <v-list-subheader>Aceitar Convites</v-list-subheader>
             <v-list-item link v-for="item, i in solicitationStore.readInvites" :key="i">
-                Group:{{ item.idGroup }}
+                Grupo: {{ item.nameGroup }}
                 <template v-slot:append>
                     <v-btn disabled variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
-                    <v-btn variant="flat" color="success" class="ml-2" @click="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
+                    <v-btn variant="flat" color="success" class="mx-2" @click.stop="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
+                    <v-btn @click.stop="$router.push(`avancado/forumlaw/${item.idGroup}?permission=true`)" variant="flat" color="grey"><v-icon>mdi-eye-arrow-right-outline</v-icon></v-btn>
                 </template>
             </v-list-item>
         </v-list>
@@ -15,8 +16,11 @@
     <v-expand-transition>
         <div v-if="links.length">
             <v-list class="mt-5 border rounded-lg">
-                <v-list-item v-for="item, i in links" :key="i" :to="`avancado/forumlaw/${item}`">
-                    Abrir grupo {{ item }}
+                <v-list-item v-for="item, i in links" :key="i" :to="`avancado/forumlaw/${item.idGroup}?permission=true`">
+                    Abrir grupo {{ item.nameGroup }}
+                    <template v-slot:append>
+                        <v-btn>entrar</v-btn>
+                    </template>
                 </v-list-item>
             </v-list>
 
@@ -32,7 +36,7 @@
 
     const actionAcceptt = async (item) => {
         await solicitationStore.acceptInvites(item)
-        addLink(item.idGroup)
+        addLink(item)
     }
 
     const links = ref([])

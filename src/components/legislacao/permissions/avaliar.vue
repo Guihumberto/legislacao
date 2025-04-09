@@ -4,10 +4,11 @@
             <v-list-subheader>Solicitações dos meus grupos</v-list-subheader>
             <v-list-item link v-for="item, i in solicitationStore.readAvaliations" :key="i">
                 user: {{ item.idUser }} -
-                Group:{{ item.idGroup }}
+                Grupo: {{ item.nameGroup }}
                 <template v-slot:append>
-                    <v-btn variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
-                    <v-btn variant="flat" color="success" class="ml-2" @click="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
+                    <v-btn disabled variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
+                    <v-btn variant="flat" color="success" class="mx-2" @click.stop="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
+                    <v-btn @click.stop="$router.push(`avancado/forumlaw/${item.idGroup}?permission=true`)" variant="flat" color="grey"><v-icon>mdi-eye-arrow-right-outline</v-icon></v-btn>
                 </template>
             </v-list-item>
         </v-list>

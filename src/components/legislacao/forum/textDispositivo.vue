@@ -134,6 +134,7 @@
             if(!valid) return
             load.value = true
             const resp = await forumStore.saveComment(comment.value)
+            comment.value.pontos = 0
             if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
             comment.value.text = null
             load.value = false

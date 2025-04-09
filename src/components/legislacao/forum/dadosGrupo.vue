@@ -98,7 +98,7 @@
 
     const sendSolicitation = async (cancelar = true) => {
         loading.value = true
-        await forumStore.sendSolicitation(forumStore.readGroupForum._id, true)
+        await forumStore.sendSolicitation({ id: forumStore.readGroupForum._id, ...forumStore.readGroupForum._source }, true)
         loading.value = false
     }
 
@@ -115,8 +115,7 @@
           const { valid } = await form.value.validate()
 
           if(valid) {
-            await forumStore.sendSolicitation(forumStore.readGroupForum._id, false, selectedUser.value)
-            // addParticipante.value = false
+            await forumStore.sendSolicitation({ id: forumStore.readGroupForum._id, ...forumStore.readGroupForum._source }, false, selectedUser.value)
             search.value = ''
             selectedUser.value = null
           }     

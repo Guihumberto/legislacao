@@ -28,7 +28,6 @@
             </v-form>
             <transition-group name="fade" tag="div">
                 <div class="comment-box" v-for="item, i in respComments" :key="item.id" v-if="respComments.length">
-                    <div class="profile-pic"></div>
                     <div class="comment-content">
                         <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                         <div class="timestamp text-subtitle">{{ item.data_include }}</div>
@@ -51,9 +50,9 @@
                         </div>
                         <div class="menu-actions" >
                             <transition name="fade">
-                                <div class="d-flex justify-end" v-if="item.id != idDelete">
-                                    <div v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
-                                        <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                                <div class="menu-comments" v-if="item.id != idDelete">
+                                    <div class="mr-1" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
+                                        <v-btn variant="text" class="mr-1" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
                                         <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false"><v-icon>mdi-delete</v-icon></v-btn>
                                     </div>
                                     <AvaliarComment :comment="item" />
@@ -146,6 +145,7 @@
             if(!valid) return
             load.value = true
             const resp = await forumStore.saveComment(comment.value, true)
+            comment.value.pontos = 0
             respComments.value.push({ id: resp, ...comment.value })
             comment.value.text = null
             load.value = false
@@ -218,6 +218,11 @@
 .menu-actions{
     position: relative;
 }
+.menu-comments{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s, transform 0.4s;
@@ -229,4 +234,9 @@
   transform: translateX(-20px);
 }
 
+@media (max-width: 600px) {
+    .menu-comments {
+        flex-direction: column;
+    }    
+}
 </style>

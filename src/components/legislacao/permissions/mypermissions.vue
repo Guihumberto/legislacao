@@ -3,9 +3,10 @@
         <v-list class="pa-0">
             <v-list-subheader>Minhas Solicitações</v-list-subheader>
             <v-list-item link v-for="item, i in solicitationStore.readSolicitations" :key="i">
-                {{ item.idGroup }}
+                Grupo: {{ item.nameGroup }}
                 <template v-slot:append>
-                    <v-btn variant="flat" color="orange" class="ml-2">Pendente</v-btn>
+                    <v-btn variant="flat" color="orange" class="mx-2">Pendente</v-btn>
+                    <v-btn @click.stop="$router.push(`avancado/forumlaw/${item.idGroup}?permission=true`)" variant="flat" color="grey"><v-icon>mdi-eye-arrow-right-outline</v-icon></v-btn>
                 </template>
             </v-list-item>
         </v-list>

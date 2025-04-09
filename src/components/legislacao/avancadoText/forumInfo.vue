@@ -36,7 +36,7 @@
                   <div v-if="showGroup">
                     <v-btn @click="showGroup = false">Voltar</v-btn>
                     <v-list class="pa-0" density="compact">
-                      <v-list-item link v-for="item, i in 5" :key="i" @click="solicitationGetIn(item)">Grupos/responsavel</v-list-item>
+                      <v-list-item link v-for="item, i in 5" :key="i" @click="solicitationGetIn(item)">Grupos/responsável</v-list-item>
                     </v-list>
                   </div>
                 </div>
@@ -76,7 +76,6 @@
                     density="compact"
                     variant="outlined"
                     placeholder="Fale sobre os objetivos dessa discussão"
-                    clearable
                     v-model="form.description"
                   ></v-textarea>
                   <v-checkbox
@@ -147,7 +146,8 @@
       title: null,
       description: null,
       group: [],
-      open: false
+      open: false,
+      active: true
     })
 
     const rules = ref({
@@ -184,15 +184,15 @@
         showForms.value = false
         confirm.value = true
         const resp = await forumStore.createForum(form.value, textlaw.value)
-        if(selectedUser.value.length) saveGroup(resp.id)
+        if(selectedUser.value.length) saveGroup({ id: resp.id, ...form.value })
         error.value = resp.code
         idU.value = resp.id
       }
     }
 
-    const saveGroup = async (id) => {
+    const saveGroup = async (item) => {
       for (const cpf of selectedUser.value) {
-        await forumStore.sendSolicitation(id, false, cpf);
+        await forumStore.sendSolicitation(item, false, cpf);
       }
     }
 

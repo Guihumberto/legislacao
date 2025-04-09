@@ -10,6 +10,7 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
     state: () => ({
         avaliations: [],
         totalAvaliations: 0,
+        totalInvites: 0,
         solicitations: [],
         invites: [],
         load: false
@@ -39,11 +40,21 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
         readTotalAvaliations(){
             return this.totalAvaliations
         },
+        readTotalInvites(){
+            return this.totalInvites
+        },
         readInvites(){
             return this.invites
         }
     },
     actions:{
+        async getAll(){
+            const loginStore = await useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+            
+            await this.getAvaliations()
+            this.getInvites()
+        },
         async getAvaliations(){
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -72,8 +83,6 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
                         
                     }
                 })
-
-                console.log('resp ava', resp);
 
                 this.avaliations = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }) )
                 this.totalAvaliations = resp.data.hits.total.value
@@ -109,7 +118,7 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
                     }
                 })
 
-                console.log('resp solic', resp);
+                console.log('resp solic oi', resp);
 
                 this.solicitations = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }) )
                 
@@ -123,7 +132,6 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
             const cpf = loginStore.readLogin.cpf
 
             try {
-                this.solicitations = []
                 const resp = await api.post('permission_group_forum/_search', {
                     query: {
                         bool:{
@@ -150,6 +158,7 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
                 })
 
                 this.invites = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }) )
+                this.totalInvites = resp.data.hits.total.value
                 
             } catch (error) {
                 console.log('error get solicitatons');
