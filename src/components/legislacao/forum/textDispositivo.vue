@@ -1,11 +1,7 @@
 <template>
     <div @mouseover="showActions = true" @mouseleave="showActions = false" class="relativeContainer">
-        <p 
-            :class="dispositivo.estrutura ? 'estrutura': ''"
-            :title="`Artigo ${dispositivo.art}`"
-            v-html="highlightText(dispositivo)">
-        </p>
-
+        <TextEdit :dispositivo="dispositivo" :search="search" />
+      
         <v-expand-transition>
             <div class="action-art" v-if="isArt && showActions || activeArt">
                 <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeArt = !activeArt">
@@ -28,7 +24,7 @@
         </v-expand-transition>
 
         <v-expand-transition>
-            <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="showActions || activeComment || dispositivo.comments.length > 0">
+            <div class="text-right border rounded mt-2 bg-blue-grey-lighten-5"  v-if="activeComment || dispositivo.comments.length > 0">
                <transition name="fade">
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
@@ -76,6 +72,7 @@
 
     import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
+    import TextEdit from './textEdit.vue';
 
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
@@ -141,34 +138,6 @@
     }
 
     const childRef = ref(null);
-
-    const highlightText = (text) => {
-        if(props.search) {
-            const normalize = str => 
-            str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-            
-            const normalizedText = normalize(text.textlaw);
-            const normalizedKeyword = normalize(props.search);
-            const regex = new RegExp(`(${normalizedKeyword})`, 'gi');
-            
-            let highlightedText = normalizedText.replace(regex, '<mark>$1</mark>');
-    
-            if(text.textlaw.startsWith('Art')) {    
-                highlightedText = `<b>${highlightedText.substr(0, 4)}</b> ${highlightedText.substr(4)}`
-            } 
-            else {
-                highlightedText = ` (art. ${text.art}º), ${highlightedText}`
-            }
-    
-            return highlightedText;
-        } else {
-            if(text.textlaw.startsWith('Art')){
-                return `<b>${text.textlaw.substr(0, 4)}</b> ${text.textlaw.substr(4)}`
-            } else {
-                return text.textlaw
-            }
-        }
-    }
     
 </script>
 
@@ -199,10 +168,5 @@
     padding: 10px;
     background: #f9f9f9;
 }
-.estrutura{
-    background: rgb(234, 232, 232);
-    padding: .5rem;
-    text-align: center;
-    font-weight: 440;
-}
+
 </style>
