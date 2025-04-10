@@ -29,17 +29,19 @@
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                          <v-select
-                             label="Tipo"
+                             label="Comentar"
                              density="compact"
                              :items="types"
                              item-title="title"
                              item-value="id"
                              class="mb-2"
                              v-model="comment.type"
-                             style="width: 150px;"
+                             style="width: 200px;"
                              hide-details
+                             clearable
                          ></v-select>
                          <v-textarea
+                             v-if="comment.type"
                              :label="types.find( x => x.id == comment.type).title"
                              density="compact"
                              variant="outlined"
@@ -48,7 +50,7 @@
                              :rules="[ rules.required ]"
                          >
                          </v-textarea>
-                         <div class="d-flex justify-end my-2">
+                         <div class="d-flex justify-end my-2" v-if="comment.type">
                              <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
                          </div>
                     </v-form>
@@ -114,7 +116,7 @@
 
     const comment = ref({
         text: null, 
-        type: 1,
+        type: '',
         idRef: props.dispositivo.id, 
         commentRef: null,
         idGroup: props.dispositivo.idGroup,
@@ -132,6 +134,7 @@
             load.value = true
             const resp = await forumStore.saveComment(comment.value)
             comment.value.pontos = 0
+            comment.value.user_name = 'Eu'
             if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
             comment.value.text = null
             load.value = false

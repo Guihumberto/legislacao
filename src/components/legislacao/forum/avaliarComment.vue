@@ -6,14 +6,14 @@
     >
         <v-tooltip text="Pontos" location="top">
             <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" :color=" comment.pontos >= 0 ? 'primary' : 'error'" variant="tonal" :loading="load">
+                <v-btn v-bind="props" :color=" comment.pontos >= 0 ? 'success' : 'error'" variant="tonal" :loading="load">
                     {{ comment.pontos }}
                 </v-btn>
             </template>
         </v-tooltip>
         <v-tooltip text="Avaliar como bom" location="top">
             <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" @click="votar('bom')" variant="tonal" :color="getVotoUsuario() == 'bom' ? 'primary':''" :disabled="load">
+                <v-btn v-bind="props" @click="votar('bom')" variant="tonal" :color="getVotoUsuario() == 'bom' ? 'success':''" :disabled="load">
                     <v-icon icon="mdi-chevron-up" ></v-icon>
                 </v-btn>
             </template>

@@ -8,7 +8,7 @@
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                     <div class="timestamp text-subtitle">{{ item.data_include }}</div>
                     <div class="comment-text text-body-2">
-                        <p v-if="item.id != idEdit">{{ item.text }}</p>
+                        <p v-if="item.id != idEdit" v-html="comentarioFormatado(item.text)"></p>
                         <div v-else>
                             <v-form>
                                 <v-textarea
@@ -146,6 +146,9 @@
             commentEdit.value = null
             loadEdit.value = false
         }
+
+        const comentarioFormatado = (item) => item.replace(/\n/g, '<br>')
+        
 
 </script>
 

@@ -28,10 +28,11 @@
             <v-card ref="menuRef">
                 <v-btn-group variant="plain">     
                     <v-btn icon @click.stop.prevent="applyBold" title="negrito"><v-icon>mdi-format-bold</v-icon></v-btn>
-                    <v-btn icon @click="applyUnderline" :title="'Sublinhar'"> <v-icon>mdi-format-underline</v-icon> </v-btn>
-                    <v-btn icon @click="applyColor('red')" title="cor do texto vermelho"><v-icon color="red">mdi-format-color-text</v-icon></v-btn>
-                    <v-btn icon @click="applyColor('blue')" title="cor do texto azul"><v-icon color="blue">mdi-format-color-text</v-icon></v-btn>
-                    <v-btn icon @click="removerFormatacao" :title="'Remover formatação'"><v-icon>mdi-format-clear</v-icon></v-btn>
+                    <v-btn icon @click.stop.prevent="applyUnderline" :title="'Sublinhar'"> <v-icon>mdi-format-underline</v-icon> </v-btn>
+                    <v-btn icon @click.stop.prevent="taxarTexto" :title="'Tachar texto'"><v-icon>mdi-format-strikethrough</v-icon></v-btn>
+                    <v-btn icon @click.stop.prevent="applyColor('red')" title="cor do texto vermelho"><v-icon color="red">mdi-format-color-text</v-icon></v-btn>
+                    <v-btn icon @click.stop.prevent="applyColor('blue')" title="cor do texto azul"><v-icon color="blue">mdi-format-color-text</v-icon></v-btn>
+                    <v-btn icon @click.stop.prevent="removerFormatacao" :title="'Remover formatação'"><v-icon>mdi-format-clear</v-icon></v-btn>
                     <v-btn icon @click="menu = false" title="Fechar"><v-icon>mdi-close-circle</v-icon></v-btn>
                 </v-btn-group>
             </v-card>
@@ -138,6 +139,10 @@
     function applyUnderline() {
         document.execCommand('underline')
         salvarDispositivo()
+    }
+
+    const taxarTexto = () => {
+        document.execCommand('strikeThrough')
     }
 
     const removerFormatacao = () => {

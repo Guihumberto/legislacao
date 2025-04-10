@@ -3,17 +3,19 @@
     <div class="response-comment">
             <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                     <v-select
-                        label="Tipo"
+                        label="Responder"
                         density="compact"
                         :items="types"
                         item-title="title"
                         item-value="id"
                         class="mb-2"
                         v-model="comment.type"
-                        style="width: 150px;"
+                        style="width: 200px;"
                         hide-details
+                        clearable
                     ></v-select>
                     <v-textarea
+                        v-if="comment.type"
                         :label="types.find( x => x.id == comment.type).title"
                         density="compact"
                         variant="outlined"
@@ -22,7 +24,7 @@
                         :rules="[ rules.required ]"
                     >
                     </v-textarea>
-                    <div class="d-flex justify-end my-2">
+                    <div class="d-flex justify-end my-2" v-if="comment.type">
                         <v-btn variant="text" color="primary" type="submit" :loading="load">Enviar</v-btn>
                     </div>
             </v-form>
@@ -32,9 +34,9 @@
                         <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                         <div class="timestamp text-subtitle">{{ item.data_include }}</div>
                         <div class="comment-text text-body-2">
-                            <p v-if="item.id != idEdit">{{ item.text }}</p>
+                            <p v-if="item.id != idEdit" v-html="comentarioFormatado(item.text)"></p>
                             <div v-else>
-                                <v-form>
+                                <v-form @submit.prevent="editComment(item)">
                                     <v-textarea
                                         label="Comentario"
                                         variant="outlined"
@@ -104,6 +106,8 @@
         load.value = false
     })
 
+    const comentarioFormatado = (item) => item.replace(/\n/g, '<br>')
+
     const types = [
         {id: 1, title: "Comentário"},
         {id: 3, title: "Resposta"},
@@ -132,7 +136,7 @@
 
     const comment = ref({
         text: null, 
-        type: 3,
+        type: '',
         idRef: props.dispositivo.id, 
         commentRef: props.idComment,
         idGroup: props.dispositivo.idGroup,
@@ -146,6 +150,7 @@
             load.value = true
             const resp = await forumStore.saveComment(comment.value, true)
             comment.value.pontos = 0
+            comment.value.user_name = 'Eu'
             respComments.value.push({ id: resp, ...comment.value })
             comment.value.text = null
             load.value = false
