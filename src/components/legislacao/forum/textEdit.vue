@@ -22,11 +22,12 @@
             transition="scale-transition"
             :activator="menuActivator"
             offset-y
-            location-strategy="connected"
+            location="top"
+            persistent
         >
             <v-card ref="menuRef">
                 <v-btn-group variant="plain">     
-                    <v-btn icon @click="applyBold" title="negrito"><v-icon>mdi-format-bold</v-icon></v-btn>
+                    <v-btn icon @click.stop.prevent="applyBold" title="negrito"><v-icon>mdi-format-bold</v-icon></v-btn>
                     <v-btn icon @click="applyUnderline" :title="'Sublinhar'"> <v-icon>mdi-format-underline</v-icon> </v-btn>
                     <v-btn icon @click="applyColor('red')" title="cor do texto vermelho"><v-icon color="red">mdi-format-color-text</v-icon></v-btn>
                     <v-btn icon @click="applyColor('blue')" title="cor do texto azul"><v-icon color="blue">mdi-format-color-text</v-icon></v-btn>
@@ -125,26 +126,22 @@
 
     function applyBold() {
         document.execCommand('bold')
-        menu.value = false
         salvarDispositivo()
     }
 
     function applyColor(color) {
         document.execCommand('styleWithCSS', false, true)
         document.execCommand('foreColor', false, color)
-        menu.value = false
         salvarDispositivo()
     }
 
     function applyUnderline() {
         document.execCommand('underline')
-        menu.value = false
         salvarDispositivo()
     }
 
     const removerFormatacao = () => {
         document.execCommand('removeFormat')
-        menu.value = false
     }
 
     const salvarDispositivo = () => {
