@@ -115,6 +115,22 @@ export const useCommentStore = defineStore("commentStore", {
             } catch (error) {
                 console.log('error update pontos');
             }
+        },
+        async saveDispositivoEdit(item){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin?.cpf || null
+            if(!cpf) return
+            try {
+                const resp = await api.post(`law_forum/_update/${item.id}`, {
+                    "doc":{
+                        textlaw: item.textlaw,
+                        last_date_update: this.formatDate
+                    }
+                })
+                console.log('salvo');
+            } catch (error) {
+                console.log('error save dispositivo');
+            }
         }
     }
 })
