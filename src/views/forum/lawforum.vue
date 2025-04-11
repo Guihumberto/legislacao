@@ -98,8 +98,9 @@
     import { useSnackStore } from "@/store/snackStore";
     const snackStore = useSnackStore()
    
-    import { useRoute } from "vue-router";
+    import { useRoute, useRouter } from "vue-router";
     const route = useRoute()
+    const router = useRouter()
 
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
@@ -131,6 +132,12 @@
                 behavior: 'smooth' // Rolagem suave
             });
         }
+        router.push({
+            query: {
+                ...route.query,
+                page: newPage
+            }
+        })
     });
 
     watch(() => route.params.id, async (newId, oldId) => {
@@ -288,7 +295,8 @@
 
     onMounted( async () => {
         await getGroup()
-        getAll()
+        await getAll()
+        route.query.page ? pagination.value.page = Number(route.query.page)  : ''
     })
 
 </script>

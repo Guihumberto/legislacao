@@ -84,10 +84,23 @@
     
     import { useLoginStore } from '@/store/LoginStore';
     const loginStore = useLoginStore()
+    
+    import { useRouter, useRoute } from 'vue-router';
+    const route = useRoute()
+    const router = useRouter()
 
     const addParticipante = ref(false)
     const form = ref(null)
     const showDet = ref(true)
+
+    watch(() => showDet.value, () => {
+        router.push({
+            query: {
+                ...route.query,
+                det: showDet.value
+            }
+        })
+    })
 
     const rules = {
         required: value => !!value || "campo obrigatório", 
@@ -96,6 +109,7 @@
 
     onMounted( async () => {
         await forumStore.getSolicitations()
+        route.query.det == 'true' ? showDet.value = true : showDet.value = false
     })
 
     const isComment = computed(() => {

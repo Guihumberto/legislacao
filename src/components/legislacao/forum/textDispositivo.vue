@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, watch } from 'vue';
 
     import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
@@ -79,11 +79,19 @@
     import { useLoginStore } from '@/store/LoginStore';
     const LoginStore = useLoginStore()
 
+    import { useRoute } from 'vue-router'
+    const route = useRoute()
+
     const showActions = ref(false);
     const activeComment = ref(false)
     const activeArt = ref(false)
     const form = ref(null)
     const load = ref(false)
+
+    watch(() => route.query.page, (newPage, oldPage) => {
+        activeComment.value = false
+      }
+    )
 
     const isArt = computed(() => {
         return props.dispositivo.textlaw.startsWith('Art') || props.dispositivo.textlaw.startsWith('<b>Art')
