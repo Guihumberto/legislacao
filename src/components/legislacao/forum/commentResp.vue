@@ -145,6 +145,16 @@
     })
 
     const saveComment = async () => {
+        
+            comment.value = {
+                ...comment.value,
+                idRef: props.dispositivo.id,
+                commentRef: props.idComment,
+                idGroup: props.dispositivo.idGroup,
+                art: props.dispositivo.art,
+                created_by: LoginStore.readLogin.cpf
+            }
+
             const { valid } = await form.value.validate()
             if(!valid) return
             load.value = true

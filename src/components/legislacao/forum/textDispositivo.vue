@@ -6,9 +6,6 @@
             <div class="action-art" v-if="isArt && showActions || activeArt">
                 <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeArt = !activeArt">
                     <v-icon>mdi-forum</v-icon>
-                    <!-- <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
-                        <v-icon>mdi-forum</v-icon>
-                    </v-badge> -->
                 </v-btn>
             </div>
         </v-expand-transition>
@@ -89,7 +86,7 @@
     const load = ref(false)
 
     const isArt = computed(() => {
-        return props.dispositivo.textlaw.startsWith('Art')
+        return props.dispositivo.textlaw.startsWith('Art') || props.dispositivo.textlaw.startsWith('<b>Art')
         ? true
         : false
     })
@@ -129,15 +126,24 @@
     ]
 
     const saveComment = async () => {
-            const { valid } = await form.value.validate()
-            if(!valid) return
-            load.value = true
-            const resp = await forumStore.saveComment(comment.value)
-            comment.value.pontos = 0
-            comment.value.user_name = 'Eu'
-            if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
-            comment.value.text = null
-            load.value = false
+        
+        comment.value = {
+            ...comment.value,
+            idRef: props.dispositivo.id,
+            idGroup: props.dispositivo.idGroup,
+            art: props.dispositivo.art,
+        }
+
+        const { valid } = await form.value.validate()
+        if(!valid) return
+        load.value = true
+        const resp = await forumStore.saveComment(comment.value)
+        console.log('comment save', resp);
+        comment.value.pontos = 0
+        comment.value.user_name = 'Eu'
+        if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
+        comment.value.text = null
+        load.value = false
     }
 
     const childRef = ref(null);
