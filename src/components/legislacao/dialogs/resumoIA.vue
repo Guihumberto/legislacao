@@ -7,9 +7,9 @@
                     <div class="d-flex">
                         <v-icon class="mr-2">mdi-robot</v-icon> <h1 class="text-h5">Resumo IA</h1>
                     </div>
-                    <v-btn icon="mdi-close" variant="text" @click="dialog=false"></v-btn>
+                    <v-btn icon="mdi-close" density="compact" variant="text" @click="dialog=false"></v-btn>
                 </v-card-title>
-                <v-card-text class="text-center">
+                <v-card-text class="text-center overflow-auto">
                     <v-chip>pág. {{ page.num_page }} - {{ page.page_to_norma.title }}</v-chip>
                     <v-sheet class="pa-2 border-1 border-red-lighten-2 mt-5" v-if="relevantTermsLaw.length">
                         <p class="font-weight-bold mb-2">Termos relevantes da Norma</p>
@@ -190,7 +190,7 @@
                     resumos.push(resp || "");
 
                     const sumRep = await await searchStore.palavraChave(parte)
-                    keywords.value.push( [ ...sumRep.split(',') ] ) 
+                    keywords.value.push( ...sumRep.split(',') ) 
        
                 } catch (erro) {
                     console.error("Erro na requisição:", erro);

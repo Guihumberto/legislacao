@@ -172,5 +172,29 @@ export const useSearchStore = defineStore("searchStore", {
                 this.load = false
             }
         },
+        async searchElastic(search, page){
+            try {
+                this.load = true
+                const resp = await api.post('pages_v2/_search', {
+                    from: page.inicio * page.page,
+                    size: page.qtd,
+                    query: {
+                        "multi_match": {
+                        "query": search.text,
+                        "fields": [
+                            "text_page",
+                            "page_to_norma.title^2"  
+                        ],
+                        "type": "most_fields"  
+                        }
+                    }
+                })
+                return resp
+            } catch (error) {
+                console.log('erro search alternative');
+            } finally {
+                this.load = false
+            }
+        }
     }
 })

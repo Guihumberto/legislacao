@@ -528,6 +528,9 @@
     import { useFavStore } from '@/store/FavStore'
     const favStore = useFavStore()
 
+    import { useSearchStore } from "@/store/SearchStore"
+    const searchStore = useSearchStore()
+
     import { useGeneralStore } from '@/store/GeneralStore'
     import { useGeralStore } from '@/store/GeralStore'
     import { useLawStore } from "@/store/LawsStore"
@@ -791,6 +794,7 @@
         const listAnos = [...new Set(list)].sort((a, b) => a.localeCompare(b))
         return listAnos
     })
+
     const resultSearchNorma = computed(() => {
         let list = resultSearch.value.map(x => ({ id_law: x.page_to_norma.parent,  nome: x.page_to_norma.title}))
         const uniqueArray = Array.from(
@@ -970,8 +974,16 @@
                     resultsSearch.value = response.data.hits.hits;
                     totalDocs.value = response.data.hits.total.value;
                 } catch (error) {
-                    snackStore.activeSnack(error.response.data.errors, "error")
-                    result.value = error.response.data.errors
+
+                    try {
+                        const resp = await searchStore.searchElastic(search.value, pagination.value)
+                        resultsSearch.value = resp.data.hits.hits;
+                        totalDocs.value = resp.data.hits.total.value;
+                    } catch (errorE) {
+                        snackStore.activeSnack(error.response.data.errors, "error")
+                        result.value = error.response.data.errors
+                    }
+
                 }finally{
                     load.value = false
                     deslocarTela('results')
@@ -1107,6 +1119,7 @@
             deslocarTela()
         }
     })
+
 </script>
 
 <style  scoped>

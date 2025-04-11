@@ -1,8 +1,8 @@
 <template>
     <v-expand-transition>
         <v-sheet
-            class="mx-auto mt-3"
-            elevation="2"
+            class="mx-auto my-3"
+            elevation="1"
             rounded="xl"
             v-if="!aggsStore.readLoad && termsSignificantes.length"
         >
