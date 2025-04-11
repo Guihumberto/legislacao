@@ -195,6 +195,22 @@ export const useSearchStore = defineStore("searchStore", {
             } finally {
                 this.load = false
             }
+        },
+        async searchIaAll(search){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.load = true
+            try {
+                const resp = await apiChat.post('ask', {
+                    question: search
+                })
+                return resp.data.answer
+            } catch (error) {
+                console.log('erro search arcadio ia');
+            } finally {
+                this.load = false
+            }
         }
     }
 })

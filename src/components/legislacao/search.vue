@@ -230,7 +230,9 @@
                         </v-tab>
                     </v-tabs>
                 </div>
-
+                <div v-if="tab == 'Arcádio'">
+                    <ArcadioIA :respArcadio="respArcadio" />
+                </div>
                 <div v-if="tab == 'Páginas'">
                     <div class="text-center my-10 py-10" v-if="load">
                         <v-progress-circular
@@ -579,7 +581,7 @@
     }
 
     const tab = ref('Páginas')
-    const tab_name = ['Páginas', 'Normas']
+    const tab_name = [ 'Arcádio', 'Páginas', 'Normas']
     const color = ref("primary")
     const filtrosavacados = ref(false)
     const searchOn = ref(false)
@@ -930,6 +932,8 @@
         }
     }
 
+    const respArcadio = ref(null)
+
     const searchEnv = async (envSolici=1) => {
         searchInToSearch.value = false
         erroSearchInToSearch.value = null
@@ -993,7 +997,13 @@
                     firstSearch.value = search.value.text
                     if(totalDocs.value) accessedStore.getAccessUser(resultsSearch.value.map( x => x._id))
                     if(totalDocs.value) favStore.getAllFavoritos(resultsSearch.value)
+                    
+                    //chat ia
+                    const resp = await searchStore.searchIaAll(search.value.text)
+                    respArcadio.value = resp
+                    
                     changeTab()
+
                 }
             } else if (search.value.semantic == 2){
                 load.value = false
@@ -1100,6 +1110,7 @@
 
     import { searchInitial } from "@/composables/tutorialSearch";
     import TermsSignificantSearch from './elements/aggs/termsSignificantSearch.vue'
+import ArcadioIA from './dialogs/arcadioIA.vue'
 
     const el1 = ref(null);
     const el2 = ref(null);
