@@ -125,28 +125,84 @@
         event.preventDefault() // bloqueia digitação normal
     }
 
-    function applyBold() {
+    const applyBold = () => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+
+        const selectedText = range.toString()
+
+        if (!selectedText.trim()) return
+        
         document.execCommand('bold')
         salvarDispositivo()
     }
 
-    function applyColor(color) {
+    const applyColor = (color) => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+
+        const selectedText = range.toString()
+
+        if (!selectedText.trim()) return
+
         document.execCommand('styleWithCSS', false, true)
         document.execCommand('foreColor', false, color)
         salvarDispositivo()
     }
 
-    function applyUnderline() {
+    const applyUnderline = () => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+
+        const selectedText = range.toString()
+
+        if (!selectedText.trim()) return
+
+        if (selectedText.endsWith(' ')) {
+            range.setEnd(range.endContainer, range.endOffset - 1)
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
+
+        document.execCommand('styleWithCSS', false, true)
         document.execCommand('underline')
         salvarDispositivo()
     }
 
     const taxarTexto = () => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+
+        const selectedText = range.toString()
+
+        if (!selectedText.trim()) return
+
+        if (selectedText.endsWith(' ')) {
+            range.setEnd(range.endContainer, range.endOffset - 1)
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
+
+        document.execCommand('styleWithCSS', false, true)
         document.execCommand('strikeThrough')
+        salvarDispositivo()
     }
 
     const removerFormatacao = () => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+
+        const selectedText = range.toString()
+
+        if (!selectedText.trim()) return
+
         document.execCommand('removeFormat')
+        salvarDispositivo()
     }
 
     const salvarDispositivo = () => {
