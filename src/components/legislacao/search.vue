@@ -1000,7 +1000,7 @@
                     
                     //chat ia
                     const resp = await searchStore.searchIaAll(search.value.text)
-                    respArcadio.value = resp
+                    respArcadio.value = resp || 'Não foi possível obter a resposta para essa pergunta'
                     
                     changeTab()
 
