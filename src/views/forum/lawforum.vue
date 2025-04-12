@@ -16,54 +16,59 @@
         
                     <v-card class="my-5">
                         <v-card-text>
-                            <div class="form">
-                                <v-text-field
-                                    variant="outlined"
-                                    density="compact"
-                                    label="Busca"
-                                    append-inner-icon="mdi-magnify"
-                                    v-model.trim="search"
-                                    @keydown.enter="filterJustArt(search)"
-                                    :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
-                                    clearable
-                                ></v-text-field>
-                            </div>
-                            <div v-if="suggestArtBtn">
-                                <v-chip 
-                                    @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                            <div>
+                                <div class="form">
+                                    <v-text-field
+                                        variant="outlined"
+                                        density="compact"
+                                        label="Busca"
+                                        append-inner-icon="mdi-magnify"
+                                        v-model.trim="search"
+                                        @keydown.enter="filterJustArt(search)"
+                                        :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                                        clearable
+                                    ></v-text-field>
+                                </div>
+                                <div v-if="suggestArtBtn">
+                                    <v-chip 
+                                        @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                                        >
+                                        Art. {{search.replace(/[^0-9]/g,'')}}
+                                    </v-chip>
+                                </div>
+                                <div>
+                                    <v-chip-group
+                                        v-if="artsFilterActive"
                                     >
-                                    Art. {{search.replace(/[^0-9]/g,'')}}
-                                </v-chip>
+                                        <v-chip 
+                                            @click="pageFilter(false)" 
+                                            variant="text" v-if="artsFilter.length == 1"
+                                            exact-active-class="0"
+                                        >
+                                            <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+                                        </v-chip>
+                                        <v-chip
+                                            v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
+                                            @click:close="artFilterRemove(tag)"
+                                            closable
+                                            >
+                                                art. {{tag}}
+                                        </v-chip>
+                                        <v-btn 
+                                            variant="text" 
+                                            @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                            Limpar Filtro
+                                        </v-btn>
+                                        <v-chip 
+                                            @click="pageFilter(true)" 
+                                            variant="text" v-if="artsFilter.length == 1">
+                                                <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+                                        </v-chip>
+                                    </v-chip-group>
+                                </div>
                             </div>
                             <div>
-                                <v-chip-group
-                                    v-if="artsFilterActive"
-                                >
-                                    <v-chip 
-                                        @click="pageFilter(false)" 
-                                        variant="text" v-if="artsFilter.length == 1"
-                                        exact-active-class="0"
-                                    >
-                                        <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                    <v-chip
-                                        v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
-                                        @click:close="artFilterRemove(tag)"
-                                        closable
-                                        >
-                                            art. {{tag}}
-                                    </v-chip>
-                                    <v-btn 
-                                        variant="text" 
-                                        @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
-                                        Limpar Filtro
-                                    </v-btn>
-                                    <v-chip 
-                                        @click="pageFilter(true)" 
-                                        variant="text" v-if="artsFilter.length == 1">
-                                            <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                </v-chip-group>
+                                <v-checkbox v-model="withComments" label="Filtrar com comentários"></v-checkbox>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -113,6 +118,8 @@
     })
     const artIndice = ref(null)
     const artsFilter = ref([])
+    
+    const withComments = ref(false)
 
     const topUp = ref(null)
 
@@ -174,6 +181,10 @@
             list = novoFiltro
         }
 
+        if(withComments.value){
+            list = list.filter(item => item.comments.length)
+        }
+
         let page = pagination.value.page - 1
         let start = page * pagination.value.perPage
         let end = start + pagination.value.perPage
@@ -208,6 +219,10 @@
                 })
             }
             total = novoFiltro.length
+        }
+
+        if(withComments.value){
+            total = listFinal.value.filter(item => item.comments.length).length
         }
 
         return Math.ceil(total/pagination.value.perPage)
