@@ -57,7 +57,9 @@
                     @click.stop="router.push(`text/${item.id}?search=${type}`)"
                 >
                 {{ item.title }} <br>
-                <small>{{ generalStore.fonteNome(item.tipo).mudar }}</small>
+
+                <small>{{ generalStore.fonteNome(item.tipo).mudar }} 
+                <v-chip v-if="item.revogado" density="compact" color="warning"> Norma Revogada</v-chip></small>
 
                 <template v-slot:prepend>
                     <v-tooltip text="inserir norma">
