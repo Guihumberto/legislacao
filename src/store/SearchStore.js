@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import api from "@/services/api"
 import apiChat from "@/services/api_chat"
 import { useLoginStore } from "./LoginStore";
+import { usePageStore } from "./PageStore";
 
 export const useSearchStore = defineStore("searchStore", {
     state: () => ({
@@ -206,6 +207,38 @@ export const useSearchStore = defineStore("searchStore", {
                     question: search
                 })
                 return resp.data.answer
+            } catch (error) {
+                console.log('erro search arcadio ia');
+            } finally {
+                this.load = false
+            }
+        },
+        async overView(id){
+            const pageStore = usePageStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.load = true
+
+            const orientacao = 'Faça um pequeno resumo em poucas palavras sobre o o que esse texto se trata. Seja Objetivo e direto.'
+
+            const item = {
+                id: id,
+                num_page: 1
+            }
+
+            try {
+                const page = await pageStore.getPageNorma(item)
+   
+                const resp = await apiChat.post('resumir', {
+                    texto: page.data[0].text_page,
+                    orientacao
+                })
+
+                await pageStore.saveResumoIA(page.data[0].id, resp.data.resumo)
+
+                return resp.data.resumo
+
             } catch (error) {
                 console.log('erro search arcadio ia');
             } finally {

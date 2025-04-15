@@ -2,9 +2,9 @@
     <v-card class="mt-2">
         <v-card-title class="text-center">Visão Geral</v-card-title>
         <v-card-text class="mt-5">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga cupiditate voluptate, 
-            libero iste quasi obcaecati autem, fugit ut rem sit dolores laborum eum expedita ullam tempore earum praesentium tempora accusamus.
-            </p>
+            
+            <p>{{ overview }} </p>
+            <v-btn :loading="loading" v-if="!overview" variant="text" block color="primary" @click="save($route.params.id)" >Salvar</v-btn>
         </v-card-text>
         <v-card-title class="text-center">Sugestão de Perguntas</v-card-title>
         <v-card-text class="mt-5">
@@ -19,12 +19,26 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
+
+import { useRoute } from 'vue-router'
+const route = useRoute()
+
+import { useSearchStore } from '@/store/SearchStore'
+const searchStore = useSearchStore()
+
+import { usePageStore } from '@/store/PageStore'
+const pageStore = usePageStore()
 
 const emits = defineEmits(['question'])
+
+const overview = ref(null)
 
 const goQuestion = (question) => {
     emits('question', question)
 }
+
+const loading = ref(false)
 
 const questions = [
     {
@@ -40,6 +54,19 @@ const questions = [
         link: '#'
     },
 ]
+
+const save = async (id) => {
+    const resp = await searchStore.overView(id)
+    overview.value = resp
+}
+
+onMounted( async () => {
+    loading.value = true
+    const resp = await pageStore.getPageNorma({id: route.params.id, num_page: 1})
+    overview.value = resp.data[0]?.summary || null
+    if(!overview.value) save(route.params.id)
+    loading.value = false
+})
 
 </script>
 

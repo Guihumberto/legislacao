@@ -82,6 +82,11 @@
     import { useRoute } from 'vue-router'
     const route = useRoute()
 
+    const props = defineProps({
+        dispositivo: Object,
+        search: String
+    })
+
     const showActions = ref(false);
     const activeComment = ref(false)
     const activeArt = ref(false)
@@ -89,6 +94,11 @@
     const load = ref(false)
 
     watch(() => route.query.page, (newPage, oldPage) => {
+        activeComment.value = false
+      }
+    )
+
+    watch(() => props.search, (newPage, oldPage) => {
         activeComment.value = false
       }
     )
@@ -110,10 +120,7 @@
 
     })
 
-    const props = defineProps({
-        dispositivo: Object,
-        search: String
-    })
+    
 
     const rules = ref({
         required: (value) => !!value || "Campo obrigatório"

@@ -30,7 +30,7 @@
                     </v-alert>
 
                     <!-- resumo -->
-                    <div class="border px-5 pt-5 bg-pink-lighten-5 rounded" v-if="summary">
+                    <div class="border px-5 pt-5 mt-5 bg-pink-lighten-5 rounded" v-if="summary">
                         <h3 class="text-h5 mb-2">Resumo da página</h3>
                         <p class="text-left">{{ summary }}</p>
                         <AvaliarResumo />

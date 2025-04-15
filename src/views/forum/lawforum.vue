@@ -123,6 +123,10 @@
 
     const topUp = ref(null)
 
+    watch(withComments, (newConfirm) => {
+        pagination.value.page = 1 
+    })
+
     watch(search, (newConfirm) => {
         pagination.value.page = 1 
     })
