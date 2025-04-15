@@ -186,17 +186,17 @@
                             </div> -->
                             <div class="radios">
                                 <v-radio-group :color="color" class="radiosGroup">
-                                    <v-tooltip text="Faça login para utilizar estes filtros"  location="top">
+                                    <v-tooltip text="Filtros não habilitado"  location="top">
                                         <template v-slot:activator="{ props }">
                                             <div class="border px-2 py-2 radioDiv" v-bind="props">
                                                 <v-radio 
                                                     density="compact"
-                                                    :disabled="!loginStore.readLogin.cpf"
+                                                    disabled
                                                     label="Incluir normas revogadas" value="item.ido">
                                                 </v-radio>
                                                 <v-radio 
                                                     density="compact"
-                                                    :disabled="!loginStore.readLogin.cpf"
+                                                    disabled
                                                     label="Incluir normas não Eficaz" value="item.ide">
                                                 </v-radio>
                                             </div>
@@ -619,13 +619,16 @@
     const result = ref("Sua pesquisa não encontrou nenhum documento correspondente")
     const autosuggestion = ref([])
     const showAutosuggest = ref(false)
-    const focusedIndex = ref(0)
+    const focusedIndex = ref(-1)
     const selected = ref(null)
     const facetas = ref({
         ano: [],
         fonte: [],
         norma: []
     })
+
+    const activeArcadioIA = ref(false)
+    provide("activeArcadioIA", activeArcadioIA)
 
     const clearSearch = () => {
         resultsSearch.value = []
@@ -902,13 +905,14 @@
         if (search.value.text.length > 2) {
              await autoSuggestionStore.fetchSuggestions(search.value.text)
              autosuggestion.value = autoSuggestionStore.autosuggestion
+             focusedIndex.value = -1
         } else {
             autosuggestion.value = []
         }
     }
 
     const actionEnterBusca = () => {
-        if(getAutosuggestion.value.length) {
+        if(getAutosuggestion.value.length && focusedIndex.value >= 0) {
             selectItem()
         } else {
             searchEnv(1)
@@ -938,7 +942,7 @@
         }
     }
 
-    const respArcadio = ref(null)
+    const respArcadio = ref('')
 
     const searchEnv = async (envSolici=1) => {
         searchInToSearch.value = false
@@ -1005,8 +1009,10 @@
                     if(totalDocs.value) favStore.getAllFavoritos(resultsSearch.value)
                     
                     //chat ia
-                    const resp = await searchStore.searchIaAll(search.value.text)
-                    respArcadio.value = resp || 'Não foi possível obter a resposta para essa pergunta'
+                    if(activeArcadioIA.value){
+                        const resp = await searchStore.searchIaAll(search.value.text)
+                        respArcadio.value = resp || 'Não foi possível obter a resposta para essa pergunta'
+                    }
                     
                     changeTab()
 
@@ -1019,6 +1025,10 @@
     }
 
     const changeTab = () => {
+        if(activeArcadioIA.value){
+            tab.value = 'Arcádio'
+            return
+        }
         if (!resultsSearch.value.length) {
             tab.value = 'Normas'
         }
@@ -1116,7 +1126,7 @@
 
     import { searchInitial } from "@/composables/tutorialSearch";
     import TermsSignificantSearch from './elements/aggs/termsSignificantSearch.vue'
-import ArcadioIA from './dialogs/arcadioIA.vue'
+    import ArcadioIA from './dialogs/arcadioIA.vue'
 
     const el1 = ref(null);
     const el2 = ref(null);

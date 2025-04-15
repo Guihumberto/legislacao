@@ -1,6 +1,9 @@
 <template>
     <div class="containerIA">
-        <h1 class="text-h5 mb-5 d-flex align-center ga-2"> <v-icon size="1.5rem">mdi-robot</v-icon> Arcadio IA</h1>
+        <div class="d-flex align-center justify-space-between">
+            <h1 class="text-h5 mb-5 d-flex align-center ga-2"> <v-icon size="1.5rem">mdi-robot</v-icon> Arcadio IA</h1>
+            <v-switch v-model="activeArcadioIA" color="success" hide-details label="Ativar"></v-switch>
+        </div>
         <div v-if="!respArcadio" class="text-justify mb-2">
             <p>Obtenha respostas geradas por IA a partir de perguntas no prompt.</p>
             <small>Algumas respostas dependem de conversão de textos relacionados com a busca.</small>
@@ -21,11 +24,11 @@
 </template>
 
 <script setup>
-    import { computed } from "vue";
+    import { computed, inject } from "vue";
     
     import Loading from "../forum/loading.vue";
     import { useSearchStore } from "@/store/SearchStore"
-        const searchStore = useSearchStore()
+    const searchStore = useSearchStore()
 
     const props = defineProps({
         respArcadio: {
@@ -33,6 +36,8 @@
             required: true
         }
     })
+
+    const activeArcadioIA = inject('activeArcadioIA')
 
     const isLogin = computed(() => {
         const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
