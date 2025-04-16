@@ -32,6 +32,7 @@
     "roboto-fontface": "*",
     "stopword": "^3.1.4",
     "v-mask": "^2.3.0",
+    "vis-network": "^9.1.9",
     "vue": "^3.2.0",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.0.0",

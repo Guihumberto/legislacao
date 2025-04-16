@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-  import { onMounted } from 'vue'
+  import { onMounted, ref, provide } from 'vue'
 
   import DefaultBar from './AppBar.vue'
   import DefaultView from './View.vue'
@@ -39,6 +39,9 @@
 
   import { useConsultaStore } from '@/store/ConsultaStore'
   const consultaStore = useConsultaStore()  
+
+  const theme = ref('light')
+  provide('theme', theme)
 
   onMounted(async () => {
     await generalStore.getListFonteMudar()

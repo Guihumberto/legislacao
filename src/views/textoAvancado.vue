@@ -16,7 +16,9 @@
                         <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
                         <ForumInfo :title="idLaw?.title" />
                     </div>
-        
+                    
+                    <Relacoes />
+
                     <div>
                         <v-expand-transition>
                             <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
@@ -476,6 +478,7 @@
 
     import { shallowRef } from 'vue'
 import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
+import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
 
     const sheet = shallowRef(false)
 
@@ -487,6 +490,7 @@ import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
     height: calc(100vh - 100px);
     font-family: Arial, sans-serif;
 }
+
 .conteudo {
     flex: 1;
     padding: 20px;
@@ -507,6 +511,7 @@ import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
 .chat.right {
     border-left: 1px solid #ddd;
 }
+
 .resizer {
     width: 5px;
     cursor: ew-resize;
@@ -525,14 +530,17 @@ import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
     align-items: center;
     height: 50vh;
 }
+
 .corpo{
     margin: 2rem;
     font-size: 15px;
     line-height: 2.1em
 }
+
 .form{
     width: 50%;
 }
+
 .fixed {
   position: fixed;
   background: purple;
@@ -543,11 +551,13 @@ import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
   animation: slideTopDocument .5s ease-in;
   transition: 1s ease;
 }
+
 @media (max-width:900px){
     .form{
         width: 100%;
     }
 }
+
 @media print {
     .btn {
         display: none;
