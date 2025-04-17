@@ -1,31 +1,52 @@
 <template>
-    <v-btn @click="dialog = true">Relações</v-btn>
+    <v-btn @click="dialog = true" variant="tonal"><v-icon>mdi-relation-many-to-many</v-icon></v-btn>
     <v-dialog v-model="dialog" width="800">
-        <v-card title="Relações">
-            <div ref="networkContainer" style="height: 500px; border: 1px solid #ccc;"></div>
-            <v-list class="overflow-y-auto" style="max-height: 300px;">
-                <v-list-item v-for="item, i in textlaw" :key="i">{{ item }}</v-list-item>
-            </v-list>
+        <v-card>
+            <v-card-title class="d-flex align-center justify-space-between">
+                <h1 class="text-h5">Relações</h1>
+                <v-btn @click="dialog = false" variant="text" icon="mdi-close"></v-btn>
+            </v-card-title>
+            <v-card-text>
+                <!-- <v-btn @click="relacoesStore.processar('pages_v2', 'relacoes_law')">Relacoes</v-btn> -->
+                <v-select
+                    label="Tipo"
+                    density="compact"
+                    variant="outlined"
+                    v-model="selectedType"
+                    :items="types"
+                    clearable
+                    placeholder="Filtre por tipo de relação"
+                ></v-select>
+                <div ref="networkContainer" style="height: 500px; border: 1px solid #ccc;"></div>
+                <v-list class="border rounded mt-5  overflow-y-auto" style="max-height: 300px;">
+                    <v-list-item v-for="item, i in textlawList" :key="i" :title="item.lei" :subtitle="`${item.tipo} - ${item.contexto}`"></v-list-item>
+                </v-list>
+            </v-card-text>
         </v-card>
     </v-dialog>
 </template>
 
 <script setup>
-    import { computed, onMounted, ref, nextTick, watch } from 'vue'
+    import { computed, ref, nextTick, watch } from 'vue'
     import { Network } from 'vis-network/standalone';
 
     import { usePageStore } from '@/store/PageStore'
     const pageStore = usePageStore()
+    
+    import { useRelacoesLawStore } from '@/store/relacoesLawStore';
+    const relacoesStore = useRelacoesLawStore()
 
     const dialog = ref(false)
 
-    const regexLei = /\b(?<tipo>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução|Portaria)\b ?n[ºoº]?\.? ?(?<numero>\d{1,5}(?:\.\d{1,5})?)(?:, de .*? (?<ano>\d{4}))?/gi;
+    const regexLei = /\b(?<tipo>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução|Portaria)\b\s*n[ºoº]?\.?\s*(?<numero>\d{1,5}(?:\.\d{1,5})?(?:\/\d{2,4})?)\s*(?:,?\s*de\s+(?<dataCompleta>.+?\s+\d{4}))?/gi;
     const regexArtigoLei = /art\.? ?\d+[ºo]?[^.]*?\b(Lei(?: Complementar)? ?n[ºoº]?\.? ?\d{1,5}(?:\.\d{1,5})?)(?:, de .*? (\d{4}))?/gi;
-    const regexRevoga =  /\b(?<verbo>Revoga|Fic(?:a|am) revogad(?:o|a|os|as))\b\s+(?<estrutura>.*?)(?<tipoNorma>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução)? ?n[ºoº]?\.?\s?(?<numero>\d{1,5}(?:\.\d{1,5})?)(?:, de .*? (?<ano>\d{4}))?/gi;
-    const regexAlteracao = /\bFic(?:a|am) alterad(?:o|a|os|as)\b[^.]*?\b((?:caput|§\d+º?|incisos? [^ ]+|inciso [^ ]+)(?:,? ?(?:o|e)? ?(?:caput|§\d+º?|incisos? [^ ]+|inciso [^ ]+))*)[^.]*?\b(?:art\.? ?\d+[A-Za-z]?)[^.]*?\b(?:Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução)? ?n[ºoº]?\.? ?\d{1,5}(?:\.\d{1,5})?(?:\/\d{2,4})?/gi;
+    const regexRevoga = /\b(?<verbo>Revoga|Fic(?:a|am) revogad(?:o|a|os|as))\b\s+(?<estrutura>.*?)(?<tipoNorma>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução|Portaria)\s*n[ºoº]?\.?\s*(?<numero>\d{1,5}(?:\.\d{1,5})?)\s*(?:, de .*? (?<ano>\d{4}))?/gi;
+    const regexAlteracao = /\bFic(?:a|am) alterad(?:o|a|os|as)\b[^.]*?\b(?<estrutura>(?:caput|§\d+º?|incisos? [^ ]+|inciso [^ ]+)(?:,? ?(?:o|e)? ?(?:caput|§\d+º?|incisos? [^ ]+|inciso [^ ]+))*)[^.]*?\b(?:art\.? ?\d+[A-Za-z]?)[^.]*?\b(?<tipoNorma>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução)? ?n[ºoº]?\.?\s?(?<numero>\d{1,5}(?:\.\d{1,5})?(?:\/\d{2,4})?)(?:, de (?<dataCompleta>.*? \d{4}))?/gi;
 
     const leiAtual = 'NORMA ATUAL'  //pageStore.readAllPages?.map(x => x._source)[0].page_to_norma.title
     const networkContainer = ref(null)
+    const selectedType = ref('')
+    const types = ['menciona', 'revoga', 'alteracao', 'menciona_artigo']
 
     const textlaw = computed(() => {
         const resp = pageStore.readAllPages.map(x => x._source.text_page).join('\n')
@@ -33,18 +54,55 @@
         return relacoes
     })
 
+    const textlawList = computed(() => {
+        const list = textlaw.value
+
+        if(selectedType.value) {
+            return list.filter(x => x.tipo === selectedType.value)
+        }
+
+        return list
+    })
+
     const extrairRelacoes = (conteudo) => {
         const relacoes = []
 
-        const leisMencionadas = conteudo.match(regexLei) || []
-        leisMencionadas.forEach(lei => {
-            relacoes.push({ tipo: 'menciona', lei: lei?.trim(), contexto: lei.replace('\n', ' ' ).trim() })
-        })
+        const leisMencionadas = [...conteudo.matchAll(regexLei)];
+        leisMencionadas.forEach(match => {
+            const { tipo, numero, dataCompleta } = match.groups;
+
+            // extrai o ano do dataCompleta ou do final do número
+            let ano;
+            if (dataCompleta) {
+                const anoMatch = dataCompleta.match(/\b(\d{4})\b/);
+                ano = anoMatch ? anoMatch[1] : undefined;
+            } else {
+                const anoCurto = numero.match(/\/(\d{2,4})$/);
+                ano = anoCurto ? (anoCurto[1].length === 2 ? '20' + anoCurto[1] : anoCurto[1]) : undefined;
+            }
+
+            const numeroLimpo = numero.replace(/\/\d{2,4}$/, ''); // remove /ano do número se presente
+
+            const lei = `${numeroLimpo}${ano ? '/' + ano : ''}`;
+
+            relacoes.push({
+                tipo: 'menciona',
+                lei: lei.trim(),
+                contexto: match[0].replace('\n', ' ').trim()
+            });
+        });
 
         const revogacoes = [...conteudo.matchAll(regexRevoga)]
         revogacoes.forEach(match => {
-            relacoes.push({ tipo: 'revoga', lei: match[1]?.trim(), contexto: match[0].replace('\n', ' ' ).trim() })
-        })
+            const { tipoNorma, numero, ano } = match.groups;
+            const lei = `${tipoNorma ? tipoNorma + ' ' : ''}nº ${numero}${ano ? ', de ' + ano : ''}`;
+
+            relacoes.push({
+                tipo: 'revoga',
+                lei: lei.trim(),
+                contexto: match[0].replace('\n', ' ').trim()
+            });
+        });
 
         const artigosDeLeis = [...conteudo.matchAll(regexArtigoLei)]
         artigosDeLeis.forEach(match => {
@@ -53,15 +111,27 @@
 
         const alteracao = [...conteudo.matchAll(regexAlteracao)]
         alteracao.forEach(match => {
-            relacoes.push({ tipo: 'alteracao', lei: match[1]?.trim(), contexto: match[0].replace('\n', ' ' ).trim() })
-        })
+            const { tipoNorma, numero, dataCompleta } = match.groups;
+
+            const lei = `${tipoNorma ? tipoNorma + ' ' : ''}nº ${numero}${dataCompleta ? ', de ' + dataCompleta : ''}`;
+
+            relacoes.push({
+                tipo: 'alteracao',
+                lei: lei.trim(),
+                contexto: match[0].replace('\n', ' ').trim()
+            });
+        });
 
         return relacoes
     }
     
+    const networkInstance = ref(null)
 
     const buildGrafos = () => {
-        const leisUnicas = [...new Map(textlaw.value.map(item => [item.lei, item])).values()]
+        if (networkInstance.value) {
+            networkInstance.value.destroy()
+        }
+        let leisUnicas = [...new Map(textlawList.value.map(item => [item.lei, item])).values()]
 
         const nodes = [
             { id: leiAtual, label: leiAtual, color: '#ff9900' }, // nó central
@@ -97,27 +167,24 @@
             }
         }
 
-        new Network(networkContainer.value, data, options)
+        networkInstance.value = new Network(networkContainer.value, data, options)
     }
 
-    onMounted( async () => {
-        await nextTick() // Garante que o DOM foi renderizado
-    
+
+    watch(dialog, async () => {
+        await nextTick()
+
         if (!networkContainer.value) {
             console.error('Container da rede não está disponível!')
             return
         }
+
         buildGrafos()
+
     })
 
-    watch(dialog, () => {
-        if (!networkContainer.value) {
-            console.error('Container da rede não está disponível!')
-            return
-        }
-        setTimeout(() => {
-            buildGrafos()
-        }, 2000)
+    watch(textlawList, () => {
+        buildGrafos()
     })
 
 

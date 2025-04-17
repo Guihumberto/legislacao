@@ -61,7 +61,7 @@
       default: false
     },
     page:{
-      type: Object,
+      type: [Object, Boolean],
       default: false
     }
   })

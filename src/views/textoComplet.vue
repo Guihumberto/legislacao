@@ -45,7 +45,7 @@
     pageStore.getAllPages(route.params.id)
 
 
-     const listPage = computed(() => {
+    const listPage = computed(() => {
         let list = pageStore.readAllPages.map(x => x._source)
         let list1 = []
 
@@ -55,7 +55,7 @@
         })
             
         return list1.sort((a, b) => a.num_page - b.num_page)
-     })
+    })
        
     const voltar = () => {
         if(route.query.idpage) router.go(-1)
