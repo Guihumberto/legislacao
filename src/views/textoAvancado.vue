@@ -13,12 +13,10 @@
                     <v-btn variant="tonal" @click="$router.push('/leges')" class="btn">Voltar</v-btn>
                     <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
                     <Relacoes />
-                    <div class="d-flex justify-space-between align-center">
-                        <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="mb-2 btn" :text="hiddenCabecalho ? 'ocultar cabeçalho':'mostrar cabeçalho'"></v-btn>
+                    <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
+                    <div class="d-flex justify-end align-center">
                         <ForumInfo :title="idLaw?.title" />
                     </div>
-                    
-                   
 
                     <div>
                         <v-expand-transition>

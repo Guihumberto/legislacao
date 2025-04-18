@@ -19,7 +19,16 @@
                 ></v-select>
                 <div ref="networkContainer" style="height: 500px; border: 1px solid #ccc;"></div>
                 <v-list class="border rounded mt-5  overflow-y-auto" style="max-height: 300px;">
+                    <v-list-subheader>Normas refereciadas</v-list-subheader>
                     <v-list-item v-for="item, i in textlawList" :key="i" :title="item.lei" :subtitle="`${item.tipo} - ${item.contexto}`"></v-list-item>
+                </v-list>
+
+                <v-list class="border rounded mt-5  overflow-y-auto" style="max-height: 300px;" v-if="relacoesStore.readRelacoes.length">
+                    <v-list-subheader>Normas que a referenciam</v-list-subheader>
+                    <v-list-item 
+                        :to="`/text/${item.norma_origem_id}`"
+                        v-for="item, i in relacoesStore.readRelacoes" :key="i" :title="item.norma_origem_titulo" :subtitle="`${item.tipo} - ${item.contexto}`">
+                    </v-list-item>
                 </v-list>
             </v-card-text>
         </v-card>
@@ -27,7 +36,7 @@
 </template>
 
 <script setup>
-    import { computed, ref, nextTick, watch } from 'vue'
+    import { computed, ref, nextTick, watch, onMounted } from 'vue'
     import { Network } from 'vis-network/standalone';
 
     import { usePageStore } from '@/store/PageStore'
@@ -170,7 +179,6 @@
         networkInstance.value = new Network(networkContainer.value, data, options)
     }
 
-
     watch(dialog, async () => {
         await nextTick()
 
@@ -187,6 +195,9 @@
         buildGrafos()
     })
 
+    onMounted(() => {
+        relacoesStore.getRelacoes(pageStore.readAllPages[0]?._source.page_to_norma.title)
+    })
 
 </script>
 

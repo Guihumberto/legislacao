@@ -63,7 +63,6 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
           
             return allHits
         },
-
         extrairMencoes(conteudo) {
             const regexLei = /\b(?<tipo>Lei(?: Complementar)?|Medida Provisória|Decreto|Resolução|Portaria)\b\s*n[ºoº]?\.?\s*(?<numero>\d{1,5}(?:\.\d{1,5})?(?:\/\d{2,4})?)\s*(?:,?\s*de\s+(?<dataCompleta>.+?\s+\d{4}))?/gi;
             const regexArtigoLei = /art\.? ?\d+[ºo]?[^.]*?\b(Lei(?: Complementar)? ?n[ºoº]?\.? ?\d{1,5}(?:\.\d{1,5})?)(?:, de .*? (\d{4}))?/gi;
@@ -130,7 +129,6 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
             return relacoes
             
         },
-
         async processar(indexOrigem, indexRelacoes) {
             const documentos = await this.buscarTodasAsPaginas(indexOrigem)
         
@@ -149,6 +147,28 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
               }
 
               console.log('Relacionamentos extraídos com sucesso.')
+            }
+        },
+        async getRelacoes(id){      
+            this.load = true
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin.cpf
+            if(!cpf) return
+             
+            try {
+                const resp = await api.post('relacoes_law/_search', {
+                    size:20,
+                    "query": {
+                        "match": {
+                            "lei_mencionada": "7.799" 
+                        }
+                    }
+                })
+                this.relacoes = resp.data.hits.hits.map(x => x._source)                
+            } catch (error) {
+                console.log('error get relacoes');
+            } finally {
+                this.load = false
             }
         }
     }
