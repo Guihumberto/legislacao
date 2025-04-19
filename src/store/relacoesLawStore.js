@@ -91,7 +91,7 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
 
                 relacoes.push({
                     tipo: 'menciona',
-                    lei_mencionada: lei.trim(),
+                    lei: lei.trim(),
                     contexto: match[0].replace('\n', ' ').trim()
                 });
             });
@@ -103,14 +103,14 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
     
                 relacoes.push({
                     tipo: 'revoga',
-                    lei_mencionada: lei.trim(),
+                    lei: lei.trim(),
                     contexto: match[0].replace('\n', ' ').trim()
                 });
             });
     
             const artigosDeLeis = [...conteudo.matchAll(regexArtigoLei)]
             artigosDeLeis.forEach(match => {
-                relacoes.push({ tipo: 'menciona_artigo', lei_mencionada: match[1]?.trim(), contexto: match[0].replace('\n', ' ' ).trim() })
+                relacoes.push({ tipo: 'menciona_artigo', lei: match[1]?.trim(), contexto: match[0].replace('\n', ' ' ).trim() })
             })
     
             const alteracao = [...conteudo.matchAll(regexAlteracao)]
@@ -121,7 +121,7 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
     
                 relacoes.push({
                     tipo: 'alteracao',
-                    lei_mencionada: lei.trim(),
+                    lei: lei.trim(),
                     contexto: match[0].replace('\n', ' ').trim()
                 });
             });
@@ -149,7 +149,12 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
               console.log('Relacionamentos extraídos com sucesso.')
             }
         },
-        async getRelacoes(id){      
+        async getRelacoes(texto){      
+            const regex = /lei\s*(?:n[oº]?\s*)?(\d{1,3}(?:[.,]\d{3})*|\d+)(?:[-–](\d{2,4}))?(?:\s*de\s*(\d{4}|\w+\s+de\s+\d{4}))?/gi;
+            const matches = texto?.match(regex);
+            console.log('texto', texto);
+            console.log(matches);
+
             this.load = true
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin.cpf
@@ -160,7 +165,7 @@ export const useRelacoesLawStore = defineStore("relacoesLawStore", {
                     size:20,
                     "query": {
                         "match": {
-                            "lei_mencionada": "7.799" 
+                            "lei": "7.799" 
                         }
                     }
                 })

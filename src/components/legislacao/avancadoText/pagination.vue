@@ -4,7 +4,7 @@
         <v-pagination
           :length="totalPage"
           v-model="pagination.page"
-          :total-visible="isMobile ? 1 : 7"
+          :total-visible="isMobile ? 1 : 5"
         ></v-pagination>
         <v-select
           density="compact"

@@ -92,7 +92,7 @@
                 </div>
             </div>
         </section>
-        <div class="chat"  :style="{ width: rightWidth + 'px' }" v-if="!xs">
+        <div class="chat" :style="{ width: rightWidth + 'px' }" v-if="!xs">
             <div class="resizer" @mousedown="startResize('right')"></div>
             <ChatLawComplete :idLaw="idLaw" />
         </div>
@@ -476,8 +476,8 @@
     }
 
     import { shallowRef } from 'vue'
-import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
-import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
+    import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
+    import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
 
     const sheet = shallowRef(false)
 
@@ -495,6 +495,10 @@ import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
     padding: 20px;
     overflow-y: auto;
     background-color: #f4f4f4;
+}
+
+.container, .container2 {
+    width: min(100%, 900px);
 }
 
 .chat {

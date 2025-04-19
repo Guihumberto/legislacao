@@ -323,13 +323,13 @@
 <style lang="scss" scoped>
 .wrapper{
     display: flex;
-    height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
     font-family: Arial, sans-serif;
 }
 .conteudo {
     flex: 1;
     padding: 20px;
-    overflow-y: auto;
+
     background-color: #f4f4f4;
 }
 
