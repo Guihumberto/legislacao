@@ -9,7 +9,8 @@ import { useSnackStore } from "./snackStore";
 export const useCommentStore = defineStore("commentStore", {
     state: () => ({
         listVotos: [],
-        load: false
+        load: false,
+        comments: []
     }),
     getters: {
         readListVotos(){
@@ -30,6 +31,9 @@ export const useCommentStore = defineStore("commentStore", {
             
             return `${day}-${month}-${year} ${hours}:${minutes}`;
         },
+        readComments(){
+            return this.comments
+        }
     },
     actions:{
         async getVotoComment(item){
@@ -130,6 +134,17 @@ export const useCommentStore = defineStore("commentStore", {
                 console.log('salvo');
             } catch (error) {
                 console.log('error save dispositivo');
+            }
+        },
+        async getAllCommnetsLaw(){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin?.cpf || null
+            if(!cpf) return
+            try {
+                const resp = await api.get('comments/_search')
+                this.comments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
+            } catch (error) {
+                console.log('error get comments');
             }
         }
     }

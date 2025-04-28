@@ -5,11 +5,8 @@
                 <v-card>
                     <v-card-text>
                         <div class="d-flex justify-space-between">
-                            <div class="d-flex ga-1">
-                                <v-btn>Marcados</v-btn>
-                                <v-btn>Comentários</v-btn>
-                                <v-btn>Vínculos</v-btn>
-                                <v-btn>Questões</v-btn>
+                            <div class="d-flex ga-1 flex-wrap">
+                                <v-btn :color="tabSelected == tab.id ? 'success' : 'grey'" @click="tabSelected = tab.id" v-for="tab, t in tabs" :key="t">{{ tab.name }}</v-btn>
                             </div>
                             <v-btn variant="text" @click="$emit('close')">Fechar</v-btn>
                         </div>
@@ -42,7 +39,11 @@
                     </v-card-text>
                 </v-card>
 
-                <Law_split ref="childRef"  />
+                <Law_split v-if="tabSelected == 1" ref="childRef"  />
+                <Marcados v-if="tabSelected == 2" />
+                <Comentarios v-if="tabSelected == 3" />
+                <Vinculos v-if="tabSelected == 4" />
+                <Questoes v-if="tabSelected == 5" />
             </div>
         </section>
     </div>
@@ -58,11 +59,44 @@
     const geralStore = useGeralStore()
 
     import Law_split from "./law_split.vue";
+    import Comentarios from "./comentarios.vue";
+    import Marcados from "./marcados.vue";
+    import Questoes from "./questoes.vue";
+    import Vinculos from "./vinculos.vue";
 
+    const tabSelected = ref(1)
     const mainLaws = [
         {id: 1742907731755, name: 'CF 88'},
         {id: 1742907901454, name: 'CTN'},
         {id: 71587, name: 'Lei 7.799'}
+    ]
+
+    const tabs = [
+        {
+            id: 1,
+            name: 'Leis',
+            icon: 'mdi-file-document-outline'
+        },
+        {
+            id: 2,
+            name: 'Marcados',
+            icon: 'mdi-file-document-outline'
+        },
+        {
+            id: 3,
+            name: 'Comentários',
+            icon: 'mdi-file-document-outline'
+        },
+        {
+            id: 4,
+            name: 'Vínculos',
+            icon: 'mdi-file-document-outline'
+        },
+        {
+            id: 5,
+            name: 'Questões',
+            icon: 'mdi-file-document-outline'
+        }
     ]
 
     const childRef = ref(null)
