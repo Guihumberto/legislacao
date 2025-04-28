@@ -1,0 +1,205 @@
+<template>
+    <div class="wrapper">
+        <section class="conteudo" ref="topUp">
+            <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+                <v-card>
+                    <v-card-text>
+                        <div class="d-flex justify-space-between">
+                            <div class="d-flex ga-1">
+                                <v-btn>Marcados</v-btn>
+                                <v-btn>Comentários</v-btn>
+                                <v-btn>Vínculos</v-btn>
+                                <v-btn>Questões</v-btn>
+                            </div>
+                            <v-btn variant="text" @click="$emit('close')">Fechar</v-btn>
+                        </div>
+                        <v-chip-group class="my-2">
+                            <v-chip v-for="item, i in mainLaws" :key="i" @click="openLaw(item.id)">{{ item.name }}</v-chip>
+                        </v-chip-group>
+
+                        <v-form @submit.prevent="searchLaw">
+                            <v-text-field
+                                label="Pesquisar"
+                                density="compact"
+                                variant="outlined"
+                                prepend-inner-icon="mdi-magnify"
+                                placeholder="Digite o nome da lei"
+                                v-model="textSerch.text"
+                                clearable
+                            >
+                                <template v-slot:append>
+                                    <v-btn type="submit" color="success">Buscar</v-btn>
+                                </template>
+                            </v-text-field>
+                            <v-btn v-if="listLaws.length" variant="text" @click="listLaws = []">limpar</v-btn>
+                        </v-form>
+                        
+                    </v-card-text>
+                    <v-card-text v-if="listLaws.length">
+                        <v-list>
+                            <v-list-item link v-for="item, i in listLaws" @click="openLaw(item.id)">{{ item.title }}</v-list-item>
+                        </v-list>
+                    </v-card-text>
+                </v-card>
+
+                <Law_split ref="childRef"  />
+            </div>
+        </section>
+    </div>
+</template>
+
+<script setup>
+    import { ref, computed, watch, onMounted, provide } from "vue";
+
+    import { useLawStore } from "@/store/LawsStore"
+    const lawStore = useLawStore()
+
+    import { useGeralStore } from '@/store/GeralStore';
+    const geralStore = useGeralStore()
+
+    import Law_split from "./law_split.vue";
+
+    const mainLaws = [
+        {id: 1742907731755, name: 'CF 88'},
+        {id: 1742907901454, name: 'CTN'},
+        {id: 71587, name: 'Lei 7.799'}
+    ]
+
+    const childRef = ref(null)
+
+    const openLaw = (id) => {
+        if (childRef.value) {
+            childRef.value.getAll(id)
+        }
+    }
+
+    const textSerch = ref({
+        text: '',
+        years: [],
+        fonte: [],
+        termo: 2,
+        semantic: 1,
+        precision: false,
+        notebook: 'Executivo',
+        estado: 'Maranhão',
+        mes: 'Dezembro',
+        assertividade: 2,
+        enableFuzzy:true
+    })
+    const listLaws = ref([])
+
+    const searchLaw = async() => {
+        try {
+            listLaws.value = []
+            const resp = await lawStore.getSearchPorlei(textSerch.value);
+            listLaws.value = resp.hits.map( x =>  x._source)
+        } catch (error) {
+            console.log("erro resultsSearchNormas");
+            listLaws.value = []
+        } 
+    }
+
+
+</script>
+
+<style lang="scss" scoped>
+.wrapper{
+    display: flex;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.conteudo {
+    flex: 1;
+    padding: 0 20px;
+    overflow-y: auto;
+    background-color: #f4f4f4;
+}
+
+.container, .container2 {
+    width: min(100%, 900px);
+}
+
+.chat {
+    width: 300px;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    position: relative;
+}
+
+.chat.right {
+    border-left: 1px solid #ddd;
+}
+
+.resizer {
+    width: 5px;
+    cursor: ew-resize;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: #ccc;
+    height: 100%;
+}
+
+.chat.right .resizer {
+    left: 0;
+}
+
+.sizeLoad{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+
+.corpo{
+    margin: 2rem;
+    font-size: 15px;
+    line-height: 2.1em
+}
+
+.form{
+    width: 50%;
+}
+
+.fixed {
+  position: fixed;
+  background: purple;
+  width: 100%;
+  text-align: center;
+  bottom: 0; /* Ajuste conforme necessário */
+  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
+  animation: slideTopDocument .5s ease-in;
+  transition: 1s ease;
+}
+
+@media (max-width:900px){
+    .form{
+        width: 100%;
+    }
+}
+
+@media print {
+    .btn {
+        display: none;
+    }
+    .pagina {
+        width: 190mm;
+        height: 285mm;
+        margin: 0;
+    }
+    // .pagina .header{
+    //     height: 10mm;
+    //     margin-bottom: 2rem;
+    // }
+
+    .content {
+        box-shadow: none;
+        margin: 0;
+    }
+}
+
+</style>
