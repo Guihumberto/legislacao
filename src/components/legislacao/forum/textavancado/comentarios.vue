@@ -1,93 +1,121 @@
 <template>
     <div>
-        <h1>Comentários</h1>
-        <p>Selecione o Artigo</p>
-        mostrar os comentarios
+        <div class="mt-2 d-flex ga-2 align-center pa-2">
+            <v-icon>mdi-chat</v-icon>
+                <h1 class="text-h5">Comentários</h1>
+        </div>
+        <div>
+            <v-select
+                :items="artsList"
+                label="Filtro por Artigo"
+                density="compact"
+                variant="outlined"
+                v-model="selectArt"
+                clearable
+                prepend-inner-icon="mdi-filter"
+            ></v-select>
+        </div>
+        <!-- <p>Selecione o Artigo</p> -->
 
         <Loading v-if="load" class="my-2 py-2" />
         <div class="pa-2 text-left" v-else>
             <transition-group name="fade" tag="div">
-                <div class="comment-box" v-for="item, i in commentStore.readComments" :key="item.id" v-if="commentStore.readComments.length">
+                <div class="comment-box" v-for="item, i in commentsList" :key="item.id" v-if="commentStore.readComments.length">
                     <div class="profile-pic"></div>
                     <div class="comment-content">
                         <div class="username">{{ item.user_name }} 
-                            <!-- <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip> -->
+                            <v-chip density="compact" :color="typeComment(item.type)?.color">{{ typeComment(item.type)?.title }}</v-chip>
+                        </div>
+                        <div>
+                            Art. {{ item.art }}
                         </div>
                         <div class="timestamp text-subtitle">{{ item.data_include }}</div>
-                        <!-- <div class="comment-text text-body-2">
-                            <p v-if="item.id != idEdit" v-html="comentarioFormatado(item.text)"></p>
-                            <div v-else>
-                                <v-form>
-                                    <v-textarea
-                                        label="Comentario"
-                                        variant="outlined"
-                                        density="compact"
-                                        v-model="commentEdit"
-                                    ></v-textarea>
-                                    <div class="text-right">
-                                        <v-btn variant="text" @click="idEdit = null">Cancelar</v-btn>
-                                        <v-btn :loading="loadEdit" class="ml-2" color="warning" @click="editComment(item)">Editar</v-btn>
-                                    </div>
-                                </v-form>
-                            </div>
-                        </div>
-                        <div class="menu-actions" >
+                       <div class="comment-text text-body-2">
+                            <p v-html="comentarioFormatado(item.text)"></p>
+                       </div>
+                       <div class="menu-actions" >
                             <transition name="fade">
-                                <div class="menu-comments" v-if="item.id != idDelete">
-                                    <div class="d-flex align-center mr-1">
-                                        <div class="d-flex" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
-                                            <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-                                            <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
-                                        </div>    
-                                        <v-btn 
+                                <div class="menu-comments">
+                                    <div class="d-flex align-center mr-1">  
+                                        <!-- <v-btn 
                                             variant="text"
                                             @click="showCommentResp = !showCommentResp">
                                             <v-badge 
                                                 :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
                                             </v-badge>
-                                        </v-btn>
+                                        </v-btn> -->
                                     </div>
                                     <AvaliarComment :comment="item" />
                                 </div>
                             </transition>
-                            <transition name="fade">
-                                <div class="d-flex align-center justify-end ga-2" v-if="item.id == idDelete">
-                                    Tem certeza que deseja excluir este comentário?
-                                    <div>
-                                        <v-btn variant="text" class="text-capitalize mr-1" @click="idDelete = null">Cancelar</v-btn>
-                                        <v-btn :loading="loadDelete" @click="deleteComment(item.id)" color="red">excluir</v-btn>
-                                    </div>
-                                </div>
-                            </transition>
                         </div>
-                        <v-expand-transition>
+                       <!--  <v-expand-transition>
                             <CommentResp v-if="showCommentResp" :dispositivo="dispositivo" :idComment="item.id" />
                         </v-expand-transition> -->
                     </div>
                 </div>
                 <v-alert class="appear" v-else type="info" variant="text" text="Não há comentários neste dispositivo."></v-alert>
             </transition-group>
+    
+            <v-btn 
+                v-if="commentStore.pagination.total > commentStore.readComments.length"
+                append-icon="mdi-plus" variant="outlined" class="my-5" 
+                block 
+                @click="commentStore.getAllCommnetsLawMore($route.params.id)">
+                Carregar
+            </v-btn>
         </div>
 
-        <!-- <v-btn append-icon="mdi-plus" variant="outlined" class="mt-5" block @click="commentStore.getAllCommnetsLaw()">Carregar</v-btn> -->
 
     </div>
 </template>
 
 <script setup>
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
+
+    import { useRoute } from 'vue-router';
+    const route = useRoute()
+
     import { useCommentStore } from '@/store/CommentStore';
     const commentStore = useCommentStore()
 
     import Loading from '../loading.vue';
+    import { computed } from 'vue';
+import AvaliarComment from '../avaliarComment.vue';
 
     const load = ref(false)
+    const selectArt = ref(null)
 
 
     onMounted( async () => {
         load.value = true
-        commentStore.getAllCommnetsLaw()
+        commentStore.getAllCommnetsLaw(route.params.id)
         load.value = false
+    })
+
+    watch(
+    () => route.params.id,
+    (newId, oldId) => {
+        console.log('teste')
+        load.value = true
+        commentStore.getAllCommnetsLaw(newId)
+        load.value = false
+    }
+    )
+
+    const commentsList = computed(() => {
+        const list = commentStore.readComments
+
+        if(selectArt.value) {
+            return list.filter(item => item.art == selectArt.value)
+        }   
+
+        return list
+    })
+
+    const artsList = computed(() => {
+        const list = commentStore.readComments.map(item => item.art)
+        return [ ...new Set(list)].sort((a, b) => a - b)
     })
 
     const typeComment = (item) => {
@@ -96,7 +124,13 @@
         if(item == 3) return { title: "Resposta", color: "orange"}
     }
 
-    const comentarioFormatado = (item) => item.replace(/\n/g, '<br>')
+    const comentarioFormatado = (item) => {
+        try {
+            return item.replace(/\n/g, '<br>')
+        } catch (error) {
+            return item
+        }
+    } 
 
 </script>
 

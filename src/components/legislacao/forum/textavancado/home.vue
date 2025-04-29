@@ -10,26 +10,29 @@
                             </div>
                             <v-btn variant="text" @click="$emit('close')">Fechar</v-btn>
                         </div>
-                        <v-chip-group class="my-2">
-                            <v-chip v-for="item, i in mainLaws" :key="i" @click="openLaw(item.id)">{{ item.name }}</v-chip>
-                        </v-chip-group>
-
-                        <v-form @submit.prevent="searchLaw">
-                            <v-text-field
-                                label="Pesquisar"
-                                density="compact"
-                                variant="outlined"
-                                prepend-inner-icon="mdi-magnify"
-                                placeholder="Digite o nome da lei"
-                                v-model="textSerch.text"
-                                clearable
-                            >
-                                <template v-slot:append>
-                                    <v-btn type="submit" color="success">Buscar</v-btn>
-                                </template>
-                            </v-text-field>
-                            <v-btn v-if="listLaws.length" variant="text" @click="listLaws = []">limpar</v-btn>
-                        </v-form>
+                        <!-- leis -->
+                        <div v-if="tabSelected == 1">
+                            <v-chip-group class="my-2">
+                                <v-chip v-for="item, i in mainLaws" :key="i" @click="openLaw(item.id)">{{ item.name }}</v-chip>
+                            </v-chip-group>
+    
+                            <v-form @submit.prevent="searchLaw">
+                                <v-text-field
+                                    label="Pesquisar"
+                                    density="compact"
+                                    variant="outlined"
+                                    prepend-inner-icon="mdi-magnify"
+                                    placeholder="Digite o nome da lei"
+                                    v-model="textSerch.text"
+                                    clearable
+                                >
+                                    <template v-slot:append>
+                                        <v-btn type="submit" color="success">Buscar</v-btn>
+                                    </template>
+                                </v-text-field>
+                                <v-btn v-if="listLaws.length" variant="text" @click="listLaws = []">limpar</v-btn>
+                            </v-form>
+                        </div>
                         
                     </v-card-text>
                     <v-card-text v-if="listLaws.length">

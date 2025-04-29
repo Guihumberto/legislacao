@@ -3,7 +3,7 @@
     <div class="pa-2 text-left" v-else>
         <transition-group name="fade" tag="div">
             <div class="comment-box" v-for="item, i in listComments" :key="item.id" v-if="listComments.length">
-                <div class="profile-pic"></div>
+                <div class="profile-pic">{{ item?.user_name.slice(0, 2) || '' }}</div>
                 <div class="comment-content">
                     <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                     <div class="timestamp text-subtitle">{{ item.data_include }}</div>
@@ -29,11 +29,12 @@
                             <div class="menu-comments" v-if="item.id != idDelete">
                                 <div class="d-flex align-center mr-1">
                                     <div class="d-flex" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
-                                        <v-btn variant="text" class="mr-2" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-                                        <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
+                                        <v-btn variant="text" class="mr-2 mt-5" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                                        <v-btn variant="text" class="mt-5" color="red" @click="idDelete = item.id, loadDelete = false, showCommentResp = false"><v-icon>mdi-delete</v-icon></v-btn>
                                     </div>    
                                     <v-btn 
                                         variant="text"
+                                        class="mt-5"
                                         @click="showCommentResp = !showCommentResp">
                                         <v-badge 
                                             :content="forumStore.countRespComments(item.id)" :color="forumStore.countRespComments(item.id) ? 'error' : 'grey'"> <v-icon>mdi-forum-plus</v-icon>
@@ -170,6 +171,10 @@
     height: 50px;
     border-radius: 50%;
     background: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
 }
 .comment-content {
     flex: 1;

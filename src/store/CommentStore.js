@@ -10,7 +10,13 @@ export const useCommentStore = defineStore("commentStore", {
     state: () => ({
         listVotos: [],
         load: false,
-        comments: []
+        comments: [],
+        pagination:{
+            start: 1,
+            total: 0,
+            page: 1,
+            perPage: 10
+        }
     }),
     getters: {
         readListVotos(){
@@ -136,15 +142,55 @@ export const useCommentStore = defineStore("commentStore", {
                 console.log('error save dispositivo');
             }
         },
-        async getAllCommnetsLaw(){
+        async getAllCommnetsLaw(id){
             const loginStore = await useLoginStore()
             const cpf = loginStore.readLogin?.cpf || null
             if(!cpf) return
             try {
-                const resp = await api.get('comments/_search')
+                this.load = true
+                const resp = await api.post('comments/_search', {
+                    from: this.pagination.start -1,
+                    size: this.pagination.perPage,
+                    query: {
+                        bool: {
+                            must: [
+                              { term: { idGroup: id }}
+                            ]
+                          }
+                    }
+                })
                 this.comments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
+                this.pagination.total = resp.data.hits.total.value
             } catch (error) {
                 console.log('error get comments');
+            } finally {
+                this.load = false
+            }
+        },
+        async getAllCommnetsLawMore(id){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin?.cpf || null
+            if(!cpf) return
+            try {
+                this.load = true
+                const resp = await api.post('comments/_search', {
+                    from: this.pagination.start -1 + this.readComments.length,
+                    size: this.pagination.perPage,
+                    query: {
+                        bool: {
+                            must: [
+                              { term: { idGroup: id }}
+                            ]
+                          }
+                    }
+                })
+                const newsComments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
+                this.comments = [...this.comments, ...newsComments]
+            
+            } catch (error) {
+                console.log('error get comments');
+            } finally {
+                this.load = false
             }
         }
     }

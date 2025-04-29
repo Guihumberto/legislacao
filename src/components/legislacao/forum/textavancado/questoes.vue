@@ -1,7 +1,10 @@
 <template>
     <div>
-        <h1>Questões</h1>
-        <p>Selecione o Artigo</p>
+        <div class="mt-2 d-flex ga-2 align-center pa-2">
+            <v-icon>mdi-check-all</v-icon>
+                <h1 class="text-h5">Questões</h1>
+        </div>
+        <p>Selecione o Dispositivo</p>
     </div>
 </template>
 

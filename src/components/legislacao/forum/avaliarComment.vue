@@ -3,6 +3,7 @@
         variant="outlined"
         divided
         density="compact"
+        class="mt-5"
     >
         <v-tooltip text="Pontos" location="top">
             <template v-slot:activator="{ props }">
