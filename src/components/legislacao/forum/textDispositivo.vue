@@ -7,6 +7,11 @@
                 <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeArt = !activeArt">
                     <v-icon>mdi-forum</v-icon>
                 </v-btn>
+                <v-btn 
+                    class="pa-0" stacked variant="text" density="compact" 
+                    @click="$router.push({query: {id: dispositivo.id, art: dispositivo.art}})">
+                    <v-icon>mdi-check-all</v-icon>
+                </v-btn>
             </div>
         </v-expand-transition>
 
@@ -174,6 +179,8 @@
 
 .action-art {
     position: absolute;
+    display: flex;
+    flex-direction: column;
     top: 0;
     left: -60px; /* Ajuste conforme necessário para alinhar ao lado */
     background: transparent;

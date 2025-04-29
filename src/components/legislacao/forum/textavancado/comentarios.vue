@@ -4,7 +4,7 @@
             <v-icon>mdi-chat</v-icon>
                 <h1 class="text-h5">Comentários</h1>
         </div>
-        <div>
+        <div class="d-flex ga-2 align-center">
             <v-select
                 :items="artsList"
                 label="Filtro por Artigo"
@@ -13,7 +13,22 @@
                 v-model="selectArt"
                 clearable
                 prepend-inner-icon="mdi-filter"
+                style="max-width: 250px;"
+                hide-details
             ></v-select>
+            <v-select
+                label="ordenar"
+                density="compact"
+                variant="outlined"
+                :items="['Por data', 'Por Artigo']"
+                v-model="selectOrder"
+                clearable
+                prepend-inner-icon="mdi-sort"
+                style="max-width: 250px;"
+                hide-details
+                disabled
+            ></v-select>
+            <v-btn disabled><v-icon>mdi-sort</v-icon></v-btn>
         </div>
         <!-- <p>Selecione o Artigo</p> -->
 
@@ -81,10 +96,11 @@
 
     import Loading from '../loading.vue';
     import { computed } from 'vue';
-import AvaliarComment from '../avaliarComment.vue';
+    import AvaliarComment from '../avaliarComment.vue';
 
     const load = ref(false)
     const selectArt = ref(null)
+    const selectOrder = ref(null)   
 
 
     onMounted( async () => {
@@ -94,13 +110,13 @@ import AvaliarComment from '../avaliarComment.vue';
     })
 
     watch(
-    () => route.params.id,
-    (newId, oldId) => {
-        console.log('teste')
-        load.value = true
-        commentStore.getAllCommnetsLaw(newId)
-        load.value = false
-    }
+        () => route.params.id,
+        (newId, oldId) => {
+            console.log('teste')
+            load.value = true
+            commentStore.getAllCommnetsLaw(newId)
+            load.value = false
+        }
     )
 
     const commentsList = computed(() => {

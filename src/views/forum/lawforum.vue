@@ -147,6 +147,7 @@
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
     import DadosGrupo from "@/components/legislacao/forum/dadosGrupo.vue";
+    import Home from "@/components/legislacao/forum/textavancado/home.vue";
    
     import { useForumStore } from "@/store/ForumStore";
     const forumStore = useForumStore()
@@ -159,7 +160,6 @@
     const router = useRouter()
 
     import { useGeralStore } from '@/store/GeralStore';
-import Home from "@/components/legislacao/forum/textavancado/home.vue";
     const geralStore = useGeralStore()
 
     const sidelaw = ref(false)
@@ -369,6 +369,7 @@ import Home from "@/components/legislacao/forum/textavancado/home.vue";
         await getGroup()
         await getAll()
         route.query.page ? pagination.value.page = Number(route.query.page)  : ''
+        geralStore.changeHeaderShow()
     })
   
 
