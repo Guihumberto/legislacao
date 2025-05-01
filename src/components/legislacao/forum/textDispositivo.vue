@@ -3,21 +3,20 @@
         <TextEdit :dispositivo="dispositivo" :search="search" />
       
         <v-expand-transition>
-            <div class="action-art" v-if="isArt && showActions || activeArt">
-                <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeArt = !activeArt">
+            <div class="action-art" v-if="isArt && showActions || activeArt" >
+                <v-btn variant="text" @click="activeArt = !activeArt">
                     <v-icon>mdi-forum</v-icon>
                 </v-btn>
                 <v-btn 
-                    class="pa-0" stacked variant="text" density="compact" 
-                    @click="$router.push({query: {id: dispositivo.id, art: dispositivo.art}})">
-                    <v-icon>mdi-check-all</v-icon>
+                    variant="text"
+                    @click="selectArt(dispositivo)"> <v-icon>mdi-check-all</v-icon>
                 </v-btn>
             </div>
         </v-expand-transition>
 
         <v-expand-transition>
             <div class="action-container" v-if="showActions || activeComment || dispositivo.comments.length > 0">
-                <v-btn class="pa-0" stacked variant="text" density="compact" @click="activeComment = !activeComment">
+                <v-btn variant="text" @click="activeComment = !activeComment">
                     <v-badge :color="dispositivo.comments.length ? 'error' : 'grey'" :content="dispositivo.comments.length">
                         <v-icon>mdi-forum</v-icon>
                     </v-badge>
@@ -84,8 +83,9 @@
     import { useLoginStore } from '@/store/LoginStore';
     const LoginStore = useLoginStore()
 
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     const route = useRoute()
+    const router = useRouter()
 
     const props = defineProps({
         dispositivo: Object,
@@ -124,8 +124,6 @@
         : !!participantes.find( x => x == cpf)
 
     })
-
-    
 
     const rules = ref({
         required: (value) => !!value || "Campo obrigatório"
@@ -167,6 +165,13 @@
     }
 
     const childRef = ref(null);
+
+    const emits = defineEmits(['open'])
+
+    const selectArt = (item) => {
+        router.push({query: {id: item.id, art: item.art}})
+        emits('open')
+    }
     
 </script>
 
@@ -180,7 +185,7 @@
 .action-art {
     position: absolute;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;;
     top: 0;
     left: -60px; /* Ajuste conforme necessário para alinhar ao lado */
     background: transparent;
@@ -189,7 +194,7 @@
 .action-container {
     position: absolute;
     top: 0;
-    right: -50px; /* Ajuste conforme necessário para alinhar ao lado */
+    right: -60px; /* Ajuste conforme necessário para alinhar ao lado */
     background: transparent;
 }
 
@@ -198,6 +203,15 @@
     border: 1px solid #ccc;
     padding: 10px;
     background: #f9f9f9;
+}
+
+@media (max-width: 768px) {
+    .action-container {
+        right: -50px;
+    }  
+    .action-art {
+        left: -50px;
+    }  
 }
 
 </style>

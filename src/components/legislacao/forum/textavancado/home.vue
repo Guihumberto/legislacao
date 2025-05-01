@@ -55,6 +55,9 @@
 <script setup>
     import { ref, computed, watch, onMounted, provide } from "vue";
 
+    import { useRoute } from 'vue-router';
+    const route = useRoute()
+
     import { useLawStore } from "@/store/LawsStore"
     const lawStore = useLawStore()
 
@@ -135,6 +138,11 @@
             listLaws.value = []
         } 
     }
+
+    watch(
+        () => route.query.art,
+        (newId, oldId) => tabSelected.value = 5
+    )
 
 
 </script>

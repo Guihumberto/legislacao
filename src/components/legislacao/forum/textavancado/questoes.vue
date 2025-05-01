@@ -7,7 +7,7 @@
         <v-alert variant="outlined" class="my-2">
             <p v-if="!$route.query.art">Selecione o artigo para gerar questões.</p>
             <div v-else>
-                <p class="pa-2 bg-grey">Seleção: art. {{ $route.query.art }}</p>
+                <p class="selectArt" ref="elemento">Art. {{ $route.query.art }} foi selecionado</p>
                 <div class="text-center">
                     <p class="my-2 text-overline">Gere questões a partir do artigo selecionado.</p>
                     <v-btn :disabled="load" :loading="load" color="primary" @click="gerarQuestoes">Gerar Questões</v-btn>
@@ -15,10 +15,10 @@
             </div>
         </v-alert>
 
-        <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoes.length">
+        <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoes.length" class="appear">
             <v-card-title class="d-flex align-center justify-space-between flex-wrap">
                 <div>
-                    Artigo 1 - Lei XXXX-20XX
+                    Artigo {{ $route.query.art }} -{{ forumStore.readGroupForum._source.title }}
                 </div>
                 <div>
                     <small> XX certas - XX erradas - XX resolvidas - total XX</small>
@@ -51,6 +51,9 @@
 <script setup>
     import { ref, onMounted, watch } from 'vue';
 
+    import { useForumStore } from '@/store/ForumStore';
+    const forumStore = useForumStore()
+
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
     const questoesStore = useQuestoesStore()
 
@@ -60,11 +63,17 @@
     const route = useRoute()
 
     const load = ref(false)
+    const elemento = ref(null)
 
     watch(
         () => route.query.art,
-        (newId, oldId) => getQuestoes()
-        
+        (newId, oldId) => {
+            getQuestoes()
+            if(elemento.value) elemento.value.classList.add('selectArtAnimar')
+            setTimeout(() => {
+                elemento.value.classList.remove('selectArtAnimar')
+            }, 1000)
+        } 
     )
 
     const getQuestoes = async () => {
@@ -84,5 +93,32 @@
 </script>
 
 <style scoped>
+.selectArt {
+    font-size: 1.2em;
+    font-weight: 500;
+    background: rgb(197, 245, 197);
+    padding: 1rem;
+    text-align: center;
+    border-radius: 12px;
+}
+.selectArtAnimar {
+    animation: aumentar 0.5s ease-in-out;
+}
+
+@keyframes aumentar {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.appear{
+    animation: aparecer 1s ease-in-out;
+}
 
 </style>

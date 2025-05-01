@@ -78,8 +78,8 @@
 
         
                     <div class="bg-white">
-                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
-                                <TextDispositivo :dispositivo="item" :search="search" />
+                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
+                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" />
                         </div>
                     </div>
         
@@ -103,7 +103,7 @@
     const { xs } = useDisplay()
 
     const leftWidth = ref(200) // Largura inicial da sidebar esquerda
-    const rightWidth = ref(350) // Largura inicial da sidebar direita
+    const rightWidth = ref(750) // Largura inicial da sidebar direita
     const isResizing = ref(false)
     const activeSidebar = ref(null)
 
@@ -205,6 +205,7 @@
     });
 
     watch(() => route.params.id, async (newId, oldId) => {
+        sidelaw.value = false
        await getGroup()
        getAll()
     });
@@ -369,7 +370,7 @@
         await getGroup()
         await getAll()
         route.query.page ? pagination.value.page = Number(route.query.page)  : ''
-        geralStore.changeHeaderShow()
+        geralStore.changeHeaderNoShow(false)
     })
   
 
@@ -393,6 +394,12 @@
     width: min(100%, 1000px);
     margin-inline: auto;
 }
+
+.selected{
+    background: rgb(222, 241, 219);
+    transition: all .3s ease-in-out;
+}
+
 .chat {
     width: 300px;
     background-color: #fff;
