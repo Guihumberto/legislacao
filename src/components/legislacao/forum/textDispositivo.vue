@@ -4,10 +4,11 @@
       
         <v-expand-transition>
             <div class="action-art" v-if="isArt && showActions || activeArt" >
-                <v-btn variant="text" @click="activeArt = !activeArt">
+                <v-btn variant="text" @click="activeArt = !activeArt" title="Todos os comentários do Artigo">
                     <v-icon>mdi-forum</v-icon>
                 </v-btn>
                 <v-btn 
+                    title="Selecionar Artigo"
                     variant="text"
                     @click="selectArt(dispositivo)"> <v-icon>mdi-check-all</v-icon>
                 </v-btn>

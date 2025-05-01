@@ -15,6 +15,7 @@
     "@tiptap/extension-highlight": "^2.10.3",
     "@tiptap/extension-italic": "^2.10.3",
     "@tiptap/extension-list-item": "^2.10.3",
+    "@tiptap/extension-strike": "^2.11.9",
     "@tiptap/extension-text-align": "^2.10.3",
     "@tiptap/extension-text-style": "^2.10.3",
     "@tiptap/extension-underline": "^2.10.3",

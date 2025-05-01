@@ -1,5 +1,5 @@
 <template>
-        <v-btn variant="text" density="compact" icon="mdi-tools" @click="dialog = true"></v-btn>
+        <v-btn variant="text"  icon="mdi-tools" @click="dialog = true"></v-btn>
         <v-dialog
             v-model="dialog"
             width="auto"

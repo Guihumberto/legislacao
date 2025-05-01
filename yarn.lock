@@ -440,6 +440,11 @@
   resolved "https://registry.npmjs.org/@tiptap/extension-strike/-/extension-strike-2.10.3.tgz"
   integrity sha512-jYoPy6F6njYp3txF3u23bgdRy/S5ATcWDO9LPZLHSeikwQfJ47nqb+EUNo5M8jIOgFBTn4MEbhuZ6OGyhnxopA==
 
+"@tiptap/extension-strike@^2.11.9":
+  version "2.11.9"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-strike/-/extension-strike-2.11.9.tgz#7446611d1b602fe00fc18d27ab18b70f51000695"
+  integrity sha512-YFZ/Mjv/wA13oO8wEK4DVw6zSuYfEz4NLF6EA2mMo8N6UUSrBFEWiGE3pHBysIwcRXTaUzzGoYN+lohbmpHwBQ==
+
 "@tiptap/extension-text-align@^2.10.3":
   version "2.10.3"
   resolved "https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-2.10.3.tgz"

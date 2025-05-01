@@ -36,6 +36,12 @@ export default [
         meta: { requiresAuth: true } 
       },
       {
+        path: '/myforuns',
+        name: 'Meus Foruns',
+        component: () => import('@/views/forum/myforuns.vue'),
+        meta: { requiresAuth: true } 
+      },
+      {
         path: '/avancado/forumlaw/:id',
         name: 'Forum Law',
         component: () => import('@/views/forum/lawforum.vue'),

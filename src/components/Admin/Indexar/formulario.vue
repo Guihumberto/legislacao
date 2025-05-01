@@ -7,7 +7,7 @@
         <v-card-text v-if="!confirm">
             <div>
                 <v-form @submit.prevent="indexarLaws()" ref="form">
-                    <div class="autocompletes">
+                    <div class="autocompletes px-10">
                         <v-autocomplete
                             clearable
                             label="Fonte"
@@ -62,7 +62,7 @@
                         </div>
                     </Transition>
                     <Transition name="fade">
-                        <div v-if="importType == 'copy-content'" class="text-right">
+                        <div v-if="importType == 'copy-content'" class="text-right px-10">
                             <v-text-field
                                 label="Nome da norma"
                                 variant="outlined"
@@ -78,6 +78,12 @@
                                 v-model="texto"
                                 clearable
                             ></v-textarea>
+                             
+                            <!-- <div class="wrapper-editor">
+                                <EditorContent class="editor" :editor="editor" />
+                            </div> -->
+
+
                             <div class="d-flex ga-2 justify-end mt-2">
                                 <v-btn variant="text" color="grey" @click="clear">Limpar</v-btn>
                                 <v-btn v-if="!importForm.text.length" color="primary" @click="importarLaw()">Importar</v-btn>
@@ -235,6 +241,7 @@
         confirm.value = false
         lawSave.value = ref(null)
         texto.value = null
+        editor.commands.clearContent()
     }
 
     const extractedText = ref("");
@@ -295,8 +302,11 @@
     const limit = 2550
 
     const importarLaw = () => {
+        // texto.value = editor.getHTML()
+        // console.log(texto.value);
         const text = dividirTextoParaPaginas(texto.value, limit)
         importForm.value.text = text
+        editor.commands.clearContent()
     }
 
     const dividirTextoParaPaginas = (texto, limiteCaracteres) => {
@@ -352,7 +362,13 @@
         clear()
     }
 
+    import { Editor, EditorContent } from '@tiptap/vue-3'
+    import StarterKit from '@tiptap/starter-kit';
 
+    const editor = new Editor({
+        extensions: [StarterKit],
+        content: '<p>Texto com <s>tachado</s></p>',
+    })
 
 </script>
 
@@ -375,6 +391,24 @@
 .card{
     animation: aparecer 2s ease;
     transition: 1s ease;
+}
+.editor{
+    padding: 1rem;
+    border: 1px solid #c2bfbf;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.5;
+}
+.wrapper-editor{
+    max-height: 30vh;
+    overflow-y: auto;
+}
+.editor s, del{
+    text-decoration: line-through !important;
+}
+s, del {
+    text-decoration: line-through !important;
 }
 @media (max-width: 500px) {
     .autocomplete{

@@ -10,7 +10,7 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/leges')" class="btn">Voltar</v-btn>   
+                    <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" class="btn">Voltar</v-btn>   
                     <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Opções</v-btn>    
                     
                     <DadosGrupo />
