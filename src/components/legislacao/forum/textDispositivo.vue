@@ -63,18 +63,23 @@
                                 </v-chip-group>
                             </v-col>
                         </v-row>
-                         <v-select
-                             label="Comentar"
-                             density="compact"
-                             :items="types"
-                             item-title="title"
-                             item-value="id"
-                             class="mb-2"
-                             v-model="comment.type"
-                             style="width: 200px;"
-                             hide-details
-                             clearable
-                         ></v-select>
+                        <div class="d-flex align-center ga-2 mb-2">
+                            <div>
+                                <v-select
+                                    label="Comentar"
+                                    density="compact"
+                                    :items="types"
+                                    item-title="title"
+                                    item-value="id"
+                                   
+                                    v-model="comment.type"
+                                    style="width: 200px;"
+                                    hide-details
+                                    clearable
+                                ></v-select>
+                            </div>
+                            <v-btn @click="gerarResumo()" v-if="comment.type == 4" color="red" variant="text" prepend-icon="mdi-robot" :loading="loadResumo" :disabled="loadResumo">Criar Resumo do artigo por ia</v-btn>
+                        </div>
                          <v-textarea
                              v-if="comment.type"
                              :label="types.find( x => x.id == comment.type).title"
@@ -83,6 +88,8 @@
                              v-model="comment.text"
                              clearable
                              :rules="[ rules.required ]"
+                             :disabled="loadResumo"
+                             :loading="loadResumo"
                          >
                          </v-textarea>
                          <div class="d-flex justify-end my-2" v-if="comment.type">
@@ -105,7 +112,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, toRefs  } from 'vue';
+    import { ref, computed, watch, toRefs, inject  } from 'vue';
 
     import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
@@ -261,6 +268,23 @@
     const saveTag2 = () => {
         tag.value = searchTag.value
         searchTag.value = ''
+    }
+
+    //resumo
+
+    import { useSearchStore } from '@/store/SearchStore';
+    const searchStore = useSearchStore()
+
+    const listFinal = inject('listFinal')
+    const loadResumo = ref(false)
+
+    const gerarResumo = async () => {
+        loadResumo.value = true
+        const artSelects = listFinal.value.filter( x => x.art == props.dispositivo.art).map(x => x.textlaw).join('\n')
+        const resumo = await searchStore.resumoPage(artSelects)
+        console.log('listFinal', resumo);
+        comment.value.text = resumo
+        loadResumo.value = false
     }
     
 </script>

@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted } from "vue";
+    import { ref, computed, watch, onMounted, provide } from "vue";
 
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
@@ -406,6 +406,8 @@
             Object.assign(listFinal.value[index], { tags: event.tags })
         }
     }   
+
+    provide('listFinal', listFinal)
 
     onMounted( async () => {
         await getGroup()
