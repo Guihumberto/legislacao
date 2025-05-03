@@ -106,7 +106,7 @@ export const useForumStore = defineStore("forumStore", {
             }
         },
         async createLawForum(item, id){
-            const newArray = item.map(obj => ({ ...obj, comments: [], idGroup: id }));
+            const newArray = item.map(obj => ({ ...obj, comments: [], tags: [], idGroup: id }));
 
             const bulkData = newArray.flatMap(doc => [{ index: { _index: 'law_forum' } }, doc]);
 
@@ -557,7 +557,39 @@ export const useForumStore = defineStore("forumStore", {
             try {
                 const resp = await api.post(`law_forum/_update/${idTag}`, {
                     script: {
-                        source: "if (ctx._source.tags == null) { ctx._source.tags = [params.new_item] } else { ctx._source.tags.add(params.new_item) } ctx._source.last_date_update = params.last_date_update",
+                        source: `
+                          if (ctx._source.tags == null) {
+                            ctx._source.tags = [params.tag];
+                          } else {
+                            if (ctx._source.tags.contains(params.tag)) {
+                              ctx._source.tags.removeIf(t -> t == params.tag);
+                            } else {
+                              ctx._source.tags.add(params.tag);
+                            }
+                          }
+                          ctx._source.last_date_update = params.last_date_update;
+                        `,
+                        lang: "painless",
+                        params: {
+                          tag: tag,
+                          last_date_update: this.formatDate,
+                        },
+                      },
+                })
+                return resp.data
+            } catch (error) {
+                console.log('error save tag');
+            }
+        },
+        async deleteTag(tag, idTag){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin.cpf
+            if(!cpf) return
+            console.log('tag delete', tag, idTag);
+            try {
+                const resp = await api.post(`law_forum/_update/${idTag}`, {
+                    script: {
+                        source: "if (ctx._source.tags == null) { ctx._source.tags = [params.new_item] } else { ctx._source.tags.remove(params.new_item) } ctx._source.last_date_update = params.last_date_update",
                         lang: "painless",
                         params: {
                           new_item: tag,
@@ -565,7 +597,7 @@ export const useForumStore = defineStore("forumStore", {
                         }
                       }
                 })
-                console.log('resp', resp);
+                return resp.data
             } catch (error) {
                 console.log('error save tag');
             }

@@ -69,7 +69,23 @@
                                 </div>
                             </div>
                             <div>
-                                <v-checkbox v-model="withComments" label="Filtrar com comentários"></v-checkbox>
+                                <div class="d-flex">
+                                    <v-checkbox v-model="withComments" label="Filtrar com comentários"></v-checkbox>
+                                    <v-checkbox v-model="withTags" label="Filtrar por Tags"></v-checkbox>
+                                </div>
+
+                                <v-expand-transition>      
+                                    <v-card v-if="listTags.length && withTags" variant="outlined">
+                                        <v-card-text>
+                                            <h2 class="text-h6 mb-2">Filtre por tags</h2>
+                                            <v-responsive class="overflow-y-auto" max-height="500">
+                                                <v-chip-group filter column multiple v-model="tagsFilter" active-class="primary" >
+                                                    <v-chip v-for="item, i in listTags" :value="item" :key="item">{{ item }}</v-chip>
+                                                </v-chip-group>
+                                            </v-responsive>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-expand-transition>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -79,7 +95,7 @@
         
                     <div class="bg-white">
                         <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
-                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" />
+                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" />
                         </div>
                     </div>
         
@@ -173,6 +189,7 @@
     const artsFilter = ref([])
     
     const withComments = ref(false)
+    const withTags = ref(false)
 
     const topUp = ref(null)
 
@@ -243,6 +260,10 @@
             list = list.filter(item => item.comments.length)
         }
 
+        if(tagsFilter.value.length){
+            list = list.filter(item => item.tags.some(tag => tagsFilter.value.includes(tag.toLowerCase())))
+        }
+
         let page = pagination.value.page - 1
         let start = page * pagination.value.perPage
         let end = start + pagination.value.perPage
@@ -300,6 +321,15 @@
     })
 
     const listFinal = ref([])
+    const tagsFilter = ref([])
+
+    const listTags = computed(() => {
+        const list = listFinal.value
+        const tags = list.flatMap(x => x.tags.map(tag => tag.toLowerCase()))
+        const tagsFlat = tags.flat()
+        const tagsUnique = [...new Set(tagsFlat)]
+        return tagsUnique
+    })
 
     const getGroup = async () => {
         await forumStore.getGroup(route.params.id)
@@ -365,6 +395,13 @@
         artsFilter.value = []
         artsFilter.value.push(art)
     }
+
+    const updateDispositivo = (event) => {
+        const index = listFinal.value.findIndex(x => x.id === event.id)
+        if (index !== -1) {
+            Object.assign(listFinal.value[index], { tags: event.tags })
+        }
+    }   
 
     onMounted( async () => {
         await getGroup()

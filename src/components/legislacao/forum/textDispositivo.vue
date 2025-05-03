@@ -43,9 +43,9 @@
                                     :loading="loadTag"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="9" v-if="listTags.length" >
+                            <v-col cols="12" sm="9">
                                 <v-chip-group column>
-                                    <v-chip variant="outlined" v-for="item, i in listTags" :key="i">{{item}}</v-chip>
+                                    <v-chip v-for="item, i in dispositivo?.tags" :key="item+i" closable @click:close="deleteTag(item)">{{item}}</v-chip>
                                 </v-chip-group>
                             </v-col>
                         </v-row>
@@ -103,6 +103,9 @@
     import { useLoginStore } from '@/store/LoginStore';
     const LoginStore = useLoginStore()
 
+    import { useSnackStore } from '@/store/snackStore';
+    const snackStore = useSnackStore()
+
     import { useRoute, useRouter } from 'vue-router'
     const route = useRoute()
     const router = useRouter()
@@ -159,7 +162,7 @@
     })
 
     const types = [
-        ...(isArt.value ? [{ id: 3, title: "Resumo" }] : []),
+        ...(isArt.value ? [{ id: 4, title: "Resumo" }] : []),
         {id: 1, title: "Comentário"},
         {id: 2, title: "Pergunta"},
     ]
@@ -187,7 +190,7 @@
 
     const childRef = ref(null);
 
-    const emits = defineEmits(['open'])
+    const emits = defineEmits(['open', 'update-dispositivo'])
 
     const selectArt = (item) => {
         router.push({query: {id: item.id, art: item.art}})
@@ -195,16 +198,35 @@
     }
 
     const tag = ref(null)
-    const listTags = ref([])
     const loadTag = ref(false)
+    const dispositivoLocal = ref({ ...props.dispositivo })
 
     const saveTag = async () => {
         if(!tag.value) return
+  
+        const exist = props.dispositivo?.tags.find( x => x.toLowerCase().trim() == tag.value.toLowerCase().trim())
+        if(exist) {
+            tag.value = null
+            snackStore.activeSnack('Tag já cadastrada.', 'warning')
+            return
+        }
+
+
         loadTag.value = true
         const resp = await forumStore.saveTag(tag.value, props.dispositivo.id)
-        listTags.value.push(tag.value.toLowerCase().trim())
+        props.dispositivo?.tags.push(tag.value.toLowerCase().trim())
         tag.value = null
         loadTag.value = false
+        snackStore.activeSnack('Tag cadastrada!', 'success')
+    }
+
+    const deleteTag = async (item) => {
+        loadTag.value = true
+        const resp = await forumStore.saveTag(item, props.dispositivo.id)
+        dispositivoLocal.value.tags = dispositivoLocal.value.tags.filter( x => x != item)
+        emits('update-dispositivo', dispositivoLocal.value)
+        loadTag.value = false
+        snackStore.activeSnack('Tag excluída!', 'error')
     }
     
 </script>
