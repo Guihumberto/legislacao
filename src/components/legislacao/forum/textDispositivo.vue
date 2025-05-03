@@ -30,6 +30,25 @@
                <transition name="fade">
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
+                        <v-row class="d-flex" v-if="LoginStore.user" >
+                            <v-col cols="3">
+                                <v-text-field
+                                    label="Tag"
+                                    variant="outlined"
+                                    density="compact"
+                                    clearable
+                                    @keypress.enter="saveTag"
+                                    v-model="tag"
+                                    :disabled="loadTag"
+                                    :loading="loadTag"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="9" v-if="listTags.length" >
+                                <v-chip-group column>
+                                    <v-chip variant="outlined" v-for="item, i in listTags" :key="i">{{item}}</v-chip>
+                                </v-chip-group>
+                            </v-col>
+                        </v-row>
                          <v-select
                              label="Comentar"
                              density="compact"
@@ -140,6 +159,7 @@
     })
 
     const types = [
+        ...(isArt.value ? [{ id: 3, title: "Resumo" }] : []),
         {id: 1, title: "Comentário"},
         {id: 2, title: "Pergunta"},
     ]
@@ -173,6 +193,19 @@
         router.push({query: {id: item.id, art: item.art}})
         emits('open')
     }
+
+    const tag = ref(null)
+    const listTags = ref([])
+    const loadTag = ref(false)
+
+    const saveTag = async () => {
+        if(!tag.value) return
+        loadTag.value = true
+        const resp = await forumStore.saveTag(tag.value, props.dispositivo.id)
+        listTags.value.push(tag.value.toLowerCase().trim())
+        tag.value = null
+        loadTag.value = false
+    }
     
 </script>
 
@@ -195,7 +228,7 @@
 .action-container {
     position: absolute;
     top: 0;
-    right: -60px; /* Ajuste conforme necessário para alinhar ao lado */
+    right: -70px; /* Ajuste conforme necessário para alinhar ao lado */
     background: transparent;
 }
 

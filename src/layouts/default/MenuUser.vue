@@ -25,10 +25,37 @@
             <template v-slot:prepend>
               <v-icon :icon="item.icon"></v-icon>
             </template>
-
             <v-list-item-title v-text="item.text"></v-list-item-title>
           </v-list-item>
-          <div class="my-5" v-if="forumStore.readMyGroup.length">
+          <v-list-item v-if="forumStore.readMyGroup.length" to="/permissoes" title="Permissões" prepend-icon="mdi-lock-alert">
+            <template v-slot:append>
+                <v-badge
+                  color="info"
+                  :content="solicitationStore.readTotalAvaliations"
+                  inline
+                ></v-badge>
+                <v-badge
+                  color="success"
+                  :content="solicitationStore.readTotalInvites"
+                  inline
+                ></v-badge>
+              </template>
+          </v-list-item>
+          <v-list-item v-else to="/permissoes" title="Permissões" prepend-icon="mdi-lock-alert">
+            <template v-slot:append>
+                <v-badge
+                  color="info"
+                  :content="solicitationStore.readTotalAvaliations"
+                  inline
+                ></v-badge>
+                <v-badge
+                  color="success"
+                  :content="solicitationStore.readTotalInvites"
+                  inline
+                ></v-badge>
+              </template>
+          </v-list-item>
+          <!-- <div class="my-5" v-if="forumStore.readMyGroup.length">
             <v-btn 
               @click="$router.push('/permissoes')"
               prepend-icon="mdi-check-circle" variant="text" block >Permissões
@@ -45,8 +72,8 @@
                 ></v-badge>
               </template>
             </v-btn>
-          </div>
-          <div v-else>
+          </div> -->
+          <!-- <div v-else>
             <v-btn 
               @click="$router.push('/permissoes')"
               prepend-icon="mdi-check-circle" variant="text" block >Permissões
@@ -63,7 +90,7 @@
                 ></v-badge>
               </template>
             </v-btn>
-          </div>
+          </div> -->
           <div class="my-5" v-if="loginStore.readLogin.admin">
             <v-list-subheader>Gerencial</v-list-subheader>
             <v-list-item

@@ -548,6 +548,27 @@ export const useForumStore = defineStore("forumStore", {
             } catch (error) {
                 console.log('error get solicitatons');
             }
+        },
+        async saveTag(tag, idTag){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin.cpf
+            if(!cpf) return
+       
+            try {
+                const resp = await api.post(`law_forum/_update/${idTag}`, {
+                    script: {
+                        source: "if (ctx._source.tags == null) { ctx._source.tags = [params.new_item] } else { ctx._source.tags.add(params.new_item) } ctx._source.last_date_update = params.last_date_update",
+                        lang: "painless",
+                        params: {
+                          new_item: tag,
+                          last_date_update: this.formatDate
+                        }
+                      }
+                })
+                console.log('resp', resp);
+            } catch (error) {
+                console.log('error save tag');
+            }
         }
     }
 })
