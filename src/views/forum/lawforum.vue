@@ -331,6 +331,11 @@
         return tagsUnique
     })
 
+    watch(withTags, (newConfirm) => {
+        if(!withTags.value) tagsFilter.value = []
+        console.log('teste');
+    })
+
     const getGroup = async () => {
         await forumStore.getGroup(route.params.id)
     }
