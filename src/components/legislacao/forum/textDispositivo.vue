@@ -32,7 +32,21 @@
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                         <v-row class="d-flex" v-if="LoginStore.user" >
                             <v-col cols="3">
-                                <v-text-field
+                                <v-autocomplete
+                                    v-model="tag"
+                                    v-model:search="searchTag"
+                                    :items="filteredTags"
+                                    label="Tag"
+                                    variant="outlined"
+                                    density="compact"
+                                    clearable
+                                    :loading="loadTag"
+                                    :disabled="loadTag"
+                                    hide-no-data
+                                    @keydown.enter="saveTag"
+                                    :search-input.sync="tag"
+                                ></v-autocomplete>
+                                <!-- <v-text-field
                                     label="Tag"
                                     variant="outlined"
                                     density="compact"
@@ -41,7 +55,7 @@
                                     v-model="tag"
                                     :disabled="loadTag"
                                     :loading="loadTag"
-                                ></v-text-field>
+                                ></v-text-field> -->
                             </v-col>
                             <v-col cols="12" sm="9">
                                 <v-chip-group column>
@@ -91,7 +105,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch } from 'vue';
+    import { ref, computed, watch, toRefs  } from 'vue';
 
     import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
@@ -112,7 +126,21 @@
 
     const props = defineProps({
         dispositivo: Object,
-        search: String
+        search: String,
+        listTags: Array,
+    })
+
+    const searchTag = ref('')
+
+    const { dispositivo, listTags } = toRefs(props)
+
+    const filteredTags = computed(() => {
+        const input = tag.value ? tag.value.toLowerCase() : ''
+        return listTags.value.filter(t =>
+            typeof t === 'string' &&
+            !dispositivo.value.tags.includes(t) &&
+            t.toLowerCase().includes(input)
+        )
     })
 
     const showActions = ref(false);
@@ -202,15 +230,16 @@
     const dispositivoLocal = ref({ ...props.dispositivo })
 
     const saveTag = async () => {
+        if(searchTag.value) saveTag2()
+        
         if(!tag.value) return
-  
+
         const exist = props.dispositivo?.tags.find( x => x.toLowerCase().trim() == tag.value.toLowerCase().trim())
         if(exist) {
             tag.value = null
             snackStore.activeSnack('Tag já cadastrada.', 'warning')
             return
         }
-
 
         loadTag.value = true
         const resp = await forumStore.saveTag(tag.value, props.dispositivo.id)
@@ -228,7 +257,11 @@
         loadTag.value = false
         snackStore.activeSnack('Tag excluída!', 'error')
     }
-    
+
+    const saveTag2 = () => {
+        tag.value = searchTag.value
+        searchTag.value = ''
+    }
     
 </script>
 
@@ -244,7 +277,7 @@
     display: flex;
     flex-direction: column;;
     top: 0;
-    left: -60px; /* Ajuste conforme necessário para alinhar ao lado */
+    left: -70px; /* Ajuste conforme necessário para alinhar ao lado */
     background: transparent;
 }
 
