@@ -71,7 +71,7 @@
                             <div>
                                 <div class="d-flex">
                                     <v-checkbox v-model="withComments" label="Filtrar com comentários"></v-checkbox>
-                                    <v-checkbox v-model="withTags" label="Filtrar por Tags"></v-checkbox>
+                                    <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length"></v-checkbox>
                                 </div>
 
                                 <v-expand-transition>      
@@ -95,7 +95,7 @@
         
                     <div class="bg-white">
                         <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
-                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" />
+                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
                         </div>
                     </div>
         
@@ -333,7 +333,6 @@
 
     watch(withTags, (newConfirm) => {
         if(!withTags.value) tagsFilter.value = []
-        console.log('teste');
     })
 
     const getGroup = async () => {
