@@ -163,6 +163,7 @@
             comment.value.user_name = 'Eu'
             respComments.value.push({ id: resp, ...comment.value })
             comment.value.text = null
+            comment.value.type = ''
             load.value = false
     }
 
@@ -250,6 +251,9 @@
 }
 
 @media (max-width: 600px) {
+    .profile-pic{
+        display: none;
+    }
     .menu-comments {
         flex-direction: column;
     }    

@@ -210,6 +210,9 @@
 }
 
 @media (max-width: 600px) {
+    .profile-pic{
+        display: none;
+    }
     .menu-comments {
         flex-direction: column;
     }    

@@ -92,7 +92,6 @@
         
                     <Pagination :totalPage="totalPage" :pagination="pagination" />
 
-        
                     <div class="bg-white">
                         <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
                                 <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
@@ -222,10 +221,19 @@
     });
 
     watch(() => route.params.id, async (newId, oldId) => {
-        sidelaw.value = false
+       sidelaw.value = false
        await getGroup()
        getAll()
     });
+
+    watch(sidelaw, (side) => {
+        if(!sidelaw.value) router.push({
+            query: {
+                id: null,
+                art: null,
+            }
+        })
+    })
 
 
     const listTextLaw = computed(() => {
@@ -304,6 +312,10 @@
             total = listFinal.value.filter(item => item.comments.length).length
         }
 
+        if(tagsFilter.value.length){
+            total = listFinal.value.filter(item => item.tags.some(tag => tagsFilter.value.includes(tag.toLowerCase()))).length
+        }
+
         return Math.ceil(total/pagination.value.perPage)
     })
 
@@ -329,6 +341,10 @@
         const tagsFlat = tags.flat()
         const tagsUnique = [...new Set(tagsFlat)]
         return tagsUnique
+    })
+
+    watch(tagsFilter, (newConfirm) => {
+        pagination.value.page = 1 
     })
 
     watch(withTags, (newConfirm) => {

@@ -31,7 +31,7 @@
                 <div v-if="activeComment">
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                         <v-row class="d-flex" v-if="LoginStore.user" >
-                            <v-col cols="3">
+                            <v-col cols="12" sm="3">
                                 <v-autocomplete
                                     v-model="tag"
                                     v-model:search="searchTag"
@@ -43,6 +43,7 @@
                                     :loading="loadTag"
                                     :disabled="loadTag"
                                     hide-no-data
+                                    hide-details
                                     @keydown.enter="saveTag"
                                     :search-input.sync="tag"
                                 ></v-autocomplete>
@@ -220,6 +221,7 @@
         comment.value.user_name = 'Eu'
         if (childRef.value) childRef.value.adicionarObjeto(comment.value, resp);
         comment.value.text = null
+        comment.value.type = null
         load.value = false
     }
 
@@ -228,6 +230,10 @@
     const emits = defineEmits(['open', 'update-dispositivo'])
 
     const selectArt = (item) => {
+        if(item.art == route.query.art) {
+            router.push({query: {id: null, art: null}})
+            return
+        }
         router.push({query: {id: item.id, art: item.art}})
         emits('open')
     }
@@ -282,7 +288,6 @@
         loadResumo.value = true
         const artSelects = listFinal.value.filter( x => x.art == props.dispositivo.art).map(x => x.textlaw).join('\n')
         const resumo = await searchStore.resumoPage(artSelects)
-        console.log('listFinal', resumo);
         comment.value.text = resumo
         loadResumo.value = false
     }
