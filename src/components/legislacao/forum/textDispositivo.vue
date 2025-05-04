@@ -64,7 +64,7 @@
                                 </v-chip-group>
                             </v-col>
                         </v-row>
-                        <div class="d-flex align-center ga-2 mb-2">
+                        <div class="d-flex align-center ga-2 my-2">
                             <div>
                                 <v-select
                                     label="Comentar"
@@ -72,9 +72,9 @@
                                     :items="types"
                                     item-title="title"
                                     item-value="id"
-                                   
+                                    variant="outlined"
                                     v-model="comment.type"
-                                    style="width: 200px;"
+                                    style="width: 218px;"
                                     hide-details
                                     clearable
                                 ></v-select>
