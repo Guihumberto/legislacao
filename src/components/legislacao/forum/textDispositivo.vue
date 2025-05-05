@@ -157,6 +157,14 @@
     const form = ref(null)
     const load = ref(false)
 
+    const closeActiveComment = () => {
+        activeComment.value = false
+    }
+
+    defineExpose({
+        closeActiveComment
+    })
+
     watch(() => route.query.page, (newPage, oldPage) => {
         activeComment.value = false
       }

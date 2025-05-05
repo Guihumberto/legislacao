@@ -69,10 +69,12 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="d-flex">
-                                    <v-checkbox v-model="withComments" label="Filtrar com comentários"></v-checkbox>
-                                    <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length"></v-checkbox>
+                                <div class="filterCheckbox">
+                                    <v-checkbox v-model="withComments" label="Filtrar com comentários" hide-details></v-checkbox>
+                                    <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length" hide-details></v-checkbox>
+                                    <v-checkbox v-model="withMarks" label="Filtrar Marcados" hide-details></v-checkbox>
                                 </div>
+                                <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
 
                                 <v-expand-transition>      
                                     <v-card v-if="listTags.length && withTags" variant="outlined">
@@ -94,7 +96,7 @@
 
                     <div class="bg-white">
                         <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
-                                <TextDispositivo :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
+                                <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
                         </div>
                     </div>
         
@@ -189,6 +191,7 @@
     
     const withComments = ref(false)
     const withTags = ref(false)
+    const withMarks = ref(false)
 
     const topUp = ref(null)
 
@@ -235,6 +238,8 @@
         })
     })
 
+    const contemEstilo = /<b>|<strong>|<u>|<ins>|<s>|<strike>|<del>|style\s*=\s*["'].*color\s*:|<span[^>]*color\s*:/i;
+
 
     const listTextLaw = computed(() => {
         let list = listFinal.value
@@ -270,6 +275,10 @@
 
         if(tagsFilter.value.length){
             list = list.filter(item => item.tags.some(tag => tagsFilter.value.includes(tag.toLowerCase())))
+        }
+
+        if(withMarks.value){
+            list = list.filter(item => contemEstilo.test(item.textlaw));
         }
 
         let page = pagination.value.page - 1
@@ -314,6 +323,10 @@
 
         if(tagsFilter.value.length){
             total = listFinal.value.filter(item => item.tags.some(tag => tagsFilter.value.includes(tag.toLowerCase()))).length
+        }
+
+        if(withMarks.value){
+            total = listFinal.value.filter(item => contemEstilo.test(item.textlaw)).length
         }
 
         return Math.ceil(total/pagination.value.perPage)
@@ -423,6 +436,14 @@
         }
     }   
 
+    const textDispositivoRef = ref(null)
+
+    const closeAllComments = () => {
+        textDispositivoRef.value.forEach((instancia) => {
+            instancia?.closeActiveComment?.()
+        })
+    }
+
     provide('listFinal', listFinal)
 
     onMounted( async () => {
@@ -452,6 +473,11 @@
 .law{
     width: min(100%, 1000px);
     margin-inline: auto;
+}
+
+.filterCheckbox{
+    display: flex;
+    align-items: center;
 }
 
 .selected{
@@ -519,6 +545,15 @@
         width: 100%;
     }
 }
+
+@media (max-width:600px){
+    .filterCheckbox{
+        flex-direction: column;
+        align-items: baseline;
+    }
+}
+
+
 
 @media print {
     .btn {
