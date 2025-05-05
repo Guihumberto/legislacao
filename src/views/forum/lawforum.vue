@@ -427,6 +427,13 @@
         }   
         artsFilter.value = []
         artsFilter.value.push(art)
+        router.push({
+            query: {
+                ...route.query,
+                page: 1
+            }
+        })
+        pagination.value.page = 1
     }
 
     const updateDispositivo = (event) => {
