@@ -8,15 +8,53 @@ import { useLoginStore } from "@/store/LoginStore";
 export const useQuestoesStore = defineStore("questoesStore", {
     state: () => ({
         questoes: [],
+        totalQuestoes: 0,
+        q_respondidas: [],
         load: false
     }),
     getters: {
         readQuestoes(){
             return this.questoes
         },
+        readTotalQuestoes(){
+            return this.totalQuestoes
+        },
+        readQuestoesResp(){
+            return this.q_respondidas
+        },
+        readQuestoesMoreResp(){
+            const merged = this.readQuestoes.map(q => {
+                const respostasDaQuestao = this.readQuestoesResp
+                  .filter(r => r.id_question === q.id)
+                  .sort((a, b) => this.parseTimestamp(b.timestamp) - this.parseTimestamp(a.timestamp))
+              
+                const respostaMaisRecente = respostasDaQuestao[0]
+              
+                return {
+                  ...q,
+                  ...(respostaMaisRecente ? {
+                    id_resposta: respostaMaisRecente.id_resposta,
+                    timestamp: respostaMaisRecente.timestamp
+                  } : {})
+                }
+            })
+            return merged
+        },
         readLoad(){
             return this.load
-        }
+        },
+        formatDate(){
+            const now = new Date();
+            
+            const day = String(now.getDate()).padStart(2, '0');  // Garante 2 dígitos para o dia
+            const month = String(now.getMonth() + 1).padStart(2, '0');  // Meses começam em 0, então somamos 1
+            const year = now.getFullYear();
+            
+            const hours = String(now.getHours()).padStart(2, '0');  // Garante 2 dígitos para a hora
+            const minutes = String(now.getMinutes()).padStart(2, '0');  // Garante 2 dígitos para os minutos
+            
+            return `${day}-${month}-${year} ${hours}:${minutes}`;
+        },
     },
     actions:{
         async gerarQuestoes(item){
@@ -49,7 +87,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
             try {
                 const resp = await api.post('questoes/_search', {
                     from: 0,
-                    size: 10,
+                    size: 100,
                     query: {
                         bool: {
                             must:[
@@ -76,11 +114,76 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 }
             )
                 this.questoes = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+                this.totalQuestoes = resp.data.hits.total.value
+                this.q_respondidas = await this.getMyQuestoesResp(item)
             } catch (error) {
                 console.log('erro get questoes');
             } finally {
                 this.load = false
             }
+        },
+        async getMyQuestoesResp(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await api.post('questoes_resp/_search', {
+                    from: 0,
+                    size: 50,
+                    query: {
+                        bool: {
+                            must:[
+                                {
+                                    "term": {
+                                        id_user: cpf
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        id_law: item.id_law,
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        id_art: item.id_art
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    sort: [
+                        {
+                            timestamp: {
+                                order: "desc"
+                            },
+                        }
+                    ]
+                }
+            )
+                return resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+            } catch (error) {
+                console.log('erro get questoes resp');
+            }
+        },
+        async saveRespQuestao(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            const questoes = { ...item, id_user: cpf, timestamp: this.formatDate }
+
+            try {
+                const resp = await api.post('questoes_resp/_doc', questoes)
+            } catch (error) {
+                console.log('erro save questoes resp');
+            }
+        },
+        parseTimestamp(timestamp){
+            const [datePart, timePart] = timestamp.split(' ')
+            const [day, month, year] = datePart.split('-').map(Number)
+            const [hour, minute] = timePart.split(':').map(Number)
+            return new Date(year, month - 1, day, hour, minute)
         }
     }
 })

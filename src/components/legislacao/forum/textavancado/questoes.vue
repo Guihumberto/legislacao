@@ -15,17 +15,19 @@
             </div>
         </v-alert>
 
-        <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoes.length" class="appear">
+        <Loading class="mt-10" v-if="loadQuestoes" />
+
+        <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
             <v-card-title class="d-flex align-center justify-space-between flex-wrap">
                 <div>
                     Artigo {{ $route.query.art }} -{{ forumStore.readGroupForum._source.title }}
                 </div>
                 <div>
-                    <small> XX certas - XX erradas - XX resolvidas - total XX</small>
+                    <small> XX certas - XX erradas - XX resolvidas - total {{ questoesStore.readTotalQuestoes }}</small>
                 </div>
             </v-card-title>
             <v-card-text class="text-black">
-                <div v-for="item, i in questoesStore.readQuestoes" :key="item.id" class="mb-5">
+                <div v-for="item, i in questoesStore.readQuestoesMoreResp" :key="item.id" class="mb-5">
                     <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
                         <div class="d-flex ga-1 align-center">
                             <!-- <v-chip color="primary" density="compact" :title="item.id">cod</v-chip>   -->
@@ -58,6 +60,7 @@
     const questoesStore = useQuestoesStore()
 
     import Questoes_alternative from './questoes_alternative.vue';
+    import Loading from '../loading.vue';
 
     import { useRoute } from 'vue-router';
     const route = useRoute()
@@ -65,9 +68,7 @@
     const load = ref(false)
     const elemento = ref(null)
 
-    watch(
-        () => route.query.art,
-        (newId, oldId) => {
+    watch(() => route.query.art, (newId, oldId) => {
             getQuestoes()
             if(elemento.value) elemento.value.classList.add('selectArtAnimar')
             setTimeout(() => {
@@ -76,14 +77,19 @@
         } 
     )
 
+    const loadQuestoes = ref(false)
+
     const getQuestoes = async () => {
+        loadQuestoes.value = true
         await questoesStore.getQuestoes({id_law: route.params.id, id_art: route.query.art})
+        loadQuestoes.value = false
     }
 
+
     const gerarQuestoes = async () => {
-        load.value = true
+        loadQuestoes.value = true
         await questoesStore.gerarQuestoes({id_law: route.params.id, id_art: route.query.art})
-        load.value = false
+        loadQuestoes.value = false
     }
 
     onMounted(async() => {
