@@ -3,7 +3,7 @@
         <div
             ref="editable"
             contenteditable
-            class="min-h-[150px]"
+            class="min-h-[150px], no-drag"
             @mouseup="handleSelection"
             @keyup="handleSelection"
             @keydown="handleKeyDown"
@@ -255,6 +255,17 @@
     padding: .5rem;
     text-align: center;
     font-weight: 440;
+}
+
+.no-drag{
+    .textP{
+    user-drag: none;
+    user-select: none;
+    -webkit-user-drag: none;   /* Para Safari */
+    -webkit-user-select: none; /* Para Safari */
+    -moz-user-select: none;    /* Para Firefox */
+    -ms-user-select: none;     /* Para I/* padrão */
+}
 }
 
 </style>

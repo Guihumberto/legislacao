@@ -95,7 +95,10 @@
                     <Pagination :totalPage="totalPage" :pagination="pagination" />
 
                     <div class="bg-white">
-                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{selected: item.art == $route.query.art && item.estrutura == false}" >
+                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{ selected: item.art == $route.query.art && item.estrutura == false}" >
+                            <div class="corner-wrapper">
+                                <div :class="{ triangle: item?.tags.length }"></div>
+                            </div>
                                 <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
                         </div>
                     </div>
@@ -536,6 +539,18 @@
     width: 50%;
 }
 
+.corner-wrapper {
+  height: 0;
+  width: 100%;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: .5rem solid red;
+  border-bottom: .5rem solid transparent;
+}
+
 .fixed {
   position: fixed;
   background: purple;
@@ -559,8 +574,6 @@
         align-items: baseline;
     }
 }
-
-
 
 @media print {
     .btn {

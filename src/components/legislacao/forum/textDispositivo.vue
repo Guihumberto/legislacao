@@ -60,7 +60,17 @@
                             </v-col>
                             <v-col cols="12" sm="9">
                                 <v-chip-group column>
-                                    <v-chip v-for="item, i in dispositivo?.tags" :key="item+i" closable @click:close="deleteTag(item)">{{item}}</v-chip>
+                                    <v-menu
+                                        v-model="menu"
+                                        :close-on-content-click="false"
+                                        location="top"
+                                    >
+                                    <template v-slot:activator="{ props }">
+                                        <v-chip @click="tag = item" v-bind="props" v-for="item, i in dispositivo?.tags" :key="item+i" closable @click:close="deleteTag(item)">{{item}}</v-chip>
+                                    </template>
+
+                                    <v-btn @click="copyTagArg" prepend-icon="mdi-content-copy">Copiar tag para todo os dispositivos do artigo</v-btn>
+                                </v-menu>
                                 </v-chip-group>
                             </v-col>
                         </v-row>
@@ -139,6 +149,7 @@
     })
 
     const searchTag = ref('')
+    const menu = ref(false)
 
     const { dispositivo, listTags } = toRefs(props)
 
@@ -282,6 +293,22 @@
     const saveTag2 = () => {
         tag.value = searchTag.value
         searchTag.value = ''
+    }
+
+    const copyTagArg = async () => {
+        const list = listFinal.value.filter(x => x.art == props.dispositivo.art)
+
+        loadTag.value = true
+        for (const el of list) {
+            const exist = el?.tags.find(x => x.toLowerCase().trim() == tag.value.toLowerCase().trim())
+            if (!exist && tag.value) {
+                await forumStore.saveTag(tag.value, el.id)
+                el.tags.push(tag.value.toLowerCase().trim())
+            }
+        }
+        loadTag.value = false
+        tag.value = null
+        snackStore.activeSnack('Tags copiadas!', 'success')
     }
 
     //resumo
