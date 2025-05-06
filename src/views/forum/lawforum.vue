@@ -437,6 +437,7 @@
             }
         })
         pagination.value.page = 1
+        closeAllComments()
     }
 
     const updateDispositivo = (event) => {

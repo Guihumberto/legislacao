@@ -69,7 +69,7 @@
                                         <v-chip @click="tag = item" v-bind="props" v-for="item, i in dispositivo?.tags" :key="item+i" closable @click:close="deleteTag(item)">{{item}}</v-chip>
                                     </template>
 
-                                    <v-btn @click="copyTagArg" prepend-icon="mdi-content-copy">Copiar tag para todo os dispositivos do artigo</v-btn>
+                                    <v-btn :loading="loadTag" :disabled="loadTag" @click="copyTagArg" prepend-icon="mdi-content-copy">Copiar tag para todo os dispositivos do artigo</v-btn>
                                 </v-menu>
                                 </v-chip-group>
                             </v-col>
