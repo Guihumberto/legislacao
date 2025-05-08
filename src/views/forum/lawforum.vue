@@ -200,6 +200,12 @@
 
     watch(withComments, (newConfirm) => {
         pagination.value.page = 1 
+        closeAllComments()
+    })
+
+    watch(withMarks, (newConfirm) => {
+        pagination.value.page = 1 
+        closeAllComments()
     })
 
     watch(search, (newConfirm) => {
@@ -361,6 +367,7 @@
 
     watch(tagsFilter, (newConfirm) => {
         pagination.value.page = 1 
+        closeAllComments()
     })
 
     watch(withTags, (newConfirm) => {

@@ -25,7 +25,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
         readQuestoesMoreResp(){
             const merged = this.readQuestoes.map(q => {
                 const respostasDaQuestao = this.readQuestoesResp
-                  .filter(r => r.id_question === q.id)
+                  ?.filter(r => r.id_question === q.id)
                   .sort((a, b) => this.parseTimestamp(b.timestamp) - this.parseTimestamp(a.timestamp))
               
                 const respostaMaisRecente = respostasDaQuestao[0]
@@ -81,27 +81,30 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
         },
         async getQuestoes(item){
+            console.log('teste', item);
             this.load = true
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
+            this.clear()
+
+            const must = [];
+
+            if (item.id_law) {
+                must.push({ match: { id_law: item.id_law } });
+            }
+
+            if (item.id_art) {
+                must.push({ match: { id_art: item.id_art } });
+            }
+
+
             try {
                 const resp = await api.post('questoes/_search', {
                     from: 0,
                     size: 100,
                     query: {
                         bool: {
-                            must:[
-                                {
-                                    "match": {
-                                        id_law: item.id_law,
-                                    }
-                                },
-                                {
-                                    "match": {
-                                        id_art: item.id_art
-                                    }
-                                }
-                            ]
+                            must
                         }
                     },
                     sort: [
@@ -127,29 +130,27 @@ export const useQuestoesStore = defineStore("questoesStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const must = [];
+
+            if (cpf) {
+                must.push({ term: {  id_user: cpf } });
+            }
+
+            if (item.id_law) {
+                must.push({ term: { id_law: item.id_law } });
+            }
+
+            if (item.id_art) {
+                must.push({ term: { id_art: item.id_art } });
+            }
+
             try {
                 const resp = await api.post('questoes_resp/_search', {
                     from: 0,
-                    size: 50,
+                    size: 100,
                     query: {
                         bool: {
-                            must:[
-                                {
-                                    "term": {
-                                        id_user: cpf
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        id_law: item.id_law,
-                                    }
-                                },
-                                {
-                                    "term": {
-                                        id_art: item.id_art
-                                    }
-                                }
-                            ]
+                          must
                         }
                     },
                     sort: [
@@ -211,6 +212,11 @@ export const useQuestoesStore = defineStore("questoesStore", {
             const [day, month, year] = datePart.split('-').map(Number)
             const [hour, minute] = timePart.split(':').map(Number)
             return new Date(year, month - 1, day, hour, minute)
+        },
+        clear(){
+            this.questoes = []
+            this.totalQuestoes = 0
+            // this.q_respondidas = []
         }
     }
 })

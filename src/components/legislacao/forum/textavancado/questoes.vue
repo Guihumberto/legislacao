@@ -23,7 +23,10 @@
                     Artigo {{ $route.query.art }} -{{ forumStore.readGroupForum._source.title }}
                 </div>
                 <div>
-                    <small> XX certas - XX erradas - XX resolvidas - total {{ questoesStore.readTotalQuestoes }}</small>
+                    <small> 
+                        XX certas - XX erradas - 
+                        <span class="text-success">{{ questoesStore.readQuestoesResp.length }} resolvida(s) </span>
+                       do total de {{ questoesStore.readTotalQuestoes }}</small>
                 </div>
             </v-card-title>
             <v-card-text class="text-black">
@@ -34,8 +37,10 @@
                             <h3>Questão {{ i + 1 }}</h3> 
                         </div>
                         <div class="d-flex ga-1 align-center">
-                            <h3>Gerada por IA</h3>
-                            <h3>2025</h3>
+                            <h3 v-if="item?.banca ">{{ item.banca }}</h3>
+                            <h3 v-else>Gerada por IA</h3>
+                            <h3 v-if="item?.ano ">{{ item.ano }}</h3>
+                            <h3 v-else>2025</h3>
                         </div>
                     </div>
                     <div class="px-1">
@@ -84,7 +89,6 @@
         await questoesStore.getQuestoes({id_law: route.params.id, id_art: route.query.art})
         loadQuestoes.value = false
     }
-
 
     const gerarQuestoes = async () => {
         loadQuestoes.value = true
