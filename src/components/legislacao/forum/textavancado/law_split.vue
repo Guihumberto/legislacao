@@ -119,7 +119,7 @@
 
     const topUp = ref(null)
 
-    const divisores = ['art.', 'livro', 'título', 'titulo'];
+    const divisores = ['art.', 'livro', 'título', 'titulo', 'capítulo'];
     
     const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
         'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 

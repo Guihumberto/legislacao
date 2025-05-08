@@ -179,6 +179,33 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 console.log('erro save questoes resp');
             }
         },
+        async saveQuestoesLawManual(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            const bulkBody = item.flatMap(doc => [
+                { index: { _index: 'questoes' } },
+                doc
+            ]);
+
+            try {
+                const response = await api.post('/_bulk', bulkBody.map(JSON.stringify).join('\n') + '\n', {
+                    headers: { 'Content-Type': 'application/x-ndjson' }
+                  });
+              
+                  if (response.data.errors) {
+                    console.error('Alguns documentos falharam ao indexar:', response.data.items);
+                  } else {
+                    console.log('Todos os documentos foram indexados com sucesso.');
+                  }
+
+                  console.log('deu tudo certo');
+                
+            } catch (error) {
+                console.log('erro save questoes manuel');
+            }
+        },
         parseTimestamp(timestamp){
             const [datePart, timePart] = timestamp.split(' ')
             const [day, month, year] = datePart.split('-').map(Number)

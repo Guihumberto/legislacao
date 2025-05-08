@@ -29,5 +29,10 @@ export default [
         component: () => import('@/views/AdminFonte.vue'),
         meta: { requiresAuth: true, role: true } 
       },
-    
+      {
+        path: '/forum/cadastro',
+        name: 'Cadastro',
+        component: () => import('@/views/forum/config/cad_forum.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
 ]

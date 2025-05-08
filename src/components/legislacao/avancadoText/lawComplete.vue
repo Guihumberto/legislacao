@@ -117,7 +117,7 @@
     const artIndice = ref(null)
     const artsFilter = ref([])
 
-    const divisores = ['art.', 'livro'];
+    const divisores = ['art.', 'livro', 'título', 'titulo', 'capítulo'];
     
     const arrayTextLawEstrutura = [   'Art.', 'Arts.','§', 'Parágrafo único', 'Paragrafo unico.',
         'I -', 'I-', 'II -', 'II-', 'III', 'IV -', 'V -', 'VI -', 
