@@ -58,6 +58,8 @@ export const useQuestoesStore = defineStore("questoesStore", {
     },
     actions:{
         async gerarQuestoes(item){
+            console.log(item);
+            
             this.load = true
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -75,7 +77,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 return resp.data
 
             } catch (error) {
-                console.log('erro save questoes');
+                console.error('Erro ao gerar questões:', error.response?.data || error.message);
             } finally {
                 this.load = false
             }
