@@ -57,9 +57,8 @@ export const useQuestoesStore = defineStore("questoesStore", {
         },
     },
     actions:{
-        async gerarQuestoes(item){
-            console.log(item);
-            
+        async gerarQuestoes(item){         
+            console.log('chama api', item);
             this.load = true
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -70,7 +69,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 const resp = await apiChat.post('gerar_questoes', {
                     id_group: item.id_law,
                     id_art: item.id_art,
-                    prompt
                 })
 
                 return resp.data

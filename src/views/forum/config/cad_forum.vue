@@ -5,7 +5,7 @@
                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-tools</v-icon>Cadastro</h1>
             </div>
             <div>
-                <v-form @submit.prevent="importar" ref="form" class="mt-4">
+                <v-form @submit.prevent="importar" ref="form" class="mt-4" >
                     <v-select
                         label="Nome"
                         density="compact"
@@ -25,6 +25,7 @@
                         :rules="[rules.required]"
                     ></v-textarea>
                     <div class="d-flex ga-2">
+                        <v-btn :loading="loadLei" :disabled="loadLei" type="submit" class="mt-4" color="grey" @click="loadLaw">Carregar</v-btn>
                         <v-btn type="submit" class="mt-4" color="primary">Importar</v-btn>
                         <v-btn type="submit" class="mt-4" color="success" @click="saveQuestoes">Salvar</v-btn>
                     </div>
@@ -35,8 +36,40 @@
                 gerar tags importante em lote <br>
                 gerar vinculos com sumulas e julgados <br>
                 gerar comentarios em lote <br>
-                filtrar por comentário feito - apenas meus comentários <br>
                 filtrar pelo artigo selecionado na busca
+            </div>
+
+            <div v-if="listFinal.length && !loadLei" class="mt-5 border rounded-lg pa-5">
+                <h5 class="mb-5">Adicionar Tags em lote para artigo</h5>
+                <v-form @submit.prevent="saveTagList" ref="refTag"> 
+                    <v-text-field
+                        label="Artigos"
+                        variant="outlined"
+                        density="compact"
+                        v-model="artigosList"
+                        :rules="[rules.required]"
+                        clearable
+                    >
+                    </v-text-field>
+                    <v-autocomplete
+                        v-model="tag"
+                        v-model:search="searchTag"
+                        :items="filteredTags"
+                        label="Tag"
+                        variant="outlined"
+                        density="compact"
+                        clearable
+                        :loading="loadTag"
+                        :disabled="loadTag"
+                        hide-no-data
+                        hide-details
+                        @keydown.enter="saveTagList"
+                        :search-input.sync="tag"
+                        :rules="[rules.required]"
+                         class="mb-5"
+                    ></v-autocomplete>
+                    <v-btn type="submit" :loading="loadTag" :disabled="loadTag">Salvar</v-btn>
+                </v-form>
             </div>
 
             <div v-if="listImport.length > 0" class="mt-5">
@@ -55,12 +88,15 @@
 
 <script setup>
 
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
 
     import { useForumStore } from '@/store/ForumStore'
     const forumStore = useForumStore()    
+
+    import { useSnackStore } from '@/store/snackStore';
+    const snackStore = useSnackStore()
     
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
     const questoesStore = useQuestoesStore()
@@ -118,6 +154,71 @@
         listaQuestoes.value = null
         lawSelect.value = null
         load.value = false
+    }
+
+    const listFinal = ref([])
+    const searchTag = ref('')
+    const tag = ref(null)
+    const loadLei = ref(false)
+    const loadTag = ref(false)
+    const artigosList = ref(null)
+    const refTag = ref(null)
+
+
+    const loadLaw = async() => {
+        loadLei.value = true
+        await forumStore.getAllPages(lawSelect.value)
+        listFinal.value = forumStore.readAllPages
+        loadLei.value = false
+    }
+
+    const filteredTags = computed(() => {
+        const list = listFinal.value
+        const tags = list.flatMap(x => x.tags.map(tag => tag.toLowerCase()))
+        const tagsFlat = tags.flat()
+        const tagsUnique = [...new Set(tagsFlat)]
+        return tagsUnique
+    })
+
+    const saveTagList = async () => {
+        const { valid } = await refTag.value.validate()
+
+        loadTag.value = true
+        if(searchTag.value) saveTag2()
+
+        const arts = artigosList.value.split(/[, -]/)
+        const artsList = [...new Set(arts)].filter(x => x.trim()).map(Number)
+        const filterDispostivos = filterArts(artsList)
+        await copyTagArg(filterDispostivos)
+
+        snackStore.activeSnack('Tags copiadas!', 'success')
+        loadTag.value = false
+        tag.value = null
+        artigosList.value = null
+    }
+
+    const filterArts = (items) => {
+        const list = listFinal.value.filter( x => items.includes(x.art))
+        return list
+    }
+
+    const saveTag2 = () => {
+        tag.value = searchTag.value
+        searchTag.value = ''
+    }
+
+    const copyTagArg = async (list) => {
+        try {
+            for (const el of list) {
+                const exist = el?.tags.find(x => x.toLowerCase().trim() == tag.value.toLowerCase().trim())
+                if (!exist && tag.value) {
+                    await forumStore.saveTag(tag.value, el.id)
+                    el.tags.push(tag.value.toLowerCase().trim())
+                }
+            }
+        } catch (error) {
+            console.log('erro ao copiar tags');
+        }
     }
 
 </script>

@@ -78,7 +78,8 @@
         const LoginStore = useLoginStore()
 
         const props = defineProps({
-            dispositivo: Object
+            dispositivo: Object,
+            usersCommentsFilter: Array
         })
 
         const comments = ref([])
@@ -100,7 +101,15 @@
 
         const listComments = computed(() => {
             try {
-                return comments.value.filter(item => !item.commentRef)
+
+                const list = comments.value.filter(item => !item.commentRef)
+
+                // if(props.usersCommentsFilter.length){
+                //     list = list.filter(x => props.usersCommentsFilter.includes(x.created_by))
+                //     console.log(list.filter(x => props.usersCommentsFilter.includes(x.created_by)));
+                // }
+
+                return list
             } catch (error) {
                 comments.value = []
                 return comments.value

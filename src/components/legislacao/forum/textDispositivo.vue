@@ -107,7 +107,7 @@
                              <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
                          </div>
                     </v-form>
-                    <Comments :dispositivo="dispositivo" ref="childRef" />
+                    <Comments :dispositivo="dispositivo" ref="childRef" :usersCommentsFilter="usersCommentsFilter" />
                 </div>
                </transition>    
             </div>
@@ -146,6 +146,7 @@
         dispositivo: Object,
         search: String,
         listTags: Array,
+        usersCommentsFilter: Array,
     })
 
     const searchTag = ref('')

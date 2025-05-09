@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <section class="conteudo" ref="topUp">
-            <div class="law">
+            <div class="law" ref="lawRef">
                 <div class="sizeLoad" v-if="forumStore.readLoad">
                     <v-progress-circular
                         :size="50"
@@ -18,7 +18,7 @@
                     <v-card class="my-5">
                         <v-card-text>
                             <div>
-                                <div class="form">
+                                <div :class="lawWidth < 600 ? 'formResize' : 'form'">
                                     <v-text-field
                                         variant="outlined"
                                         density="compact"
@@ -69,17 +69,39 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="filterCheckbox">
-                                    <v-checkbox v-model="withComments" label="Filtrar com comentários" hide-details></v-checkbox>
+                                <div class="filterCheckbox" :class="{'d-flex flex-column align-start': lawWidth < 600}">
+                                    <v-checkbox v-model="withComments" label="Somente com comentários" hide-details></v-checkbox>
                                     <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length" hide-details></v-checkbox>
                                     <v-checkbox v-model="withMarks" label="Filtrar Marcados" hide-details></v-checkbox>
                                 </div>
-                                <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
 
-                                <v-expand-transition>      
-                                    <v-card v-if="listTags.length && withTags" variant="outlined">
+                                <!-- <v-expand-transition>      
+                                    <v-card v-if="withComments" variant="outlined">
                                         <v-card-text>
-                                            <h2 class="text-h6 mb-2">Filtre por tags</h2>
+                                            <p class="mb-2">Filtre por comentários dos usuários</p>
+                                            <v-responsive class="overflow-y-auto" max-height="500">
+                                                <v-select
+                                                    multiple
+                                                    v-model="usersCommentsFilter"
+                                                    :items="commentStore.readUsersComments"
+                                                    item-title="key"
+                                                    item-value="key"
+                                                    variant="outlined"
+                                                    label="Usuários"
+                                                    density="compact"
+                                                    class="pt-2"
+                                                    clearable
+                                                    prepend-inner-icon="mdi-chat"
+                                                ></v-select>
+                                            </v-responsive>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-expand-transition> -->
+                                
+                                <v-expand-transition>      
+                                    <v-card v-if="listTags.length && withTags" variant="outlined" class="mt-2">
+                                        <v-card-text>
+                                            <p class="mb-2">Filtre por tags</p>
                                             <v-responsive class="overflow-y-auto" max-height="500">
                                                 <v-chip-group filter column multiple v-model="tagsFilter" active-class="primary" >
                                                     <v-chip v-for="item, i in listTags" :value="item" :key="item">{{ item }}</v-chip>
@@ -88,6 +110,9 @@
                                         </v-card-text>
                                     </v-card>
                                 </v-expand-transition>
+                                <div class="text-right mt-2">
+                                    <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
+                                </div>
                             </div>
                         </v-card-text>
                     </v-card>
@@ -99,7 +124,7 @@
                             <div class="corner-wrapper">
                                 <div :class="{ triangle: item?.tags.length }"></div>
                             </div>
-                                <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" />
+                                <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" :usersCommentsFilter="usersCommentsFilter" />
                         </div>
                     </div>
         
@@ -117,7 +142,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide } from "vue";
+    import { ref, computed, watch, onMounted, provide, onBeforeUnmount } from "vue";
 
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
@@ -464,11 +489,46 @@
 
     provide('listFinal', listFinal)
 
+    //Fitrar por usuários
+    import { useCommentStore } from "@/store/CommentStore";
+    const commentStore = useCommentStore()
+    
+    const usersCommentsFilter = ref([])
+
+    const usersComments =  computed(() => {
+        return ['Humbert', 'maria']
+    })
+
+    //risize div law
+    const lawRef = ref(null)
+    const lawWidth = ref(0)
+    const lawHeight = ref(0)
+    let observer = null
+    
     onMounted( async () => {
+        observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                lawWidth.value = entry.contentRect.width
+                lawHeight.value = entry.contentRect.height
+            }
+        })
+
+        if (lawRef.value) {
+            observer.observe(lawRef.value)
+        }
+
         await getGroup()
         await getAll()
         route.query.page ? pagination.value.page = Number(route.query.page)  : ''
         geralStore.changeHeaderNoShow(false)
+        commentStore.getUsersCommentsLaw(route.params.id)
+    })
+
+    onBeforeUnmount(() => {
+        if (observer && lawRef.value) {
+            observer.unobserve(lawRef.value)
+            observer.disconnect()
+        }
     })
   
 
@@ -545,6 +605,10 @@
 
 .form{
     width: 50%;
+}
+
+.formResize{
+    width: 100%;
 }
 
 .corner-wrapper {

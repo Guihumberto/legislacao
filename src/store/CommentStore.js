@@ -16,7 +16,8 @@ export const useCommentStore = defineStore("commentStore", {
             total: 0,
             page: 1,
             perPage: 10
-        }
+        },
+        userComments: []
     }),
     getters: {
         readListVotos(){
@@ -39,6 +40,9 @@ export const useCommentStore = defineStore("commentStore", {
         },
         readComments(){
             return this.comments
+        },
+        readUsersComments(){
+            return this.userComments
         }
     },
     actions:{
@@ -191,6 +195,33 @@ export const useCommentStore = defineStore("commentStore", {
                 console.log('error get comments');
             } finally {
                 this.load = false
+            }
+        },
+        async getUsersCommentsLaw(id){
+            try {
+                const resp = await api.post('comments/_search', {
+                    size: 0,
+                    "query": {
+                        "match": {
+                            "idGroup": id
+                        }
+                    },
+                    "aggs": {
+                        "by_user": {
+                            "terms": {
+                                "field": "created_by",
+                                "size": 100
+                            }
+                        }
+                    }
+                })
+
+                const response = resp.data.aggregations.by_user.buckets
+                this.userComments = response
+                return response 
+
+            } catch (error) {
+                console.log('error get users comments');
             }
         }
     }

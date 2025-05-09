@@ -30,6 +30,23 @@
             ></v-select>
             <v-btn disabled><v-icon>mdi-sort</v-icon></v-btn>
         </div>
+        <div class="mt-2">
+            <v-responsive class="overflow-y-auto" max-height="500">
+                <v-select
+                    multiple
+                    v-model="usersCommentsFilter"
+                    :items="commentStore.readUsersComments"
+                    item-title="key"
+                    item-value="key"
+                    variant="outlined"
+                    label="Usuários"
+                    density="compact"
+                    class="pt-2"
+                    clearable
+                    prepend-inner-icon="mdi-chat"
+                ></v-select>
+            </v-responsive>
+        </div>
         <!-- <p>Selecione o Artigo</p> -->
 
         <Loading v-if="load" class="my-2 py-2" />
@@ -101,6 +118,7 @@
     const load = ref(false)
     const selectArt = ref(null)
     const selectOrder = ref(null)   
+    const usersCommentsFilter = ref([])
 
 
     onMounted( async () => {
@@ -125,6 +143,10 @@
         if(selectArt.value) {
             return list.filter(item => item.art == selectArt.value)
         }   
+
+        if(usersCommentsFilter.value.length) {
+            return list.filter(item => usersCommentsFilter.value.includes(item.created_by))
+        }
 
         return list
     })
