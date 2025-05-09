@@ -35,6 +35,8 @@
                 gerar tags importante em lote <br>
                 gerar vinculos com sumulas e julgados <br>
                 gerar comentarios em lote <br>
+                filtrar por comentário feito - apenas meus comentários <br>
+                filtrar pelo artigo selecionado na busca
             </div>
 
             <div v-if="listImport.length > 0" class="mt-5">

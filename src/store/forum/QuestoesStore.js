@@ -73,13 +73,13 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     prompt
                 })
 
-                await this.getQuestoes(item)
                 return resp.data
 
             } catch (error) {
                 console.error('Erro ao gerar questões:', error.response?.data || error.message);
             } finally {
                 this.load = false
+                await this.getQuestoes(item)
             }
         },
         async getQuestoes(item){
