@@ -15,6 +15,19 @@
             </div>
         </v-alert>
 
+        <v-card class="my-2" variant="flat" >
+            <v-card-text>
+                <v-chip-group
+                    multiple
+                    v-model="artsFilter"
+                    color="primary"
+                    column
+                >
+                    <v-chip v-for="art, a in listArtsFilter" :key="art">{{art}}</v-chip>
+                </v-chip-group>
+            </v-card-text>
+        </v-card>
+
         <Loading class="mt-10" v-if="loadQuestoes" />
 
         <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
@@ -56,7 +69,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, watch } from 'vue';
+    import { ref, onMounted, watch, inject } from 'vue';
 
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
@@ -73,6 +86,9 @@
     const load = ref(false)
     const elemento = ref(null)
 
+    const listArtsFilter = inject('listArtsFilter')
+    const artsFilter = ref([])
+
     watch(() => route.query.art, (newId, oldId) => {
             getQuestoes()
             if(elemento.value) elemento.value.classList.add('selectArtAnimar')
@@ -82,12 +98,30 @@
         } 
     )
 
+    watch(listArtsFilter, (newId, oldId) => {
+        getQuestoes()
+    });
+
+    watch(() => artsFilter.value, (newId, oldId) => {
+            getQuestoes()
+        }
+    )
+
     const loadQuestoes = ref(false)
 
     const getQuestoes = async () => {
         loadQuestoes.value = true
-        await questoesStore.getQuestoes({id_law: route.params.id, id_art: route.query.art})
+        if(listArtsFilter.value.length) {
+            await getQuestoesFilter()
+        } else {
+            await questoesStore.getQuestoes({id_law: route.params.id, id_art: route.query.art})
+        }
         loadQuestoes.value = false
+    }
+
+    const getQuestoesFilter = async () => {
+        if(!artsFilter.value.length && listArtsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: listArtsFilter.value})
+        if(artsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: artsFilter.value})
     }
 
     const gerarQuestoes = async () => {

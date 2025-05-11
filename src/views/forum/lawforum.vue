@@ -499,6 +499,28 @@
         return ['Humbert', 'maria']
     })
 
+    //artigos por tag filter
+
+    const listArtsTagsFilter = computed(() => {
+        try {
+            let list = listFinal.value
+            list = list.filter(item => item.tags.some(tag => tagsFilter.value.includes(tag.toLowerCase()))).map( x => x.art)
+
+            if(artsFilterActive.value){
+                artsFilter.value.forEach(art => {
+                    list.push(art)
+                })
+            }
+
+            const artUnique = [...new Set(list)]
+            return artUnique
+        } catch (error) {
+            return []
+        }
+    })
+
+    provide('listArtsFilter', listArtsTagsFilter)
+
     //risize div law
     const lawRef = ref(null)
     const lawWidth = ref(0)

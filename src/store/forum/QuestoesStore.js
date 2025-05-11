@@ -81,7 +81,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
         },
         async getQuestoes(item){
-            console.log('teste', item);
             this.load = true
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -94,9 +93,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
 
             if (item.id_art) {
-                must.push({ match: { id_art: item.id_art } });
+                if(!Array.isArray(item.id_art)) must.push({ match: { id_art: item.id_art } });
+                if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
             }
-
 
             try {
                 const resp = await api.post('questoes/_search', {
@@ -141,7 +140,8 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
 
             if (item.id_art) {
-                must.push({ term: { id_art: item.id_art } });
+                if(!Array.isArray(item.id_art)) must.push({ match: { id_art: item.id_art } });
+                if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
             }
 
             try {
