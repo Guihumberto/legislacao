@@ -15,7 +15,7 @@
             </div>
         </v-alert>
 
-        <v-card class="my-2" variant="flat" >
+        <v-card class="my-2" variant="flat" v-if="listArtsFilter.length" >
             <v-card-text>
                 <v-chip-group
                     multiple
@@ -23,7 +23,7 @@
                     color="primary"
                     column
                 >
-                    <v-chip v-for="art, a in listArtsFilter" :key="art">{{art}}</v-chip>
+                    <v-chip v-for="art, a in listArtsFilter" :key="art" :value="art">{{art}}</v-chip>
                 </v-chip-group>
             </v-card-text>
         </v-card>

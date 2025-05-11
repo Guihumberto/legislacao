@@ -93,6 +93,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
 
             if (item.id_art) {
+                console.log('chama api', item.id_art);
                 if(!Array.isArray(item.id_art)) must.push({ match: { id_art: item.id_art } });
                 if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
             }
