@@ -47,6 +47,7 @@
             id_art: props.aleternativa.id_art,
             id_question: props.aleternativa.id,
             id_resposta: marked.value,
+            result: resposta.value
         }
 
         const resp = await questoesStore.saveRespQuestao(objeto)
