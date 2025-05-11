@@ -30,8 +30,8 @@
 
         <Loading class="mt-10" v-if="loadQuestoes" />
 
-        <v-card variant="outlined" color="grey" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
-            <v-card-title class="d-flex align-center justify-space-between flex-wrap">
+        <v-card variant="outlined" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
+            <v-card-title class="d-flex align-start justify-space-between flex-column">
                 <div>
                     Artigo {{ $route.query.art }} -{{ forumStore.readGroupForum._source.title }}
                 </div>
@@ -41,9 +41,12 @@
                         <span class="text-success">{{ questoesStore.readQuestoesResp.length }} resolvida(s) </span>
                        do total de {{ questoesStore.readTotalQuestoes }}</small>
                 </div>
+                <div class="border rounded-lg px-2">
+                    <v-checkbox hide-details label="Apenas não respondidas" v-model="formQuestions.noResponse"></v-checkbox>
+                </div>
             </v-card-title>
             <v-card-text class="text-black">
-                <div v-for="item, i in questoesStore.readQuestoesMoreResp" :key="item.id" class="mb-5">
+                <div v-for="item, i in listQuestoes" :key="item.id" class="mb-5">
                     <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
                         <div class="d-flex ga-1 align-center">
                             <!-- <v-chip color="primary" density="compact" :title="item.id">cod</v-chip>   -->
@@ -61,7 +64,6 @@
                         </p>
                         <Questoes_alternative :aleternativa="item" />
                     </div>
-                  
                 </div>
             </v-card-text>
         </v-card>
@@ -69,7 +71,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, watch, inject } from 'vue';
+    import { ref, onMounted, watch, inject, computed } from 'vue';
 
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
@@ -88,6 +90,18 @@
 
     const listArtsFilter = inject('listArtsFilter')
     const artsFilter = ref([])
+
+    const formQuestions = ref({
+        noResponse: false
+    })
+
+    const listQuestoes = computed(() => {
+        let list = questoesStore.readQuestoesMoreResp
+        if(formQuestions.value.noResponse) {
+            list = list.filter(item => !item.timestamp)
+        }
+        return list
+    })
 
     watch(() => route.query.art, (newId, oldId) => {
             getQuestoes()
