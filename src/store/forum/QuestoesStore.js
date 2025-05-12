@@ -4,11 +4,13 @@ import api from "@/services/api"
 import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "@/store/LoginStore";
+import { useFavQuestoesStore } from "./favQuestionStore";
 
 export const useQuestoesStore = defineStore("questoesStore", {
     state: () => ({
         questoes: [],
         totalQuestoes: 0,
+        totalRespQuestoes: 0,
         q_respondidas: [],
         load: false
     }),
@@ -18,6 +20,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
         },
         readTotalQuestoes(){
             return this.totalQuestoes
+        },
+        readTotalRespQuestoes(){
+            return this.totalRespQuestoes
         },
         readQuestoesResp(){
             return this.q_respondidas
@@ -58,7 +63,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
     },
     actions:{
         async gerarQuestoes(item){         
-            console.log('chama api', item);
             this.load = true
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
@@ -82,6 +86,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
         },
         async getQuestoes(item){
             this.load = true
+            const favStore = useFavQuestoesStore()
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             this.clear()
@@ -118,10 +123,12 @@ export const useQuestoesStore = defineStore("questoesStore", {
             )
                 this.questoes = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
                 this.totalQuestoes = resp.data.hits.total.value
-                this.q_respondidas = await this.getMyQuestoesResp(item)
+               
             } catch (error) {
                 console.log('erro get questoes');
             } finally {
+                this.q_respondidas = await this.getMyQuestoesResp(item)
+                await favStore.getAllFavLaw(item.id_law)
                 this.load = false
             }
         },
@@ -163,6 +170,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     ]
                 }
             )
+                this.totalRespQuestoes = resp.data.hits.total.value
                 return resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
             } catch (error) {
                 console.log('erro get questoes resp');

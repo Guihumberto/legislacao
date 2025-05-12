@@ -32,17 +32,60 @@
 
         <v-card variant="outlined" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
             <v-card-title class="d-flex align-start justify-space-between flex-column">
-                <div>
-                    Artigo {{ $route.query.art }} -{{ forumStore.readGroupForum._source.title }}
+                <div class="px-1 d-flex justify-space-between align-center w-100">
+                    <div>
+                        <span v-if="$route.query.art">Artigo {{ $route.query.art }} - </span>{{ forumStore.readGroupForum._source.title }} 
+                    </div>
+                    <div class="pa-1 bg-primary rounded">{{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
                 </div>
-                <div>
+                <div class="px-1">
                     <small> 
-                        XX certas - XX erradas - 
-                        <span class="text-success">{{ questoesStore.readQuestoesResp.length }} resolvida(s) </span>
-                       do total de {{ questoesStore.readTotalQuestoes }}</small>
+                        {{ infoHeader.acertos }} certa{{ insertWordS(infoHeader.acertos) }} - {{ infoHeader.erros }} errada{{ insertWordS(infoHeader.erros) }} - 
+                        <span class="text-success">{{ infoHeader.respondidas }} resolvida{{ insertWordS(infoHeader.respondidas) }} </span>
+                       do total de {{ infoHeader.total }}</small>
                 </div>
-                <div class="border rounded-lg px-2">
-                    <v-checkbox hide-details label="Apenas não respondidas" v-model="formQuestions.noResponse"></v-checkbox>
+                <div class="w-100 border rounded-lg pa-2 ">
+                    <div class="w-100 d-flex ga-1">
+                       <v-select
+                        label="Filtro"
+                        :items="typeRespQuestions"
+                        item-title="name"
+                        item-value="id"
+                        v-model="formQuestions.typeRespQuestions"
+                        variant="outlined"
+                        density="compact"
+                        hide-details 
+                        class="w-100"
+                       ></v-select>
+                       <div class="d-flex ga-1 w-100">
+                           <v-select
+                            label="Ano"
+                            :items="listAnos"
+                            v-model="formQuestions.ano"
+                            variant="outlined"
+                            density="compact"
+                            hide-details 
+                            clearable
+                            class="w-50"
+                           ></v-select>
+                           <v-select
+                            label="Banca"
+                            :items="listBancas"
+                            v-model="formQuestions.banca"
+                            variant="outlined"
+                            density="compact"
+                            hide-details 
+                            clearable
+                            class="w-50"     
+                           ></v-select>
+                       </div>
+                    </div>
+                    <v-checkbox
+                        label="Apenas favoritas"
+                        density="compact"
+                        v-model="formQuestions.favoritas"
+                        hide-details
+                    ></v-checkbox>
                 </div>
             </v-card-title>
             <v-card-text class="text-black">
@@ -57,6 +100,7 @@
                             <h3 v-else>Gerada por IA</h3>
                             <h3 v-if="item?.ano ">{{ item.ano }}</h3>
                             <h3 v-else>2025</h3>
+                            <FavQuestoes :questao="item" />
                         </div>
                     </div>
                     <div class="px-1">
@@ -79,10 +123,14 @@
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
     const questoesStore = useQuestoesStore()
 
+    import { useFavQuestoesStore } from '@/store/forum/favQuestionStore';
+    const favQuestoesStores = useFavQuestoesStore()
+
     import Questoes_alternative from './questoes_alternative.vue';
     import Loading from '../loading.vue';
 
     import { useRoute } from 'vue-router';
+    import FavQuestoes from './favQuestoes.vue';
     const route = useRoute()
 
     const load = ref(false)
@@ -92,16 +140,82 @@
     const artsFilter = ref([])
 
     const formQuestions = ref({
-        noResponse: false
+        typeRespQuestions: 1,
+        banca: null,
+        ano: null,
+        favoritas: false,
     })
+
+    const typeRespQuestions = [
+        {id: 1, name: 'Todas'},
+        {id: 2, name: 'Apenas não respondidas'},
+        {id: 3, name: 'Apenas respondidas'},
+        {id: 4, name: 'Apenas as que errei'},
+        {id: 5, name: 'Apenas as que acertei'},
+    ]
 
     const listQuestoes = computed(() => {
         let list = questoesStore.readQuestoesMoreResp
-        if(formQuestions.value.noResponse) {
-            list = list.filter(item => !item.timestamp)
-        }
+
+        if(formQuestions.value.typeRespQuestions == 1)  list = questoesStore.readQuestoesMoreResp
+        if(formQuestions.value.typeRespQuestions == 2)  list = list.filter(item => !item.timestamp)
+        if(formQuestions.value.typeRespQuestions == 3)  list = list.filter(item => item.timestamp)
+        if(formQuestions.value.typeRespQuestions == 4)  list = list.filter(item => item.timestamp && item.resposta != item.id_resposta)
+        if(formQuestions.value.typeRespQuestions == 5)  list = list.filter(item => item.timestamp && item.resposta == item.id_resposta)
+        if(formQuestions.value.banca)  list = list.filter(item => item.banca == formQuestions.value.banca)
+        if(formQuestions.value.ano)  list = list.filter(item => item.ano == formQuestions.value.ano)
+
+        if(formQuestions.value.favoritas)  list = list.filter(item => favQuestoes.value.includes(item.id))
+        
         return list
     })
+
+    const listQuestoesRefBancaAno = computed(() => {
+        let list = questoesStore.readQuestoesMoreResp
+
+        if(formQuestions.value.typeRespQuestions == 1)  list = questoesStore.readQuestoesMoreResp
+        if(formQuestions.value.typeRespQuestions == 2)  list = list.filter(item => !item.timestamp)
+        if(formQuestions.value.typeRespQuestions == 3)  list = list.filter(item => item.timestamp)
+        if(formQuestions.value.typeRespQuestions == 4)  list = list.filter(item => item.timestamp && item.resposta != item.id_resposta)
+        if(formQuestions.value.typeRespQuestions == 5)  list = list.filter(item => item.timestamp && item.resposta == item.id_resposta)    
+
+        return list
+    })
+
+    const favQuestoes = computed(() => {
+        return favQuestoesStores.readFavorites.filter(x => x.fav).map( x => x.id_question)
+    })
+
+    const infoHeader = computed(() => {
+        const list = listQuestoes.value
+        const info = {
+            total: list.length,
+            acertos: list.filter(item => item.timestamp && item.resposta == item.id_resposta).length,
+            erros: list.filter(item => item.timestamp && item.resposta != item.id_resposta).length,
+            nao_respondidas: list.filter(item => !item.timestamp).length,
+            respondidas: list.filter(item => item.timestamp).length,
+        }
+        return info
+    })
+
+    const listBancas = computed(() => {
+        const list = listQuestoesRefBancaAno.value.filter(item => item.banca)
+        const listBancas = list.map(item => item.banca)
+        const uniqueBancas = [...new Set(listBancas)]
+        return uniqueBancas
+    }) 
+
+    const listAnos = computed(() => {
+        const list = listQuestoesRefBancaAno.value.filter(item => item.ano)
+        const listAnos = list.map(item => item.ano)
+        const uniqueAnos = [...new Set(listAnos)]
+        return uniqueAnos
+    })
+
+    const insertWordS = (num) => {
+        if(num > 1) return 's'
+        return ''
+    }   
 
     watch(() => route.query.art, (newId, oldId) => {
             getQuestoes()
@@ -154,7 +268,7 @@
 .selectArt {
     font-size: 1.2em;
     font-weight: 500;
-    background: rgb(197, 245, 197);
+    background: #DCEDC8;
     padding: 1rem;
     text-align: center;
     border-radius: 12px;

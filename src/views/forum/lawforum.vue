@@ -581,7 +581,7 @@
 }
 
 .selected{
-    background: rgb(222, 241, 219);
+    background: #DCEDC8;
     transition: all .3s ease-in-out;
 }
 
