@@ -216,6 +216,22 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 console.log('erro save questoes manuel');
             }
         },
+        async relatarErrorQUestao(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            const { descriptionError, typeError, id_art, id, id_law, tipo } = item
+
+            const questoes = { descriptionError, typeError, id_art, id_questao: id, id_law, tipo, id_user: cpf, timestamp: this.formatDate }
+
+            try {
+                const resp = await api.post('error_question/_doc', questoes)
+                return resp.data
+            } catch (error) {
+                return error.code
+            }
+        },
         parseTimestamp(timestamp){
             const [datePart, timePart] = timestamp.split(' ')
             const [day, month, year] = datePart.split('-').map(Number)

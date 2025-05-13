@@ -13,6 +13,9 @@
             <p v-if="resposta == 'acertou'" class="text-success font-weight-bold">Você acertou!</p>
             <p v-else class="text-error font-weight-bold">Você errou!</p>
             {{ aleternativa.justificativa }}
+            <div class="text-right mt-2">
+                <InfoError :questao="aleternativa" />
+            </div>
         </div>
     </div>
 
@@ -20,6 +23,7 @@
 
 <script setup>
     import { onMounted, ref, computed } from 'vue';
+    import InfoError from './infoError.vue';
 
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
     const questoesStore = useQuestoesStore()
