@@ -35,4 +35,10 @@ export default [
         component: () => import('@/views/forum/config/cad_forum.vue'),
         meta: { requiresAuth: true, role: true } 
       },
+      {
+        path: '/forum/tratarerros',
+        name: 'Tratar error',
+        component: () => import('@/views/forum/config/tratar_erros.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
 ]

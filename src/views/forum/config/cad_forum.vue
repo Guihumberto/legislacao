@@ -87,7 +87,6 @@
 </template>
 
 <script setup>
-
     import { ref, computed } from 'vue';
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()

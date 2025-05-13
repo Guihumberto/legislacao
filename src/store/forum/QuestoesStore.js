@@ -12,6 +12,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
         totalQuestoes: 0,
         totalRespQuestoes: 0,
         q_respondidas: [],
+        errorList: [],
         load: false
     }),
     getters: {
@@ -44,6 +45,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 }
             })
             return merged
+        },
+        readErrorList(){
+            return this.errorList
         },
         readLoad(){
             return this.load
@@ -230,6 +234,29 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 return resp.data
             } catch (error) {
                 return error.code
+            }
+        },
+        async getAllErrorQuestion(){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await api.post('error_question/_search', {
+                    from: 0,
+                    size: 100,
+                    sort: [
+                        {
+                            timestamp: {
+                                order: "desc"
+                            },
+                        }
+                    ]
+                }
+            )
+                this.errorList = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+            } catch (error) {
+             console.log('erro get error question');
             }
         },
         parseTimestamp(timestamp){
