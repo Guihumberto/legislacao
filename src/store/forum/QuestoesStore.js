@@ -88,6 +88,17 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 await this.getQuestoes(item)
             }
         },
+        async getQuestao(item){
+            const loginStore = useLoginStore()
+            if(!loginStore.readLogin?.cpf) return
+
+            try {
+                const resp = await api.get(`questoes/_doc/${item}`)
+                return {id: resp.data._id, ...resp.data._source}
+            } catch (error) {
+                console.log('erro get questoes');
+            }
+        },
         async getQuestoes(item){
             this.load = true
             const favStore = useFavQuestoesStore()

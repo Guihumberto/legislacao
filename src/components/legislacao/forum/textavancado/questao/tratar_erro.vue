@@ -2,7 +2,7 @@
     <v-btn @click="dialog = true" variant="text" size="small" color="error">Tratar</v-btn>
     <v-dialog v-model="dialog">
         <v-card width="500" class="mx-auto">
-            <v-card-title class="bg-error d-flex align-center justify-space-between">
+            <v-card-title class="bg-primary d-flex align-center justify-space-between">
                 Tratar Erro
                 <v-btn @click="dialog = false" variant="text" icon="mdi-close" density="compact"></v-btn>
             </v-card-title>
@@ -11,35 +11,21 @@
                 <p>{{ errorMap(erro.typeError) }}</p>
                 <p>Usuário: {{ erro.id_user }}</p>
                 <p>{{ erro.timestamp }}</p>
-                <!-- <v-form @submit.prevent="sendError" ref="formerror" v-if="!resp">
-                    <v-select
-                        variant="outlined"
-                        label="Tipo de erro"
-                        v-model="form.typeError"
-                        :items="listErrors"
-                        item-title="name"
-                        item-value="id"
-                        density="compact"
-                        class="mb-2"
-                        :rules="[rules.required]"
-                        clearable
-                        :disabled="load"
-                    ></v-select>
-                    <v-textarea
-                        variant="outlined"
-                        label="Descreva o erro"
-                        v-model="form.descriptionError"
-                        density="compact"
-                        class="mb-2"
-                        v-if="form.typeError == 4"
-                        :rules="[rules.required]"
-                        :disabled="load"
-                    ></v-textarea>
-                    <div class="text-right">
-                        <v-btn :disabled="load" class="mr-2" variant="text" @click="dialog = false">Fechar</v-btn>
-                        <v-btn :loading="load" :disabled="load" type="submit" color="error">Enviar</v-btn>
+                <v-form @submit.prevent="tratarErro" ref="formerror" v-if="!resp" class="mt-10">
+                    <div class="border pa-2 rounded mb-5">
+                        {{ questao.pergunta }} <br> <br>
+                        Resposta: {{ questao.resposta }}
+                        <div class="d-flex justify-center py-5 ga-2">
+                            <v-btn>Verdadeiro</v-btn>
+                            <v-btn>Falso</v-btn>
+                        </div>
                     </div>
-                </v-form> -->
+                    <div class="text-right">
+                        <v-btn :disabled="load" variant="text" @click="dialog = false">Fechar</v-btn>
+                        <v-btn :loading="load" class="mx-2" :disabled="load" type="submit" color="primary">Alterar</v-btn>
+                        <v-btn :loading="load" :disabled="load" type="submit" color="error">Excluir</v-btn>
+                    </div>
+                </v-form>
                 <v-alert variant="outlined" :type="resp == 'created' ? 'success' : 'error'" v-if="resp"  :text="resp == 'created' ? 'Erro relatado com sucesso' : 'Algo deu errado!'" class="mt-2">
                     <template v-slot:append>
                         <v-btn v-if="resp == 'created'" variant="outlined" @click="dialog = false">Fechar</v-btn>
@@ -54,10 +40,15 @@
 <script setup>
     import { ref, computed, onMounted } from 'vue';
 
+    import { useQuestoesStore } from '@/store/forum/QuestoesStore';
+    const questaoStore = useQuestoesStore()
+
     const dialog = ref(false)
     const resp = ref(null)
+    const load = ref(false)
+    const questao = ref(null)
 
-    const tratarErro = () => {
+    const tratarErro = async () => {
         console.log('tratar erro')
     }   
 
@@ -90,6 +81,12 @@
     const errorMap = (item) => {
         return listErrors.find(e => e.id === item).name
     }
+
+    onMounted(async() => {
+        const resp = await questaoStore.getQuestao(props.erro.id_questao)
+        console.log('resp questao', resp);
+        questao.value = resp
+    })
 
 </script>
 

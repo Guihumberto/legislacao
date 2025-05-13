@@ -58,7 +58,7 @@
     onMounted( async () => {
         load.value = true
         await questoresStore.getAllErrorQuestion()
-        // console.log('oi');
+        console.log('omamadsdsi');
         load.value = false
     })
 
