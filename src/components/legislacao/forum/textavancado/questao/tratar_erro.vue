@@ -11,21 +11,28 @@
                 <p>{{ errorMap(erro.typeError) }}</p>
                 <p>Usuário: {{ erro.id_user }}</p>
                 <p>{{ erro.timestamp }}</p>
-                <v-form @submit.prevent="tratarErro" ref="formerror" v-if="!resp" class="mt-10">
+                <v-form @submit.prevent="tratarErro" ref="formerror" v-if="!resp && !deleteId" class="mt-10">
                     <div class="border pa-2 rounded mb-5">
                         {{ questao.pergunta }} <br> <br>
                         Resposta: {{ questao.resposta }}
                         <div class="d-flex justify-center py-5 ga-2">
-                            <v-btn>Verdadeiro</v-btn>
-                            <v-btn>Falso</v-btn>
+                            <v-btn :variant="resposta == 'verdadeiro' ? 'flat':'outlined'" :color=" resposta == 'verdadeiro' ? 'success' : ''" @click="resposta = 'verdadeiro'">Verdadeiro</v-btn>
+                            <v-btn :variant="resposta == 'falso' ? 'flat':'outlined'" :color=" resposta == 'falso' ? 'error' : ''" @click="resposta = 'falso'">Falso</v-btn>
                         </div>
                     </div>
                     <div class="text-right">
                         <v-btn :disabled="load" variant="text" @click="dialog = false">Fechar</v-btn>
-                        <v-btn :loading="load" class="mx-2" :disabled="load" type="submit" color="primary">Alterar</v-btn>
-                        <v-btn :loading="load" :disabled="load" type="submit" color="error">Excluir</v-btn>
+                        <v-btn :loading="load" class="mx-2" :disabled="load || !resposta" type="submit" color="primary">Alterar</v-btn>
+                        <v-btn :loading="load" :disabled="load" type="submit" color="error" @click="deleteId = questao.id">Excluir</v-btn>
                     </div>
                 </v-form>
+                <div class="mt-10 border pa-2 rounded mb-5" v-if="deleteId">
+                    <p>Deseja realmente apagar esta questão?</p>
+                    <div class="d-flex ga-1 justify-center mt-10">
+                        <v-btn variant="text" @click="deleteId = null">cancelar</v-btn>
+                        <v-btn variant="flat" color="red" @click="deleteActionId">Apagar</v-btn>
+                    </div>
+                </div>
                 <v-alert variant="outlined" :type="resp == 'created' ? 'success' : 'error'" v-if="resp"  :text="resp == 'created' ? 'Erro relatado com sucesso' : 'Algo deu errado!'" class="mt-2">
                     <template v-slot:append>
                         <v-btn v-if="resp == 'created'" variant="outlined" @click="dialog = false">Fechar</v-btn>
@@ -47,10 +54,25 @@
     const resp = ref(null)
     const load = ref(false)
     const questao = ref(null)
+    const resposta = ref(null)
+    const deleteId = ref(false)
 
     const tratarErro = async () => {
         console.log('tratar erro')
     }   
+
+    const deleteActionId = async () => {
+        load.value = true
+        const objeto = {
+            id_questao: deleteId.value,
+            id_erro: props.erro.id
+        }
+        const response = await questaoStore.deleteQuestao(objeto);
+        resp.value = response
+        load.value = false
+        deleteId.value = null
+        dialog.value = false
+    }
 
     const props = defineProps({
         erro: {
@@ -84,7 +106,6 @@
 
     onMounted(async() => {
         const resp = await questaoStore.getQuestao(props.erro.id_questao)
-        console.log('resp questao', resp);
         questao.value = resp
     })
 

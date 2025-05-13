@@ -9,7 +9,7 @@
             </div>
             <div class="mt-10" v-if="questoresStore.readErrorList.length && !load">
                 <v-list class="bg-transparent border rounded-lg">
-                    <v-list-item v-for="item, i in questoresStore.readErrorList" :key="id" prepend-icon="mdi-alert">
+                    <v-list-item v-for="item, i in questoresStore.readErrorList" :key="item.id" prepend-icon="mdi-alert">
                         {{ errorMap(item.typeError) }} - {{ item.id_questao }}
                         <template v-slot:append>
                             <Tratar_erro :erro="item" />
@@ -32,6 +32,16 @@
     import Tratar_erro from '@/components/legislacao/forum/textavancado/questao/tratar_erro.vue';
 
     const load = ref(false)
+    
+
+    onMounted( async () => {
+        load.value = true
+        await questoresStore.getAllErrorQuestion()
+        load.value = false
+    })
+
+
+
     const listErrors = [
         {
             name: 'Gabarito Invertido',
@@ -54,13 +64,6 @@
     const errorMap = (item) => {
         return listErrors.find(e => e.id === item).name
     }
-
-    onMounted( async () => {
-        load.value = true
-        await questoresStore.getAllErrorQuestion()
-        console.log('omamadsdsi');
-        load.value = false
-    })
 
 </script>
 

@@ -238,7 +238,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
 
             const { descriptionError, typeError, id_art, id, id_law, tipo } = item
 
-            const questoes = { descriptionError, typeError, id_art, id_questao: id, id_law, tipo, id_user: cpf, timestamp: this.formatDate }
+            const questoes = { descriptionError, typeError, id_art, id_questao: id, id_law, tipo, id_user: cpf, timestamp: this.formatDate, tratado: false }
 
             try {
                 const resp = await api.post('error_question/_doc', questoes)
@@ -250,12 +250,16 @@ export const useQuestoesStore = defineStore("questoesStore", {
         async getAllErrorQuestion(){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
-            if(!cpf) return
-
+          
             try {
                 const resp = await api.post('error_question/_search', {
                     from: 0,
                     size: 100,
+                    query:{
+                        term:{
+                            tratado: false
+                        }
+                    },
                     sort: [
                         {
                             timestamp: {
@@ -268,6 +272,51 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 this.errorList = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
             } catch (error) {
              console.log('erro get error question');
+            }
+        },
+        async tratarErro(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            try {
+                const resp = await api.post(`error_question/_update/${item}`, {
+                    "doc":{
+                        tratado: true
+                    }
+                })
+                this.updateReadListErro(item)
+                console.log('tratado', resp);
+            } catch (error) {
+                console.log('error no tratamento de erro');
+            }
+        },
+        updateReadListErro(item){
+            this.errorList = this.errorList.filter(erro => erro.id != item)
+        },
+        async deleteQuestao(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            try {
+                const resp = await api.delete(`questoes/_doc/${item.id_questao}`)
+                await this.tratarErro(item.id_erro)
+               
+                console.log('delete', resp);
+
+                return resp
+            } catch (error) {
+                console.log('error delete questao');
+                return error
+            }
+        },
+        async updateQuestao(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            try {
+                
+            } catch (error) {
+                console.log('error update questao');
             }
         },
         parseTimestamp(timestamp){
