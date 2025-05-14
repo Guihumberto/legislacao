@@ -7,8 +7,8 @@
             <div v-if="load">
                 Carregando
             </div>
-            <div class="mt-10" v-if="questoresStore.readErrorList.length && !load">
-                <v-list class="bg-transparent border rounded-lg">
+            <div class="mt-10" v-if="!load">
+                <v-list class="bg-transparent border rounded-lg"  v-if="questoresStore.readErrorList.length">
                     <v-list-item v-for="item, i in questoresStore.readErrorList" :key="item.id" prepend-icon="mdi-alert">
                         {{ errorMap(item.typeError) }} - {{ item.id_questao }}
                         <template v-slot:append>
@@ -16,6 +16,11 @@
                         </template>
                     </v-list-item>
                 </v-list>
+                <v-alert variant="outlined" type="info" text="Não há erros em questão relatados." v-if="!questoresStore.readErrorList.length">
+                    <template v-slot:append>
+                        <v-btn variant="text" @click="questoresStore.getAllErrorQuestion()"><v-icon>mdi-update</v-icon></v-btn>
+                    </template>
+                </v-alert>
             </div>
         </div>
     </section>

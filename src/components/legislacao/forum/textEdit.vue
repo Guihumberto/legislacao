@@ -8,6 +8,8 @@
             @keyup="handleSelection"
             @keydown="handleKeyDown"
             @paste.prevent
+            @dragstart.prevent
+            @drop.prevent
         >
             <p 
                 :class="dispositivo.estrutura ? 'estrutura': ''"
@@ -236,6 +238,12 @@
     onMounted(() => {
         document.addEventListener('click', handleClickOutside)
         document.addEventListener('scroll', handleScroll, true)
+        
+        const el = editable.value;
+        if (el) {
+            el.addEventListener('dragstart', e => e.preventDefault());
+            el.addEventListener('drop', e => e.preventDefault());
+        }
     })
 
     onBeforeUnmount(() => {

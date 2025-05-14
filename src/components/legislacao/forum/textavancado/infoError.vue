@@ -36,7 +36,7 @@
                         <v-btn :loading="load" :disabled="load" type="submit" color="error">Enviar</v-btn>
                     </div>
                 </v-form>
-                <v-alert variant="outlined" :type="resp == 'created' ? 'success' : 'error'" v-if="resp"  :text="resp == 'created' ? 'Erro relatado com sucesso' : 'Algo deu errado!'" class="mt-2">
+                <v-alert variant="outlined" :type="resp == 'created' ? 'info' : 'error'" v-if="resp"  :text="resp == 'created' ? 'Erro relatado com sucesso' : 'Algo deu errado!'" class="mt-2">
                     <template v-slot:append>
                         <v-btn v-if="resp == 'created'" variant="outlined" @click="dialog = false">Fechar</v-btn>
                         <v-btn v-else variant="outlined" @click="resp = null">Tentar Novamente</v-btn>

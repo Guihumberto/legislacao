@@ -300,8 +300,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
             try {
                 const resp = await api.delete(`questoes/_doc/${item.id_questao}`)
                 await this.tratarErro(item.id_erro)
-               
-                console.log('delete', resp);
 
                 return resp
             } catch (error) {
@@ -309,14 +307,25 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 return error
             }
         },
-        async updateQuestao(item){
+        async updateQuestao(item, id_erro){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+            const objeto = { ...item }
+            delete objeto.id
+            console.log('id', item.id);
             try {
+                const resp = await api.post(`questoes/_update/${item.id}`, {
+                    doc: objeto
+                })
+
+                await this.tratarErro(id_erro)
+
+                return resp.data.result
                 
             } catch (error) {
                 console.log('error update questao');
+                return 'error'
             }
         },
         parseTimestamp(timestamp){
