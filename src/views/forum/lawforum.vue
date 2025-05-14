@@ -274,19 +274,29 @@
 
     const contemEstilo = /<b>|<strong>|<u>|<ins>|<s>|<strike>|<del>|style\s*=\s*["'].*color\s*:|<span[^>]*color\s*:/i;
 
+    const stripHtmlTags = (str) => {
+        return str.replace(/<[^>]*>/g, '');
+    }
+
 
     const listTextLaw = computed(() => {
         let list = listFinal.value
 
-        if(search.value){
+        if (search.value) {
             let searchb = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-            //retirar caracteres especiais
-            let exp = new RegExp(searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-            //fazer o filtro
-            let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+            
+            // Remover caracteres especiais do termo buscado
+            let cleanedSearch = searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, "");
+            let exp = new RegExp(cleanedSearch, "i");
 
-            list = filtro
-        } 
+            // Fazer o filtro, removendo as tags HTML do texto
+            let filtro = list.filter(item => {
+                const plainText = stripHtmlTags(item.textlaw).normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                return exp.test(plainText) || exp.test(item.art);
+            });
+
+            list = filtro;
+        }
 
         if(artsFilterActive.value){
             let novoFiltro = []

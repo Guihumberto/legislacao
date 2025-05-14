@@ -6,7 +6,13 @@
                     <v-card-text>
                         <div class="d-flex justify-space-between">
                             <div class="d-flex ga-1 flex-wrap">
-                                <v-btn :color="tabSelected == tab.id ? 'success' : 'grey'" @click="tabSelected = tab.id" v-for="tab, t in tabs" :key="t">{{ tab.name }}</v-btn>
+                                <div v-for="tab, t in tabs" :key="t">
+                                    <v-tooltip :text="tab.name" location="top">
+                                        <template v-slot:activator="{ props }">
+                                        <v-btn  v-bind="props" :color="tabSelected == tab.id ? 'success' : 'grey'" @click="tabSelected = tab.id"  :icon="tab.icon"></v-btn>
+                                        </template>
+                                    </v-tooltip>
+                                </div>
                             </div>
                             <v-btn variant="text" @click="$emit('close')">Fechar</v-btn>
                         </div>
@@ -81,27 +87,27 @@
         {
             id: 1,
             name: 'Leis',
-            icon: 'mdi-file-document-outline'
+            icon: 'mdi-bookshelf'
         },
         {
             id: 2,
             name: 'Marcados',
-            icon: 'mdi-file-document-outline'
+            icon: 'mdi-marker'
         },
         {
             id: 3,
             name: 'Comentários',
-            icon: 'mdi-file-document-outline'
+            icon: 'mdi-chat'
         },
         {
             id: 4,
             name: 'Vínculos',
-            icon: 'mdi-file-document-outline'
+            icon: 'mdi-link-box'
         },
         {
             id: 5,
             name: 'Questões',
-            icon: 'mdi-file-document-outline'
+            icon: 'mdi-order-bool-ascending-variant'
         }
     ]
 

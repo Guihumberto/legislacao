@@ -11,13 +11,15 @@
                         <p v-if="item.id != idEdit" v-html="comentarioFormatado(item.text)"></p>
                         <div v-else>
                             <v-form>
-                                <v-textarea
+                                <ComentEdit 
                                     label="Comentario"
-                                    variant="outlined"
-                                    density="compact"
                                     v-model="commentEdit"
-                                ></v-textarea>
-                                <div class="text-right">
+                                    :disabled="loadEdit"
+                                    :loading="loadEdit"
+                                    class="mt-5"
+                                    :max-length="1000"
+                                />
+                                <div class="text-right mt-5">
                                     <v-btn variant="text" @click="idEdit = null">Cancelar</v-btn>
                                     <v-btn :loading="loadEdit" class="ml-2" color="warning" @click="editComment(item)">Editar</v-btn>
                                 </div>
@@ -70,6 +72,8 @@
         import Loading from './loading.vue';
         import CommentResp from './commentResp.vue';
         import AvaliarComment from './avaliarComment.vue';
+        import ComentEdit from './comentarios/comentEdit.vue';
+
         
         import { useForumStore } from '@/store/ForumStore';
         const forumStore = useForumStore()
@@ -196,9 +200,7 @@
     color: gray;
     font-size: 12px;
 }
-.comment-text {
-    margin-top: 5px;
-}
+
 .menu-actions{
     position: relative;
 }
@@ -207,6 +209,21 @@
     justify-content: end;
     align-items: center;
 }
+
+.comment-text {
+    margin-top: 5px;
+}
+
+.comment-text p > ol,
+.comment-text p > ul {
+  margin-left: 2rem;
+  padding-left: 1.5rem;
+}
+
+.comment-text li {
+  margin-bottom: 0.25rem;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s, transform 0.4s;

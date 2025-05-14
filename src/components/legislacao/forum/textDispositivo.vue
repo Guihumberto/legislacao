@@ -1,5 +1,5 @@
 <template>
-    <div @mouseover="showActions = true" @mouseleave="showActions = false" class="relativeContainer">
+    <div @mouseover="handleMouseOver" @mouseleave="handleMouseLeave" class="relativeContainer">
         <TextEdit :dispositivo="dispositivo" :search="search" />
       
         <v-expand-transition>
@@ -91,18 +91,15 @@
                             </div>
                             <v-btn @click="gerarResumo()" v-if="comment.type == 4" color="red" variant="text" prepend-icon="mdi-robot" :loading="loadResumo" :disabled="loadResumo">Criar Resumo do artigo por ia</v-btn>
                         </div>
-                         <v-textarea
-                             v-if="comment.type"
-                             :label="types.find( x => x.id == comment.type).title"
-                             density="compact"
-                             variant="outlined"
-                             v-model="comment.text"
-                             clearable
-                             :rules="[ rules.required ]"
-                             :disabled="loadResumo"
-                             :loading="loadResumo"
-                         >
-                         </v-textarea>
+                        <ComentEdit 
+                            v-if="comment.type"
+                            :label="types.find(x => x.id == comment.type).title"
+                            v-model="comment.text"
+                            :disabled="loadResumo"
+                            :loading="loadResumo"
+                            class="mt-5"
+                            :max-length="1000"
+                        />
                          <div class="d-flex justify-end my-2" v-if="comment.type">
                              <v-btn color="primary" type="submit" :loading="load">Enviar</v-btn>
                          </div>
@@ -127,6 +124,7 @@
 
     import CommentsArt from './commentsArt.vue';
     import Comments from './comments.vue';
+    import ComentEdit from './comentarios/comentEdit.vue';
     import TextEdit from './textEdit.vue';
 
     import { useForumStore } from '@/store/ForumStore';
@@ -164,6 +162,21 @@
     })
 
     const showActions = ref(false);
+    let hideActionsTimeout = null
+
+    const handleMouseOver = () => {
+        clearTimeout(hideActionsTimeout)
+        showActions.value = true
+    }
+
+    const handleMouseLeave = () => {
+        hideActionsTimeout = setTimeout(() => {
+        showActions.value = false
+    }, 300) // 300ms de atraso
+}
+
+
+
     const activeComment = ref(false)
     const activeArt = ref(false)
     const form = ref(null)
@@ -315,6 +328,7 @@
     //resumo
 
     import { useSearchStore } from '@/store/SearchStore';
+    
     const searchStore = useSearchStore()
 
     const listFinal = inject('listFinal')

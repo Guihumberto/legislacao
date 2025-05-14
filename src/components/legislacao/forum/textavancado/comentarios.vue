@@ -53,7 +53,7 @@
         <div class="pa-2 text-left" v-else>
             <transition-group name="fade" tag="div">
                 <div class="comment-box" v-for="item, i in commentsList" :key="item.id" v-if="commentStore.readComments.length">
-                    <div class="profile-pic"></div>
+                    <div class="profile-pic">{{ item?.user_name.slice(0, 2) || '' }}</div>
                     <div class="comment-content">
                         <div class="username">{{ item.user_name }} 
                             <v-chip density="compact" :color="typeComment(item.type)?.color">{{ typeComment(item.type)?.title }}</v-chip>
@@ -190,6 +190,10 @@
     height: 50px;
     border-radius: 50%;
     background: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
 }
 .comment-content {
     flex: 1;

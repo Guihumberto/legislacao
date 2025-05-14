@@ -55,32 +55,54 @@
     })
 
     const highlightText = (text) => {
-        if(props.search) {
-            const normalize = str => 
-            str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-            
-            const normalizedText = normalize(text.textlaw);
-            const normalizedKeyword = normalize(props.search);
-            const regex = new RegExp(`(${normalizedKeyword})`, 'gi');
-            
-            let highlightedText = normalizedText.replace(regex, '<mark>$1</mark>');
+        if (props.search) {
+            const normalize = str =>
+                str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-            if(text.textlaw.startsWith('Art')) {    
-                highlightedText = `<b>${highlightedText.substr(0, 4)}</b> ${highlightedText.substr(4)}`
-            } 
-            else {
-                highlightedText = ` (art. ${text.art}º), ${highlightedText}`
+            const originalText = text.textlaw;
+            const normalizedText = normalize(originalText);
+            const normalizedKeyword = normalize(props.search);
+
+            // Procurar todas as ocorrências preservando os índices
+            const indices = [];
+            let startIndex = 0;
+
+            while (startIndex < normalizedText.length) {
+                const matchIndex = normalizedText.indexOf(normalizedKeyword, startIndex);
+                if (matchIndex === -1) break;
+                indices.push([matchIndex, matchIndex + normalizedKeyword.length]);
+                startIndex = matchIndex + normalizedKeyword.length;
+            }
+
+            // Realça as partes do texto original com <mark>
+            let highlightedText = '';
+            let lastIndex = 0;
+
+            for (const [start, end] of indices) {
+                highlightedText += originalText.slice(lastIndex, start);
+                highlightedText += '<mark>' + originalText.slice(start, end) + '</mark>';
+                lastIndex = end;
+            }
+
+            highlightedText += originalText.slice(lastIndex);
+
+            // Formata o início dependendo do tipo de texto
+            if (originalText.startsWith('Art')) {
+                highlightedText = `<b>${highlightedText.substr(0, 4)}</b>${highlightedText.substr(4)}`;
+            } else {
+                highlightedText = ` (art. ${text.art}º), ${highlightedText}`;
             }
 
             return highlightedText;
         } else {
-            if(text.textlaw.startsWith('Art')){
-                return `<b>${text.textlaw.substr(0, 4)}</b> ${text.textlaw.substr(4)}`
+            if (text.textlaw.startsWith('Art')) {
+                return `<b>${text.textlaw.substr(0, 4)}</b>${text.textlaw.substr(4)}`;
             } else {
-                return text.textlaw
+                return text.textlaw;
             }
         }
-    }
+    };
+
 
     const menu = ref(false)
     const menuRef = ref(null)

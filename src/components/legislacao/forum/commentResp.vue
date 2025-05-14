@@ -4,6 +4,7 @@
             <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                     <v-select
                         label="Responder"
+                        variant="outlined"
                         density="compact"
                         :items="types"
                         item-title="title"
@@ -14,16 +15,15 @@
                         hide-details
                         clearable
                     ></v-select>
-                    <v-textarea
+                    <ComentEdit 
                         v-if="comment.type"
                         :label="types.find( x => x.id == comment.type).title"
-                        density="compact"
-                        variant="outlined"
                         v-model="comment.text"
-                        clearable
-                        :rules="[ rules.required ]"
-                    >
-                    </v-textarea>
+                        :disabled="load"
+                        :loading="load"
+                        class="mt-5"
+                        :max-length="1000"
+                    />
                     <div class="d-flex justify-end my-2" v-if="comment.type">
                         <v-btn variant="text" color="primary" type="submit" :loading="load">Enviar</v-btn>
                     </div>
@@ -37,13 +37,15 @@
                             <p v-if="item.id != idEdit" v-html="comentarioFormatado(item.text)"></p>
                             <div v-else>
                                 <v-form @submit.prevent="editComment(item)">
-                                    <v-textarea
+                                    <ComentEdit 
                                         label="Comentario"
-                                        variant="outlined"
-                                        density="compact"
                                         v-model="commentEdit"
-                                    ></v-textarea>
-                                    <div class="text-right">
+                                        :disabled="loadEdit"
+                                        :loading="loadEdit"
+                                        class="mt-5"
+                                        :max-length="1000"
+                                    />
+                                    <div class="text-right mt-5">
                                         <v-btn variant="text" @click="idEdit = null">Cancelar</v-btn>
                                         <v-btn :loading="loadEdit" class="ml-2" color="warning" @click="editComment(item)">Editar</v-btn>
                                     </div>
@@ -53,7 +55,7 @@
                         <div class="menu-actions" >
                             <transition name="fade">
                                 <div class="menu-comments" v-if="item.id != idDelete">
-                                    <div class="mr-1" v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
+                                    <div v-if="item.id != idEdit && LoginStore.readLogin.cpf == item.created_by">
                                         <v-btn variant="text" class="mr-1" @click="actionEdit(item)"><v-icon>mdi-pencil</v-icon></v-btn>
                                         <v-btn variant="text" color="red" @click="idDelete = item.id, loadDelete = false"><v-icon>mdi-delete</v-icon></v-btn>
                                     </div>
@@ -87,6 +89,7 @@
     
     import Loading from './loading.vue';
     import AvaliarComment from './avaliarComment.vue';
+    import ComentEdit from './comentarios/comentEdit.vue';
 
     const respComments = ref([])
     const idEdit = ref(null)
@@ -200,6 +203,12 @@
 </script>
 
 <style scoped>
+.response-comment{
+    padding: 1rem;
+    border: 1px solid rgb(185, 181, 181);
+    margin-top: 1rem;
+    border-radius: 12px;
+}
 .appear{
     animation: aparecer 1s ease-in-out;
 }
@@ -230,6 +239,7 @@
 }
 .comment-text {
     margin-top: 5px;
+    padding: 1rem;
 }
 .menu-actions{
     position: relative;
@@ -237,7 +247,7 @@
 .menu-comments{
     display: flex;
     justify-content: end;
-    align-items: center;
+    align-items: baseline;
 }
 .fade-enter-active,
 .fade-leave-active {
@@ -248,6 +258,12 @@
 .fade-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+/* Estilos para recuo adequado das listas */
+ul, ol {
+    padding-left: 24px;
+    margin: 8px 0;
 }
 
 @media (max-width: 600px) {
