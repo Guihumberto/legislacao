@@ -124,7 +124,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 must.push({ terms: { _id: listRespondidas } });
             }
            
-
             if (item.id_law) {
                 must.push({ match: { id_law: item.id_law } });
             }
@@ -132,6 +131,18 @@ export const useQuestoesStore = defineStore("questoesStore", {
             if (item.id_art) {
                 if(!Array.isArray(item.id_art)) must.push({ match: { id_art: item.id_art } });
                 if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
+            }
+
+            if(filter.ano.length){
+                must.push({ terms: { ano: filter.ano } });
+            }
+
+            // if(filter.banca.length){
+            //     must.push({ terms: { banca: filter.banca } });
+            // }
+
+            if(filter.favoritas){
+                console.log('favoritas - fazer algo');
             }
             
             try {
@@ -154,7 +165,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 }
             )
                 this.questoes = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
-                this.totalQuestoes = resp.data.hits.total.value
                
             } catch (error) {
                 console.log('erro get questoes');
@@ -207,7 +217,6 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     ]
                 }
             )
-                this.totalRespQuestoes = resp.data.hits.total.value
                 return resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
             } catch (error) {
                 console.log('erro get questoes resp');
@@ -395,8 +404,47 @@ export const useQuestoesStore = defineStore("questoesStore", {
         },
         clear(){
             this.questoes = []
-            this.totalQuestoes = 0
             // this.q_respondidas = []
+        },
+        async totasisQuestoesLaw(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            try {
+                const respQ = await api.post('questoes/_search', {
+                    size: 0,
+                    query:{
+                        match:{
+                            id_law: item
+                        }
+                    }
+                })
+                this.totalQuestoes = respQ.data.hits.total.value
+
+                const respR = await api.post('questoes_resp/_search', {
+                    size: 0,
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    term:{
+                                        id_user: cpf
+                                    }
+                                },
+                                {
+                                    match:{
+                                        id_law: item
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+
+                this.totalRespQuestoes = respR.data.hits.total.value
+            } catch (error) {
+                console.log('error totais questoes law');
+            }
         }
     }
 })

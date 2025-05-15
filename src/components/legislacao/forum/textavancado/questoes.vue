@@ -36,11 +36,11 @@
                     <div>
                         <span v-if="$route.query.art">Artigo {{ $route.query.art }} - </span>{{ forumStore.readGroupForum._source.title }} 
                     </div>
-                    <div class="pa-1 bg-primary rounded">{{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
+                    <div class="pa-1 bg-primary rounded">Total: {{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
                 </div>
                 <div class="px-1">
                     <small> 
-                        {{ infoHeader.acertos }} certa{{ insertWordS(infoHeader.acertos) }} - {{ infoHeader.erros }} errada{{ insertWordS(infoHeader.erros) }} - 
+                        <b> <v-icon size="1.2rem">mdi-filter</v-icon> Filtro:</b> {{ infoHeader.acertos }} certa{{ insertWordS(infoHeader.acertos) }} - {{ infoHeader.erros }} errada{{ insertWordS(infoHeader.erros) }} - 
                         <span class="text-success">{{ infoHeader.respondidas }} resolvida{{ insertWordS(infoHeader.respondidas) }} </span>
                        do total de {{ infoHeader.total }}</small>
                 </div>
@@ -62,6 +62,7 @@
                             label="Ano"
                             :items="listAnos"
                             v-model="formQuestions.ano"
+                            multiple
                             variant="outlined"
                             density="compact"
                             hide-details 
@@ -72,6 +73,7 @@
                             label="Banca"
                             :items="listBancas"
                             v-model="formQuestions.banca"
+                            multiple
                             variant="outlined"
                             density="compact"
                             hide-details 
@@ -145,8 +147,8 @@
 
     const formQuestions = ref({
         typeRespQuestions: 1,
-        banca: null,
-        ano: null,
+        banca: [],
+        ano: [],
         favoritas: false,
     })
 
@@ -166,8 +168,8 @@
         if(formQuestions.value.typeRespQuestions == 3)  list = list.filter(item => item.timestamp)
         if(formQuestions.value.typeRespQuestions == 4)  list = list.filter(item => item.timestamp && item.resposta != item.id_resposta)
         if(formQuestions.value.typeRespQuestions == 5)  list = list.filter(item => item.timestamp && item.resposta == item.id_resposta)
-        if(formQuestions.value.banca)  list = list.filter(item => item.banca == formQuestions.value.banca)
-        if(formQuestions.value.ano)  list = list.filter(item => item.ano == formQuestions.value.ano)
+        if(formQuestions.value.banca.length)  list = list.filter(item => formQuestions.value.banca.includes(item.banca))
+        if(formQuestions.value.ano.length)  list = list.filter(item => formQuestions.value.ano.includes(item.ano))
 
         if(formQuestions.value.favoritas)  list = list.filter(item => favQuestoes.value.includes(item.id))
         
@@ -264,7 +266,10 @@
 
 
     onMounted(async() => {
+        loadQuestoes.value = true
+        await questoesStore.totasisQuestoesLaw(route.params.id)
         await getQuestoes()
+        loadQuestoes.value = false
     })  
 
 </script>
