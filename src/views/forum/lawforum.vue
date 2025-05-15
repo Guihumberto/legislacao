@@ -579,6 +579,28 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
+.conteudo::-webkit-scrollbar {
+  width: 8px; /* largura da barra */
+}
+.conteudo::-webkit-scrollbar-track {
+  background: #f1f1f1; /* trilho da barra */
+  border-radius: 4px;
+}
+
+.conteudo::-webkit-scrollbar-thumb {
+  background-color: #888; /* "botão" da barra */
+  border-radius: 4px;
+}
+
+.conteudo::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* ao passar o mouse */
+}
+
+/* Firefox */
+.conteudo {
+  scrollbar-width: thin;            /* largura fina */
+  scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
+}
 
 .law{
     width: min(100%, 1000px);
@@ -610,12 +632,32 @@
 }
 
 .resizer {
-    width: 5px;
-    cursor: ew-resize;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: #ccc;
+  width: 5px;
+  cursor: ew-resize;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: #ccc;
+  z-index: 10;
+}
+
+/* Indicador oval no centro da barra */
+.resizer::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 40px;
+  background-color: #aaa;
+  border-radius: 10px;
+  opacity: 0.6;
+}
+
+.resizer:hover::before {
+  background-color: #888;
+  opacity: 1;
 }
 
 .chat.right .resizer {

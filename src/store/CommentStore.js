@@ -17,7 +17,9 @@ export const useCommentStore = defineStore("commentStore", {
             page: 1,
             perPage: 10
         },
-        userComments: []
+        userComments: [],
+        listUsers: [],
+        listArts: []
     }),
     getters: {
         readListVotos(){
@@ -43,7 +45,14 @@ export const useCommentStore = defineStore("commentStore", {
         },
         readUsersComments(){
             return this.userComments
-        }
+        },
+        readListUsers(){
+            const loginStore = useLoginStore()
+            return loginStore.readListUsers
+        },
+        readListArts(){
+            return this.listArts
+        },
     },
     actions:{
         async getVotoComment(item){
@@ -146,35 +155,35 @@ export const useCommentStore = defineStore("commentStore", {
                 console.log('error save dispositivo');
             }
         },
-        async getAllCommnetsLaw(id){
+        async getAllCommnetsLawMore(id, search = {}, sortComments = null){
             const loginStore = await useLoginStore()
             const cpf = loginStore.readLogin?.cpf || null
             if(!cpf) return
-            try {
-                this.load = true
-                const resp = await api.post('comments/_search', {
-                    from: this.pagination.start -1,
-                    size: this.pagination.perPage,
-                    query: {
-                        bool: {
-                            must: [
-                              { term: { idGroup: id }}
-                            ]
-                          }
-                    }
-                })
-                this.comments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
-                this.pagination.total = resp.data.hits.total.value
-            } catch (error) {
-                console.log('error get comments');
-            } finally {
-                this.load = false
+
+            let mustClauses = [];
+
+            if(id){
+                mustClauses.push({
+                    term: { idGroup: id }
+               });
             }
-        },
-        async getAllCommnetsLawMore(id){
-            const loginStore = await useLoginStore()
-            const cpf = loginStore.readLogin?.cpf || null
-            if(!cpf) return
+
+            if(search?.listCpfs?.length){
+                mustClauses.push({
+                   terms: { created_by: search.listCpfs }
+               });
+            }
+
+            if(search?.listArts?.length){
+                mustClauses.push({
+                   terms: { art: search.listArts }
+               });
+            }
+
+            let sortClauses = [];
+            
+            sortClauses.push(sortComments);
+
             try {
                 this.load = true
                 const resp = await api.post('comments/_search', {
@@ -182,17 +191,16 @@ export const useCommentStore = defineStore("commentStore", {
                     size: this.pagination.perPage,
                     query: {
                         bool: {
-                            must: [
-                              { term: { idGroup: id }}
-                            ]
-                          }
-                    }
+                            must: mustClauses.length > 0 ? mustClauses : [{ match_all: {} }]
+                        }
+                    },
+                    sort: sortClauses
                 })
                 const newsComments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
                 this.comments = [...this.comments, ...newsComments]
             
             } catch (error) {
-                console.log('error get comments');
+                console.log('error get comments 2');
             } finally {
                 this.load = false
             }
@@ -222,6 +230,114 @@ export const useCommentStore = defineStore("commentStore", {
 
             } catch (error) {
                 console.log('error get users comments');
+            }
+        },
+        async getList(id, order){
+            await this.getAllCommnetsLaw(id, null, order)
+            await this.getListUsers(id)
+            await this.getListArts(id)
+        },
+        async getAllCommnetsLaw(id, search = {}, sortComments = null){
+            const loginStore = await useLoginStore()
+            const cpf = loginStore.readLogin?.cpf || null
+            if(!cpf) return
+
+            let mustClauses = [];
+
+            if(id){
+                mustClauses.push({
+                    term: { idGroup: id }
+               });
+            }
+
+            if(search?.listCpfs?.length){
+                mustClauses.push({
+                   terms: { created_by: search.listCpfs }
+               });
+            }
+
+            if(search?.listArts?.length){
+                mustClauses.push({
+                   terms: { art: search.listArts }
+               });
+            }
+
+            let sortClauses = [];
+            
+            sortClauses.push(sortComments);
+
+            try {
+                this.load = true
+                const resp = await api.post('comments/_search', {
+                    from: this.pagination.start -1,
+                    size: this.pagination.perPage,
+                    query: {
+                        bool: {
+                            must: mustClauses.length > 0 ? mustClauses : [{ match_all: {} }]
+                        }
+                    },
+                    sort: sortClauses
+                })
+                this.comments = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }))
+                this.pagination.total = resp.data.hits.total.value
+            } catch (error) {
+                console.log('error get comments 1');
+            } finally {
+                this.load = false
+            }
+        },
+        async getListUsers(id){
+            const loginStore = useLoginStore()
+            try {
+                const resp = await api.post('comments/_search', {
+                    size: 0,
+                    "query": {
+                        "match": {
+                            "idGroup": id
+                        }
+                    },
+                    "aggs": {
+                        "by_users": {
+                            "terms": {
+                                "field": "created_by",
+                                "size": 100
+                            }
+                        }
+                    }
+                })
+                this.listUsers =  resp.data.aggregations.by_users.buckets
+
+                const list = {
+                    listCpf: this.listUsers.map( x => x.key)
+                }
+                
+                await loginStore.searchUsers(list)
+
+            } catch (error) {
+                console.log('error getlist users');
+            }
+        },
+        async getListArts(id){
+            try {
+                const resp = await api.post('comments/_search', {
+                    size: 0,
+                    "query": {
+                        "match": {
+                            "idGroup": id
+                        }
+                    },
+                    "aggs": {
+                        "by_arts": {
+                            "terms": {
+                                "field": "art",
+                                "size": 100
+                            }
+                        }
+                    }
+                })
+                this.listArts =  resp.data.aggregations.by_arts.buckets
+            } catch (error) {
+                console.log('error getlist users');
             }
         }
     }

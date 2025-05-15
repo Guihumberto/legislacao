@@ -144,6 +144,12 @@ export const useLoginStore = defineStore("loginStore", {
                });
             }
 
+            if(search?.listCpf.length){
+                mustClauses.push({
+                   terms: { cpf: search.listCpf }
+               });
+            }
+
             if(search.lotacao){
                 mustClauses.push({
                    match: { setor: search.lotacao }

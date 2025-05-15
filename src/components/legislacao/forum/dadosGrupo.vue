@@ -14,7 +14,7 @@
                     <small>Data de Criação do grupo: {{ forumStore.readGroupForum._source.data_include }}</small> <br><br>
                     <v-list class="pa-0 border mb-2 bg-transparent" density="compact" v-if="forumStore.readGroupForum._source.group.length">
                         <v-list-subheader>Participantes</v-list-subheader>
-                        <v-list-item v-for="item, i in forumStore.readGroupForum._source.group">{{ item }}</v-list-item>
+                        <v-list-item v-for="item, i in forumStore.readNameGorup">{{ item.name }}</v-list-item>
                     </v-list>
                     
                     <v-btn 

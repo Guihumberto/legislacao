@@ -65,15 +65,22 @@ export const useForumStore = defineStore("forumStore", {
         },
         readIdsComments(){
             return this.allComments.map(x => x.id)
+        },
+        readNameGorup(){
+            const loginStore = useLoginStore()
+            return loginStore.readListUsers
         }
     },
     actions:{
         async getGroup(id){
             const commentStore = await useCommentStore()
+            const loginStore = useLoginStore()
             try {
                 const resp = await api.get(`group_forum/_doc/${id}`)
                 this.groupForum = resp.data
                 commentStore.getVotoComment(this.groupForum)
+                const listCpf = this.groupForum._source.group
+                loginStore.searchUsers({listCpf})
             } catch (error) {
                 console.log('error get Group');
             }

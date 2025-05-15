@@ -1,56 +1,60 @@
 <template>
     <div>
         <div class="mt-2 d-flex ga-2 align-center pa-2">
-            <v-icon>mdi-chat</v-icon>
-                <h1 class="text-h5">Comentários</h1>
+            <v-icon>mdi-chat</v-icon> <h1 class="text-h5">Comentários</h1>
         </div>
-        <div class="d-flex ga-2 align-center">
-            <v-select
-                :items="artsList"
-                label="Filtro por Artigo"
-                density="compact"
-                variant="outlined"
-                v-model="selectArt"
-                clearable
-                prepend-inner-icon="mdi-filter"
-                style="max-width: 250px;"
-                hide-details
-            ></v-select>
-            <v-select
-                label="ordenar"
-                density="compact"
-                variant="outlined"
-                :items="['Por data', 'Por Artigo']"
-                v-model="selectOrder"
-                clearable
-                prepend-inner-icon="mdi-sort"
-                style="max-width: 250px;"
-                hide-details
-                disabled
-            ></v-select>
-            <v-btn disabled><v-icon>mdi-sort</v-icon></v-btn>
-        </div>
-        <div class="mt-2">
-            <v-responsive class="overflow-y-auto" max-height="500">
-                <v-select
-                    multiple
-                    v-model="usersCommentsFilter"
-                    :items="commentStore.readUsersComments"
-                    item-title="key"
-                    item-value="key"
-                    variant="outlined"
-                    label="Usuários"
-                    density="compact"
-                    class="pt-2"
-                    clearable
-                    prepend-inner-icon="mdi-chat"
-                ></v-select>
-            </v-responsive>
-        </div>
-        <!-- <p>Selecione o Artigo</p> -->
+        <v-card>
+            <v-card-text>
+                <div class="d-flex ga-2 align-center">
+                    <v-select
+                        :items="listArts"
+                        label="Filtro por Artigo"
+                        density="compact"
+                        variant="outlined"
+                        v-model="selectArt"
+                        clearable
+                        prepend-inner-icon="mdi-filter"
+                        style="max-width: 250px;"
+                        hide-details
+                        multiple
+                    ></v-select>
+                    <v-select
+                        label="ordenar"
+                        density="compact"
+                        variant="outlined"
+                        :items="listOrderby"
+                        item-title="name"
+                        item-value="id"
+                        v-model="selectOrder.tipo"
+                        clearable
+                        prepend-inner-icon="mdi-sort"
+                        style="max-width: 250px;"
+                        hide-details
+                    ></v-select>
+                    <v-btn @click="selecionarOrdem"><v-icon>{{ selectOrder.order == 'asc' ?  'mdi-sort-ascending' : 'mdi-sort-descending' }}</v-icon></v-btn>
+                </div>
+                <div class="mt-2 d-flex ga-2 align-center">
+                        <v-select
+                            multiple
+                            v-model="usersCommentsFilter"
+                            :items="listUsers"
+                            item-title="name"
+                            item-value="cpf"
+                            variant="outlined"
+                            label="Usuários"
+                            density="compact"
+                            clearable
+                            prepend-inner-icon="mdi-chat"
+                            hide-details
+                        ></v-select>
+                        <v-btn prepend-icon="mdi-magnify" color="success" variant="flat" @click="searchComments">Buscar</v-btn>
+                </div>
+            </v-card-text>
+        </v-card>
+
 
         <Loading v-if="load" class="my-2 py-2" />
-        <div class="pa-2 text-left" v-else>
+        <div class="mt-2 text-left" v-else>
             <transition-group name="fade" tag="div">
                 <div class="comment-box" v-for="item, i in commentsList" :key="item.id" v-if="commentStore.readComments.length">
                     <div class="profile-pic">{{ item?.user_name.slice(0, 2) || '' }}</div>
@@ -93,7 +97,7 @@
                 v-if="commentStore.pagination.total > commentStore.readComments.length"
                 append-icon="mdi-plus" variant="outlined" class="my-5" 
                 block 
-                @click="commentStore.getAllCommnetsLawMore($route.params.id)">
+                @click="searchCommentsMore">
                 Carregar
             </v-btn>
         </div>
@@ -116,14 +120,42 @@
     import AvaliarComment from '../avaliarComment.vue';
 
     const load = ref(false)
-    const selectArt = ref(null)
-    const selectOrder = ref(null)   
+    const selectArt = ref([])
+    const selectOrder = ref({
+        tipo: 'art',
+        order: 'asc'
+    })   
+
+    const listOrderby = [
+        {id: 'data_include', name: 'pela data da inclusão' },
+        {id: 'art', name: 'Pelo artigo' }
+    ]
+
+    const selecionarOrdem = () => {
+        if(selectOrder.value.order == 'asc') {
+            selectOrder.value.order = 'desc'
+           return
+        }   
+        if(selectOrder.value.order == 'desc') {
+            selectOrder.value.order = 'asc'
+            return
+        } 
+    }
+
+    const order = computed(() => {
+        return  {
+                [selectOrder.value.tipo]: {
+                        order: selectOrder.value.order, 
+                     }
+                }
+    })
+
     const usersCommentsFilter = ref([])
 
 
     onMounted( async () => {
         load.value = true
-        commentStore.getAllCommnetsLaw(route.params.id)
+        await commentStore.getList(route.params.id, order.value)
         load.value = false
     })
 
@@ -137,11 +169,20 @@
         }
     )
 
+    const listArts = computed(() => {
+        return commentStore.readListArts.map(x => x.key).sort((a, b) => a - b)
+    })
+
+    const listUsers = computed(() => {
+        return commentStore.readListUsers.map(x => ({ cpf: x.cpf, name: x.name }))
+    })
+
     const commentsList = computed(() => {
         const list = commentStore.readComments
 
-        if(selectArt.value) {
-            return list.filter(item => item.art == selectArt.value)
+        if(selectArt.value.length) {
+            let inteiros = selectArt.value.map(Number)
+            return list.filter(item => inteiros.includes(item.art))
         }   
 
         if(usersCommentsFilter.value.length) {
@@ -151,10 +192,6 @@
         return list
     })
 
-    const artsList = computed(() => {
-        const list = commentStore.readComments.map(item => item.art)
-        return [ ...new Set(list)].sort((a, b) => a - b)
-    })
 
     const typeComment = (item) => {
         if(item == 1) return { title: "Comentário", color: "success"}
@@ -169,6 +206,28 @@
             return item
         }
     } 
+
+    const searchComments = async () => {
+        const objeto = {
+            listArts: selectArt.value,
+            listCpfs: usersCommentsFilter.value
+        }
+
+        load.value = true
+        await commentStore.getAllCommnetsLaw(route.params.id, objeto, order.value)
+        load.value = false
+    }
+
+    const searchCommentsMore = async () => {
+        const objeto = {
+            listArts: selectArt.value,
+            listCpfs: usersCommentsFilter.value
+        }
+ 
+        load.value = true
+        commentStore.getAllCommnetsLawMore(route.params.id, objeto, order.value)
+        load.value = false
+    }
 
 </script>
 

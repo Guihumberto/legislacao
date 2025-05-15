@@ -167,6 +167,29 @@
     background-color: #f4f4f4;
 }
 
+.conteudo::-webkit-scrollbar {
+  width: 8px; /* largura da barra */
+}
+.conteudo::-webkit-scrollbar-track {
+  background: #f1f1f1; /* trilho da barra */
+  border-radius: 4px;
+}
+
+.conteudo::-webkit-scrollbar-thumb {
+  background-color: #888; /* "botão" da barra */
+  border-radius: 4px;
+}
+
+.conteudo::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* ao passar o mouse */
+}
+
+/* Firefox */
+.conteudo {
+  scrollbar-width: thin;            /* largura fina */
+  scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
+}
+
 .container, .container2 {
     width: min(100%, 900px);
 }
