@@ -106,28 +106,31 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
                 console.log('erroe update fav question');
             }
         },
-        async getAllFavLaw(item){
+        async getAllFavLaw(item, list){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+
+            const must = [];
+
+            if(list.length){
+                must.push({ terms: { id_question: list } });
+            }
+
+            if (cpf) {
+                must.push({ term: {  id_user: cpf } });
+            }
+
+            if (item) {
+                must.push({ term: { id_law: item } });
+            }
             
             try {
                 const resp = await api.post('fav_question/_search', {
                     size: 100,
                     query:{
-                        bool:{
-                            must:[
-                                {
-                                    term:{
-                                        id_user: cpf
-                                    }
-                                },
-                                {
-                                    term:{
-                                        id_law: item
-                                    }
-                                }
-                            ]
+                        bool: {
+                            must
                         }
                     }
                 })  

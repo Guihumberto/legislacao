@@ -93,7 +93,7 @@
                     <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
                         <div class="d-flex ga-1 align-center">
                             <!-- <v-chip color="primary" density="compact" :title="item.id">cod</v-chip>   -->
-                            <h3>Questão {{ i + 1 }}</h3> 
+                            <h3 class="d-flex align-center ga-1"> <v-icon size="1.4rem">mdi-checkbox-marked-circle-outline</v-icon> Questão {{ i + 1 }}</h3> 
                         </div>
                         <div class="d-flex ga-1 align-center">
                             <h3 v-if="item?.banca ">{{ item.banca }}</h3>
@@ -108,6 +108,10 @@
                         </p>
                         <Questoes_alternative :aleternativa="item" />
                     </div>
+                </div>
+                <div class="my-2 text-center">
+                    <v-btn v-if="true" variant="outlined" prepend-icon="mdi-plus" @click="getQuestoes">Mostrar mais</v-btn>
+                    <v-alert v-else type="info" text="Não há mais questões para serem exibidas."></v-alert>
                 </div>
             </v-card-text>
         </v-card>
@@ -242,14 +246,14 @@
         if(listArtsFilter.value.length) {
             await getQuestoesFilter()
         } else {
-            await questoesStore.getQuestoes({id_law: route.params.id, id_art: route.query.art})
+            await questoesStore.getQuestoes({ id_law: route.params.id, id_art: route.query.art }, formQuestions.value)
         }
         loadQuestoes.value = false
     }
 
     const getQuestoesFilter = async () => {
-        if(!artsFilter.value.length && listArtsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: listArtsFilter.value})
-        if(artsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: artsFilter.value})
+        if(!artsFilter.value.length && listArtsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: listArtsFilter.value}, formQuestions.value)
+        if(artsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: artsFilter.value}, formQuestions.value)
     }
 
     const gerarQuestoes = async () => {
@@ -257,6 +261,7 @@
         await questoesStore.gerarQuestoes({id_law: route.params.id, id_art: route.query.art})
         loadQuestoes.value = false
     }
+
 
     onMounted(async() => {
         await getQuestoes()

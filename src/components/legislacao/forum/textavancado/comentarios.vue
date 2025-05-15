@@ -197,6 +197,7 @@
         if(item == 1) return { title: "Comentário", color: "success"}
         if(item == 2) return { title: "Pergunta", color: "primary"}
         if(item == 3) return { title: "Resposta", color: "orange"}
+        if(item == 4) return { title: "Resumo", color: "purple"}
     }
 
     const comentarioFormatado = (item) => {

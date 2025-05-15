@@ -84,8 +84,8 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } catch (error) {
                 console.error('Erro ao gerar questões:', error.response?.data || error.message);
             } finally {
-                this.load = false
                 await this.getQuestoes(item)
+                this.load = false
             }
         },
         async getQuestao(item){
@@ -99,32 +99,49 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 console.log('erro get questoes');
             }
         },
-        async getQuestoes(item){
+        async getQuestoes(item, filter){
             this.load = true
             const favStore = useFavQuestoesStore()
             const loginStore = useLoginStore()
             if(!loginStore.readLogin?.cpf) return
             this.clear()
 
+            console.log('filter', filter);
+
+            let listRespondidas = []
+            if(filter.typeRespQuestions != 1) listRespondidas = await this.getResposndidas(item.id_law)
+                
+
+            const must_not = [];
+
+            if(listRespondidas.length && filter.typeRespQuestions == 2){
+                must_not.push({ terms: { _id: listRespondidas } });
+            }
+
             const must = [];
+
+            if(listRespondidas.length && filter.typeRespQuestions > 2){
+                must.push({ terms: { _id: listRespondidas } });
+            }
+           
 
             if (item.id_law) {
                 must.push({ match: { id_law: item.id_law } });
             }
 
             if (item.id_art) {
-                console.log('chama api', item.id_art);
                 if(!Array.isArray(item.id_art)) must.push({ match: { id_art: item.id_art } });
                 if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
             }
-
+            
             try {
                 const resp = await api.post('questoes/_search', {
                     from: 0,
                     size: 100,
                     query: {
                         bool: {
-                            must
+                            must,
+                            must_not
                         }
                     },
                     sort: [
@@ -142,17 +159,22 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } catch (error) {
                 console.log('erro get questoes');
             } finally {
-                this.q_respondidas = await this.getMyQuestoesResp(item)
-                await favStore.getAllFavLaw(item.id_law)
+                const list = this.questoes.map(item => item.id) || []
+                if(filter.typeRespQuestions == 1) this.q_respondidas = await this.getMyQuestoesResp(item, list)
+                await favStore.getAllFavLaw(item.id_law, list)
                 this.load = false
             }
         },
-        async getMyQuestoesResp(item){
+        async getMyQuestoesResp(item, list){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
             const must = [];
+
+            if(list.length){
+                must.push({ terms: { id_question: list } });
+            }
 
             if (cpf) {
                 must.push({ term: {  id_user: cpf } });
@@ -326,6 +348,43 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } catch (error) {
                 console.log('error update questao');
                 return 'error'
+            }
+        },
+        //fitros avancados para questoes
+        async getResposndidas(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await api.post('questoes_resp/_search', {
+                    from: 0,
+                    size: 500,
+                    query: {
+                        bool: {
+                          must: [
+                            {
+                              term: {
+                                id_user: cpf
+                              }
+                            },
+                            {
+                              term: {
+                                id_law: item
+                              }
+                            }
+                          ]
+                        }
+                    }
+                })
+
+                console.log('resp', resp);  
+
+                this.q_respondidas = resp.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+                return this.q_respondidas.map(x => x.id_question)
+         
+            } catch (error) {
+                console.log('error get questoes respondidas');
             }
         },
         parseTimestamp(timestamp){
