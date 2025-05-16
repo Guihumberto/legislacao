@@ -32,21 +32,26 @@
                     <v-form v-if="isComment" class="mx-2 mt-5" ref="form" @submit.prevent="saveComment">
                         <v-row class="d-flex" v-if="LoginStore.user" >
                             <v-col cols="12" sm="3">
-                                <v-autocomplete
-                                    v-model="tag"
-                                    v-model:search="searchTag"
-                                    :items="filteredTags"
-                                    label="Tag"
-                                    variant="outlined"
-                                    density="compact"
-                                    clearable
-                                    :loading="loadTag"
-                                    :disabled="loadTag"
-                                    hide-no-data
-                                    hide-details
-                                    @keydown.enter="saveTag"
-                                    :search-input.sync="tag"
-                                ></v-autocomplete>
+                                <v-tooltip text="Enter para salvar" location="top" color="info">
+                                    <template v-slot:activator="{ props }">
+                                        <v-autocomplete
+                                            v-bind="props"
+                                            v-model="tag"
+                                            v-model:search="searchTag"
+                                            :items="filteredTags"
+                                            label="Tag"
+                                            variant="outlined"
+                                            density="compact"
+                                            clearable
+                                            :loading="loadTag"
+                                            :disabled="loadTag"
+                                            hide-no-data
+                                            hide-details
+                                            @keydown.enter="saveTag"
+                                            :search-input.sync="tag"
+                                        ></v-autocomplete>
+                                    </template>
+                                </v-tooltip>
                                 <!-- <v-text-field
                                     label="Tag"
                                     variant="outlined"

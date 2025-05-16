@@ -1,10 +1,6 @@
 import { defineStore } from "pinia";
-
 import api from "@/services/api"
-
 import { useLoginStore } from "@/store/LoginStore";
-import { id } from "vuetify/lib/locale/index.mjs";
-import { fin } from "stopword";
 
 export const useFavQuestoesStore = defineStore("favQuestoesStore", {
     state: () => ({
@@ -106,7 +102,7 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
                 console.log('erroe update fav question');
             }
         },
-        async getAllFavLaw(item, list){
+        async getAllFavLaw(item, list = []){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
@@ -135,6 +131,7 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
                     }
                 })  
                 this.favs = resp.data.hits.hits.map(item => ({id: item._id, ...item._source}))
+                return this.favs
             } catch (error) {
                 console.log('erroe get all fav law');
             } finally {

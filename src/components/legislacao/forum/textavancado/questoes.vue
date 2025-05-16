@@ -30,7 +30,7 @@
 
         <Loading class="mt-10" v-if="loadQuestoes" />
 
-        <v-card variant="outlined" v-if="questoesStore.readQuestoesMoreResp.length && !loadQuestoes" class="appear">
+        <v-card variant="outlined" v-if="questoesStore.readTotalQuestoes && !loadQuestoes" class="appear">
             <v-card-title class="d-flex align-start justify-space-between flex-column">
                 <div class="px-1 d-flex justify-space-between align-center w-100">
                     <div>
@@ -99,9 +99,7 @@
                         </div>
                         <div class="d-flex ga-1 align-center">
                             <h3 v-if="item?.banca ">{{ item.banca }}</h3>
-                            <h3 v-else>Gerada por IA</h3>
                             <h3 v-if="item?.ano ">{{ item.ano }}</h3>
-                            <h3 v-else>2025</h3>
                             <FavQuestoes :questao="item" />
                         </div>
                     </div>
@@ -112,8 +110,14 @@
                     </div>
                 </div>
                 <div class="my-2 text-center">
-                    <v-btn v-if="true" variant="outlined" prepend-icon="mdi-plus" @click="getQuestoes">Mostrar mais</v-btn>
-                    <v-alert v-else type="info" text="Não há mais questões para serem exibidas."></v-alert>
+                    <v-btn v-if="countZeroList < 2" variant="outlined" prepend-icon="mdi-plus" @click="getQuestoes">Mostrar mais</v-btn>
+                    <v-alert v-else type="warning" variant="outlined" text="Não há mais questões para serem exibidas.">
+                        <template v-slot:append>
+                            <v-btn variant="outlined" append-icon="mdi-update" @click="reiniciarBusca">
+                                reiniciar
+                            </v-btn>
+                        </template>
+                    </v-alert>
                 </div>
             </v-card-text>
         </v-card>
@@ -169,7 +173,7 @@
         if(formQuestions.value.typeRespQuestions == 4)  list = list.filter(item => item.timestamp && item.resposta != item.id_resposta)
         if(formQuestions.value.typeRespQuestions == 5)  list = list.filter(item => item.timestamp && item.resposta == item.id_resposta)
         if(formQuestions.value.banca.length)  list = list.filter(item => formQuestions.value.banca.includes(item.banca))
-        if(formQuestions.value.ano.length)  list = list.filter(item => formQuestions.value.ano.includes(item.ano))
+        if(formQuestions.value.ano.length)  list = list.filter(item => formQuestions.value.ano.includes(Number(item.ano)))
 
         if(formQuestions.value.favoritas)  list = list.filter(item => favQuestoes.value.includes(item.id))
         
@@ -205,17 +209,14 @@
     })
 
     const listBancas = computed(() => {
-        const list = listQuestoesRefBancaAno.value.filter(item => item.banca)
-        const listBancas = list.map(item => item.banca)
-        const uniqueBancas = [...new Set(listBancas)]
-        return uniqueBancas
+        const list = questoesStore.readListBancas?.map(item => item.key.toUpperCase())
+        const unique = [...new Set(list)]
+        return unique 
     }) 
 
     const listAnos = computed(() => {
-        const list = listQuestoesRefBancaAno.value.filter(item => item.ano)
-        const listAnos = list.map(item => item.ano)
-        const uniqueAnos = [...new Set(listAnos)]
-        return uniqueAnos
+        const list = questoesStore.readListAnos?.map(item => item.key).sort((a, b) => b - a)
+        return list
     })
 
     const insertWordS = (num) => {
@@ -243,6 +244,27 @@
 
     const loadQuestoes = ref(false)
 
+    const countZeroList = ref(0)
+
+    const setZeroList = (num) => {
+        if(!num) countZeroList.value++
+        if(num) countZeroList.value = 0
+    }
+
+    const clearFormSearch = () => {
+        formQuestions.value = {
+            typeRespQuestions: 1,
+            banca: [],
+            ano: [],
+            favoritas: false,
+        }
+    }
+
+    const reiniciarBusca = () => {
+        clearFormSearch()
+        getQuestoes()
+    }
+
     const getQuestoes = async () => {
         loadQuestoes.value = true
         if(listArtsFilter.value.length) {
@@ -251,6 +273,8 @@
             await questoesStore.getQuestoes({ id_law: route.params.id, id_art: route.query.art }, formQuestions.value)
         }
         loadQuestoes.value = false
+        setZeroList(questoesStore.readQuestoesMoreResp.length)
+
     }
 
     const getQuestoesFilter = async () => {
@@ -270,6 +294,7 @@
         await questoesStore.totasisQuestoesLaw(route.params.id)
         await getQuestoes()
         loadQuestoes.value = false
+        questoesStore.getLists()
     })  
 
 </script>

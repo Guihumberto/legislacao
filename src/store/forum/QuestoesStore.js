@@ -13,7 +13,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
         totalRespQuestoes: 0,
         q_respondidas: [],
         errorList: [],
-        load: false
+        load: false,
+        listBancas: [],
+        listAnos: []
     }),
     getters: {
         readQuestoes(){
@@ -64,6 +66,12 @@ export const useQuestoesStore = defineStore("questoesStore", {
             
             return `${day}-${month}-${year} ${hours}:${minutes}`;
         },
+        readListBancas(){
+            return this.listBancas
+        },
+        readListAnos(){
+            return this.listAnos
+        }
     },
     actions:{
         async gerarQuestoes(item){         
@@ -106,10 +114,20 @@ export const useQuestoesStore = defineStore("questoesStore", {
             if(!loginStore.readLogin?.cpf) return
             this.clear()
 
-            console.log('filter', filter);
+            //fitrar todas favoritas
+            let listFavoritas = []
+            if(filter.favoritas) listFavoritas = await favStore.getAllFavLaw(item.id_law, [])
 
+            //filtrar todas respondidas
             let listRespondidas = []
-            if(filter.typeRespQuestions != 1) listRespondidas = await this.getResposndidas(item.id_law)
+            if(filter.typeRespQuestions != 1) {
+                if(filter.favoritas && listFavoritas.length) {
+                    const ids_questoes = listFavoritas.map(q => q.id_question)
+                    listRespondidas = await this.getResposndidas(item.id_law, ids_questoes)
+                } else {
+                    listRespondidas = await this.getResposndidas(item.id_law)
+                }
+            } 
                 
 
             const must_not = [];
@@ -118,10 +136,17 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 must_not.push({ terms: { _id: listRespondidas } });
             }
 
+
             const must = [];
 
             if(listRespondidas.length && filter.typeRespQuestions > 2){
                 must.push({ terms: { _id: listRespondidas } });
+            }
+
+             //favoritas com todas as questoes
+             if(filter.typeRespQuestions == 1 && filter.favoritas && listFavoritas.length){
+                const ids_questoes = listFavoritas.map(q => q.id_question)
+                must.push({ terms: { _id: ids_questoes } });
             }
            
             if (item.id_law) {
@@ -137,12 +162,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 must.push({ terms: { ano: filter.ano } });
             }
 
-            // if(filter.banca.length){
-            //     must.push({ terms: { banca: filter.banca } });
-            // }
-
-            if(filter.favoritas){
-                console.log('favoritas - fazer algo');
+            if(filter.banca.length){
+                console.log('bancas - fazer algo', filter.banca);
+                must.push({ terms: { 'banca.keyword': filter.banca } });
             }
             
             try {
@@ -171,7 +193,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } finally {
                 const list = this.questoes.map(item => item.id) || []
                 if(filter.typeRespQuestions == 1) this.q_respondidas = await this.getMyQuestoesResp(item, list)
-                await favStore.getAllFavLaw(item.id_law, list)
+                if(!filter.favoritas)await favStore.getAllFavLaw(item.id_law, list)
                 this.load = false
             }
         },
@@ -360,10 +382,24 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
         },
         //fitros avancados para questoes
-        async getResposndidas(item){
+        async getResposndidas(item, list = []){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+
+            const must = []
+
+            if (item) {
+                must.push({ term: { id_law: item } });
+            }
+
+            if (cpf) {
+                must.push({ term: { id_user: cpf } });
+            }
+
+            if (list.length) {
+                must.push({ terms: { id_question: list } });
+            }
 
             try {
                 const resp = await api.post('questoes_resp/_search', {
@@ -371,18 +407,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     size: 500,
                     query: {
                         bool: {
-                          must: [
-                            {
-                              term: {
-                                id_user: cpf
-                              }
-                            },
-                            {
-                              term: {
-                                id_law: item
-                              }
-                            }
-                          ]
+                          must
                         }
                     }
                 })
@@ -445,6 +470,46 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } catch (error) {
                 console.log('error totais questoes law');
             }
+        },
+        async getListBancas(){
+            try {
+                const resp = await api.post('questoes/_search', {
+                    size: 0,
+                    "aggs": {
+                        "by_bancas": {
+                            "terms": {
+                                "field": "banca.keyword",
+                                "size": 100
+                            }
+                        }
+                    }
+                })
+                this.listBancas = resp.data.aggregations.by_bancas.buckets
+            } catch (error) {
+                console.log('error get bancas');
+            }
+        },
+        async getListAnos(){
+            try {
+                const resp = await api.post('questoes/_search', {
+                    size: 0,
+                    "aggs": {
+                        "by_anos": {
+                            "terms": {
+                                "field": "ano",
+                                "size": 100
+                            }
+                        }
+                    }
+                })
+                this.listAnos = resp.data.aggregations.by_anos.buckets
+            } catch (error) {
+                console.log('error get bancas');
+            }
+        },
+        async getLists(){
+            await this.getListBancas()
+            await this.getListAnos()
         }
     }
 })
