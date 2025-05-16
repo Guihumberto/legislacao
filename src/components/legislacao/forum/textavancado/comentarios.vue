@@ -49,6 +49,10 @@
                         ></v-select>
                         <v-btn prepend-icon="mdi-magnify" color="success" variant="flat" @click="searchComments">Buscar</v-btn>
                 </div>
+                <div class=" text-overline mt-5 border rounded-lg pa-2 text-right" style="border-color: #e0e0e0;">
+                    <p v-if="commentStore.apenasmeusComentarios">Apenas você comentou nesta norma ({{ commentStore.readTotalCommentsUser }})</p>
+                    <p v-else>você tem {{ commentStore.readTotalCommentsUser }} comentários do total de {{ commentStore.readTotalComments }}</p>
+                </div>
             </v-card-text>
         </v-card>
 
@@ -92,9 +96,10 @@
                 </div>
                 <v-alert class="appear" v-else type="info" variant="text" text="Não há comentários neste dispositivo."></v-alert>
             </transition-group>
-    
+            
+
             <v-btn 
-                v-if="commentStore.pagination.total > commentStore.readComments.length"
+                v-if="commentStore.pagination.total > commentStore.readComments.length && commentsList.length"
                 append-icon="mdi-plus" variant="outlined" class="my-5" 
                 block 
                 @click="searchCommentsMore">
@@ -220,6 +225,9 @@
     }
 
     const searchCommentsMore = async () => {
+        if(commentStore.pagination.total > commentStore.readComments.length) {
+            searchComments()
+        }
         const objeto = {
             listArts: selectArt.value,
             listCpfs: usersCommentsFilter.value

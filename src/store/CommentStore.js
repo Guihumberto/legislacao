@@ -19,7 +19,9 @@ export const useCommentStore = defineStore("commentStore", {
         },
         userComments: [],
         listUsers: [],
-        listArts: []
+        listArts: [],
+        totalComments: 0,
+        totalCommentsUser: 0
     }),
     getters: {
         readListVotos(){
@@ -53,6 +55,17 @@ export const useCommentStore = defineStore("commentStore", {
         readListArts(){
             return this.listArts
         },
+        readTotalComments(){
+            return this.totalComments
+        },
+        readTotalCommentsUser(){
+            return this.totalCommentsUser
+        },
+        apenasmeusComentarios(){
+            return this.readTotalComments == this.readTotalCommentsUser
+            ? true
+            : false
+        }   
     },
     actions:{
         async getVotoComment(item){
@@ -236,6 +249,7 @@ export const useCommentStore = defineStore("commentStore", {
             await this.getAllCommnetsLaw(id, null, order)
             await this.getListUsers(id)
             await this.getListArts(id)
+            this.totasisCommentssLaw(id)
         },
         async getAllCommnetsLaw(id, search = {}, sortComments = null){
             const loginStore = await useLoginStore()
@@ -339,6 +353,47 @@ export const useCommentStore = defineStore("commentStore", {
             } catch (error) {
                 console.log('error getlist users');
             }
-        }
+        },
+        async totasisCommentssLaw(item){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await api.post('comments/_search', {
+                    size: 0,
+                    query:{
+                        match:{
+                            idGroup: item
+                        }
+                    }
+                })
+
+                this.totalComments = resp.data.hits.total.value
+                const respUser = await api.post('comments/_search', {
+                    size: 0,
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    match:{
+                                        idGroup: item
+                                    }
+                                },
+                                {
+                                    match:{
+                                        created_by: cpf
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+
+                this.totalCommentsUser = respUser.data.hits.total.value
+            } catch (error) {
+                console.log('error totais questoes law');
+            }
+        },
     }
 })
