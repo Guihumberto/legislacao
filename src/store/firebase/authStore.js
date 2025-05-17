@@ -28,25 +28,28 @@ export const useAuthStore = defineStore("authStore", {
     // Initialize auth state checking
     async init() {
       this.load = true;
-      
-      // First check for redirect result
+    
       try {
         const result = await getRedirectResult(auth);
         if (result) {
           this.user = result.user;
-          console.log('Redirect result:', this.user);
+          console.log('Usuário logado via redirect:', this.user);
+        } else {
+          console.log('Nenhum resultado de redirecionamento.');
         }
       } catch (error) {
-        console.error('Error processing redirect result:', error);
+        console.error('Erro ao obter resultado do redirecionamento:', error);
       }
-      
-      // Then set up auth state listener
-      onAuthStateChanged(auth, (user) => {
-        this.user = user;
+    
+      await new Promise((resolve) => {
+        onAuthStateChanged(auth, (user) => {
+          this.user = user;
+          resolve(user);
+        });
       });
-      
+    
       this.load = false;
-    },  
+    },
     async register(email, password) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -72,6 +75,7 @@ export const useAuthStore = defineStore("authStore", {
         const provider = new GoogleAuthProvider();
         // Use the imported auth instance consistently;
         await signInWithRedirect(auth, provider);
+        sessionStorage.setItem('redirecting', 'true');
         // Note: No return value here as the redirect happens immediately
        
       } catch (error) {

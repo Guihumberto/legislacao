@@ -34,6 +34,7 @@
          </v-text-field>
          <v-btn block color="primary" type="submit" :loading="loadLogin">Entrar</v-btn>
          <v-btn variant="outlined" color="error" block class="mt-5" prepend-icon="mdi-google" @click="handleGoogleLogin" :disabled="loadLogin">Login com Google</v-btn>
+            {{ authService.getCurrentUser }}
          <div class="d-flex justify-center">
              <v-checkbox color="success" label="Manter conectado" v-model="keepConnected" hide-details></v-checkbox>
          </div>
@@ -42,7 +43,7 @@
          </div>
          <v-expand-transition>
              <div v-if="readErro" class="text-center mt-2">
-                 <v-btn variant="outlined" color="error" @click="limparErro()"  append-icon="mdi-close" > {{ readErro }}</v-btn>
+                 <v-btn variant="text" color="error" @click="limparErro()"  append-icon="mdi-close" > {{ readErro }}</v-btn>
              </div>
          </v-expand-transition>
      </v-form>
@@ -147,7 +148,7 @@
           case 'auth/wrong-password':
             return 'Senha incorreta.';
           default:
-            return 'Ocorreu um erro ao fazer login. Tente novamente.';
+            return 'Ocorreu um erro. Tente novamente.';
         }
     };
 
@@ -163,26 +164,36 @@
     })
 
     onMounted(async () => {
-      try {
-        loadLogin.value = true;
-        const user = authService.getCurrentUser
-        console.log('user1', user);
-        if (user?.uid) {
-            console.log('user2', user)
-            const login = await loginStore.addUserGoolge(authService.getCurrentUser, keepConnected.value)
-            if(!login.name){
-                userNew.value = { ...login }
-                dialog.value = true
-            } else {
-                const redirectTo = route.query.redirect || '/leges'
-                router.push(redirectTo)
-            }
+        if (sessionStorage.getItem('redirecting') === 'true') {
+            console.log('Tentando recuperar login via redirect...');
+            sessionStorage.removeItem('redirecting');
         }
-      } catch (error) {
-        readErro.value = traduzirErro(error.code);
-      } finally {
-        loadLogin.value = false;
-      }
+
+        try {
+            loadLogin.value = true;
+
+            await authService.init(); // só espera a inicialização
+
+            const currentUser = authService.getCurrentUser;
+            console.log('Usuário atual:', currentUser);
+
+            if (currentUser?.uid) {
+                // const login = await loginStore.addUserGoogle(currentUser, keepConnected.value)
+                if (!login.name) {
+                    userNew.value = { ...login };
+                    dialog.value = true;
+                } else {
+                    const redirectTo = route.query.redirect || '/leges';
+                    router.push(redirectTo);
+                }
+            }
+
+        } catch (error) {
+            readErro.value = traduzirErro(error.code);
+            console.error(error);
+        } finally {
+            loadLogin.value = false;
+        }
     });
 </script>
 
