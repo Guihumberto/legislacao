@@ -4,6 +4,7 @@
             <div class="login">
                 <bannerInit />
                 <LoginLeges />
+                <!-- <LoginFirebase /> -->
             </div>
         </div>
     </section>
@@ -11,6 +12,7 @@
 
 <script setup>
     import bannerInit from '@/components/LoginCreate/bannerInit.vue';
+    import LoginFirebase from '@/components/LoginCreate/loginFirebase.vue';
     import LoginLeges from '@/components/LoginCreate/LoginLeges.vue';
 
     import { useGeralStore } from '@/store/GeralStore';

@@ -36,6 +36,7 @@
                     placeholder="Digite o setor que vc está lotado"
                     v-model="user.setor"
                     :rules="[rules.required]"
+                    v-if="false"
                 ></v-text-field>
                  <div class="actionsform">
                     <v-btn color="grey" variant="text" @click="clear()">Limpar</v-btn>
@@ -48,7 +49,7 @@
                 <p>Verifique os dados abaixo:</p> <br>
                 <p><span class="bold">Nome: </span>{{ user.name }}</p>
                 <p><span class="bold">Apelido: </span>{{ user.nickname }}</p>
-                <p><span class="bold">Setor: </span>{{ user.setor }}</p>
+                <p v-if="user.setor"><span class="bold">Setor: </span>{{ user.setor }}</p>
                 <p v-if="user.orgao"> <span class="bold">Orgão: </span>{{ user.orgao }}</p>
             </div>
             <div class="actionsform">
@@ -62,7 +63,7 @@
 
 <script setup>
     import { useLoginStore } from '@/store/LoginStore';
-    import { ref, inject } from 'vue';
+    import { ref, inject, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     const router = useRouter()
 
@@ -76,6 +77,10 @@
         required: value => !!value || "campo obrigatório", 
         minfield: (v) => (v||'').length >= 3 || "Mínimo 4 caracteres",
     }
+
+    const props = defineProps({
+        userNew: Object
+    })
 
     const user = ref({
         name: null, 
@@ -113,6 +118,10 @@
                 clear()
                 dialog.value = false
     }
+    
+    onMounted(() => {
+        if(props.userNew?.cpf) user.value = { ...props.userNew }
+    })
 
 </script>
 

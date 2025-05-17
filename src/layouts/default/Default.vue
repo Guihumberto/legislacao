@@ -166,7 +166,7 @@ section .container{
   width: min(90vw, 1000px);
   margin-inline: auto;
   /* margin-bottom: 1rem; */
-  min-height: calc(100vh - 228px);
+  min-height: calc(100vh - 273px);
   padding: 1rem 0 .1rem;
   transition: 1s ease;
 }
@@ -175,7 +175,7 @@ section .container2{
   width: min(90vw, 1000px);
   margin-inline: auto;
   /* margin-bottom: 1rem; */
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 152px);
   padding: 1rem 0 .1rem;
   transition: 1s ease;
 }

@@ -33,6 +33,7 @@
          >
          </v-text-field>
          <v-btn block color="primary" type="submit" :loading="loadLogin">Entrar</v-btn>
+         <v-btn variant="outlined" color="error" block class="mt-5" prepend-icon="mdi-google" @click="handleGoogleLogin" :disabled="loadLogin">Login com Google</v-btn>
          <div class="d-flex justify-center">
              <v-checkbox color="success" label="Manter conectado" v-model="keepConnected" hide-details></v-checkbox>
          </div>
@@ -47,17 +48,20 @@
      </v-form>
      <div v-else class="text-center">
          <v-icon class="mb-5" size="5rem" color="primary"> mdi-flash</v-icon>
-         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: ${loginStore.readLogin.cpf + ' -'} ${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''} `"></v-alert>
+         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: ${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''} `"></v-alert>
          <v-btn variant="flat" color="primary" @click="$router.push('/leges')" class="mt-5" append-icon="mdi-magnify">Iniciar busca</v-btn>
         </div>
-     <FirstLogin :dialog="dialog" />
+     <FirstLogin :dialog="dialog" :userNew="userNew" />
  </div>
 </template>
 
 <script setup>
-    import { ref, computed, provide } from 'vue';
+    import { ref, computed, provide, onMounted } from 'vue';
     import FirstLogin from './firstLogin.vue'
     import { mask } from 'vue-the-mask'
+
+    import { useAuthStore } from '@/store/firebase/authStore';
+    const authService = useAuthStore();
 
     import { useRouter, useRoute } from 'vue-router';
     const router = useRouter()
@@ -96,10 +100,6 @@
 
     provide('dialog', dialog)
 
-    const readLogin = computed(()=> {
-        return false //'avaliacaoStore.readLogin'
-    })
-
     const readErro = ref(false)
 
     const login = async () => {
@@ -123,9 +123,67 @@
              }
     }
 
+    const handleGoogleLogin = async () => {
+        loadLogin.value = true;
+        readErro.value = '';
+  
+        try {
+          await authService.loginWithGoogle();
+        } catch (error) {
+            readErro.value = traduzirErro(error.code);
+        } finally {
+            loadLogin.value = false;
+        }
+    };
+
+    const traduzirErro = (errorCode) => {
+        switch (errorCode) {
+          case 'auth/invalid-email':
+            return 'Email inválido.';
+          case 'auth/user-disabled':
+            return 'Usuário desativado.';
+          case 'auth/user-not-found':
+            return 'Usuário não encontrado.';
+          case 'auth/wrong-password':
+            return 'Senha incorreta.';
+          default:
+            return 'Ocorreu um erro ao fazer login. Tente novamente.';
+        }
+    };
+
     const limparErro = () => {
         readErro.value = false
     }
+
+    const userNew = ref({
+        name: null, 
+        nickname: null, 
+        setor: null,
+        cargo: 'user'
+    })
+
+    onMounted(async () => {
+      try {
+        loadLogin.value = true;
+        const user = authService.getCurrentUser
+        console.log('user1', user);
+        if (user?.uid) {
+            console.log('user2', user)
+            const login = await loginStore.addUserGoolge(authService.getCurrentUser, keepConnected.value)
+            if(!login.name){
+                userNew.value = { ...login }
+                dialog.value = true
+            } else {
+                const redirectTo = route.query.redirect || '/leges'
+                router.push(redirectTo)
+            }
+        }
+      } catch (error) {
+        readErro.value = traduzirErro(error.code);
+      } finally {
+        loadLogin.value = false;
+      }
+    });
 </script>
 
 <style lang="scss" scoped>

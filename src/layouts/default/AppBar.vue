@@ -141,11 +141,9 @@
 </script>
 
 <style>
-body{
-  padding-top: 28px; 
-}
 header{
   background-image: linear-gradient(90deg, #020024 0%, #090979 35%, #00d4ff 100%);
+  margin-top: 1rem;
 }
 header h1{
   font-weight: 700;
@@ -163,8 +161,8 @@ header h1{
 }
 
 .btn-side-bar{
-      display: none;
-    }
+  display: none;
+}
 .wrappersubheader{
   background: var(--primary-color);
   color: white;

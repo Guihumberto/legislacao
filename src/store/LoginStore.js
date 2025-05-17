@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/services/api"
 
 import { useUserAreaStore } from "./AreaUserStore";
+import { useAuthStore } from "./firebase/authStore";
 
 export const useLoginStore = defineStore("loginStore", {
     state: () => ({
@@ -63,6 +64,7 @@ export const useLoginStore = defineStore("loginStore", {
                 const userAreaStore = useUserAreaStore()
                 const cpf = this.apenasNumeros(item.login)
                 const user = await this.findUserElastic(cpf)
+
                 if(user._source.cpf == cpf && user._source.password == item.password){
                     this.login = { id: user._id, ...user._source }
                     const date_now = Date.now()
@@ -92,7 +94,8 @@ export const useLoginStore = defineStore("loginStore", {
             }
         },
         logOut(router, link = null){
-            console.log('logOut', link);
+            const authStore = useAuthStore()
+            authStore.logout()
             this.clearLogin()
             if(link){
                 router.push(link)
@@ -192,7 +195,6 @@ export const useLoginStore = defineStore("loginStore", {
             const isInvalidCpf = this.validarCPF(item)
             
             if(isExist || !isInvalidCpf){
-                console.log(isExist);
                 return true
             }
             try {
@@ -205,6 +207,65 @@ export const useLoginStore = defineStore("loginStore", {
                 return false
             } catch (error) {
                 console.log('erro ao add user');
+            } finally {
+                this.load = false
+            }
+        },
+        async addUserGoolge(item, connected = false){
+            this.load = true
+            const user = await this.findUserElastic(item.uid)
+
+            console.log('primeiro', user);
+
+            if(user._source?.cpf){
+                console.log('segundo', user._source.cpf);
+                this.login = { id: user._id, ...user._source }
+                const date_now = Date.now()
+                this.login.last_login = date_now
+                await this.editUser(this.login)
+
+                if(!user._source?.first_login){
+                    this.login.first_login = date_now
+                    await this.editUser(this.login)
+                }
+
+                this.saveUserData(connected)
+
+                // await userAreaStore.getAllFavoritos()
+                await userAreaStore.getAllHistórico()
+                await userAreaStore.getCollection()
+                await userAreaStore.getDocs()
+                
+                return this.login
+            }
+
+            const objeto = {
+                name: null,
+                nickname: item.displayName,
+                cpf: item.uid,
+                perfil: 1,
+                date_created: Date.now(),
+                last_login: Date.now(),
+                first_login: Date.now(),
+                admin: false,
+                img: item.photoURL,
+                active: true,
+                setor: null,
+                cargo: null,
+                about: null,
+                email: item.email,
+            }
+
+            try {
+                console.log('geelo', item);
+                const resp = await api.post('users/_doc', objeto)
+                this.login = { id:  resp.data._id, ...objeto }
+                this.listUsers.push( {...this.login} )
+                this.saveUserData(connected)
+  
+                return objeto
+            } catch (error) {
+                console.log('erro ao add user golge');
             } finally {
                 this.load = false
             }

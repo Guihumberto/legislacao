@@ -7,6 +7,8 @@
 // Plugins
 import { registerPlugins } from '@/plugins'
 import 'shepherd.js/dist/css/shepherd.css'
+import { useAuthStore } from '@/store/firebase/authStore';
+
 
 // Components
 import App from './App.vue'
@@ -18,4 +20,10 @@ const app = createApp(App)
 
 registerPlugins(app)
 
-app.mount('#app')
+const authStore = useAuthStore()
+
+authStore.init().then(() => {
+    app.mount('#app')
+})
+
+

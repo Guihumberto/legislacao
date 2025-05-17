@@ -41,4 +41,10 @@ export default [
         component: () => import('@/views/forum/config/tratar_erros.vue'),
         meta: { requiresAuth: true, role: true } 
       },
+      {
+        path: '/admin/rag',
+        name: 'Rag Chat',
+        component: () => import('@/views/admin/rag_chat.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
 ]
