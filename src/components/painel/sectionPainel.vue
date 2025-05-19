@@ -21,7 +21,7 @@
                 max-width="400"
                 elevation="3"
                 hover
-                @click="$router.push('homepainel/concurso/1')"
+                @click="$router.push(`homepainel/concurso/${concurso.id}`)"
             >
                 <v-img
                 v-if="concurso.img"
