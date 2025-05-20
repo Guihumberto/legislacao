@@ -1,6 +1,6 @@
 <template>
     <section>
-        <v-btn-toggle v-model="options" mandatory class="mr-2" density="compact">
+        <v-btn-toggle v-model="options" mandatory class="mr-2" density="compact" color="primary">
             <v-btn value="1">
                 <v-icon>mdi-alert-box-outline</v-icon>
                 <span class="d-none d-sm-inline ml-1">Assuntos Relevantes</span>
