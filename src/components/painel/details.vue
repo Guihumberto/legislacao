@@ -16,12 +16,12 @@
       <v-card
         max-width="400"
         prepend-icon="mdi-notebook"
-        :text="concurso.descricao"
-        :title="concurso.titulo"
+        :text="concurso.concurso"
+        :title="concurso.cargo"
       >
         <div class="my-5 px-5">
-            Banca: <br>
-            Vagas: <br>
+            Banca: {{ concurso.banca }}<br>
+            Vagas:  <br>
             Data da prova: <br>
         </div>
         <template v-slot:actions>
@@ -30,7 +30,6 @@
             text="Fechar"
             @click="dialog = false"
           ></v-btn>
-          <v-btn @click="$router.push('homepainel/concurso/1')">Ir</v-btn>
         </template>
       </v-card>
     </v-dialog>

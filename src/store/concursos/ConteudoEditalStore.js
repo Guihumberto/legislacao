@@ -4,17 +4,19 @@ import api from "@/services/api"
 
 import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from "@/store/snackStore";
-import { query } from "firebase/firestore";
 
 
 export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
-  state: () => ({
-    conteudoEdital: [],
-    edital: {id: null},
-    loading: false,
-    error: null,
-  }),
-  getters: {
+    state: () => ({
+        conteudoEdital: [],
+        edital: {id: null},
+        loading: false,
+        error: null,
+        editaisUser: [],
+        conteudoEditalUser: [],
+        editalUser: {}
+    }),
+    getters: {
         getConteudoEdital() {
             return this.conteudoEdital;
         },
@@ -39,6 +41,15 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             
             return `${day}-${month}-${year} ${hours}:${minutes}`;
         },
+        readEditarUser(){
+            return this.editaisUser
+        },
+        readConteudoEditalUser(){
+            return this.conteudoEditalUser
+        },
+        readEditalUser(){
+            return this.editalUser
+        }
     },
     actions: {
         async getConteudo(id) {
@@ -194,5 +205,70 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                 return true
             }
         },
+        async getEditalUser() {
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.editaisUser = []
+            try {
+                const response = await api.post('conteudo_edital_import/_search', {
+                    size: 100,
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    exists:{
+                                        field: "id_edital_ref"
+                                    }
+                                },
+                                 {
+                                    match:{
+                                        created_by: cpf
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                });
+                this.editaisUser = response.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+            } catch (error) {
+                this.error = error;
+                console.log('error get edital user');
+            }
+        },
+        async getConteudoEditalUser(id) {
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.conteudoEditalUser = []
+            try {
+                const response = await api.post('conteudo_edital_import/_search', {
+                    size: 100,
+                    query:{
+                        match:{
+                            id_edital: id
+                        }
+                                
+                    }
+                });
+                this.conteudoEditalUser = response.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
+            } catch (error) {
+                this.error = error;
+                console.log('error get conteudo edital user');
+            }
+        },
+        async getEditalOneUser(id){
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.editalUser = {}
+            try {
+                const response = await api.get(`conteudo_edital_import/_doc/${id}`);
+                this.editalUser = {id: response.data._id, ...response.data._source }
+            } catch (error) {
+                this.error = error;
+                console.log('error get edital user');
+            }
+        }
   }
 })

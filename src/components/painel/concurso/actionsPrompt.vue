@@ -13,7 +13,7 @@
       >
         <v-card-text class="overflow-y-auto border mx-5" style="max-height: 400px;">
             <div>
-                <pre>{{ prompt }}</pre>
+                <p>{{ prompt }}</p>
             </div>
             
         </v-card-text>
@@ -32,27 +32,17 @@
 </template>
 
 <script setup>
- import { ref, watch } from 'vue'
+ import { inject } from 'vue'
 
-  const dialog = ref(false)
+  const dialog = inject('dialog')
+
   const props = defineProps({
-        prompt: {
-                type: String,
-                required: true
-        },
-        dialog2: {
-                type: Boolean,
-                required: true
-        }
+        prompt: String
  })
 
     const copiarPrompt = () => {
         navigator.clipboard.writeText(props.prompt)
     }
-
-    watch(props.dialog2, () => {
-        dialog.value = true
-    })
 </script>
 
   
