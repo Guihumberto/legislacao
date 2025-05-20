@@ -15,7 +15,7 @@ export const useRevisaoStore = defineStore("revisaoStore", {
         readLoad(){
             return this.load
         },
-        reasRevisao(){
+        readRevisao(){
             return this.revisao
         }
     },

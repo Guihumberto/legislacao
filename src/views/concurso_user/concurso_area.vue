@@ -41,17 +41,27 @@
                                             <div v-if="viewMode === 'full'">
                                                 <v-expansion-panels>
                                                     <v-expansion-panel
-                                                        v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser"
+                                                        v-for="(disciplina, disciplinaIndex) in conteudoList"
                                                         :key="disciplinaIndex"
                                                     >
                                                         <v-expansion-panel-title @click="selectActionsDisciplina(disciplina)">
                                                             <div class="w-100 d-flex justify-space-between align-center">
-                                                                {{ disciplina.disciplina }}
-                                                                <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
-                                                                    <template v-slot:activator="{ props }">
-                                                                        <v-btn v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
-                                                                    </template>
-                                                                </v-tooltip>
+                                                                <b>{{ disciplina.disciplina }}</b>
+                                                                <div>
+                                        
+                                                                    <v-tooltip text="Filtrar pelas Relevantes" location="top">
+                                                                        <template v-slot:activator="{ props }">
+                                                                            <v-btn 
+                                                                                v-if="disciplina?.top_relevante"
+                                                                                v-bind="props" variant="text" :color="filter.relevante ? 'primary' : 'grey'" icon="mdi-filter" @click.stop="filter.relevante = !filter.relevante"></v-btn>
+                                                                        </template>
+                                                                    </v-tooltip>     
+                                                                    <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
+                                                                        <template v-slot:activator="{ props }">
+                                                                            <v-btn v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
+                                                                        </template>
+                                                                    </v-tooltip>
+                                                                </div>
                                                             </div>
                                                         </v-expansion-panel-title>
                                                     <v-expansion-panel-text>
@@ -200,14 +210,16 @@
     import Questoes from '@/components/painel/options/questoes.vue';
     import Resumo from '@/components/painel/options/resumo.vue';
     import Guia from '@/components/painel/options/guia.vue';
+    import Details from '@/components/painel/details.vue';
 
     import { useGeralStore } from '@/store/GeralStore';
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
+    import { useRevisaoStore } from '@/store/concursos/EditalRevisao';
     import { useRoute } from 'vue-router';
-    import Details from '@/components/painel/details.vue';
     const route = useRoute()
     const geralStore = useGeralStore()
     const conteudoStore = useConteudoEditalStore()
+    const revisaoStore = useRevisaoStore()
 
     const id = route.params.id
     const load = ref(false)
@@ -235,6 +247,42 @@
     const edital = computed(() => {
         return conteudoStore.readEditalUser
     })
+
+    const filter = ref({
+        relevante: false
+    })
+
+    const conteudoList = computed(() => {
+        const list = conteudoStore.readConteudoEditalUser
+
+          if(topRelevantes.value?.top_relevante.length){
+                let find = list.find(item => item.disciplina == topRelevantes.value.disciplina)
+                if(find) find.top_relevante = topRelevantes.value.top_relevante
+          }
+
+        if (filter.value.relevante && topRelevantes.value?.top_relevante?.length) {
+            return list.map(item => {
+            if (item.disciplina === topRelevantes.value.disciplina) {
+                return {
+                ...item,
+                topicos: item.topicos.filter(topico =>
+                    topRelevantes.value.top_relevante.includes(topico.numero)
+                ),
+                top_relevante: topRelevantes.value.top_relevante,
+                }
+            }
+            return item
+            })
+        }
+
+        return list
+    })
+
+    const topRelevantes = computed(() => {
+        const list = revisaoStore.readRevisao
+        return list
+    })
+
 
     const selectItem = (local, disciplina = null, topico = null, subtopico = null, subsubtopico = null) => {
       prompt.value = null

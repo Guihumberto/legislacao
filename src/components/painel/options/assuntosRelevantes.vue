@@ -1,9 +1,11 @@
 <template>
     <section>
         <div>
-            <div v-if="revisaoStore.reasRevisao?.resumo_geral" class="mb-15 mt-5">
-                {{ revisaoStore.reasRevisao.top_relevante }}
-                <div class="bg-white pa-10 text-left" v-html="revisaoStore.reasRevisao.resumo_geral">
+            <div v-if="revisaoStore.readRevisao?.resumo_geral" class="mb-15 mt-5">
+                <v-chip-group>
+                    <v-chip v-for="item, i in revisaoStore.readRevisao.top_relevante">{{ item }}</v-chip>
+                </v-chip-group>
+                <div class="bg-white pa-10 text-left text" v-html="revisaoStore.readRevisao.resumo_geral">
                 </div>
             </div>
             <v-form @submit.prevent="onSubmit" ref="form" v-else>
@@ -29,7 +31,7 @@
 </template>
 
 <script setup>
-    import { onMounted, ref } from 'vue';
+    import { ref, watch } from 'vue';
     import { useRevisaoStore } from '@/store/concursos/EditalRevisao';
     const revisaoStore = useRevisaoStore()
 
@@ -73,15 +75,23 @@
         }
     }
 
-    onMounted(async() => {
-        load.value = true
-        console.log('oi');
-        await revisaoStore.getRevisao(props.select)
-        load.value = false
+    watch(
+    () => props.select, (val) => { 
+        revisaoStore.getRevisao(props.select)
     })
+
    
 </script>
 
 <style scoped>
+.text{
+    line-height: 2;
+}
+.text ul,
+.text ol {
+  padding-left: 1.5rem; /* ou use margin-left */
+  margin-bottom: 1rem;  /* opcional, para espaçamento inferior */
+}
+
 
 </style>
