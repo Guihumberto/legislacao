@@ -176,15 +176,19 @@
         </div> -->
         <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-if="sidebar">
             <div class="panel-content">
-                Painel Direito
+                <v-card-text :class="geralStore.readHeaderShow ? 'content': 'conten2'" class="text-center">
+                    <Home />
+                    <p>Disciplina, topico, subtopico selecionado</p>
+                </v-card-text>
             </div>
         </div>
    </section>
 </template>
 
 <script setup>
-    import { onMounted, ref, computed, provide, onUnmounted } from 'vue';
+    import { onMounted, ref, computed, provide, onUnmounted, watch } from 'vue';
 
+    import Home from '@/components/painel/options/home.vue';
     import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
 
     import { useGeralStore } from '@/store/GeralStore';
@@ -201,7 +205,7 @@
 
     const prompt = ref(null)
     const dialog = ref(false)
-    const sidebar = ref(false)
+    const sidebar = ref(true)
 
     provide('dialog', dialog)
 
@@ -353,6 +357,10 @@
     const isHovering = ref(false);
     const startX = ref(0);
     const startLeftWidth = ref(0);
+
+    watch(sidebar, (newSidebar) => {
+       if(!sidebar.value) leftWidth.value = 900
+    })
 
     // Largura do painel direito calculada
     const rightWidth = computed(() => {
