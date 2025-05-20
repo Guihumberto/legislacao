@@ -2,15 +2,16 @@
    <section>
          <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
           <v-container>
-            <h1 class="text-h5 my-5">Organizador de Disciplinas</h1>
+            <h1 class="text-h5 mt-5">{{ $route.query.concurso }}</h1>
+            <h2 class="text-h6 mb-5">{{ route.query.cargo }}</h2>
             <div v-if="conteudoStore.getLoading">Carregando...</div>
             <v-row>  
               <v-col cols="12" v-if="!conteudoStore.getLoading && conteudoStore.getConteudoEdital.length > 0">
                 <v-card>
                   <v-card-title class="d-flex align-center">
-                    Conteúdo Processado
+                    Conteúdo Verticalizado
                     <v-spacer></v-spacer>
-                    <v-btn-toggle v-model="viewMode" mandatory>
+                    <v-btn-toggle v-model="viewMode" mandatory class="mr-2">
                       <v-btn value="full">
                         <v-icon>mdi-format-list-bulleted</v-icon>
                         <span class="d-none d-sm-inline ml-1">Completo</span>
@@ -19,11 +20,11 @@
                         <v-icon>mdi-gavel</v-icon>
                         <span class="d-none d-sm-inline ml-1">Normas</span>
                       </v-btn>
-                      <v-btn value="json">
-                        <v-icon>mdi-code-json</v-icon>
-                        <span class="d-none d-sm-inline ml-1">JSON</span>
-                      </v-btn>
                     </v-btn-toggle>
+                    <v-btn @click="importar" color="primary" :disabled="load" :loading="load">
+                      <v-icon>mdi-import</v-icon>
+                      <span class="d-none d-sm-inline ml-1">IMPORTAR</span>
+                    </v-btn>
                   </v-card-title>
                   
                   <v-card-text>
@@ -84,17 +85,18 @@
 
                     <!-- Exibição apenas das normas -->
                     <div v-else-if="viewMode === 'normas'">
-                      <v-list lines="two">
+                      <v-list lines="two" >
                         <template v-for="(disciplina, disciplinaIndex) in conteudoStore.getConteudoEdital" :key="disciplinaIndex">
-                          <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>
-                          
+                          <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>   
                           <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
                             <template v-if="topico.normas && topico.normas.length > 0">
                               <v-list-item
                                 v-for="(norma, normaIndex) in topico.normas"
+                                 prepend-icon="mdi-book"
                                 :key="`t-${topicoIndex}-${normaIndex}`"
                                 :title="norma"
                                 :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
+                                class="ml-5"
                               ></v-list-item>
                             </template>
                             
@@ -102,9 +104,11 @@
                               <template v-if="subtopico.normas && subtopico.normas.length > 0">
                                 <v-list-item
                                   v-for="(norma, normaIndex) in subtopico.normas"
+                                  prepend-icon="mdi-book"
                                   :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
                                   :title="norma"
                                   :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
+                                   class="ml-5"
                                 ></v-list-item>
                               </template>
                               
@@ -112,9 +116,11 @@
                                 <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
                                   <v-list-item
                                     v-for="(norma, normaIndex) in subSubtopico.normas"
+                                     prepend-icon="mdi-book"
                                     :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
                                     :title="norma"
                                     :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
+                                     class="ml-5"
                                   ></v-list-item>
                                 </template>
                               </template>
@@ -124,19 +130,6 @@
                       </v-list>
                     </div>
 
-                    <!-- Exibição do JSON -->
-                    <div v-else>
-                      <v-btn
-                        color="secondary"
-                        class="mb-4"
-                        @click="copyJSON"
-                        :disabled="!conteudoStore.getConteudoEdital.length"
-                      >
-                        <v-icon>mdi-content-copy</v-icon>
-                        Copiar JSON
-                      </v-btn>
-                      <pre class="json-display">{{ JSON.stringify(conteudoStore.getConteudoEdital, null, 2) }}</pre>
-                    </div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -149,6 +142,8 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue';
 
+  import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
+
   import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
   import { useGeralStore } from '@/store/GeralStore';
   import { useRoute } from 'vue-router';
@@ -158,13 +153,24 @@
   const route = useRoute()
   const id_concurso = route.params.id
 
-  import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
   const viewMode = ref('full')
+  const load = ref(false)
 
+  const importar = async () => {
+    load.value = true;
+    await conteudoStore.importConteudoEditalUser()
+    load.value = false;
+  }
+
+  const selectItem = (item) => {
+    load.value = true;
+    console.log('item', item);  
+    load.value = false
+  }
 
   onMounted(async () => {
-    console.log('id_concurso', id_concurso);
     await conteudoStore.getConteudo(id_concurso);
+    conteudoStore.getEdital(id_concurso)
   });
 
 

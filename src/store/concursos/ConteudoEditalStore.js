@@ -1,22 +1,31 @@
 import { defineStore } from "pinia";
+
 import api from "@/services/api"
+
 import { useLoginStore } from "@/store/LoginStore";
+import { useSnackStore } from "@/store/snackStore";
+import { query } from "firebase/firestore";
+
 
 export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
   state: () => ({
     conteudoEdital: [],
+    edital: {id: null},
     loading: false,
     error: null,
   }),
   getters: {
         getConteudoEdital() {
-        return this.conteudoEdital;
+            return this.conteudoEdital;
         },
         getLoading() {
-        return this.loading;
+            return this.loading;
         },
         getError() {
-        return this.error;
+            return this.error;
+        },
+        readEdital(){
+            return this.edital
         },
         formatDate(){
             const now = new Date();
@@ -37,7 +46,8 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             this.error = null;
             this.conteudoEdital = []
             try {
-                const response = await api.get('conteudo_edital/_search', {
+                const response = await api.post('conteudo_edital/_search', {
+                    from: 0,
                     size:100,
                     query: {
                         match: {
@@ -46,6 +56,19 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                     }
                 });
                 this.conteudoEdital = response.data.hits.hits.map(hit => hit._source);
+            } catch (error) {
+                this.error = error;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async getEdital(idu) {
+            this.loading = true;
+            this.error = null;
+            this.edital = { id: null }
+            try {
+                const response = await api.get(`edital/_doc/${idu}`);
+                this.edital = {id: response.data._id, ...response.data._source }
             } catch (error) {
                 this.error = error;
             } finally {
@@ -91,6 +114,85 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                 console.log('erroe create concurso');
                 return null
             }
-        }
+        },
+        //importar user
+        async importConteudoEditalUser(){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+
+            if(!cpf) {
+                snackStore.activeSnack('Faça login para importar editais', 'error',)
+                return
+            }
+
+            const isExist = await this.verificaEdital(this.readEdital.id)
+
+            if(isExist){
+                snackStore.activeSnack('Edital já adicionado a sua área', 'error',)
+                return
+            }
+
+            const objeto = { ...this.readEdital, created_by: cpf, data_include: this.formatDate, id_edital_ref: this.readEdital.id }
+            delete objeto.id
+             
+
+            try {
+                const response = await api.post('conteudo_edital_import/_doc', objeto);
+                const resp = await this.importConteudoUser(this.getConteudoEdital, response.data._id)
+
+                snackStore.activeSnack('Edital importado com sucesso', 'success',)
+            } catch (error) {
+                console.log('error importar editais', error);
+            }
+        },
+        async importConteudoUser(conteudoEditalData, id_edital) {   
+           const loginStore = useLoginStore()
+           const cpf = loginStore.readLogin?.cpf  
+           if(!id_edital) return
+
+           const concurso = { ...this.readEdital, created_by: cpf, data_include: this.formatDate, id_edital }
+           delete concurso.id
+            
+           const newArray = conteudoEditalData.map(obj => ({ ...obj, ...concurso}));
+           const bulkData = newArray.flatMap(doc => [{ index: { _index: 'conteudo_edital_import' } }, doc]);
+
+           try {
+                const response = await api.post(`conteudo_edital_import/_bulk`, bulkData.map(JSON.stringify).join("\n") + "\n", {
+                     headers: { "Content-Type": "application/x-ndjson" }
+                });
+           } catch (error) {
+                console.log('error create conteudo edital', error);
+           }
+        },
+        async verificaEdital(idu) {
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            try {
+               const response = await post.get('conteudo_edital_import/_search', {
+                    size: 0,
+                    query:{
+                        bool:{
+                            must:[
+                                {
+                                    match:{
+                                        id_edital_ref: idu
+                                    }
+                                },
+                                 {
+                                    match:{
+                                        created_by: cpf
+                                    }
+                                }
+                            ]
+                        }
+                    }
+               });
+               return response.data.hits.total.value
+            } catch (error) {
+                this.error = error;
+                return true
+            }
+        },
   }
 })

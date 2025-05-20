@@ -53,4 +53,16 @@ export default [
         component: () => import('@/views/forum/permissoes.vue'),
         meta: { requiresAuth: true } 
       },
+      {
+        path: '/areauser',
+        name: 'Painel do Usuário',
+        component: () => import('@/views/concurso_user/painel_user.vue'),
+        meta: { requiresAuth: true } 
+      },
+      {
+        path: '/areauser/concurso/:id',
+        name: 'Concurso Painel',
+        component: () => import('@/views/concurso_user/concurso_area.vue'),
+        meta: { requiresAuth: true } 
+      },
 ]
