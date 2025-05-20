@@ -13,7 +13,7 @@
                 <p class="text-subtitle-1 text-center grey--text text--darken-2">
                     Selecione uma das seções abaixo para iniciar ou adicione seu próprio conteúdo.
                 </p>
-                <v-btn color="primary" class="mt-5" variant="flat" prepend-icon="mdi-calendar">Criar meu próprio plano</v-btn>
+                <v-btn color="primary" class="mt-5" variant="flat" prepend-icon="mdi-calendar" @click="$router.push('/homepainel/create_plan')">Criar meu próprio plano</v-btn>
             </div>
             </v-sheet>
             

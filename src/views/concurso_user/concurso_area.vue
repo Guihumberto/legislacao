@@ -41,10 +41,10 @@
                                             <div v-if="viewMode === 'full'">
                                                 <v-expansion-panels>
                                                     <v-expansion-panel
-                                                    v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser"
-                                                    :key="disciplinaIndex"
+                                                        v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser"
+                                                        :key="disciplinaIndex"
                                                     >
-                                                        <v-expansion-panel-title>
+                                                        <v-expansion-panel-title @click="selectActionsDisciplina(disciplina)">
                                                             <div class="w-100 d-flex justify-space-between align-center">
                                                                 {{ disciplina.disciplina }}
                                                                 <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
@@ -172,16 +172,22 @@
             ></v-icon>
         </div>
 
-        <!-- <div :class="geralStore.readHeaderShow ? 'container': 'container2'" v-if="sidebar">   
-        </div> -->
-        <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-if="sidebar">
-            <div class="panel-content">
-                <v-card-text :class="geralStore.readHeaderShow ? 'content': 'conten2'" class="text-center">
-                    <Home />
-                    <p>Disciplina, topico, subtopico selecionado</p>
-                </v-card-text>
+        <Transition name="fade">
+            <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
+                <div class="panel-content">
+                    <v-card-text class="text-center">
+                        <Home />
+                        <p>Disciplina, topico, subtopico selecionado</p>
+                        <div :class="geralStore.readHeaderShow ? 'content3': 'conten4'">
+                            <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina"/>
+                            <Questoes v-if="options === '2'" :select="selectDisciplina" />
+                            <Guia v-if="options === '3'" :select="selectDisciplina" />
+                            <Resumo v-if="options === '4'" :select="selectDisciplina" />
+                        </div>
+                    </v-card-text>
+                </div>
             </div>
-        </div>
+        </Transition>
    </section>
 </template>
 
@@ -190,6 +196,10 @@
 
     import Home from '@/components/painel/options/home.vue';
     import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
+    import AssuntosRelevantes from '@/components/painel/options/assuntosRelevantes.vue';
+    import Questoes from '@/components/painel/options/questoes.vue';
+    import Resumo from '@/components/painel/options/resumo.vue';
+    import Guia from '@/components/painel/options/guia.vue';
 
     import { useGeralStore } from '@/store/GeralStore';
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
@@ -205,9 +215,20 @@
 
     const prompt = ref(null)
     const dialog = ref(false)
-    const sidebar = ref(true)
+    const sidebar = ref(false)
+    const options = ref('1')
+    const selectDisciplina = ref(null)
+
+    const selectActionsDisciplina = (item) => {
+        selectDisciplina.value = {
+            id_concurso: item.id_concurso,
+            disciplina: item.disciplina
+        }
+        sidebar.value = true
+    }
 
     provide('dialog', dialog)
+    provide('options', options)
 
     const textoInit = ref(null)
 
@@ -458,58 +479,73 @@
 </script>
 
 <style scoped>
-.resizable-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 80vh;
-  overflow: hidden;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  height: 79vh;
-}
-.resizable-container2 {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 80vh;
-  overflow: hidden;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  height: 88.3vh;
-}
+    .resizable-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    height: 79vh;
+    }
 
-.panel {
-  height: 100%;
-  overflow: hidden;
-}
+    .resizable-container2 {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    height: 88.3vh;
+    }
 
-.panel-content {
-  padding: 16px;
-  height: 100%;
-}
+    .panel {
+    height: 100%;
+    overflow: hidden;
+    }
 
-.content{
-    height: 55vh;
-    overflow-y: auto;
-}
-.conten2{
-    height: 64vh;
-    overflow-y: auto;
-}
+    .panel-content {
+    padding: 16px;
+    height: 100%;
+    }
 
-.panel-divider {
-  width: 10px;
-  height: 100%;
-  background-color: #f5f5f5;
-  cursor: col-resize;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-}
+    .content{
+        height: 55vh;
+        overflow-y: auto;
+    }
 
-.panel-divider:hover {
-  background-color: #e0e0e0;
-}
+    .conten2{
+        height: 64vh;
+        overflow-y: auto;
+    }
+
+    .content3{
+        height: 75vh;
+        overflow-y: auto;
+    }
+
+    .conten4{
+        height: 84vh;
+        overflow-y: auto;
+    }
+
+    .panel-divider {
+    width: 10px;
+    height: 100%;
+    background-color: #f5f5f5;
+    cursor: col-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    }
+
+    .panel-divider:hover {
+        background-color: #e0e0e0;
+    }
+    .right-panel{
+        transition: 1s ease-in-out;
+    }
 </style>

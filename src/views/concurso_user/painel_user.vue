@@ -20,7 +20,11 @@
                             </template>
                         </v-list-item>
                     </v-list>
-                    <v-alert v-else variant="outlined" type="info" text="Você ainda não adicionou um edital."></v-alert>
+                    <v-alert v-else variant="outlined" type="info" text="Você ainda não adicionou um edital.">
+                        <template v-slot:append>
+                            <v-btn color="primary" @click="$router.push('/homepainel')">editais</v-btn>
+                        </template>
+                    </v-alert>
                 </div>
             </div>
         </div>

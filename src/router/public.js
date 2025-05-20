@@ -85,6 +85,11 @@ export default [
         component: () => import('@/views/public/concurso.vue'),
       },
       {
+        path: '/homepainel/create_plan',
+        name: 'Criar Plano',
+        component: () => import('@/views/public/create_plan.vue'),
+      },
+      {
         path: '/restricted',
         name: 'Area Restrita',
         component: () => import('@/views/areaRestricted.vue'),

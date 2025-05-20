@@ -1,9 +1,11 @@
 <template>
    <section>
          <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+          <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/homepainel')">Voltar</v-btn>
           <v-container>
-            <h1 class="text-h5 mt-5">{{ $route.query.concurso }}</h1>
-            <h2 class="text-h6 mb-5">{{ route.query.cargo }}</h2>
+            <h1 class="text-h5 mt-5" v-if="$route.query.concurso != 'undefined'">{{ $route.query.concurso }}</h1>
+            <h2 class="text-h6 mb-5" v-if="$route.query.concurso != 'undefined'">{{ route.query.cargo }}</h2>
+            <v-alert type="info" text="Não há conteúdo a ser selecionado" v-if="$route.query.concurso == 'undefined' && !conteudoStore.getLoading"></v-alert>
             <div v-if="conteudoStore.getLoading">Carregando...</div>
             <v-row>  
               <v-col cols="12" v-if="!conteudoStore.getLoading && conteudoStore.getConteudoEdital.length > 0">
@@ -136,7 +138,7 @@
             </v-row>
           </v-container>
         </div>
-    </section>
+   </section>
 </template>
 
 <script setup>
