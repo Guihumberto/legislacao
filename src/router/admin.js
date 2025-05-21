@@ -47,4 +47,10 @@ export default [
         component: () => import('@/views/admin/rag_chat.vue'),
         meta: { requiresAuth: true, role: true } 
       },
+       {
+        path: '/admin/edital_cadastro',
+        name: 'Cad Edital',
+        component: () => import('@/views/admin/concurso_admin.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
 ]

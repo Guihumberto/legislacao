@@ -1,7 +1,7 @@
 <template>
     <section>
         <div>
-            <div v-if="revisaoStore.readRevisao?.resumo_geral" class="mb-15 mt-5">
+            <div v-if="revisaoStore.readRevisao?.resumo_geral" class="mt-5">
                 <v-chip-group>
                     <v-chip v-for="item, i in revisaoStore.readRevisao.top_relevante">{{ item }}</v-chip>
                 </v-chip-group>

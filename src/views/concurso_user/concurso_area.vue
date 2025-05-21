@@ -52,13 +52,16 @@
                                                                     <v-tooltip text="Filtrar pelas Relevantes" location="top">
                                                                         <template v-slot:activator="{ props }">
                                                                             <v-btn 
+                                                                                density="compact"
                                                                                 v-if="disciplina?.top_relevante"
                                                                                 v-bind="props" variant="text" :color="filter.relevante ? 'primary' : 'grey'" icon="mdi-filter" @click.stop="filter.relevante = !filter.relevante"></v-btn>
                                                                         </template>
                                                                     </v-tooltip>     
                                                                     <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
                                                                         <template v-slot:activator="{ props }">
-                                                                            <v-btn v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
+                                                                            <v-btn 
+                                                                                density="compact"
+                                                                                v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
                                                                         </template>
                                                                     </v-tooltip>
                                                                 </div>
@@ -255,10 +258,10 @@
     const conteudoList = computed(() => {
         const list = conteudoStore.readConteudoEditalUser
 
-          if(topRelevantes.value?.top_relevante.length){
-                let find = list.find(item => item.disciplina == topRelevantes.value.disciplina)
-                if(find) find.top_relevante = topRelevantes.value.top_relevante
-          }
+        if(topRelevantes.value?.top_relevante?.length){
+            let find = list.find(item => item.disciplina == topRelevantes.value.disciplina)
+            if(find) find.top_relevante = topRelevantes.value.top_relevante
+        }
 
         if (filter.value.relevante && topRelevantes.value?.top_relevante?.length) {
             return list.map(item => {
@@ -570,12 +573,12 @@
     }
 
     .content3{
-        height: 75vh;
+        height: 70vh;
         overflow-y: auto;
     }
 
     .conten4{
-        height: 84vh;
+        height: 79vh;
         overflow-y: auto;
     }
 

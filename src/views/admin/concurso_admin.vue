@@ -80,7 +80,7 @@
               <v-col cols="12" v-if="disciplinas.length > 0">
                 <v-card variant="flat" class="mb-5">
                   <v-card-text>
-                    <v-form @click.prevent="saveConteudo">
+                    <v-form>
                       <v-row>
                         <v-col cols="12" sm="6">
                           <v-text-field
@@ -137,7 +137,7 @@
                       </v-row>
                       <div>
                         <v-btn variant="text" class="mr-2">Limpar</v-btn>
-                        <v-btn :disable="load" :loading="load" type="submit" color="success">Salvar</v-btn>
+                        <v-btn :disable="load" :loading="load" @click="saveConteudo" color="success">Salvar</v-btn>
                       </div>
                     </v-form>
                   </v-card-text>
@@ -1060,8 +1060,8 @@ do Piauí, das autarquias e das fundações públicas estaduais) e suas alteraç
     async saveConteudo(){
       this.load = true
       const jsonString = JSON.stringify(this.disciplinas, null, 2);
-      // await conteudoStore.createConteudoEdital(this.disciplinas, this.form)
-      await conteudoStore.createConcurso(this.form)
+      await conteudoStore.createConteudoEdital(this.disciplinas, this.form)
+      // await conteudoStore.createConcurso(this.form)
       this.load = false
     },
     copiarPrompt(){
