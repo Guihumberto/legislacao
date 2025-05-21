@@ -60,7 +60,6 @@
                                                                     <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
                                                                         <template v-slot:activator="{ props }">
                                                                             <v-btn 
-                                                                                v-if="userMaster"
                                                                                 density="compact"
                                                                                 v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
                                                                         </template>
@@ -290,6 +289,7 @@
 
     const selectItem = (local, disciplina = null, topico = null, subtopico = null, subsubtopico = null) => {
       prompt.value = null
+      if(!userMaster.value) return
       if(local == 'disciplina') {
         const texto = createPrompt(disciplina.topicos, disciplina.disciplina)
         const promptInit = textoInit.value.replace(/\n/g, ' ').trim().replace(/\s+/g, ' ')
