@@ -90,9 +90,10 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             this.loading = true;
             this.error = null;
 
-           const id_concurso = await this.createConcurso(concurso)
+           const id = await this.createConcurso(concurso)
+           const id_concurso = id
 
-           console.log('id_concurso'. id_concurso);
+           console.log('id_concurso'. id_concurso, id);
 
            if(!id_concurso) return
             
@@ -121,7 +122,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                     created_by: cpf,
                     data_include: this.formatDate
                 })
-                console.log('response', response);
+                console.log('create', response);
                 return response.data._id
             } catch (error) {
                 console.log('erroe create concurso');
