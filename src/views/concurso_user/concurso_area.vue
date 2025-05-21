@@ -21,11 +21,11 @@
                             <div v-if="!load">
                                 <v-row v-if="conteudoStore.readConteudoEditalUser.length">
                                     <v-col cols="12" v-if="conteudoStore.readConteudoEditalUser.length > 0">
-                                        <v-card>        
+                                        <v-card color="transparent" variant="flat" class="border">        
                                             <v-card-title class="d-flex align-center">
                                                 Conteúdo Verticalizado
                                                 <v-spacer></v-spacer>
-                                                <v-btn-toggle v-model="viewMode" mandatory class="mr-2">
+                                                <v-btn-toggle v-model="viewMode" mandatory class="mr-2" color="primary">
                                                     <v-btn value="full">
                                                         <v-icon>mdi-format-list-bulleted</v-icon>
                                                         <span class="d-none d-sm-inline ml-1">Completo</span>

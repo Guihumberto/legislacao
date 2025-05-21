@@ -130,7 +130,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             }
         },
         //importar user
-        async importConteudoEditalUser(){
+        async importConteudoEditalUser(id){
             const snackStore = useSnackStore()
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
@@ -140,7 +140,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                 return
             }
 
-            const isExist = await this.verificaEdital(this.readEdital.id)
+            const isExist = await this.verificaEdital(id)
 
             if(isExist){
                 snackStore.activeSnack('Edital já adicionado a sua área', 'error',)
@@ -154,10 +154,12 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             try {
                 const response = await api.post('conteudo_edital_import/_doc', objeto);
                 const resp = await this.importConteudoUser(this.getConteudoEdital, response.data._id)
-
+                
                 snackStore.activeSnack('Edital importado com sucesso', 'success',)
+                return true
             } catch (error) {
                 console.log('error importar editais', error);
+                return false
             }
         },
         async importConteudoUser(conteudoEditalData, id_edital) {   
@@ -183,7 +185,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             try {
-               const response = await post.get('conteudo_edital_import/_search', {
+               const response = await api.post('conteudo_edital_import/_search', {
                     size: 0,
                     query:{
                         bool:{
@@ -205,6 +207,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                return response.data.hits.total.value
             } catch (error) {
                 this.error = error;
+                console.log('error ao verificar edital');
                 return true
             }
         },

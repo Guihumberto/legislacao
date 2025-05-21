@@ -23,7 +23,8 @@
                         <span class="d-none d-sm-inline ml-1">Normas</span>
                       </v-btn>
                     </v-btn-toggle>
-                    <v-btn @click="importar" color="primary" :disabled="load" :loading="load">
+                    <v-btn v-if="importSuccess" color="success" append-icon="mdi-login-variant" @click="$router.push('/areauser')">acessar</v-btn>
+                    <v-btn v-else @click="importar" color="primary" :disabled="load" :loading="load">
                       <v-icon>mdi-import</v-icon>
                       <span class="d-none d-sm-inline ml-1">IMPORTAR</span>
                     </v-btn>
@@ -157,10 +158,12 @@
 
   const viewMode = ref('full')
   const load = ref(false)
+  const importSuccess = ref(false)
 
   const importar = async () => {
     load.value = true;
-    await conteudoStore.importConteudoEditalUser()
+    const resp = await conteudoStore.importConteudoEditalUser(id_concurso)
+    if(resp) importSuccess.value = true;
     load.value = false;
   }
 
