@@ -60,6 +60,7 @@
                                                                     <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
                                                                         <template v-slot:activator="{ props }">
                                                                             <v-btn 
+                                                                                v-if="userMaster"
                                                                                 density="compact"
                                                                                 v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
                                                                         </template>
@@ -192,7 +193,7 @@
                         <Home />
                         <p>Disciplina, topico, subtopico selecionado</p>
                         <div :class="geralStore.readHeaderShow ? 'content3': 'conten4'">
-                            <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina"/>
+                            <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
                             <Questoes v-if="options === '2'" :select="selectDisciplina" />
                             <Guia v-if="options === '3'" :select="selectDisciplina" />
                             <Resumo v-if="options === '4'" :select="selectDisciplina" />
@@ -513,6 +514,19 @@
     const handleResize = () => {
     initDimensions();
     };
+
+    //local storage
+
+    const userMaster = computed(() => {
+        const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+        const login = {
+            login: JSON.parse(data).cpf,
+            password: JSON.parse(data).password
+        } 
+        return login.login == '01791743390'
+        ? true
+        : false
+    })
 
     onMounted(async() => {
         initDimensions();

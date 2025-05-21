@@ -8,24 +8,26 @@
                 <div class="bg-white pa-10 text-left text" v-html="revisaoStore.readRevisao.resumo_geral">
                 </div>
             </div>
-            <v-form @submit.prevent="onSubmit" ref="form" v-else>
-                <v-text-field
-                    label="Ponto chave"
-                    density="compact"
-                    variant="outlined"
-                    v-model="campos.pontosChaves"
-                    :rules="[rules.required]"
-                ></v-text-field>
-                <ComentEdit 
-                    label="Resumo"
-                    v-model="campos.resumoTexto"
-                    :disabled="load"
-                    :loading="load"
-                    class="mt-5"
-                    :max-length="5000"
-                />
-                <v-btn type="submit" class="mt-5" variant="flat" color="primary">Salvar</v-btn>
-            </v-form>
+            <div v-else>
+                <v-form @submit.prevent="onSubmit" ref="form" v-if="usermaster">
+                    <v-text-field
+                        label="Ponto chave"
+                        density="compact"
+                        variant="outlined"
+                        v-model="campos.pontosChaves"
+                        :rules="[rules.required]"
+                    ></v-text-field>
+                    <ComentEdit 
+                        label="Resumo"
+                        v-model="campos.resumoTexto"
+                        :disabled="load"
+                        :loading="load"
+                        class="mt-5"
+                        :max-length="5000"
+                    />
+                    <v-btn type="submit" class="mt-5" variant="flat" color="primary">Salvar</v-btn>
+                </v-form>
+            </div>
         </div>
     </section>
 </template>
@@ -38,7 +40,8 @@
     import ComentEdit from '@/components/legislacao/forum/comentarios/comentEdit.vue';
 
     const props = defineProps({
-        select: Object
+        select: Object,
+        usermaster: Boolean,
     })
 
     const rules = ref({
