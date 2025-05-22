@@ -70,47 +70,56 @@
                                                                 </div>
                                                             </div>
                                                         </v-expansion-panel-title>
-                                                    <v-expansion-panel-text>
-                                                        
-                                                        <v-list density="compact">
-                                                        <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
-            
-                                                            <v-list-item
-                                                            @click="selectItem('topico', disciplina, topico)"
-                                                            link
-                                                            :title="topico.numero + ' ' + topico.conteudo"
-                                                            :class="topico.normas && topico.normas.length ? 'bg-light-blue-lighten-5' : ''"
-                                                            >
-                                                            </v-list-item>
+                                                        <v-expansion-panel-text>
                                                             
-                                                            <v-list-item link
-                                                            @click="selectItem('subtopico', disciplina, topico, subtopico)"
-                                                            v-for="(subtopico, subtopicoIndex) in topico.subtopicos"
-                                                            :key="subtopicoIndex"
-                                                            :title="subtopico.numero + ' ' + subtopico.conteudo"
-                                                            :class="[
-                                                                'pl-10',
-                                                                subtopico.normas && subtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
-                                                            ]"
-                                                            >
-                                                            </v-list-item>
-                                                            
-                                                            <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="'sub-'+subtopicoIndex">
-                                                            <v-list-item link
-                                                                @click="selectItem('subsubtopico', disciplina, topico, subtopico, subSubtopico)"
-                                                                v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos"
-                                                                :key="subSubtopicoIndex"
-                                                                :title="subSubtopico.numero + ' ' + subSubtopico.conteudo"
-                                                                :class="[
-                                                                'pl-16',
-                                                                subSubtopico.normas && subSubtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
-                                                                ]"
-                                                            >
-                                                            </v-list-item>
+                                                            <v-list density="compact">
+                                                                <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
+                                                                    <v-list-item
+                                                                        @click="selectItem('topico', disciplina, topico)"
+                                                                        link
+                                                                        :title="topico.numero + ' ' + topico.conteudo"
+                                                                        :class="topico.normas && topico.normas.length ? 'bg-light-blue-lighten-5' : ''"
+                                                                    >
+                                                                        <template v-slot:append>
+                                                                            <v-btn color="green" variant="text"><v-icon>mdi-check-all</v-icon></v-btn>
+                                                                        </template>
+                                                                    </v-list-item>
+                                                                    
+                                                                    <v-list-item link
+                                                                        @click="selectItem('subtopico', disciplina, topico, subtopico)"
+                                                                        v-for="(subtopico, subtopicoIndex) in topico.subtopicos"
+                                                                        :key="subtopicoIndex"
+                                                                        :title="subtopico.numero + ' ' + subtopico.conteudo"
+                                                                        :class="[
+                                                                            'pl-10',
+                                                                            subtopico.normas && subtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
+                                                                        ]"
+                                                                    >
+                                                                        <template v-slot:append>
+                                                                            <div >
+                                                                                <v-btn color="success" variant="text"><v-icon>mdi-check</v-icon></v-btn>
+                                                                            </div>
+                                                                        </template>
+                                                                        
+                                                                        <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="'sub-'+ subSubtopicoIndex">
+                                                                                <v-list-item link
+                                                                                    @click="selectItem('subsubtopico', disciplina, topico, subtopico, subSubtopico)"
+                                                                                    :title="subSubtopico.numero + ' ' + subSubtopico.conteudo"
+                                                                                    :class="[
+                                                                                    'pl-16',
+                                                                                    subSubtopico.normas && subSubtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
+                                                                                    ]"
+                                                                                >
+                                                                                    <template v-slot:append>
+                                                                                        <v-btn color="success" variant="text"><v-icon>mdi-check</v-icon></v-btn>
+                                                                                    </template>
+                                                                                </v-list-item>
+                                                                        </template>
+                                                                    </v-list-item>
+                                                                    
                                                             </template>
-                                                        </template>
-                                                        </v-list>
-                                                    </v-expansion-panel-text>
+                                                            </v-list>
+                                                        </v-expansion-panel-text>
                                                     </v-expansion-panel>
                                                 </v-expansion-panels>
                                             </div>
@@ -264,21 +273,31 @@
 
         if(topRelevantes.value?.top_relevante?.length){
             let find = list.find(item => item.disciplina == topRelevantes.value.disciplina)
-            if(find) find.top_relevante = topRelevantes.value.top_relevante
+            if(find) find.top_relevante = topRelevantes.value.top_relevante.map(Number);
         }
 
         if (filter.value.relevante && topRelevantes.value?.top_relevante?.length) {
+
+            const ordem = new Map(topRelevantes.value?.top_relevante.map(Number).map((num, index) => [num, index]));
+       
             return list.map(item => {
-            if (item.disciplina === topRelevantes.value.disciplina) {
-                return {
-                ...item,
-                topicos: item.topicos.filter(topico =>
-                    topRelevantes.value.top_relevante.includes(topico.numero)
-                ),
-                top_relevante: topRelevantes.value.top_relevante,
+                if (item.disciplina === topRelevantes.value.disciplina) {
+                    const findDisciplina = {
+                        ...item,
+                        topicos: item.topicos.filter(topico =>
+                            topRelevantes.value.top_relevante.includes(topico.numero)
+                        ),
+                        top_relevante: topRelevantes.value.top_relevante,
+                    }
+              
+                    findDisciplina.topicos = [...findDisciplina.topicos].sort((a, b) => {
+                        return (ordem.get(Number(a.numero)) ?? Infinity) - (ordem.get(Number(b.numero)) ?? Infinity);
+                    });
+
+                    return findDisciplina;
+
                 }
-            }
-            return item
+                return item
             })
         }
 
