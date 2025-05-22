@@ -1,5 +1,6 @@
 <template>
-   <section :class="geralStore.readHeaderShow ? 'resizable-container': 'resizable-container2'">
+   <section >
+    <div class="container" :class="geralStore.readHeaderShow ? 'container': 'container2'">
         <div ref="leftPanel" class="panel left-panel" :style="{ width: leftWidth + 'px' }">
             <div class="panel-content">
                  <div>
@@ -9,13 +10,15 @@
                             <Details :concurso="edital" />
                         </div>
                         <v-divider class="my-5"></v-divider>
-                        <div class="border rounded-lg pa-5 mb-5">
+                        <div class="border rounded-lg pa-5 mb-5" style="max-width: 1050px; margin: auto;">
                             <div class="mb-5 d-flex justify-space-between align-center" v-if="!load">
                                 <div>
-                                    <h1 class="text-h5">{{ $route.query.cargo }}</h1>
+                                    <h1 class="text-h6">{{ $route.query.cargo }}</h1>
                                     <p>{{ $route.query.concurso }}</p>
                                 </div>
-                                <v-btn @click="sidebar = !sidebar" :icon="sidebar ? 'mdi-arrow-left': 'mdi-arrow-right'"></v-btn>
+                                <v-btn 
+                                    variant="text" @click="sidebar = !sidebar" 
+                                    :icon="sidebar ? 'mdi-arrow-left-bold-box-outline': 'mdi-arrow-right-bold-box-outline'"></v-btn>
                             </div>
                             <div v-else>Carregando....</div>
                             <div v-if="!load">
@@ -23,9 +26,9 @@
                                     <v-col cols="12" v-if="conteudoStore.readConteudoEditalUser.length > 0">
                                         <v-card color="transparent" variant="flat" class="border">        
                                             <v-card-title class="d-flex align-center">
-                                                Conteúdo Verticalizado
+                                                <span v-if="leftWidth > 600">Conteúdo Verticalizado</span>
                                                 <v-spacer></v-spacer>
-                                                <v-btn-toggle v-model="viewMode" mandatory class="mr-2" color="primary">
+                                                <v-btn-toggle v-model="viewMode" mandatory class="mr-2" color="primary" density="compact">
                                                     <v-btn value="full">
                                                         <v-icon>mdi-format-list-bulleted</v-icon>
                                                         <span class="d-none d-sm-inline ml-1">Completo</span>
@@ -170,7 +173,7 @@
                 </div>
             </div>
         </div>
-
+        <!-- barra ed ajuste -->
         <div 
             v-if="sidebar"
             ref="divider" 
@@ -184,11 +187,11 @@
                 icon="mdi-drag-vertical"
             ></v-icon>
         </div>
-
+        <!-- menu de opcoes -->
         <Transition name="fade">
             <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
                 <div class="panel-content">
-                    <v-card-text class="text-center">
+                    <v-card-text class="text-center"  style="max-width: 1050px; margin: auto;">
                         <Home />
                         <p>Disciplina, topico, subtopico selecionado</p>
                         <div :class="geralStore.readHeaderShow ? 'content3': 'conten4'">
@@ -201,6 +204,7 @@
                 </div>
             </div>
         </Transition>
+    </div>
    </section>
 </template>
 
@@ -432,12 +436,13 @@
     const startLeftWidth = ref(0);
 
     watch(sidebar, (newSidebar) => {
-       if(!sidebar.value) leftWidth.value = 900
+       if(!sidebar.value) leftWidth.value = 1050
+       if(sidebar.value) leftWidth.value = 800
     })
 
     // Largura do painel direito calculada
     const rightWidth = computed(() => {
-    return containerWidth.value - leftWidth.value - 10; // 10px é a largura do divisor
+        return containerWidth.value - leftWidth.value - 10; // 10px é a largura do divisor
     });
 
     // Iniciar o redimensionamento
@@ -503,11 +508,12 @@
 
     // Inicializar as dimensões
     const initDimensions = () => {
-    if (leftPanel.value && rightPanel.value) {
-        const container = leftPanel.value.parentElement;
-        containerWidth.value = container.clientWidth;
-        leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
-    }
+        if (leftPanel.value && rightPanel.value) {
+            const container = leftPanel.value.parentElement;
+            containerWidth.value = container.clientWidth;
+            leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
+        }
+        leftWidth.value = 1050
     };
 
     // Atualizar dimensões no redimensionamento da janela
@@ -544,73 +550,89 @@
 </script>
 
 <style scoped>
-    .resizable-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 80vh;
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    height: 79vh;
+    .container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        height: 79vh;
     }
-
     .resizable-container2 {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    height: 80vh;
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    height: 88.3vh;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        height: 88.3vh;
     }
-
     .panel {
     height: 100%;
     overflow: hidden;
     }
-
     .panel-content {
     padding: 16px;
     height: 100%;
     }
-
     .content{
         height: 55vh;
         overflow-y: auto;
     }
-
     .conten2{
         height: 64vh;
         overflow-y: auto;
     }
-
     .content3{
         height: 70vh;
         overflow-y: auto;
     }
-
     .conten4{
         height: 79vh;
         overflow-y: auto;
     }
-
-    .panel-divider {
-    width: 10px;
-    height: 100%;
-    background-color: #f5f5f5;
-    cursor: col-resize;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
+     .content::-webkit-scrollbar, .content2::-webkit-scrollbar, .content3::-webkit-scrollbar, .content4::-webkit-scrollbar {
+        width: 8px; /* largura da barra */
+    }
+    .content::-webkit-scrollbar-track, .content2::-webkit-scrollbar-track, .content3::-webkit-scrollbar-track, .content4::-webkit-scrollbar-track {
+        background: #f1f1f1; /* trilho da barra */
+        border-radius: 4px;
     }
 
+    .content::-webkit-scrollbar-thumb, .content2::-webkit-scrollbar-thumb, .content3::-webkit-scrollbar-thumb, .content4::-webkit-scrollbar-thumb {
+        background-color: #888; /* "botão" da barra */
+        border-radius: 4px;
+    }
+
+    .content::-webkit-scrollbar-thumb:hover,  .content2::-webkit-scrollbar-thumb:hover, .content3::-webkit-scrollbar-thumb:hover,  .content4::-webkit-scrollbar-thumb:hover {
+        background-color: #555; /* ao passar o mouse */
+    }
+    /* Firefox */
+    .content, .content2, .content3, .content4 {
+        scrollbar-width: thin;            /* largura fina */
+        scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
+    }
+    .panel-divider {
+        width: 10px;
+        height: 100%;
+        background-color: #f5f5f5;
+        cursor: col-resize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+    }
     .panel-divider:hover {
         background-color: #e0e0e0;
     }
     .right-panel{
         transition: 1s ease-in-out;
     }
+    .fade-enter-from, .fade-leave-to {
+        opacity: 0;
+        transform: translatex(30px);
+    }
+
+    
 </style>
