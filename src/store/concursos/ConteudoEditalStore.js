@@ -49,6 +49,14 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
         },
         readEditalUser(){
             return this.editalUser
+        },
+        readUserSelect(){
+            const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+            const login = {
+                login: JSON.parse(data).cpf,
+                password: JSON.parse(data).password
+            } 
+            return login.login
         }
     },
     actions: {
@@ -213,7 +221,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
         },
         async getEditalUser() {
             const loginStore = useLoginStore()
-            const cpf = loginStore.readLogin?.cpf
+            const cpf = this.readUserSelect
             if(!cpf) return
             this.editaisUser = []
             try {
@@ -244,7 +252,7 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
         },
         async getConteudoEditalUser(id) {
             const loginStore = useLoginStore()
-            const cpf = loginStore.readLogin?.cpf
+            const cpf = this.readUserSelect
             if(!cpf) return
             this.conteudoEditalUser = []
             try {

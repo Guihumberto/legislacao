@@ -388,7 +388,7 @@
 
     watch(sidebar, (newSidebar) => {
        if(!sidebar.value) leftWidth.value = 1050
-       if(sidebar.value) leftWidth.value = 800
+       if(sidebar.value) leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
     })
 
     // Largura do painel direito calculada
@@ -462,13 +462,13 @@
         if (leftPanel.value && rightPanel.value) {
             const container = leftPanel.value.parentElement;
             containerWidth.value = container.clientWidth;
-            leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
+            leftWidth.value = 1050
         }
     };
 
     // Atualizar dimensões no redimensionamento da janela
     const handleResize = () => {
-    initDimensions();
+        initDimensions();
     };
 
     //local storage
