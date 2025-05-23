@@ -47,79 +47,10 @@
                                                         v-for="(disciplina, disciplinaIndex) in conteudoList"
                                                         :key="disciplinaIndex"
                                                     >
-                                                        <v-expansion-panel-title @click="selectActionsDisciplina(disciplina)">
-                                                            <div class="w-100 d-flex justify-space-between align-center">
-                                                                <b>{{ disciplina.disciplina }}</b>
-                                                                <div>
-                                        
-                                                                    <v-tooltip text="Filtrar pelas Relevantes" location="top">
-                                                                        <template v-slot:activator="{ props }">
-                                                                            <v-btn 
-                                                                                density="compact"
-                                                                                v-if="disciplina?.top_relevante"
-                                                                                v-bind="props" variant="text" :color="filter.relevante ? 'primary' : 'grey'" icon="mdi-filter" @click.stop="filter.relevante = !filter.relevante"></v-btn>
-                                                                        </template>
-                                                                    </v-tooltip>     
-                                                                    <v-tooltip text="Analisar disciplina por pontos mais cobrados" location="top">
-                                                                        <template v-slot:activator="{ props }">
-                                                                            <v-btn 
-                                                                                density="compact"
-                                                                                v-bind="props" variant="text" color="primary" icon="mdi-chart-line" @click.stop="selectItem('disciplina', disciplina)"></v-btn>
-                                                                        </template>
-                                                                    </v-tooltip>
-                                                                </div>
-                                                            </div>
-                                                        </v-expansion-panel-title>
-                                                        <v-expansion-panel-text>
-                                                            
-                                                            <v-list density="compact">
-                                                                <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
-                                                                    <v-list-item
-                                                                        @click="selectItem('topico', disciplina, topico)"
-                                                                        link
-                                                                        :title="topico.numero + ' ' + topico.conteudo"
-                                                                        :class="topico.normas && topico.normas.length ? 'bg-light-blue-lighten-5' : ''"
-                                                                    >
-                                                                        <template v-slot:append>
-                                                                            <v-btn color="green" variant="text"><v-icon>mdi-check-all</v-icon></v-btn>
-                                                                        </template>
-                                                                    </v-list-item>
-                                                                    
-                                                                    <v-list-item link
-                                                                        @click="selectItem('subtopico', disciplina, topico, subtopico)"
-                                                                        v-for="(subtopico, subtopicoIndex) in topico.subtopicos"
-                                                                        :key="subtopicoIndex"
-                                                                        :title="subtopico.numero + ' ' + subtopico.conteudo"
-                                                                        :class="[
-                                                                            'pl-10',
-                                                                            subtopico.normas && subtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
-                                                                        ]"
-                                                                    >
-                                                                        <template v-slot:append>
-                                                                            <div >
-                                                                                <v-btn color="success" variant="text"><v-icon>mdi-check</v-icon></v-btn>
-                                                                            </div>
-                                                                        </template>
-                                                                        
-                                                                        <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="'sub-'+ subSubtopicoIndex">
-                                                                                <v-list-item link
-                                                                                    @click="selectItem('subsubtopico', disciplina, topico, subtopico, subSubtopico)"
-                                                                                    :title="subSubtopico.numero + ' ' + subSubtopico.conteudo"
-                                                                                    :class="[
-                                                                                    'pl-16',
-                                                                                    subSubtopico.normas && subSubtopico.normas.length ? 'bg-light-blue-lighten-5' : ''
-                                                                                    ]"
-                                                                                >
-                                                                                    <template v-slot:append>
-                                                                                        <v-btn color="success" variant="text"><v-icon>mdi-check</v-icon></v-btn>
-                                                                                    </template>
-                                                                                </v-list-item>
-                                                                        </template>
-                                                                    </v-list-item>
-                                                                    
-                                                            </template>
-                                                            </v-list>
-                                                        </v-expansion-panel-text>
+                                                        <DisciplinaItem 
+                                                            @envSelectItem="selectItem"
+                                                            @envSelecDisci="selectActionsDisciplina"
+                                                            :disciplinaItem="disciplina" :disciplinaIndex="disciplinaIndex" :filter="filter" />
                                                     </v-expansion-panel>
                                                 </v-expansion-panels>
                                             </div>
@@ -227,6 +158,7 @@
     import Resumo from '@/components/painel/options/resumo.vue';
     import Guia from '@/components/painel/options/guia.vue';
     import Details from '@/components/painel/details.vue';
+    import DisciplinaItem from '@/components/painel/concurso/disciplinaItem.vue';
 
     import { useGeralStore } from '@/store/GeralStore';
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
@@ -532,7 +464,6 @@
             containerWidth.value = container.clientWidth;
             leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
         }
-        leftWidth.value = 1050
     };
 
     // Atualizar dimensões no redimensionamento da janela

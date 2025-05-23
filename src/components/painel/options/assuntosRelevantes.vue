@@ -1,11 +1,14 @@
 <template>
     <section>
         <div>
-            <div v-if="revisaoStore.readRevisao?.resumo_geral" class="mt-5">
+            <div v-if="revisaoStore.readRevisao?.resumo_geral && !edit" class="mt-5">
                 <v-chip-group>
                     <v-chip v-for="item, i in revisaoStore.readRevisao.top_relevante">{{ item }}</v-chip>
                 </v-chip-group>
                 <div class="bg-white pa-10 text-left text" v-html="revisaoStore.readRevisao.resumo_geral">
+                </div>
+                <div class="mt-5" v-if="usermaster">
+                    <v-btn prepend-icon="mdi-pencil" color="warning" variant="flat" @click="editarResumo">Editar</v-btn>
                 </div>
             </div>
             <div v-else>
@@ -25,7 +28,11 @@
                         class="mt-5"
                         :max-length="5000"
                     />
-                    <v-btn type="submit" class="mt-5" variant="flat" color="primary">Salvar</v-btn>
+                    <div class="mt-5">
+                        <v-btn v-if="edit" class="mr-2" variant="flat" @click="edit = false">Cancelar</v-btn>
+                        <v-btn v-if="edit" type="submit" variant="flat" color="warning">Editar</v-btn>
+                        <v-btn v-else type="submit" variant="flat" color="primary">Salvar</v-btn>
+                    </div>
                 </v-form>
             </div>
         </div>
@@ -49,6 +56,7 @@
         minname: (v) => (v||'').length >= 3 || "Mínimo 3 caracteres",
     })
 
+    const edit = ref(false);
     const form = ref(null);
     const load = ref(false);    
     const campos = ref({
@@ -74,13 +82,35 @@
         if(valid) {
             load.value = true
             await revisaoStore.createRevisao(revisao)
+            clearCampos()
+            if(edit.value) {
+                edit.value = false
+                revisaoStore.getRevisao(props.select)
+            }
             load.value = false
+        }
+    }
+
+    const editarResumo = () => {
+        edit.value = true
+        campos.value = {
+            pontosChaves: revisaoStore.readRevisao.top_relevante.join(","),
+            resumoTexto: revisaoStore.readRevisao.resumo_geral,
+        }
+    }
+
+    const clearCampos = () => {
+        campos.value = {
+            pontosChaves: '',
+            resumoTexto: '',
         }
     }
 
     watch(
     () => props.select, (val) => { 
         revisaoStore.getRevisao(props.select)
+        edit.value = false
+        clearCampos()
     })
 
    

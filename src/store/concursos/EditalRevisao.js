@@ -21,7 +21,6 @@ export const useRevisaoStore = defineStore("revisaoStore", {
     },
     actions:{
         async createRevisao(revisao){
-            console.log('revisao', revisao);
             const snackStore = useSnackStore()
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf

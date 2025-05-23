@@ -255,7 +255,14 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                             id_edital: id
                         }
                                 
-                    }
+                    },
+                    sort: [
+                         {
+                            disciplina: {
+                                order: "asc", // Ordena pelos IDs em ordem decrescente
+                            },
+                        }
+                    ]
                 });
                 this.conteudoEditalUser = response.data.hits.hits.map(item => ({ id: item._id, ...item._source}))
             } catch (error) {
@@ -274,6 +281,26 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             } catch (error) {
                 this.error = error;
                 console.log('error get edital user');
+            }
+        },
+        async editDisciplinaItem(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await api.post(`conteudo_edital_import/_update/${item.id}`, {
+                    doc: item
+                });
+                snackStore.activeSnack('Item Atualizado com sucesso.', 'success',)
+            } catch (error) {
+                this.error = error;
+                console.log('error edit disciplina item user');
+                snackStore.activeSnack('Ocorreu um erro ao atualizar', 'error',)
+            } finally {
+                this.loading = false;
             }
         }
   }
