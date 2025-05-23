@@ -24,7 +24,7 @@
                             <div v-if="!load">
                                 <v-row v-if="conteudoStore.readConteudoEditalUser.length">
                                     <v-col cols="12" v-if="conteudoStore.readConteudoEditalUser.length > 0">
-                                        <v-card color="transparent" variant="flat" class="border">        
+                                        <v-card color="#ECEFF1" variant="flat" class="border mb-5 pb-5">        
                                             <v-card-title class="d-flex align-center">
                                                 <span v-if="leftWidth > 600">Conteúdo Verticalizado</span>
                                                 <v-spacer></v-spacer>
@@ -154,8 +154,8 @@
     import Home from '@/components/painel/options/home.vue';
     import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
     import AssuntosRelevantes from '@/components/painel/options/assuntosRelevantes.vue';
-    import Questoes from '@/components/painel/options/questoes.vue';
-    import Resumo from '@/components/painel/options/resumo.vue';
+    import Questoes from '@/components/painel/options/guias/questoes.vue';
+    import Resumo from '@/components/painel/options/guias/resumo.vue';
     import Guia from '@/components/painel/options/guia.vue';
     import Details from '@/components/painel/details.vue';
     import DisciplinaItem from '@/components/painel/concurso/disciplinaItem.vue';
@@ -535,23 +535,23 @@
     overflow: hidden;
     }
     .panel-content {
-    padding: 16px;
-    height: 100%;
+        padding: 16px;
+        height: 100%;
     }
     .content{
-        height: 55vh;
+        height: 60vh;
         overflow-y: auto;
     }
     .conten2{
-        height: 64vh;
-        overflow-y: auto;
-    }
-    .content3{
         height: 70vh;
         overflow-y: auto;
     }
+    .content3{
+        height: 75vh;
+        overflow-y: auto;
+    }
     .conten4{
-        height: 79vh;
+        height: 84vh;
         overflow-y: auto;
     }
      .content::-webkit-scrollbar, .content2::-webkit-scrollbar, .content3::-webkit-scrollbar, .content4::-webkit-scrollbar {
