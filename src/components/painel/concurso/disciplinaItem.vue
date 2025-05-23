@@ -59,7 +59,7 @@
                     <template v-slot:append  v-if="hoverSubTopico == subtopicoIndex+subtopico.numero">
                         <div>
                             <v-btn 
-                                @click.stop="concluirTarefa(subtopico)" 
+                                @click.stop="concluirTarefa(subtopico, topico)" 
                                 :color="subtopico?.checked ? 'error':'success'" variant="text" density="compact"><v-icon>{{ subtopico?.checked ? 'mdi-close':'mdi-check'}}</v-icon></v-btn>
                         </div>
                     </template>
@@ -79,7 +79,7 @@
                                 </v-list-item-title>
                                 <template v-slot:append v-if="hoverSubSubTopico === subSubtopicoIndex+subSubtopico.numero">
                                     <v-btn 
-                                        @click.stop="concluirTarefa(subSubtopico)" 
+                                        @click.stop="concluirTarefa(subSubtopico, topico, subtopico)" 
                                         :color="subSubtopico?.checked ? 'error':'success'" variant="text" density="compact">
                                         <v-icon>{{ subSubtopico?.checked ? 'mdi-close':'mdi-check'}}</v-icon>
                                     </v-btn>
@@ -122,7 +122,7 @@
         }
     })
 
-    const concluirTarefa = async (item) => {
+    const concluirTarefa = async (item, grupo = null, subGrupo = null) => {
         if(load.value){
             snackStore.activeSnack('Aguarde enquanto salva o item', 'error',)
             return
@@ -134,22 +134,37 @@
         } 
 
         const newCheckedValue = !item?.checked
-        toggleChecked(item, newCheckedValue)
+        toggleChecked(item, newCheckedValue, grupo, subGrupo)
         await salvarNoElasticsearch(props.disciplinaItem)
     }
 
-    const toggleChecked = (item, newCheckedValue) => {
+    const toggleChecked = (item, newCheckedValue, grupo = null, subgrupo) => {
         item.checked = newCheckedValue
+
+        if(!newCheckedValue && grupo) {
+            grupo.checked = false
+            if(subgrupo) subgrupo.checked = false
+        } 
+
+        if(newCheckedValue && grupo){
+            const finishTopicos = grupo.subtopicos.filter(t => !t.checked).length === 0 
+            if(finishTopicos) grupo.checked = true
+            if(subgrupo){
+                const finishSub = subgrupo.subtopicos.filter(t => !t.checked).length === 0
+                if(finishSub) subgrupo.checked = true
+                const finishTopicos2 = grupo.subtopicos.filter(t => !t.checked).length === 0 
+                if(finishTopicos2) grupo.checked = true
+            }
+        }
 
         // Marca/desmarca apenas os subtopicos diretos (1 nível abaixo)
         if (item?.subtopicos && item?.subtopicos?.length) {
+            
             item.subtopicos.forEach(sub => {
                 sub.checked = newCheckedValue
-                if(!newCheckedValue) item.checked = false
                 // Se tiver subSubtopicos, também marca apenas um nível abaixo
                 if (sub.subtopicos && sub.subtopicos.length) {
                     sub.subtopicos.forEach(subsub => {
-                        if(!newCheckedValue) sub.checked = false
                         subsub.checked = newCheckedValue
                     })
                 }

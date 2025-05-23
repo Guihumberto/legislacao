@@ -1,6 +1,6 @@
 <template>
    <section >
-    <div class="container" :class="geralStore.readHeaderShow ? 'container': 'container2'">
+    <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
         <div ref="leftPanel" class="panel left-panel" :style="{ width: leftWidth + 'px' }">
             <div class="panel-content">
                  <div>
@@ -491,6 +491,7 @@
         await conteudoStore.getConteudoEditalUser(id)
         conteudoStore.getEditalOneUser(id)
         load.value = false
+        geralStore.changeHeaderNoShow(false)
     })  
 
     onUnmounted(() => {
@@ -507,7 +508,18 @@
         overflow: hidden;
         border: 1px solid #e0e0e0;
         border-radius: 4px;
-        height: 79vh;
+        height: calc(100vh - 137px);
+        transition: 1s ease;
+    }
+    .container2{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        height: calc(100vh - 16px);
+        transition: 1s ease;
     }
     .resizable-container2 {
         display: flex;

@@ -1,5 +1,5 @@
 <template>
-  <div class="footer" :class="$route.name == 'Avancado' ? 'noneFooter':''">
+  <div class="footer" :class="$route.name == 'Avancado' || $route.name == 'Concurso Painel' ? 'noneFooter':''">
       <!-- <div class="container">
         <div class="datasefaz">
           <h3>OH-MY-SEARCH</h3>
@@ -41,92 +41,107 @@
 </script>
 
 <style lang="scss" scoped>
-.footer{
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  color: var(--clr-accent-100);
-  width: 100%;
-  background: rgb(158, 158, 165);
-}
-.container{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 0;
-  min-height: 10rem;
-  gap: 3rem;
-  width: min(90%, 1000px);
-}
-.datasefaz{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-.datasefaz > *{
-  text-align: left;
-  width: 100%;
-}
-.subfooter{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: rgb(58, 58, 59);
-  width: 100%;
-  padding: 1rem 0;
-}
-.textasdim{
-  font-size: .9rem;
-  text-align: center;
-}
-.linksfinal a{
-  text-decoration: none;
-  padding: .5rem;
-  color: #000;
-  transition: .5s;
-}
-.linksfinal a:hover{
-  text-decoration: underline;
-}
-.btn{
-  margin: 0 1rem;
-}
-.off{
-  display: none;
-}
-.info{
-  background: #03012D;
-}
-@media (max-width:900px) {
-  .container{
+  .footer{
+    display: flex;
+    justify-content: center;
     flex-direction: column;
+    align-items: center;
+    color: var(--clr-accent-100);
+    width: 100%;
+    background: rgb(158, 158, 165);
+    transition: 1s ease;
+    animation: topAppear 1s ease;
+  }
+  .container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+    min-height: 10rem;
+    gap: 3rem;
+    width: min(90%, 1000px);
+  }
+  .datasefaz{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   .datasefaz > *{
+    text-align: left;
+    width: 100%;
+  }
+  .subfooter{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgb(58, 58, 59);
+    width: 100%;
+    padding: 1rem 0;
+  }
+  .textasdim{
+    font-size: .9rem;
     text-align: center;
   }
-}
-@media (max-width:500px) {
-  .groupbtns{
-    display: grid;
-    grid-auto-columns: 1fr;
-    gap: 1rem;
+  .linksfinal a{
+    text-decoration: none;
+    padding: .5rem;
+    color: #000;
+    transition: .5s;
+  }
+  .linksfinal a:hover{
+    text-decoration: underline;
   }
   .btn{
-    margin: 0;
+    margin: 0 1rem;
   }
   .off{
-    display: block;
+    display: none;
+  }
+  .info{
+    background: #03012D;
   }
   .noneFooter{
     display: none;
-}
-}
-@media print {
-    .footer {
-        display: none;
+  }
+  @media (max-width:900px) {
+    .container{
+      flex-direction: column;
     }
-}
+    .datasefaz > *{
+      text-align: center;
+    }
+  }
+  @media (max-width:500px) {
+    .groupbtns{
+      display: grid;
+      grid-auto-columns: 1fr;
+      gap: 1rem;
+    }
+    .btn{
+      margin: 0;
+    }
+    .off{
+      display: block;
+    }
+    .noneFooter{
+      display: none;
+    }
+  }
+  @media print {
+      .footer {
+          display: none;
+      }
+  }
+
+  @keyframes topAppear {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+    
+  }
 </style>

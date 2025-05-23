@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div :class="geralStore.readHeaderShow ? 'wrapper': 'wrapper2'">
         <section class="conteudo" ref="topUp">
             <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
                 <div class="sizeLoad" v-if="pageStore.readLoad">
@@ -486,7 +486,12 @@
 <style lang="scss" scoped>
 .wrapper{
     display: flex;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 140px);
+    font-family: Arial, sans-serif;
+}
+.wrapper2{
+    display: flex;
+    height: calc(100vh - 20px);
     font-family: Arial, sans-serif;
 }
 
