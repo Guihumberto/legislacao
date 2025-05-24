@@ -1,14 +1,25 @@
 <template>
     <section>
-        <div>
-            <h1>Guia De estudo</h1>
+        <div class="mt-5">
+            <h1 class="text-h4">Guia de estudos</h1>
+            <p class="font-weight-bold">{{ selected?.disciplina }}</p>
+            <p>{{ selected.numero }} - {{ selected?.conteudo }}</p>
         </div>
-        <div class="d-flex justify-center">
-            <v-chip-group v-model="select" active-class="primary--text" column>
-                <v-chip v-for="type, t in typesGuia">{{ type.title }}</v-chip>
-            </v-chip-group>
-        </div>
-        <div class="mt-5 border rounded-lg" style="min-height: 54vh;">
+        <div class="mt-5">
+            <div class="pa-2 mx-auto" v-for="item,i in typesGuia" :key="i" style="max-width: 500px;">
+                <v-card class="text-left" variant="outlined" color="grey">
+                    <v-card-title class="text-black d-flex align-center ga-2">
+                          <v-icon size="1.5rem">{{ item.icon }}</v-icon>
+                           {{ item.title }}
+                    </v-card-title>
+                    <v-card-text >
+                        Crie revisão dos pontos relevantes desse assunto
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-btn variant="outlined" block color="black" @click="generateReview">Gerar</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </div>
         </div>
     </section>
 </template>
@@ -16,44 +27,63 @@
 <script setup>
    import { ref } from 'vue';
 
-   const select = ref('')
+   const props = defineProps({
+        selected: {
+            type: Object,
+            default: {
+                id: null
+            },
+        },
+        usermaster: {
+            type: Boolean,
+            default: true,
+        },
+    })
+
+   const selectGuia = ref('')
    const typesGuia = [
         {
             id: 1,
-            title: 'Questões',
-            icon: 'mdi-file-document-outline',
+            title: 'Gerar Questões',
+            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            icon: 'mdi-list-status',
             color: 'grey',
         },
         {
             id: 2,
-            title: 'Resumo',
+            title: 'Gerar Revisão',
+            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
             icon: 'mdi-file-document-outline',
             color: 'grey',
         },
         {
             id: 3,
-            title: 'Flashcards',
-            icon: 'mdi-file-document-outline',
+            title: 'Gerar Flashcards',
+            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            icon: 'mdi-card-text-outline',
             color: 'grey',
         },
         {
             id: 4,
-            title: 'Súmulas',
-            icon: 'mdi-file-document-outline',
+            title: 'Procurar Súmulas',
+            subtitle: 'Crie revisão school pontos relevantes desse assunto',
+            icon: 'mdi-account-school',
             color: 'grey',
         },
         {
             id: 5,
-            title: 'Jurisprudências',
-            icon: 'mdi-file-document-outline',
+            title: 'Procurar Jurisprudências',
+            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            icon: 'mdi-gavel',
             color: 'grey',
         },
         {
             id: 6,
-            title: 'Artigos relevantes',
-            icon: 'mdi-file-document-outline',
+            title: 'Procurar Artigos relevantes',
+            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
-        }
+        },
    ]
 </script>
 

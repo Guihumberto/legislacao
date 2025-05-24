@@ -130,15 +130,12 @@
         <!-- menu de opcoes -->
         <Transition name="fade">
             <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
-                <div class="panel-content">
+                <div class="panel-content overflow-y-auto">
                     <v-card-text class="text-center"  style="max-width: 1050px; margin: auto;">
                         <Home />
-                        <p>Disciplina, topico, subtopico selecionado</p>
-                        <div :class="geralStore.readHeaderShow ? 'content3': 'conten4'">
+                        <div>
                             <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
-                            <Questoes v-if="options === '2'" :select="selectDisciplina" />
-                            <Guia v-if="options === '3'" :select="selectDisciplina" />
-                            <Resumo v-if="options === '4'" :select="selectDisciplina" />
+                            <Guia v-if="options === '3'" :selected="topicoSelected" :usermaster="userMaster" />
                         </div>
                     </v-card-text>
                 </div>
@@ -241,8 +238,23 @@
         return list
     })
 
+    const topicoSelected = ref({ id: null })
+
+    const setTopicoSelected = (local, item, topico) => {
+        const { disciplina, banca, id, id_concurso, id_edital, top_relevante } = item
+        topicoSelected.value = {
+            disciplina, 
+            banca, 
+            id, 
+            id_concurso,
+            id_edital, 
+            top_relevante,
+            ...topico
+        } 
+    }
 
     const selectItem = (local, disciplina = null, topico = null, subtopico = null, subsubtopico = null) => {
+      setTopicoSelected(local, disciplina, topico)
       prompt.value = null
       if(!userMaster.value) return
       if(local == 'disciplina') {
