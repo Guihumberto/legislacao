@@ -299,6 +299,7 @@ header .container {
     display: none;
   }
   header .container{
+    margin-top: 2rem;
     padding: 1rem 0;
   }
 }
