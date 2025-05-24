@@ -1,5 +1,5 @@
 <template>
-  <div class="footer" :class="$route.name == 'Avancado' || $route.name == 'Concurso Painel' ? 'noneFooter':''">
+  <div class="footer" :class="$route.name == 'Avancado' || $route.name == 'Concurso Painel' || $route.name == 'Forum Law' ? 'noneFooter':''">
       <!-- <div class="container">
         <div class="datasefaz">
           <h3>OH-MY-SEARCH</h3>
