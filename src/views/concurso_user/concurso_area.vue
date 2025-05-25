@@ -135,7 +135,9 @@
                         <Home />
                         <div>
                             <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
-                            <Guia v-if="options === '3'" :selected="topicoSelected" :usermaster="userMaster" />
+                            <Guia 
+                                @clearDisciplina="clearDisciplina"
+                                v-if="options === '3'" :selectDisciplina="selectDisciplina" :selected="topicoSelected" :usermaster="userMaster" :prompt="prompt" />
                         </div>
                     </v-card-text>
                 </div>
@@ -151,8 +153,6 @@
     import Home from '@/components/painel/options/home.vue';
     import ActionsPrompt from '@/components/painel/concurso/actionsPrompt.vue';
     import AssuntosRelevantes from '@/components/painel/options/assuntosRelevantes.vue';
-    import Questoes from '@/components/painel/options/guias/questoes.vue';
-    import Resumo from '@/components/painel/options/guias/resumo.vue';
     import Guia from '@/components/painel/options/guia.vue';
     import Details from '@/components/painel/details.vue';
     import DisciplinaItem from '@/components/painel/concurso/disciplinaItem.vue';
@@ -161,6 +161,8 @@
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
     import { useRevisaoStore } from '@/store/concursos/EditalRevisao';
     import { useRoute } from 'vue-router';
+    import { useOptionsStore } from '@/store/concursos/OptionsStore';
+    const optionStore = useOptionsStore()
     const route = useRoute()
     const geralStore = useGeralStore()
     const conteudoStore = useConteudoEditalStore()
@@ -182,6 +184,14 @@
             disciplina: item.disciplina
         }
         sidebar.value = true
+        topicoSelected.value = { id: null}
+    }
+
+    const clearDisciplina = () => {
+        selectDisciplina.value = {
+            id_concurso: '',
+            disciplina: ''
+        }
     }
 
     provide('dialog', dialog)
@@ -251,6 +261,8 @@
             top_relevante,
             ...topico
         } 
+        sidebar.value = true
+        options.value = '3'
     }
 
     const selectItem = (local, disciplina = null, topico = null, subtopico = null, subsubtopico = null) => {
@@ -267,7 +279,7 @@
         const texto = createPrompt2(topico, disciplina.disciplina)
         const promptInit = textoInit.value
         prompt.value = (promptInit + texto).replace(/\n/g, ' ').trim().replace(/\s+/g, ' ')
-        dialog.value = true
+        // dialog.value = true
       }
       if(local == 'subtopico') {
         const texto = createPrompt3(subtopico, disciplina.disciplina, topico.conteudo)
@@ -501,13 +513,15 @@
         window.addEventListener('resize', handleResize);
         load.value = true
         await conteudoStore.getConteudoEditalUser(id)
-        conteudoStore.getEditalOneUser(id)
+        await conteudoStore.getEditalOneUser(id)
+        await optionStore.getAllRevisoes(conteudoStore.readEditalUser)
         load.value = false
         geralStore.changeHeaderNoShow(false)
     })  
 
     onUnmounted(() => {
         window.removeEventListener('resize', handleResize);
+        optionStore.clearUnMounted()
     });
  
 </script>

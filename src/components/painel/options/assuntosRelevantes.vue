@@ -35,6 +35,7 @@
                     </div>
                 </v-form>
             </div>
+            <v-alert class="mt-5" v-if="!select" type="info" variant="outlined" text="Selecione uma disciplina!"></v-alert>
         </div>
     </section>
 </template>
