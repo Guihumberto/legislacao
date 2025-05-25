@@ -26,8 +26,8 @@
         <v-expand-transition>
             <div class="content" v-if="selectGuia">
                 <Resumo @back="selectGuia = ''" v-if="selectGuia == 2" :selected="selected" @submit="submitForm" />
-                <Questoes @back="selectGuia = ''" v-if="selectGuia == 1" :selected="selected" />
-                <Flashcards @back="selectGuia = ''" v-if="selectGuia == 3" :selected="selected" />
+                <Questoes @back="selectGuia = ''" v-if="selectGuia == 1" :selected="selected" @submit="submitForm" />
+                <Flashcards @back="selectGuia = ''" v-if="selectGuia == 3" :selected="selected" @submit="submitForm" />
             </div>
         </v-expand-transition>
         <v-expand-transition>
@@ -49,7 +49,8 @@
                     <v-list-item-title> {{ item.title }} </v-list-item-title>
                      <v-list-item-subtitle> {{ item.conteudo }} </v-list-item-subtitle>
                     <template v-slot:append>
-                        <Revisao :conteudo="item" />
+                        <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" />
+                        <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" />
                     </template>
                 </v-list-item>
                 <v-alert v-if="!listResumo.length" type="info" variant="outlined" text="Não há revisoes criadas neste filtro."></v-alert>
@@ -71,6 +72,7 @@
    import Questoes from './guias/questoes.vue';
    import Flashcards from './guias/flashcards.vue';
    import Revisao from './dialog/revisao.vue';
+   import QuestoesDialog from './dialog/questoes.vue';
 
    const props = defineProps({
         selectDisciplina: {
@@ -150,7 +152,7 @@
 
    const itemsTypeGuia = [
         'resumo',
-        'Questões',
+        'questoes',
         'Flashcards',
         'Súmulas',
         'Jurisprudências',
