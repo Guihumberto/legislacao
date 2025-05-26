@@ -1,216 +1,216 @@
 <template>
-  <v-container class="d-flex justify-center align-center" style="min-height: 70vh;">
+  <v-container class="d-flex justify-center align-start" style="min-height: 50vh;">
     <div class="flashcard-container">
-      <!-- Header com progresso -->
-      <div class="progress-header mb-4">
-        <div class="d-flex justify-space-between align-center mb-2">
-          <h3 class="text-h6 font-weight-medium">
-            Flash Cards
-          </h3>
-          <div class="text-caption text-medium-emphasis">
-            {{ currentIndex + 1 }} de {{ flashcards.length }}
+        <!-- Header com progresso -->
+        <div class="progress-header mb-4">
+          <div class="d-flex justify-space-between align-center mb-2">
+            <h3 class="text-h6 font-weight-medium">
+              Flash Cards
+            </h3>
+            <div class="text-caption text-medium-emphasis">
+              {{ currentIndex + 1 }} de {{ flashcards.length }}
+            </div>
+          </div>
+          
+          <v-progress-linear
+            :model-value="progressPercentage"
+            color="primary"
+            height="6"
+            rounded
+          ></v-progress-linear>
+          
+          <div class="d-flex justify-center mt-2">
+            <small class="text-medium-emphasis">
+              {{ progressPercentage.toFixed(0) }}% concluído
+            </small>
           </div>
         </div>
-        
-        <v-progress-linear
-          :model-value="progressPercentage"
-          color="primary"
-          height="6"
-          rounded
-        ></v-progress-linear>
-        
-        <div class="d-flex justify-center mt-2">
-          <small class="text-medium-emphasis">
-            {{ progressPercentage.toFixed(0) }}% concluído
-          </small>
-        </div>
-      </div>
 
-      <!-- Card Principal -->
-      <v-card
-        class="flash-card mx-auto"
-        width="600"
-        min-height="400"
-        elevation="8"
-        :class="{ 'flipped': showAnswer }"
-      >
-        <!-- Pergunta -->
-        <v-card-text 
-          v-if="!showAnswer" 
-          class="card-content d-flex flex-column justify-center align-center text-center"
+        <!-- Card Principal -->
+        <v-card
+          class="flash-card mx-auto"
+          width="600"
+          min-height="400"
+          elevation="8"
+          :class="{ 'flipped': showAnswer }"
         >
-          <div class="question-section">
-            <v-icon 
-              icon="mdi-help-circle-outline" 
-              size="48" 
-              color="primary" 
-              class="mb-4"
-            ></v-icon>
-            
-            <h2 class="text-h5 mb-6 font-weight-medium">
-              {{ currentCard?.pergunta }}
-            </h2>
+          <!-- Pergunta -->
+          <v-card-text 
+            v-if="!showAnswer" 
+            class="card-content d-flex flex-column justify-center align-center text-center"
+          >
+            <div class="question-section">
+              <v-icon 
+                icon="mdi-help-circle-outline" 
+                size="48" 
+                color="primary" 
+                class="mb-4"
+              ></v-icon>
+              
+              <h2 class="text-h5 mb-6 font-weight-medium">
+                {{ currentCard?.pergunta }}
+              </h2>
+              
+              <v-btn
+                color="primary"
+                size="large"
+                variant="elevated"
+                prepend-icon="mdi-eye"
+                @click="revealAnswer"
+                class="reveal-btn"
+              >
+                Ver Resposta
+              </v-btn>
+            </div>
+          </v-card-text>
+
+          <!-- Resposta -->
+          <v-card-text 
+            v-else 
+            class="card-content d-flex flex-column"
+          >
+            <div class="answer-section flex-grow-1">
+              <div class="d-flex align-center mb-4">
+                <v-icon 
+                  icon="mdi-lightbulb-outline" 
+                  size="32" 
+                  color="success" 
+                  class="mr-3"
+                ></v-icon>
+                <h3 class="text-h6 font-weight-medium">Resposta</h3>
+              </div>
+              
+              <!-- Pergunta pequena no topo -->
+              <v-card 
+                variant="outlined" 
+                class="mb-4 question-reminder"
+                color="grey-lighten-4"
+              >
+                <v-card-text class="py-2">
+                  <small class="text-medium-emphasis">{{ currentCard?.pergunta }}</small>
+                </v-card-text>
+              </v-card>
+              
+              <!-- Resposta principal -->
+              <div class="answer-text text-body-1 mb-6">
+                {{ currentCard?.resposta }}
+              </div>
+            </div>
+
+            <!-- Botões de avaliação -->
+            <div class="evaluation-section">
+              <v-divider class="mb-4"></v-divider>
+              
+              <p class="text-center text-body-2 text-medium-emphasis mb-4">
+                Como você se saiu?
+              </p>
+              
+              <div class="d-flex justify-center gap-3 flex-wrap">
+                <v-btn
+                  color="error"
+                  variant="elevated"
+                  prepend-icon="mdi-close-circle"
+                  @click="evaluate('wrong')"
+                  class="evaluation-btn"
+                >
+                  Errei
+                </v-btn>
+                
+                <v-btn
+                  color="warning"
+                  variant="elevated"
+                  prepend-icon="mdi-information"
+                  @click="evaluate('partial')"
+                  class="evaluation-btn"
+                >
+                  Complementei
+                </v-btn>
+                
+                <v-btn
+                  color="success"
+                  variant="elevated"
+                  prepend-icon="mdi-check-circle"
+                  @click="evaluate('correct')"
+                  class="evaluation-btn"
+                >
+                  Acertei
+                </v-btn>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- Controles de Navegação -->
+        <div class="navigation-controls mt-4 d-flex justify-space-between align-center">
+          <v-btn
+            :disabled="currentIndex === 0"
+            variant="outlined"
+            prepend-icon="mdi-chevron-left"
+            @click="previousCard"
+            class="nav-btn"
+          >
+            Anterior
+          </v-btn>
+
+          <div class="d-flex gap-2">
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-refresh"
+              @click="resetCurrentCard"
+              size="small"
+              :disabled="!showAnswer"
+            >
+              Resetar
+            </v-btn>
             
             <v-btn
-              color="primary"
-              size="large"
-              variant="elevated"
-              prepend-icon="mdi-eye"
-              @click="revealAnswer"
-              class="reveal-btn"
+              variant="text"
+              prepend-icon="mdi-shuffle-variant"
+              @click="shuffleCards"
+              size="small"
             >
-              Ver Resposta
+              Embaralhar
             </v-btn>
           </div>
-        </v-card-text>
 
-        <!-- Resposta -->
-        <v-card-text 
-          v-else 
-          class="card-content d-flex flex-column"
-        >
-          <div class="answer-section flex-grow-1">
-            <div class="d-flex align-center mb-4">
-              <v-icon 
-                icon="mdi-lightbulb-outline" 
-                size="32" 
-                color="success" 
-                class="mr-3"
-              ></v-icon>
-              <h3 class="text-h6 font-weight-medium">Resposta</h3>
-            </div>
-            
-            <!-- Pergunta pequena no topo -->
-            <v-card 
-              variant="outlined" 
-              class="mb-4 question-reminder"
-              color="grey-lighten-4"
-            >
-              <v-card-text class="py-2">
-                <small class="text-medium-emphasis">{{ currentCard?.pergunta }}</small>
-              </v-card-text>
-            </v-card>
-            
-            <!-- Resposta principal -->
-            <div class="answer-text text-body-1 mb-6">
-              {{ currentCard?.resposta }}
-            </div>
-          </div>
-
-          <!-- Botões de avaliação -->
-          <div class="evaluation-section">
-            <v-divider class="mb-4"></v-divider>
-            
-            <p class="text-center text-body-2 text-medium-emphasis mb-4">
-              Como você se saiu?
-            </p>
-            
-            <div class="d-flex justify-center gap-3 flex-wrap">
-              <v-btn
-                color="error"
-                variant="elevated"
-                prepend-icon="mdi-close-circle"
-                @click="evaluate('wrong')"
-                class="evaluation-btn"
-              >
-                Errei
-              </v-btn>
-              
-              <v-btn
-                color="warning"
-                variant="elevated"
-                prepend-icon="mdi-information"
-                @click="evaluate('partial')"
-                class="evaluation-btn"
-              >
-                Complementei
-              </v-btn>
-              
-              <v-btn
-                color="success"
-                variant="elevated"
-                prepend-icon="mdi-check-circle"
-                @click="evaluate('correct')"
-                class="evaluation-btn"
-              >
-                Acertei
-              </v-btn>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
-
-      <!-- Controles de Navegação -->
-      <div class="navigation-controls mt-4 d-flex justify-space-between align-center">
-        <v-btn
-          :disabled="currentIndex === 0"
-          variant="outlined"
-          prepend-icon="mdi-chevron-left"
-          @click="previousCard"
-          class="nav-btn"
-        >
-          Anterior
-        </v-btn>
-
-        <div class="d-flex gap-2">
           <v-btn
-            variant="text"
-            prepend-icon="mdi-refresh"
-            @click="resetCurrentCard"
-            size="small"
-            :disabled="!showAnswer"
+            :disabled="currentIndex === flashcards.length - 1"
+            variant="outlined"
+            append-icon="mdi-chevron-right"
+            @click="nextCard"
+            class="nav-btn"
           >
-            Resetar
-          </v-btn>
-          
-          <v-btn
-            variant="text"
-            prepend-icon="mdi-shuffle-variant"
-            @click="shuffleCards"
-            size="small"
-          >
-            Embaralhar
+            Próximo
           </v-btn>
         </div>
 
-        <v-btn
-          :disabled="currentIndex === flashcards.length - 1"
-          variant="outlined"
-          append-icon="mdi-chevron-right"
-          @click="nextCard"
-          class="nav-btn"
+        <!-- Estatísticas -->
+        <v-card 
+          v-if="stats.total > 0" 
+          variant="outlined" 
+          class="mt-4 stats-card"
         >
-          Próximo
-        </v-btn>
-      </div>
-
-      <!-- Estatísticas -->
-      <v-card 
-        v-if="stats.total > 0" 
-        variant="outlined" 
-        class="mt-4 stats-card"
-      >
-        <v-card-text class="py-3">
-          <div class="d-flex justify-center gap-6 text-center">
-            <div>
-              <div class="text-h6 text-success font-weight-bold">{{ stats.correct }}</div>
-              <small class="text-medium-emphasis">Acertos</small>
+          <v-card-text class="py-3">
+            <div class="d-flex justify-center gap-6 text-center">
+              <div>
+                <div class="text-h6 text-success font-weight-bold">{{ stats.correct }}</div>
+                <small class="text-medium-emphasis">Acertos</small>
+              </div>
+              <div>
+                <div class="text-h6 text-warning font-weight-bold">{{ stats.partial }}</div>
+                <small class="text-medium-emphasis">Parciais</small>
+              </div>
+              <div>
+                <div class="text-h6 text-error font-weight-bold">{{ stats.wrong }}</div>
+                <small class="text-medium-emphasis">Erros</small>
+              </div>
+              <div>
+                <div class="text-h6 text-primary font-weight-bold">{{ stats.accuracy }}%</div>
+                <small class="text-medium-emphasis">Precisão</small>
+              </div>
             </div>
-            <div>
-              <div class="text-h6 text-warning font-weight-bold">{{ stats.partial }}</div>
-              <small class="text-medium-emphasis">Parciais</small>
-            </div>
-            <div>
-              <div class="text-h6 text-error font-weight-bold">{{ stats.wrong }}</div>
-              <small class="text-medium-emphasis">Erros</small>
-            </div>
-            <div>
-              <div class="text-h6 text-primary font-weight-bold">{{ stats.accuracy }}%</div>
-              <small class="text-medium-emphasis">Precisão</small>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
+          </v-card-text>
+        </v-card>
     </div>
 
     <!-- Feedback Toast -->

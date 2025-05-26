@@ -12,13 +12,12 @@
         <div v-if="resposta" class="border pa-2 w-100" :class="resposta == 'acertou' ? 'bg-blue-lighten-5' : 'bg-red-lighten-5'">
             <p v-if="resposta == 'acertou'" class="text-success font-weight-bold">Você acertou!</p>
             <p v-else class="text-error font-weight-bold">Você errou!</p>
-            {{ aleternativa.justificativa }}
+                {{ aleternativa.justificativa }}
             <div class="text-right mt-2">
                 <InfoError :questao="aleternativa" />
             </div>
         </div>
     </div>
-
 </template>
 
 <script setup>
@@ -74,6 +73,6 @@
 
 <style scoped>
     .bloqueado {
-    pointer-events: none;
+        pointer-events: none;
     }
 </style>

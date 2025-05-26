@@ -14,9 +14,8 @@
                     </div>
                     <v-btn density="compact" icon="mdi-close" variant="text" @click="dialog = false"></v-btn>
                 </v-card-title>
-                <v-card-subtitle class="text-h5 pa-2 ml-5"> {{ conteudo.title }}</v-card-subtitle>
                 <v-card-text class="overflow-auto" style="max-height: 800px;">
-                    <div v-for="item, i in conteudo.questoes" :key="item.id" class="mb-5">
+                    <!-- <div v-for="item, i in conteudo.questoes" :key="item.id" class="mb-5">
                         <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
                             <div class="d-flex ga-1 align-center">
                                 <h3 class="d-flex align-center ga-1"> <v-icon size="1.4rem">mdi-checkbox-marked-circle-outline</v-icon> Questão {{ i + 1 }}</h3> 
@@ -32,7 +31,13 @@
                             </p>
                             <Questoes_alternative :aleternativa="item" />
                         </div>
-                    </div>
+                    </div> -->
+                    <CardQuestoes 
+                        :listQuestoes="conteudo.questoes"
+                        @evaluate="handleEvaluation"
+                        @cardChange="handleCardChange"
+                        @complete="handleComplete"
+                    />
                 </v-card-text>
             </v-card>
         </v-dialog>
@@ -43,6 +48,7 @@
     import { ref } from 'vue';
 
     import Questoes_alternative from './questoes_alternative.vue';
+    import CardQuestoes from './cardQuestoes.vue';
 
     const dialog = ref(false)
     
@@ -54,6 +60,28 @@
             },
         },
     })
+
+    // Handlers dos eventos
+    const handleEvaluation = (data) => {
+        console.log(`Card ${data.cardIndex + 1}: ${data.result}`)
+        console.log('Pergunta:', data.question)
+        console.log('Timestamp:', data.timestamp)
+    }
+
+    const handleCardChange = (data) => {
+        console.log('Card atual:', data.currentIndex + 1)
+        console.log('Progresso:', data.progress + '%')
+    }
+
+    const handleComplete = (stats) => {
+        console.log('Sessão completa!')
+        console.log('Estatísticas finais:', stats)
+        // alert(`Parabéns! Você completou todas as Questões!
+        // Acertos: ${stats.correct}
+        // Parciais: ${stats.partial}  
+        // Erros: ${stats.wrong}
+        // Precisão: ${stats.accuracy}%`)
+    }
   
 </script>
 
