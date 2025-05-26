@@ -28,6 +28,9 @@
                 <Resumo @back="selectGuia = ''" v-if="selectGuia == 2" :selected="selected" @submit="submitForm" />
                 <Questoes @back="selectGuia = ''" v-if="selectGuia == 1" :selected="selected" @submit="submitForm" />
                 <Flashcards @back="selectGuia = ''" v-if="selectGuia == 3" :selected="selected" @submit="submitForm" />
+                <Sumulas @back="selectGuia = ''" v-if="selectGuia == 4" :selected="selected" @submit="submitForm" />
+                <Jurisprudencia @back="selectGuia = ''" v-if="selectGuia == 5" :selected="selected" @submit="submitForm" />
+                <Artigos @back="selectGuia = ''" v-if="selectGuia == 6" :selected="selected" @submit="submitForm" />
             </div>
         </v-expand-transition>
         <v-expand-transition>
@@ -52,13 +55,15 @@
                         <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" />
                         <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" />
                         <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" />
+                        <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" />
+                        <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" />
+                        <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" />
                     </template>
                 </v-list-item>
                 <v-alert v-if="!listResumo.length" type="info" variant="outlined" text="Não há revisoes criadas neste filtro."></v-alert>
             </v-list>
             <v-alert v-if="!loading && !optionsStore.readRevisao.length" text="Ainda não foram criadas revisões para este tópico"></v-alert>
         </v-expand-transition>
-        
     </section>
 </template>
 
@@ -75,6 +80,12 @@
    import Revisao from './dialog/revisao.vue';
    import QuestoesDialog from './dialog/questoes.vue';
    import FlashcardsDialog from './dialog/flahscards.vue';
+   import Sumulas from './guias/sumulas.vue';
+   import Jurisprudencia from './guias/jursprudencia.vue';
+   import Artigos from './guias/artigos.vue';
+   import SumulasDialog from './dialog/sumulas.vue';
+   import JurisprudenciaDialog from './dialog/jurisprundencia.vue';
+   import ArtigosDialog from './dialog/artigos.vue';
 
    const props = defineProps({
         selectDisciplina: {
@@ -157,7 +168,7 @@
         'questoes',
         'flahscards',
         'sumulas',
-        'jurisprudencia',
+        'jurisprudencias',
         'artigos',
    ]
 
