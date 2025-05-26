@@ -51,6 +51,7 @@
                     <template v-slot:append>
                         <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" />
                         <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" />
+                        <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" />
                     </template>
                 </v-list-item>
                 <v-alert v-if="!listResumo.length" type="info" variant="outlined" text="Não há revisoes criadas neste filtro."></v-alert>
@@ -73,6 +74,7 @@
    import Flashcards from './guias/flashcards.vue';
    import Revisao from './dialog/revisao.vue';
    import QuestoesDialog from './dialog/questoes.vue';
+   import FlashcardsDialog from './dialog/flahscards.vue';
 
    const props = defineProps({
         selectDisciplina: {
@@ -153,10 +155,10 @@
    const itemsTypeGuia = [
         'resumo',
         'questoes',
-        'Flashcards',
-        'Súmulas',
-        'Jurisprudências',
-        'Artigos',
+        'flahscards',
+        'sumulas',
+        'jurisprudencia',
+        'artigos',
    ]
 
    const loading = ref(false)

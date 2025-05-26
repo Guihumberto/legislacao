@@ -54,7 +54,7 @@
 
     const formref = ref(null)
     const form = ref({
-        title: props.selected?.conteudo || '',
+        title: `Resumo: ${props.selected?.conteudo}` || '',
         text: '',
     })
 

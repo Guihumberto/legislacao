@@ -46,9 +46,6 @@
 <script setup>
     import { ref } from 'vue';
 
-    import { useOptionsStore } from '@/store/concursos/OptionsStore';
-    const optionsStore = useOptionsStore();
-
     const props = defineProps({
         selected: {
             type: Object,
@@ -60,7 +57,7 @@
 
     const formref = ref(null)
     const form = ref({
-        title: props.selected?.conteudo || '',
+        title: `Questões: ${props.selected?.conteudo}` || '',
         listaQuestoes: '',
     })
 
