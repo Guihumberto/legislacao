@@ -79,10 +79,14 @@
                                 clearable
                             ></v-textarea>
                              
-                            <!-- <div class="wrapper-editor">
-                                <EditorContent class="editor" :editor="editor" />
-                            </div> -->
-
+                            <ComentEdit 
+                                label="Texto Editado"
+                                v-model="texto"
+                                :disabled="adminStore.readLoad"
+                                :loading="adminStore.readLoad"
+                                class="mt-5"
+                                :max-length="100000000"
+                            />
 
                             <div class="d-flex ga-2 justify-end mt-2">
                                 <v-btn variant="text" color="grey" @click="clear">Limpar</v-btn>
@@ -168,13 +172,13 @@
 
     import { useGeneralStore } from '@/store/GeneralStore';
     const generalStore = useGeneralStore()
-    
 
     import { useAdminStore } from '@/store/AdminStore';
     import PublishNews from './publishNews.vue';
     const adminStore = useAdminStore()
     
     import SpeelsLawText from './speelsLawText.vue';
+    import ComentEdit from '@/components/legislacao/forum/comentarios/comentEdit.vue';
 
     const confirm = ref(false)
     const lawData = ref({})
@@ -241,7 +245,6 @@
         confirm.value = false
         lawSave.value = ref(null)
         texto.value = null
-        editor.commands.clearContent()
     }
 
     const extractedText = ref("");
@@ -302,11 +305,14 @@
     const limit = 2550
 
     const importarLaw = () => {
-        // texto.value = editor.getHTML()
-        // console.log(texto.value);
+        console.log(texto.value);
+        texto.value = removeSubscripts(texto.value)
+        texto.value = removeAllHtmlTags(texto.value)
+
+        console.log(texto.value);
+  
         const text = dividirTextoParaPaginas(texto.value, limit)
         importForm.value.text = text
-        editor.commands.clearContent()
     }
 
     const dividirTextoParaPaginas = (texto, limiteCaracteres) => {
@@ -362,13 +368,34 @@
         clear()
     }
 
-    import { Editor, EditorContent } from '@tiptap/vue-3'
-    import StarterKit from '@tiptap/starter-kit';
+    const removeSubscripts = (text) => {
+        const subscripts = []
+        const strikethroughs = [];
 
-    const editor = new Editor({
-        extensions: [StarterKit],
-        content: '<p>Texto com <s>tachado</s></p>',
-    })
+        const withoutSubAndS = text
+            .replace(/<sub[^>]*>(.*?)<\/sub>/gi, (match, content) => {
+                if (content.trim()) {
+                subscripts.push(content.trim());
+                }
+                return '';
+            })
+            .replace(/<s[^>]*>(.*?)<\/s>/gi, (match, content) => {
+                if (content.trim()) {
+                strikethroughs.push(content.trim());
+                }
+                return '';
+        });
+        
+        return withoutSubAndS // { text: withoutSubAndS, subscripts, strikethroughs }
+    }
+
+    const removeAllHtmlTags = (text) => {
+        return text
+            .replace(/<\/p>\s*<p>/gi, '\n')
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .trim();
+    }
 
 </script>
 

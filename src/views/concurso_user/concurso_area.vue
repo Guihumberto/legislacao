@@ -129,9 +129,9 @@
         </div>
         <!-- menu de opcoes -->
         <Transition name="fade">
-            <div ref="rightPanel" class="panel right-panel" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
-                <div class="panel-content overflow-y-auto">
-                    <v-card-text class="text-center"  style="max-width: 1050px; margin: auto;">
+            <div ref="rightPanel" class="panel right-panel overflow-y-auto" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
+                <div class="panel-content">
+                    <v-card-text class="text-center">
                         <Home />
                         <div>
                             <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
@@ -557,8 +557,8 @@
         height: 88.3vh;
     }
     .panel {
-    height: 100%;
-    overflow: hidden;
+        height: 100%;
+        overflow: hidden;
     }
     .panel-content {
         padding: 16px;
