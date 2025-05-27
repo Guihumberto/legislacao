@@ -281,7 +281,7 @@
         // Auto-avança para o próximo card após 1.5s se não for o último
         if (currentIndex.value < props.listQuestoes.length - 1) {
             setTimeout(() => {
-                nextCard()
+                // nextCard()
             }, 3500)
         } else {
             // Se for o último card, emite evento de conclusão

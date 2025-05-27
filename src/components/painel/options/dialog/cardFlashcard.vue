@@ -123,7 +123,7 @@
                   @click="evaluate('partial')"
                   class="evaluation-btn"
                 >
-                  Complementei
+                  Acertei parcialmente
                 </v-btn>
                 
                 <v-btn
@@ -272,15 +272,15 @@
         const accuracy = total > 0 ? Math.round(((correct + partial * 0.5) / total) * 100) : 0
         
         return { total, correct, partial, wrong, accuracy }
-        })
+    })
 
-        const feedbackColor = computed(() => {
-            switch (lastEvaluation.value) {
-                case 'correct': return 'success'
-                case 'wrong': return 'error'
-                case 'partial': return 'warning'
-                default: return 'primary'
-            }
+    const feedbackColor = computed(() => {
+        switch (lastEvaluation.value) {
+            case 'correct': return 'success'
+            case 'wrong': return 'error'
+            case 'partial': return 'warning'
+            default: return 'primary'
+        }
     })
 
     const feedbackIcon = computed(() => {
