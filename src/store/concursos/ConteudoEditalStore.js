@@ -310,6 +310,25 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
             } finally {
                 this.loading = false;
             }
+        },
+        async deleteEditalUser(id){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await api.delete(`conteudo_edital_import/_doc/${id}`);
+                this.editaisUser = this.editaisUser.filter(item => item.id !== id)
+                snackStore.activeSnack('Item Deletado com sucesso.', 'success',)
+            } catch (error) {
+                this.error = error;
+                console.log('error delete edital user');
+                snackStore.activeSnack('Ocorreu um erro ao deletar', 'error',)
+            } finally {
+                this.loading = false;
+            }
         }
   }
 })
