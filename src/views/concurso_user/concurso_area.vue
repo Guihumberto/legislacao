@@ -1,149 +1,149 @@
 <template>
-   <section >
-    <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-        <div ref="leftPanel" class="panel left-panel" :style="{ width: leftWidth + 'px' }">
-            <div class="panel-content">
-                 <div>
-                        <div class="d-flex align-center justify-space-between mb-5">
-                            <v-btn @click="$router.push('/areauser')" variant="text" prepend-icon="mdi-arrow-left">Voltar</v-btn>
-                            <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-school</v-icon>Concurso</h1>
-                            <Details :concurso="edital" />
-                        </div>
-                        <v-divider class="my-5"></v-divider>
-                        <div class="border rounded-lg pa-5 mb-5" style="max-width: 1050px; margin: auto;">
-                            <div class="mb-5 d-flex justify-space-between align-center" v-if="!load">
-                                <div>
-                                    <h1 class="text-h6">{{ $route.query.cargo }}</h1>
-                                    <p>{{ $route.query.concurso }}</p>
-                                </div>
-                                <v-btn 
-                                    variant="text" @click="sidebar = !sidebar" 
-                                    :icon="sidebar ? 'mdi-arrow-left-bold-box-outline': 'mdi-arrow-right-bold-box-outline'"></v-btn>
+   <section>
+        <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+            <div ref="leftPanel" class="panel left-panel" :style="{ width: leftWidth + 'px' }">
+                <div class="panel-content">
+                    <div>
+                            <div class="d-flex align-center justify-space-between mb-5">
+                                <v-btn @click="$router.push('/areauser')" variant="text" prepend-icon="mdi-arrow-left">Voltar</v-btn>
+                                <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-school</v-icon>Concurso</h1>
+                                <Details :concurso="edital" />
                             </div>
-                            <div v-else>Carregando....</div>
-                            <div v-if="!load">
-                                <v-row v-if="conteudoStore.readConteudoEditalUser.length">
-                                    <v-col cols="12" v-if="conteudoStore.readConteudoEditalUser.length > 0">
-                                        <v-card color="#ECEFF1" variant="flat" class="border mb-5 pb-5">        
-                                            <v-card-title class="d-flex align-center">
-                                                <span v-if="leftWidth > 600">Conteúdo Verticalizado</span>
-                                                <v-spacer></v-spacer>
-                                                <v-btn-toggle v-model="viewMode" mandatory class="mr-2" color="primary" density="compact">
-                                                    <v-btn value="full">
-                                                        <v-icon>mdi-format-list-bulleted</v-icon>
-                                                        <span class="d-none d-sm-inline ml-1">Completo</span>
-                                                    </v-btn>
-                                                    <v-btn value="normas">
-                                                        <v-icon>mdi-gavel</v-icon>
-                                                        <span class="d-none d-sm-inline ml-1">Normas</span>
-                                                    </v-btn>
-                                                </v-btn-toggle>
-                                            </v-card-title>
-                                        <v-card-text :class="geralStore.readHeaderShow ? 'content': 'conten2'">
-                                            <!-- Exibição do conteúdo completo -->
-                                            <div v-if="viewMode === 'full'">
-                                                <v-expansion-panels>
-                                                    <v-expansion-panel
-                                                        v-for="(disciplina, disciplinaIndex) in conteudoList"
-                                                        :key="disciplinaIndex"
-                                                    >
-                                                        <DisciplinaItem 
-                                                            @envSelectItem="selectItem"
-                                                            @envSelecDisci="selectActionsDisciplina"
-                                                            :disciplinaItem="disciplina" :disciplinaIndex="disciplinaIndex" :filter="filter" />
-                                                    </v-expansion-panel>
-                                                </v-expansion-panels>
-                                            </div>
-            
-                                            <!-- Exibição apenas das normas -->
-                                            <div v-else-if="viewMode === 'normas'">
-                                                <v-list lines="two" >
-                                                    <template v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser" :key="disciplinaIndex">
-                                                    <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>   
-                                                    <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
-                                                        <template v-if="topico.normas && topico.normas.length > 0">
-                                                        <v-list-item
-                                                            v-for="(norma, normaIndex) in topico.normas"
-                                                            prepend-icon="mdi-book"
-                                                            :key="`t-${topicoIndex}-${normaIndex}`"
-                                                            :title="norma"
-                                                            :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
-                                                            class="ml-5"
-                                                        ></v-list-item>
-                                                        </template>
-                                                        
-                                                        <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="subtopicoIndex">
-                                                        <template v-if="subtopico.normas && subtopico.normas.length > 0">
+                            <v-divider class="my-5"></v-divider>
+                            <div class="border rounded-lg pa-5 mb-5" style="max-width: 1050px; margin: auto;">
+                                <div class="mb-5 d-flex justify-space-between align-center" v-if="!load">
+                                    <div>
+                                        <h1 class="text-h6">{{ $route.query.cargo }}</h1>
+                                        <p>{{ $route.query.concurso }}</p>
+                                    </div>
+                                    <v-btn 
+                                        variant="text" @click="sidebar = !sidebar" 
+                                        :icon="sidebar ? 'mdi-arrow-left-bold-box-outline': 'mdi-arrow-right-bold-box-outline'"></v-btn>
+                                </div>
+                                <div v-else>Carregando....</div>
+                                <div v-if="!load">
+                                    <v-row v-if="conteudoStore.readConteudoEditalUser.length">
+                                        <v-col cols="12" v-if="conteudoStore.readConteudoEditalUser.length > 0">
+                                            <v-card color="#ECEFF1" variant="flat" class="border mb-5 pb-5">        
+                                                <v-card-title class="d-flex align-center">
+                                                    <span v-if="leftWidth > 600">Conteúdo Verticalizado</span>
+                                                    <v-spacer></v-spacer>
+                                                    <v-btn-toggle v-model="viewMode" mandatory class="mr-2" color="primary" density="compact">
+                                                        <v-btn value="full">
+                                                            <v-icon>mdi-format-list-bulleted</v-icon>
+                                                            <span class="d-none d-sm-inline ml-1">Completo</span>
+                                                        </v-btn>
+                                                        <v-btn value="normas">
+                                                            <v-icon>mdi-gavel</v-icon>
+                                                            <span class="d-none d-sm-inline ml-1">Normas</span>
+                                                        </v-btn>
+                                                    </v-btn-toggle>
+                                                </v-card-title>
+                                            <v-card-text :class="geralStore.readHeaderShow ? 'content': 'conten2'">
+                                                <!-- Exibição do conteúdo completo -->
+                                                <div v-if="viewMode === 'full'">
+                                                    <v-expansion-panels>
+                                                        <v-expansion-panel
+                                                            v-for="(disciplina, disciplinaIndex) in conteudoList"
+                                                            :key="disciplinaIndex"
+                                                        >
+                                                            <DisciplinaItem 
+                                                                @envSelectItem="selectItem"
+                                                                @envSelecDisci="selectActionsDisciplina"
+                                                                :disciplinaItem="disciplina" :disciplinaIndex="disciplinaIndex" :filter="filter" />
+                                                        </v-expansion-panel>
+                                                    </v-expansion-panels>
+                                                </div>
+                
+                                                <!-- Exibição apenas das normas -->
+                                                <div v-else-if="viewMode === 'normas'">
+                                                    <v-list lines="two" >
+                                                        <template v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser" :key="disciplinaIndex">
+                                                        <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>   
+                                                        <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
+                                                            <template v-if="topico.normas && topico.normas.length > 0">
                                                             <v-list-item
-                                                            v-for="(norma, normaIndex) in subtopico.normas"
-                                                            prepend-icon="mdi-book"
-                                                            :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
-                                                            :title="norma"
-                                                            :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
-                                                            class="ml-5"
-                                                            ></v-list-item>
-                                                        </template>
-                                                        
-                                                        <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="subSubtopicoIndex">
-                                                            <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
-                                                            <v-list-item
-                                                                v-for="(norma, normaIndex) in subSubtopico.normas"
+                                                                v-for="(norma, normaIndex) in topico.normas"
                                                                 prepend-icon="mdi-book"
-                                                                :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
+                                                                :key="`t-${topicoIndex}-${normaIndex}`"
                                                                 :title="norma"
-                                                                :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
+                                                                :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
                                                                 class="ml-5"
                                                             ></v-list-item>
                                                             </template>
+                                                            
+                                                            <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="subtopicoIndex">
+                                                            <template v-if="subtopico.normas && subtopico.normas.length > 0">
+                                                                <v-list-item
+                                                                v-for="(norma, normaIndex) in subtopico.normas"
+                                                                prepend-icon="mdi-book"
+                                                                :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
+                                                                :title="norma"
+                                                                :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
+                                                                class="ml-5"
+                                                                ></v-list-item>
+                                                            </template>
+                                                            
+                                                            <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="subSubtopicoIndex">
+                                                                <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
+                                                                <v-list-item
+                                                                    v-for="(norma, normaIndex) in subSubtopico.normas"
+                                                                    prepend-icon="mdi-book"
+                                                                    :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
+                                                                    :title="norma"
+                                                                    :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
+                                                                    class="ml-5"
+                                                                ></v-list-item>
+                                                                </template>
+                                                            </template>
+                                                            </template>
                                                         </template>
                                                         </template>
-                                                    </template>
-                                                    </template>
-                                                </v-list>
-                                            </div>
-            
-                                        </v-card-text>
-                                        </v-card>
-                                    </v-col>
-                                </v-row>
-                                <v-alert v-else variant="outlined" type="info" text="Você ainda não adicionou um edital."></v-alert>
+                                                    </v-list>
+                                                </div>
+                
+                                            </v-card-text>
+                                            </v-card>
+                                        </v-col>
+                                    </v-row>
+                                    <v-alert v-else variant="outlined" type="info" text="Você ainda não adicionou um edital."></v-alert>
+                                </div>
                             </div>
-                        </div>
-                        <ActionsPrompt :prompt="prompt" />
+                            <ActionsPrompt :prompt="prompt" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- barra ed ajuste -->
-        <div 
-            v-if="sidebar"
-            ref="divider" 
-            class="panel-divider"
-            @mousedown="startResize"
-            @mouseover="onDividerHover"
-            @mouseleave="onDividerLeave"
-            >
-            <v-icon
-                :color="isDragging || isHovering ? 'primary' : 'grey'"
-                icon="mdi-drag-vertical"
-            ></v-icon>
-        </div>
-        <!-- menu de opcoes -->
-        <Transition name="fade">
-            <div ref="rightPanel" class="panel right-panel overflow-y-auto" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
-                <div class="panel-content">
-                    <v-card-text class="text-center">
-                        <Home />
-                        <div>
-                            <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
-                            <Guia 
-                                @clearDisciplina="clearDisciplina"
-                                v-if="options === '3'" :selectDisciplina="selectDisciplina" :selected="topicoSelected" :usermaster="userMaster" :prompt="prompt" />
-                        </div>
-                    </v-card-text>
-                </div>
+            <!-- barra ed ajuste -->
+            <div 
+                v-if="sidebar"
+                ref="divider" 
+                class="panel-divider"
+                @mousedown="startResize"
+                @mouseover="onDividerHover"
+                @mouseleave="onDividerLeave"
+                >
+                <v-icon
+                    :color="isDragging || isHovering ? 'primary' : 'grey'"
+                    icon="mdi-drag-vertical"
+                ></v-icon>
             </div>
-        </Transition>
-    </div>
+            <!-- menu de opcoes -->
+            <Transition name="fade">
+                <div ref="rightPanel" class="panel right-panel overflow-y-auto" :style="{ width: rightWidth + 'px' }" v-show="sidebar">
+                    <div class="panel-content">
+                        <v-card-text class="text-center">
+                            <Home />
+                            <div>
+                                <AssuntosRelevantes v-if="options === '1'" :select="selectDisciplina" :usermaster="userMaster"/>
+                                <Guia 
+                                    @clearDisciplina="clearDisciplina"
+                                    v-if="options === '3'" :selectDisciplina="selectDisciplina" :selected="topicoSelected" :usermaster="userMaster" :prompt="prompt" />
+                            </div>
+                        </v-card-text>
+                    </div>
+                </div>
+            </Transition>
+        </div>
    </section>
 </template>
 

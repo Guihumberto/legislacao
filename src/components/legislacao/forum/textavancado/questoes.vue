@@ -1,126 +1,128 @@
 <template>
-    <div>
-        <div class="mt-2 d-flex ga-2 align-center pa-2">
-            <v-icon>mdi-check-all</v-icon>
-                <h1 class="text-h5">Questões</h1>
-        </div>
-        <v-alert variant="outlined" class="my-2">
-            <p v-if="!$route.query.art">Selecione o artigo para gerar questões.</p>
-            <div v-else>
-                <p class="selectArt" ref="elemento">Art. {{ $route.query.art }} foi selecionado</p>
-                <div class="text-center">
-                    <p class="my-2 text-overline">Gere questões a partir do artigo selecionado.</p>
-                    <v-btn :disabled="load" :loading="load" color="primary" @click="gerarQuestoes">Gerar Questões</v-btn>
-                </div>
+     <div class="wrapper">
+        <section class="conteudo" ref="topUp" :class="rightWidth > 500 ? 'conteudo1' : 'conteudo2'">
+            <div class="mt-2 d-flex ga-2 align-center pa-2">
+                <v-icon>mdi-check-all</v-icon>
+                    <h1 class="text-h5">Questões</h1>
             </div>
-        </v-alert>
-
-        <v-card class="my-2" variant="flat" v-if="listArtsFilter.length" >
-            <v-card-text>
-                <v-chip-group
-                    multiple
-                    v-model="artsFilter"
-                    color="primary"
-                    column
-                >
-                    <v-chip v-for="art, a in listArtsFilter" :key="art" :value="art">{{art}}</v-chip>
-                </v-chip-group>
-            </v-card-text>
-        </v-card>
-
-        <Loading class="mt-10" v-if="loadQuestoes" />
-
-        <v-card variant="outlined" v-if="questoesStore.readTotalQuestoes && !loadQuestoes" class="appear">
-            <v-card-title class="d-flex align-start justify-space-between flex-column">
-                <div class="px-1 d-flex justify-space-between align-center w-100">
-                    <div>
-                        <span v-if="$route.query.art">Artigo {{ $route.query.art }} - </span>{{ forumStore.readGroupForum._source.title }} 
+            <v-alert variant="outlined" class="my-2">
+                <p v-if="!$route.query.art">Selecione o artigo para gerar questões.</p>
+                <div v-else>
+                    <p class="selectArt" ref="elemento">Art. {{ $route.query.art }} foi selecionado</p>
+                    <div class="text-center">
+                        <p class="my-2 text-overline">Gere questões a partir do artigo selecionado.</p>
+                        <v-btn :disabled="load" :loading="load" color="primary" @click="gerarQuestoes">Gerar Questões</v-btn>
                     </div>
-                    <div class="pa-1 bg-primary rounded">Total: {{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
                 </div>
-                <div class="px-1">
-                    <small> 
-                        <b> <v-icon size="1.2rem">mdi-filter</v-icon> Filtro:</b> {{ infoHeader.acertos }} certa{{ insertWordS(infoHeader.acertos) }} - {{ infoHeader.erros }} errada{{ insertWordS(infoHeader.erros) }} - 
-                        <span class="text-success">{{ infoHeader.respondidas }} resolvida{{ insertWordS(infoHeader.respondidas) }} </span>
-                       do total de {{ infoHeader.total }}</small>
-                </div>
-                <div class="w-100 border rounded-lg pa-2 ">
-                    <div class="w-100 d-flex ga-1">
-                       <v-select
-                        label="Filtro"
-                        :items="typeRespQuestions"
-                        item-title="name"
-                        item-value="id"
-                        v-model="formQuestions.typeRespQuestions"
-                        variant="outlined"
-                        density="compact"
-                        hide-details 
-                        class="w-100"
-                       ></v-select>
-                       <div class="d-flex ga-1 w-100">
-                           <v-select
-                            label="Ano"
-                            :items="listAnos"
-                            v-model="formQuestions.ano"
-                            multiple
-                            variant="outlined"
-                            density="compact"
-                            hide-details 
-                            clearable
-                            class="w-50"
-                           ></v-select>
-                           <v-select
-                            label="Banca"
-                            :items="listBancas"
-                            v-model="formQuestions.banca"
-                            multiple
-                            variant="outlined"
-                            density="compact"
-                            hide-details 
-                            clearable
-                            class="w-50"     
-                           ></v-select>
-                       </div>
-                    </div>
-                    <v-checkbox
-                        label="Apenas favoritas"
-                        density="compact"
-                        v-model="formQuestions.favoritas"
-                        hide-details
-                    ></v-checkbox>
-                </div>
-            </v-card-title>
-            <v-card-text class="text-black">
-                <div v-for="item, i in listQuestoes" :key="item.id" class="mb-5">
-                    <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
-                        <div class="d-flex ga-1 align-center">
-                            <!-- <v-chip color="primary" density="compact" :title="item.id">cod</v-chip>   -->
-                            <h3 class="d-flex align-center ga-1"> <v-icon size="1.4rem">mdi-checkbox-marked-circle-outline</v-icon> Questão {{ i + 1 }}</h3> 
+            </v-alert>
+
+            <v-card class="my-2" variant="flat" v-if="listArtsFilter.length" >
+                <v-card-text>
+                    <v-chip-group
+                        multiple
+                        v-model="artsFilter"
+                        color="primary"
+                        column
+                    >
+                        <v-chip v-for="art, a in listArtsFilter" :key="art" :value="art">{{art}}</v-chip>
+                    </v-chip-group>
+                </v-card-text>
+            </v-card>
+
+            <Loading class="mt-10" v-if="loadQuestoes" />
+
+            <v-card variant="outlined" v-if="questoesStore.readTotalQuestoes && !loadQuestoes" class="appear">
+                <v-card-title class="d-flex align-start justify-space-between flex-column">
+                    <div class="px-1 d-flex justify-space-between align-center w-100">
+                        <div>
+                            <span v-if="$route.query.art">Artigo {{ $route.query.art }} - </span>{{ forumStore.readGroupForum._source.title }} 
                         </div>
-                        <div class="d-flex ga-1 align-center">
-                            <h3 v-if="item?.banca ">{{ item.banca }}</h3>
-                            <h3 v-if="item?.ano ">{{ item.ano }}</h3>
-                            <FavQuestoes :questao="item" />
-                        </div>
+                        <div class="pa-1 bg-primary rounded">Total: {{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
                     </div>
                     <div class="px-1">
-                        <p>{{ item.pergunta }}
-                        </p>
-                        <Questoes_alternative :aleternativa="item" />
+                        <small> 
+                            <b> <v-icon size="1.2rem">mdi-filter</v-icon> Filtro:</b> {{ infoHeader.acertos }} certa{{ insertWordS(infoHeader.acertos) }} - {{ infoHeader.erros }} errada{{ insertWordS(infoHeader.erros) }} - 
+                            <span class="text-success">{{ infoHeader.respondidas }} resolvida{{ insertWordS(infoHeader.respondidas) }} </span>
+                        do total de {{ infoHeader.total }}</small>
                     </div>
-                </div>
-                <div class="my-2 text-center">
-                    <v-btn v-if="countZeroList < 2" variant="outlined" prepend-icon="mdi-plus" @click="getQuestoes">Mostrar mais</v-btn>
-                    <v-alert v-else type="warning" variant="outlined" text="Não há mais questões para serem exibidas.">
-                        <template v-slot:append>
-                            <v-btn variant="outlined" append-icon="mdi-update" @click="reiniciarBusca">
-                                reiniciar
-                            </v-btn>
-                        </template>
-                    </v-alert>
-                </div>
-            </v-card-text>
-        </v-card>
+                    <div class="w-100 border rounded-lg pa-2 ">
+                        <div class="w-100 d-flex ga-1">
+                        <v-select
+                            label="Filtro"
+                            :items="typeRespQuestions"
+                            item-title="name"
+                            item-value="id"
+                            v-model="formQuestions.typeRespQuestions"
+                            variant="outlined"
+                            density="compact"
+                            hide-details 
+                            class="w-100"
+                        ></v-select>
+                        <div class="d-flex ga-1 w-100">
+                            <v-select
+                                label="Ano"
+                                :items="listAnos"
+                                v-model="formQuestions.ano"
+                                multiple
+                                variant="outlined"
+                                density="compact"
+                                hide-details 
+                                clearable
+                                class="w-50"
+                            ></v-select>
+                            <v-select
+                                label="Banca"
+                                :items="listBancas"
+                                v-model="formQuestions.banca"
+                                multiple
+                                variant="outlined"
+                                density="compact"
+                                hide-details 
+                                clearable
+                                class="w-50"     
+                            ></v-select>
+                        </div>
+                        </div>
+                        <v-checkbox
+                            label="Apenas favoritas"
+                            density="compact"
+                            v-model="formQuestions.favoritas"
+                            hide-details
+                        ></v-checkbox>
+                    </div>
+                </v-card-title>
+                <v-card-text class="text-black">
+                    <div v-for="item, i in listQuestoes" :key="item.id" class="mb-5">
+                        <div class="mb-2 pa-2 bg-grey-lighten-2 d-flex ga-1 justify-space-between">
+                            <div class="d-flex ga-1 align-center">
+                                <!-- <v-chip color="primary" density="compact" :title="item.id">cod</v-chip>   -->
+                                <h3 class="d-flex align-center ga-1"> <v-icon size="1.4rem">mdi-checkbox-marked-circle-outline</v-icon> Questão {{ i + 1 }}</h3> 
+                            </div>
+                            <div class="d-flex ga-1 align-center">
+                                <h3 v-if="item?.banca ">{{ item.banca }}</h3>
+                                <h3 v-if="item?.ano ">{{ item.ano }}</h3>
+                                <FavQuestoes :questao="item" />
+                            </div>
+                        </div>
+                        <div class="px-1">
+                            <p>{{ item.pergunta }}
+                            </p>
+                            <Questoes_alternative :aleternativa="item" />
+                        </div>
+                    </div>
+                    <div class="my-2 text-center">
+                        <v-btn v-if="countZeroList < 2" variant="outlined" prepend-icon="mdi-plus" @click="getQuestoes">Mostrar mais</v-btn>
+                        <v-alert v-else type="warning" variant="outlined" text="Não há mais questões para serem exibidas.">
+                            <template v-slot:append>
+                                <v-btn variant="outlined" append-icon="mdi-update" @click="reiniciarBusca">
+                                    reiniciar
+                                </v-btn>
+                            </template>
+                        </v-alert>
+                    </div>
+                </v-card-text>
+            </v-card>
+        </section>
     </div>
 </template>
 
@@ -148,6 +150,8 @@
 
     const listArtsFilter = inject('listArtsFilter')
     const artsFilter = ref([])
+
+    const rightWidth = inject('rightWidth')
 
     const formQuestions = ref({
         typeRespQuestions: 1,
@@ -300,32 +304,55 @@
 </script>
 
 <style scoped>
-.selectArt {
-    font-size: 1.2em;
-    font-weight: 500;
-    background: #DCEDC8;
-    padding: 1rem;
-    text-align: center;
-    border-radius: 12px;
-}
-.selectArtAnimar {
-    animation: aumentar 0.5s ease-in-out;
-}
+    .wrapper{
+        display: flex;
+        justify-content: center;
+        min-height: 50vh;
+        font-family: Arial, sans-serif;
+        padding-bottom: 2rem;
+        width: 100%;
+    }
 
-@keyframes aumentar {
-    0% {
-        transform: scale(1);
+    .conteudo {
+        margin-top: 1rem;
+        padding: 0 20px;
+        background-color: #fffdfd;
     }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
 
-.appear{
-    animation: aparecer 1s ease-in-out;
-}
+    .conteudo1 {
+        width: 900px;
+    }
+
+    .conteudo2 {
+        max-width: 900px;
+    }
+
+    .selectArt {
+        font-size: 1.2em;
+        font-weight: 500;
+        background: #DCEDC8;
+        padding: 1rem;
+        text-align: center;
+        border-radius: 12px;
+    }
+    .selectArtAnimar {
+        animation: aumentar 0.5s ease-in-out;
+    }
+
+    @keyframes aumentar {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .appear{
+        animation: aparecer 1s ease-in-out;
+    }
 
 </style>

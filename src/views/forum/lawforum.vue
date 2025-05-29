@@ -1,144 +1,164 @@
 <template>
-    <div :class="geralStore.readHeaderShow ? 'wrapper': 'wrapper2'">
-        <section class="conteudo" ref="topUp">
-            <div class="law" ref="lawRef">
-                <div class="sizeLoad" v-if="forumStore.readLoad">
-                    <v-progress-circular
-                        :size="50"
-                        color="primary"
-                        indeterminate
-                    ></v-progress-circular>
-                </div>
-                <div v-else>
-                    <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" class="btn">Voltar</v-btn>   
-                    <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Opções</v-btn>    
-                    
-                    <DadosGrupo />
-        
-                    <v-card class="my-5">
-                        <v-card-text>
-                            <div>
-                                <div :class="lawWidth < 600 ? 'formResize' : 'form'">
-                                    <v-text-field
-                                        variant="outlined"
-                                        density="compact"
-                                        label="Busca"
-                                        append-inner-icon="mdi-magnify"
-                                        v-model.trim="search"
-                                        @keydown.enter="filterJustArt(search)"
-                                        :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
-                                        clearable
-                                    ></v-text-field>
-                                </div>
-                                <div v-if="suggestArtBtn">
-                                    <v-chip 
-                                        @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+    <section>
+        <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+            <section ref="leftPanel" class="panel conteudo overflow-y-auto" :style="{ width: leftWidth + 'px' }">
+                <div class="law" ref="lawRef">
+                    <div class="sizeLoad" v-if="forumStore.readLoad">
+                        <v-progress-circular
+                            :size="50"
+                            color="primary"
+                            indeterminate
+                        ></v-progress-circular>
+                    </div>
+                    <div v-else>
+                        <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" class="btn">Voltar</v-btn>   
+                        <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Opções</v-btn>    
+                        
+                        <DadosGrupo />
+            
+                        <v-card class="my-5">
+                            <v-card-text>
+                                <div>
+                                    <div :class="leftWidth < 600 ? 'formResize' : 'form'">
+                                        <v-text-field
+                                            variant="outlined"
+                                            density="compact"
+                                            label="Busca"
+                                            append-inner-icon="mdi-magnify"
+                                            v-model.trim="search"
+                                            @keydown.enter="filterJustArt(search)"
+                                            :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                                            clearable
+                                        ></v-text-field>
+                                    </div>
+                                    <div v-if="suggestArtBtn">
+                                        <v-chip 
+                                            @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                                            >
+                                            Art. {{search.replace(/[^0-9]/g,'')}}
+                                        </v-chip>
+                                    </div>
+                                    <div>
+                                        <v-chip-group
+                                            v-if="artsFilterActive"
                                         >
-                                        Art. {{search.replace(/[^0-9]/g,'')}}
-                                    </v-chip>
+                                            <v-chip 
+                                                @click="pageFilter(false)" 
+                                                variant="text" v-if="artsFilter.length == 1"
+                                                exact-active-class="0"
+                                            >
+                                                <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+                                            </v-chip>
+                                            <v-chip
+                                                v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
+                                                @click:close="artFilterRemove(tag)"
+                                                closable
+                                                >
+                                                    art. {{tag}}
+                                            </v-chip>
+                                            <v-btn 
+                                                variant="text" 
+                                                @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                                Limpar Filtro
+                                            </v-btn>
+                                            <v-chip 
+                                                @click="pageFilter(true)" 
+                                                variant="text" v-if="artsFilter.length == 1">
+                                                    <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+                                            </v-chip>
+                                        </v-chip-group>
+                                    </div>
                                 </div>
                                 <div>
-                                    <v-chip-group
-                                        v-if="artsFilterActive"
-                                    >
-                                        <v-chip 
-                                            @click="pageFilter(false)" 
-                                            variant="text" v-if="artsFilter.length == 1"
-                                            exact-active-class="0"
-                                        >
-                                            <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
-                                        </v-chip>
-                                        <v-chip
-                                            v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
-                                            @click:close="artFilterRemove(tag)"
-                                            closable
-                                            >
-                                                art. {{tag}}
-                                        </v-chip>
-                                        <v-btn 
-                                            variant="text" 
-                                            @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
-                                            Limpar Filtro
-                                        </v-btn>
-                                        <v-chip 
-                                            @click="pageFilter(true)" 
-                                            variant="text" v-if="artsFilter.length == 1">
-                                                <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
-                                        </v-chip>
-                                    </v-chip-group>
+                                    <div class="filterCheckbox" :class="{'d-flex flex-column align-start': leftWidth < 600}">
+                                        <v-checkbox v-model="withComments" label="Somente com comentários" hide-details></v-checkbox>
+                                        <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length" hide-details></v-checkbox>
+                                        <v-checkbox v-model="withMarks" label="Filtrar Marcados" hide-details></v-checkbox>
+                                    </div>
+    
+                                    <!-- <v-expand-transition>      
+                                        <v-card v-if="withComments" variant="outlined">
+                                            <v-card-text>
+                                                <p class="mb-2">Filtre por comentários dos usuários</p>
+                                                <v-responsive class="overflow-y-auto" max-height="500">
+                                                    <v-select
+                                                        multiple
+                                                        v-model="usersCommentsFilter"
+                                                        :items="commentStore.readUsersComments"
+                                                        item-title="key"
+                                                        item-value="key"
+                                                        variant="outlined"
+                                                        label="Usuários"
+                                                        density="compact"
+                                                        class="pt-2"
+                                                        clearable
+                                                        prepend-inner-icon="mdi-chat"
+                                                    ></v-select>
+                                                </v-responsive>
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-expand-transition> -->
+                                    
+                                    <v-expand-transition>      
+                                        <v-card v-if="listTags.length && withTags" variant="outlined" class="mt-2">
+                                            <v-card-text>
+                                                <p class="mb-2">Filtre por tags</p>
+                                                <v-responsive class="overflow-y-auto" max-height="500">
+                                                    <v-chip-group filter column multiple v-model="tagsFilter" active-class="primary" >
+                                                        <v-chip v-for="item, i in listTags" :value="item" :key="item">{{ item }}</v-chip>
+                                                    </v-chip-group>
+                                                </v-responsive>
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-expand-transition>
+                                    <div class="text-right mt-2">
+                                        <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <div class="filterCheckbox" :class="{'d-flex flex-column align-start': lawWidth < 600}">
-                                    <v-checkbox v-model="withComments" label="Somente com comentários" hide-details></v-checkbox>
-                                    <v-checkbox v-model="withTags" label="Filtrar por Tags" :disabled="!listTags.length" hide-details></v-checkbox>
-                                    <v-checkbox v-model="withMarks" label="Filtrar Marcados" hide-details></v-checkbox>
+                            </v-card-text>
+                        </v-card>
+            
+                        <Pagination :totalPage="totalPage" :pagination="pagination" />
+    
+                        <div class="bg-white">
+                            <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{ selected: item.art == $route.query.art && item.estrutura == false}" >
+                                <div class="corner-wrapper">
+                                    <div :class="{ triangle: item?.tags.length }"></div>
                                 </div>
-
-                                <!-- <v-expand-transition>      
-                                    <v-card v-if="withComments" variant="outlined">
-                                        <v-card-text>
-                                            <p class="mb-2">Filtre por comentários dos usuários</p>
-                                            <v-responsive class="overflow-y-auto" max-height="500">
-                                                <v-select
-                                                    multiple
-                                                    v-model="usersCommentsFilter"
-                                                    :items="commentStore.readUsersComments"
-                                                    item-title="key"
-                                                    item-value="key"
-                                                    variant="outlined"
-                                                    label="Usuários"
-                                                    density="compact"
-                                                    class="pt-2"
-                                                    clearable
-                                                    prepend-inner-icon="mdi-chat"
-                                                ></v-select>
-                                            </v-responsive>
-                                        </v-card-text>
-                                    </v-card>
-                                </v-expand-transition> -->
-                                
-                                <v-expand-transition>      
-                                    <v-card v-if="listTags.length && withTags" variant="outlined" class="mt-2">
-                                        <v-card-text>
-                                            <p class="mb-2">Filtre por tags</p>
-                                            <v-responsive class="overflow-y-auto" max-height="500">
-                                                <v-chip-group filter column multiple v-model="tagsFilter" active-class="primary" >
-                                                    <v-chip v-for="item, i in listTags" :value="item" :key="item">{{ item }}</v-chip>
-                                                </v-chip-group>
-                                            </v-responsive>
-                                        </v-card-text>
-                                    </v-card>
-                                </v-expand-transition>
-                                <div class="text-right mt-2">
-                                    <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
-                                </div>
+                                    <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" :usersCommentsFilter="usersCommentsFilter" />
                             </div>
-                        </v-card-text>
-                    </v-card>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
-
-                    <div class="bg-white">
-                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i" :class="{ selected: item.art == $route.query.art && item.estrutura == false}" >
-                            <div class="corner-wrapper">
-                                <div :class="{ triangle: item?.tags.length }"></div>
-                            </div>
-                                <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" :usersCommentsFilter="usersCommentsFilter" />
                         </div>
+            
+                        <Pagination :totalPage="totalPage" :pagination="pagination" />
                     </div>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
                 </div>
+            </section>
+            <!-- barra ed ajuste -->
+            <div 
+                v-if="sidelaw"
+                ref="divider" 
+                class="panel-divider"
+                @mousedown="startResize"
+                @mouseover="onDividerHover"
+                @mouseleave="onDividerLeave"
+                >
+                <v-icon
+                    :color="isDragging || isHovering ? 'primary' : 'grey'"
+                    icon="mdi-drag-vertical"
+                ></v-icon>
             </div>
-        </section>
-        <transition name="fade">
-            <div class="chat" :style="{ width: rightWidth + 'px' }" v-if="!xs && sidelaw">
-                <div class="resizer" @mousedown="startResize('right')"></div>
-                <Home @close="sidelaw = false" />
-            </div>
-        </transition>
-    </div>
+            <!-- menu de opcoes -->
+            <transition name="fade">
+                <div 
+                    ref="rightPanel" 
+                    class="panel right-panel overflow-y-auto chat" 
+                    :style="{ width: rightWidth + 'px' }" v-show="!xs && sidelaw"
+                >
+                    <Home @close="sidelaw = false" class="chat-content" />
+                </div>
+            </transition>
+        </div>
+    </section>
 </template>
 
 <script setup>
@@ -146,48 +166,6 @@
 
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
-
-    const leftWidth = ref(200) // Largura inicial da sidebar esquerda
-    const rightWidth = ref(750) // Largura inicial da sidebar direita
-    const isResizing = ref(false)
-    const activeSidebar = ref(null)
-
-    const startResize = (side) => {
-      isResizing.value = true;
-      activeSidebar.value = side;
-
-      // Adiciona os eventos de movimento e liberação
-      window.addEventListener("mousemove", onResize);
-      window.addEventListener("mouseup", stopResize);
-    }
-
-    const onResize = (event) => {
-        if (isResizing.value && activeSidebar.value) {
-          const containerWidth = document.querySelector(".container").offsetWidth;
-  
-          if (activeSidebar.value === "left") {
-            // Calcula a nova largura da sidebar esquerda
-            const newLeftWidth = Math.min(Math.max(event.clientX, 100), containerWidth - rightWidth.value - 100);
-            leftWidth.value = newLeftWidth;
-          } else if (activeSidebar.value === "right") {
-            // Calcula a nova largura da sidebar direita
-            const newRightWidth = Math.min(
-              Math.max(containerWidth - event.clientX, 100),
-              containerWidth - leftWidth.value - 100
-            );
-            rightWidth.value = newRightWidth;
-          }
-        }
-    }
-    
-    const stopResize = () => {
-      isResizing.value = false;
-      activeSidebar.value = null;
-
-      // Remove os eventos de movimento e liberação
-      window.removeEventListener("mousemove", onResize);
-      window.removeEventListener("mouseup", stopResize);
-    }
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
@@ -221,8 +199,6 @@
     const withTags = ref(false)
     const withMarks = ref(false)
 
-    const topUp = ref(null)
-
     watch(withComments, (newConfirm) => {
         pagination.value.page = 1 
         closeAllComments()
@@ -243,8 +219,8 @@
     );
 
     watch(() => pagination.value.page, (newPage, oldPage) => {
-        if (topUp.value) {
-            topUp.value.scrollTo({
+        if (leftPanel.value) {
+            leftPanel.value.scrollTo({
                 top: 0,
                 behavior: 'smooth' // Rolagem suave
             });
@@ -277,7 +253,6 @@
     const stripHtmlTags = (str) => {
         return str.replace(/<[^>]*>/g, '');
     }
-
 
     const listTextLaw = computed(() => {
         let list = listFinal.value
@@ -505,10 +480,6 @@
     
     const usersCommentsFilter = ref([])
 
-    const usersComments =  computed(() => {
-        return ['Humbert', 'maria']
-    })
-
     //artigos por tag filter
 
     const listArtsTagsFilter = computed(() => {
@@ -531,24 +502,108 @@
 
     provide('listArtsFilter', listArtsTagsFilter)
 
-    //risize div law
-    const lawRef = ref(null)
-    const lawWidth = ref(0)
-    const lawHeight = ref(0)
-    let observer = null
+    const leftPanel = ref(null);
+    const rightPanel = ref(null);
+    const divider = ref(null);
+
+    // Estado do componente
+    const containerWidth = ref(0);
+    const leftWidth = ref(0);
+    const isDragging = ref(false);
+    const isHovering = ref(false);
+    const startX = ref(0);
+    const startLeftWidth = ref(0);
+
+    watch(sidelaw, (newSidebar) => {
+       if(!sidelaw.value) leftWidth.value = 20000
+       if(sidelaw.value) leftWidth.value = containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
+    })
+
+    // Largura do painel direito calculada
+    const rightWidth = computed(() => {
+        return containerWidth.value - leftWidth.value - 10; // 10px é a largura do divisor
+    });
+
+    provide('rightWidth', rightWidth)
+
+    // Iniciar o redimensionamento
+    const startResize = (e) => {
+    isDragging.value = true;
+    startX.value = e.clientX;
+    startLeftWidth.value = leftWidth.value;
+    
+    // Adicionar evento de mousemove ao documento
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+    
+    // Alterar o cursor durante o arrasto
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none'; // Impedir seleção de texto durante o arrasto
+    };
+
+    // Fazer o redimensionamento
+    const resize = (e) => {
+    if (!isDragging.value) return;
+    
+    const delta = e.clientX - startX.value;
+    let newLeftWidth = startLeftWidth.value + delta;
+    
+    // Limites para o redimensionamento
+    const minWidth = 100; // Largura mínima para cada painel
+    const maxWidth = containerWidth.value - minWidth - 10; // Largura máxima considerando o divisor
+    
+    if (newLeftWidth < minWidth) {
+        newLeftWidth = minWidth;
+    } else if (newLeftWidth > maxWidth) {
+        newLeftWidth = maxWidth;
+    }
+    
+    leftWidth.value = newLeftWidth;
+    };
+
+    // Parar o redimensionamento
+    const stopResize = () => {
+    isDragging.value = false;
+    
+    // Remover eventos de documento
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+    
+    // Restaurar o cursor
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    };
+
+    // Manipuladores para estilização do divisor
+    const onDividerHover = () => {
+    isHovering.value = true;
+    document.body.style.cursor = 'col-resize';
+    };
+
+    const onDividerLeave = () => {
+    if (!isDragging.value) {
+        isHovering.value = false;
+        document.body.style.cursor = '';
+    }
+    };
+
+    // Inicializar as dimensões
+    const initDimensions = () => {
+        if (leftPanel.value && rightPanel.value) {
+            const container = leftPanel.value.parentElement;
+            containerWidth.value = container.clientWidth;
+            leftWidth.value =  10000//containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
+        }
+    };
+
+    // Atualizar dimensões no redimensionamento da janela
+    const handleResize = () => {
+        initDimensions();
+    };
     
     onMounted( async () => {
-        observer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                lawWidth.value = entry.contentRect.width
-                lawHeight.value = entry.contentRect.height
-            }
-        })
-
-        if (lawRef.value) {
-            observer.observe(lawRef.value)
-        }
-
+        initDimensions();
+        window.addEventListener('resize', handleResize);
         await getGroup()
         await getAll()
         route.query.page ? pagination.value.page = Number(route.query.page)  : ''
@@ -557,193 +612,169 @@
     })
 
     onBeforeUnmount(() => {
-        if (observer && lawRef.value) {
-            observer.unobserve(lawRef.value)
-            observer.disconnect()
-        }
+        window.removeEventListener('resize', handleResize);
     })
   
 
 </script>
 
 <style lang="scss" scoped>
-.wrapper{
-    display: flex;
-    height: calc(100vh - 140px); 
-    font-family: Arial, sans-serif;
-}
-.wrapper2{
-    display: flex;
-    height: calc(100vh - 20px); 
-    font-family: Arial, sans-serif;
-}
-.conteudo {
-    flex: 1;
-    padding: 20px;
-    background-color: #f4f4f4;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-.conteudo::-webkit-scrollbar {
-  width: 8px; /* largura da barra */
-}
-.conteudo::-webkit-scrollbar-track {
-  background: #f1f1f1; /* trilho da barra */
-  border-radius: 4px;
-}
+    .container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        height: calc(100vh - 137px);
+    }
 
-.conteudo::-webkit-scrollbar-thumb {
-  background-color: #888; /* "botão" da barra */
-  border-radius: 4px;
-}
+    .container2{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        height: calc(100vh - 16px);
+    }
+    
+    .conteudo {
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
 
-.conteudo::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* ao passar o mouse */
-}
+    .conteudo::-webkit-scrollbar {
+    width: 8px; /* largura da barra */
+    }
 
-/* Firefox */
-.conteudo {
-  scrollbar-width: thin;            /* largura fina */
-  scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
-}
+    .conteudo::-webkit-scrollbar-track {
+    background: #f1f1f1; /* trilho da barra */
+    border-radius: 4px;
+    }
 
-.law{
-    width: min(100%, 1000px);
-    margin-inline: auto;
-}
+    .conteudo::-webkit-scrollbar-thumb {
+    background-color: #888; /* "botão" da barra */
+    border-radius: 4px;
+    }
 
-.filterCheckbox{
-    display: flex;
-    align-items: center;
-}
+    .conteudo::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* ao passar o mouse */
+    }
 
-.selected{
-    background: #DCEDC8;
-    transition: all .3s ease-in-out;
-}
+    /* Firefox */
+    .conteudo {
+    scrollbar-width: thin;            /* largura fina */
+    scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
+    }
 
-.chat {
-    width: 300px;
-    background-color: #fff;
-    border-left: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    position: relative;
-}
+    .law{
+        width: min(100%, 1000px);
+        margin-inline: auto;
+    }
 
-.chat.right {
-    border-left: 1px solid #ddd;
-}
+    .filterCheckbox{
+        display: flex;
+        align-items: center;
+    }
 
-.resizer {
-  width: 5px;
-  cursor: ew-resize;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  background-color: #ccc;
-  z-index: 10;
-}
+    .selected{
+        background: #DCEDC8;
+        transition: all .3s ease-in-out;
+    }
 
-/* Indicador oval no centro da barra */
-.resizer::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 40px;
-  background-color: #aaa;
-  border-radius: 10px;
-  opacity: 0.6;
-}
+    .chat {
+        background-color: #fff;
+        border-left: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        position: relative;
+    }
 
-.resizer:hover::before {
-  background-color: #888;
-  opacity: 1;
-}
+    .sizeLoad{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+    }
 
-.chat.right .resizer {
-    left: 0;
-}
-
-.sizeLoad{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-}
-
-.corpo{
-    margin: 2rem;
-    font-size: 15px;
-    line-height: 2.1em
-}
-
-.form{
-    width: 50%;
-}
-
-.formResize{
-    width: 100%;
-}
-
-.corner-wrapper {
-  height: 0;
-  width: 100%;
-}
-
-.triangle {
-  width: 0;
-  height: 0;
-  border-left: .5rem solid red;
-  border-bottom: .5rem solid transparent;
-}
-
-.fixed {
-  position: fixed;
-  background: purple;
-  width: 100%;
-  text-align: center;
-  bottom: 0; /* Ajuste conforme necessário */
-  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
-  animation: slideTopDocument .5s ease-in;
-  transition: 1s ease;
-}
-
-@media (max-width:900px){
     .form{
+        width: 50%;
+    }
+
+    .formResize{
         width: 100%;
     }
-}
 
-@media (max-width:600px){
-    .filterCheckbox{
-        flex-direction: column;
-        align-items: baseline;
+    .corner-wrapper {
+    height: 0;
+    width: 100%;
     }
-}
 
-@media print {
-    .btn {
-        display: none;
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: .5rem solid red;
+        border-bottom: .5rem solid transparent;
     }
-    .pagina {
-        width: 190mm;
-        height: 285mm;
-        margin: 0;
-    }
-    // .pagina .header{
-    //     height: 10mm;
-    //     margin-bottom: 2rem;
-    // }
 
-    .content {
-        box-shadow: none;
-        margin: 0;
+    .panel {
+        height: 100%;
+        overflow: hidden;
     }
-}
+    .panel-content {
+        padding: 16px;
+        height: 100%;
+    }
 
+    .panel-divider {
+        width: 10px;
+        height: 100%;
+        background-color: #fff;
+        cursor: col-resize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+    }
+    .panel-divider:hover {
+        background-color: #e0e0e0;
+    }
+    .right-panel{
+        transition: 1s ease-in-out;
+    }
+
+    @media (max-width:900px){
+        .form{
+            width: 100%;
+        }
+    }
+
+    @media (max-width:600px){
+        .filterCheckbox{
+            flex-direction: column;
+            align-items: baseline;
+        }
+    }
+
+    @media print {
+        .btn {
+            display: none;
+        }
+        .pagina {
+            width: 190mm;
+            height: 285mm;
+            margin: 0;
+        }
+        // .pagina .header{
+        //     height: 10mm;
+        //     margin-bottom: 2rem;
+        // }
+
+        .content {
+            box-shadow: none;
+            margin: 0;
+        }
+    }
 </style>

@@ -1,92 +1,88 @@
 <template>
     <div class="wrapper">
         <section class="conteudo" ref="topUp">
-            <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-                <div class="sizeLoad" v-if="pageStore.readLoad">
-                    <v-progress-circular
-                        :size="50"
-                        color="primary"
-                        indeterminate
-                    ></v-progress-circular>
-                </div>
-                <div v-if="!pageStore.readLoad && listTextLaw.length">
-                    <!-- <v-btn variant="tonal" class="btn mr-2" @click="listTextLaw = []">Voltar</v-btn> -->
-                    <Relacoes />
-                    <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
-  
-                    <div>
-                        <v-expand-transition>
-                            <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
-                                <p v-html="cabecalho"></p>
-                            </div>
-                        </v-expand-transition>
-                    </div>
-        
-                    <v-card class="my-5" :title="idLaw?.title">
-                        <v-card-text>
-                            <div class="form">
-                                <v-text-field
-                                    variant="outlined"
-                                    density="compact"
-                                    label="Busca"
-                                    append-inner-icon="mdi-magnify"
-                                    v-model.trim="search"
-                                    @keydown.enter="filterJustArt(search)"
-                                    :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
-                                    clearable
-                                ></v-text-field>
-                            </div>
-                            <div v-if="suggestArtBtn">
-                                <v-chip 
-                                    @click="filterJustArt(search.replace(/[^0-9]/g,''))"
-                                    >
-                                    Art. {{search.replace(/[^0-9]/g,'')}}
-                                </v-chip>
-                            </div>
-                            <div>
-                                <v-chip-group
-                                    v-if="artsFilterActive"
-                                >
-                                    <v-chip 
-                                        @click="pageFilter(false)" 
-                                        variant="text" v-if="artsFilter.length == 1"
-                                        exact-active-class="0"
-                                    >
-                                        <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                    <v-chip
-                                        v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
-                                        @click:close="artFilterRemove(tag)"
-                                        closable
-                                        >
-                                            art. {{tag}}
-                                    </v-chip>
-                                    <v-btn 
-                                        variant="text" 
-                                        @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
-                                        Limpar Filtro
-                                    </v-btn>
-                                    <v-chip 
-                                        @click="pageFilter(true)" 
-                                        variant="text" v-if="artsFilter.length == 1">
-                                            <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
-                                    </v-chip>
-                                </v-chip-group>
-                            </div>
-                        </v-card-text>
-                    </v-card>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
-        
-                    <div class="bg-white">
-                        <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
-                                <TextDispositivo :dispositivo="item" :search="search" />
-                        </div>
-                    </div>
-        
-                    <Pagination :totalPage="totalPage" :pagination="pagination" />
-                </div>
+            <div class="sizeLoad" v-if="pageStore.readLoad">
+                <Loading class="my-10 py-2" />
             </div>
+            
+            <div v-if="!pageStore.readLoad && listTextLaw.length">
+                <!-- <v-btn variant="tonal" class="btn mr-2" @click="listTextLaw = []">Voltar</v-btn> -->
+                <Relacoes />
+                <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
+
+                <div>
+                    <v-expand-transition>
+                        <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
+                            <p v-html="cabecalho"></p>
+                        </div>
+                    </v-expand-transition>
+                </div>
+    
+                <v-card class="my-5" :title="idLaw?.title">
+                    <v-card-text>
+                        <div class="form">
+                            <v-text-field
+                                variant="outlined"
+                                density="compact"
+                                label="Busca"
+                                append-inner-icon="mdi-magnify"
+                                v-model.trim="search"
+                                @keydown.enter="filterJustArt(search)"
+                                :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
+                                clearable
+                            ></v-text-field>
+                        </div>
+                        <div v-if="suggestArtBtn">
+                            <v-chip 
+                                @click="filterJustArt(search.replace(/[^0-9]/g,''))"
+                                >
+                                Art. {{search.replace(/[^0-9]/g,'')}}
+                            </v-chip>
+                        </div>
+                        <div>
+                            <v-chip-group
+                                v-if="artsFilterActive"
+                            >
+                                <v-chip 
+                                    @click="pageFilter(false)" 
+                                    variant="text" v-if="artsFilter.length == 1"
+                                    exact-active-class="0"
+                                >
+                                    <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
+                                </v-chip>
+                                <v-chip
+                                    v-for=" tag in artsFilter.sort((a, b) => a - b)" :key="tag"
+                                    @click:close="artFilterRemove(tag)"
+                                    closable
+                                    >
+                                        art. {{tag}}
+                                </v-chip>
+                                <v-btn 
+                                    variant="text" 
+                                    @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                    Limpar Filtro
+                                </v-btn>
+                                <v-chip 
+                                    @click="pageFilter(true)" 
+                                    variant="text" v-if="artsFilter.length == 1">
+                                        <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
+                                </v-chip>
+                            </v-chip-group>
+                        </div>
+                    </v-card-text>
+                </v-card>
+    
+                <Pagination :totalPage="totalPage" :pagination="pagination" />
+    
+                <div class="bg-white">
+                    <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
+                            <TextDispositivo :dispositivo="item" :search="search" />
+                    </div>
+                </div>
+    
+                <Pagination :totalPage="totalPage" :pagination="pagination" />
+            </div>
+            
         </section>
     </div>
 </template>
@@ -96,6 +92,7 @@
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
+    import Loading from '../loading.vue';
    
     import { usePageStore } from "@/store/PageStore";
     const pageStore = usePageStore()
@@ -415,76 +412,28 @@
 <style lang="scss" scoped>
 .wrapper{
     display: flex;
+    justify-content: center;
     height: 100%;
     font-family: Arial, sans-serif;
 }
 
 .conteudo {
-    flex: 1;
     padding: 0 20px;
-    overflow-y: auto;
     background-color: #f4f4f4;
-}
-
-.container, .container2 {
-    width: min(100%, 900px);
-}
-
-.chat {
-    width: 300px;
-    background-color: #fff;
-    border-left: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    position: relative;
-}
-
-.chat.right {
-    border-left: 1px solid #ddd;
-}
-
-.resizer {
-    width: 5px;
-    cursor: ew-resize;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: #ccc;
-    height: 100%;
-}
-
-.chat.right .resizer {
-    left: 0;
+    max-width: 900px;
 }
 
 .sizeLoad{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
-}
-
-.corpo{
-    margin: 2rem;
-    font-size: 15px;
-    line-height: 2.1em
+    margin: 5rem auto;
 }
 
 .form{
     width: 50%;
 }
 
-.fixed {
-  position: fixed;
-  background: purple;
-  width: 100%;
-  text-align: center;
-  bottom: 0; /* Ajuste conforme necessário */
-  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
-  animation: slideTopDocument .5s ease-in;
-  transition: 1s ease;
-}
 
 @media (max-width:900px){
     .form{

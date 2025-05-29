@@ -1,8 +1,8 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper2">
         <section class="conteudo" ref="topUp">
-            <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-                <v-card>
+            <div class="py-5">
+                <v-card max-width="900px" class="mx-auto">
                     <v-card-text>
                         <div class="d-flex justify-space-between">
                             <div class="d-flex ga-1 flex-wrap">
@@ -154,126 +154,14 @@
 </script>
 
 <style lang="scss" scoped>
-.wrapper{
+.wrapper22{
     display: flex;
-    height: 100%;
     font-family: Arial, sans-serif;
 }
 
 .conteudo {
-    flex: 1;
     padding: 0 20px;
-    overflow-y: auto;
     background-color: #f4f4f4;
-}
-
-.conteudo::-webkit-scrollbar {
-  width: 8px; /* largura da barra */
-}
-.conteudo::-webkit-scrollbar-track {
-  background: #f1f1f1; /* trilho da barra */
-  border-radius: 4px;
-}
-
-.conteudo::-webkit-scrollbar-thumb {
-  background-color: #888; /* "botão" da barra */
-  border-radius: 4px;
-}
-
-.conteudo::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* ao passar o mouse */
-}
-
-/* Firefox */
-.conteudo {
-  scrollbar-width: thin;            /* largura fina */
-  scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
-}
-
-.container, .container2 {
-    width: min(100%, 900px);
-}
-
-.chat {
-    width: 300px;
-    background-color: #fff;
-    border-left: 1px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    position: relative;
-}
-
-.chat.right {
-    border-left: 1px solid #ddd;
-}
-
-.resizer {
-    width: 5px;
-    cursor: ew-resize;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: #ccc;
-    height: 100%;
-}
-
-.chat.right .resizer {
-    left: 0;
-}
-
-.sizeLoad{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-}
-
-.corpo{
-    margin: 2rem;
-    font-size: 15px;
-    line-height: 2.1em
-}
-
-.form{
-    width: 50%;
-}
-
-.fixed {
-  position: fixed;
-  background: purple;
-  width: 100%;
-  text-align: center;
-  bottom: 0; /* Ajuste conforme necessário */
-  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
-  animation: slideTopDocument .5s ease-in;
-  transition: 1s ease;
-}
-
-@media (max-width:900px){
-    .form{
-        width: 100%;
-    }
-}
-
-@media print {
-    .btn {
-        display: none;
-    }
-    .pagina {
-        width: 190mm;
-        height: 285mm;
-        margin: 0;
-    }
-    // .pagina .header{
-    //     height: 10mm;
-    //     margin-bottom: 2rem;
-    // }
-
-    .content {
-        box-shadow: none;
-        margin: 0;
-    }
 }
 
 </style>
