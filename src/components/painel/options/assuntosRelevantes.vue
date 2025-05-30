@@ -11,7 +11,7 @@
                     <v-btn prepend-icon="mdi-pencil" color="warning" variant="flat" @click="editarResumo">Editar</v-btn>
                 </div>
             </div>
-            <div v-else>
+            <div v-else class="mt-5">
                 <v-form @submit.prevent="onSubmit" ref="form" v-if="usermaster">
                     <v-text-field
                         label="Ponto chave"

@@ -60,18 +60,72 @@ export const useOptionsStore = defineStore("optionsStore", {
             if(!cpf || !item?.id_edital_ref) return
             try {
                 const response = await api.post('guia_estudo/_search', {
-                    size: 100,
+                    size: 1000,
                     query:{
-                        match:{
-                            id_concurso: item.id_edital_ref
+                        "bool":{
+                            "should":[
+                                {
+                                    "term":{
+                                        "id_concurso": item.id_edital_ref
+                                    }
+                                },
+                                {
+                                    "bool": {
+                                        "must": [
+                                            { "term": { "typeGuide": "controle" }},
+                                            { "term": { "id_concurso": item.id_edital_ref }},
+                                            { "term": { "user_id": cpf }},
+                                        ]
+                                    }
+                                }
+                            ]
                         }
                     }
                 })
+
                 this.revisao = response.data.hits.hits.map(item => ({id: item._id, ...item._source}))
                 snackStore.activeSnack("Guia Carregado!", "success")
             } catch (error) {
                 console.log('erro resumo1')
                 snackStore.activeSnack("Erro ao buscar resumo!", "error")
+            }
+        },
+        async concluirGuia(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            const id = item.id + cpf
+
+            const { concluido } = item
+
+            try {
+                const response = await api.put(`guia_estudo/_doc/${id}`, {
+                        guia_id: item.id,
+                        user_id: cpf,
+                        concluido: !item.concluido,
+                        data_include: this.formatDate,
+                        typeGuide: 'controle',
+                        id_concurso: item.id_concurso
+                })
+                
+                const find = this.revisao.find(x => x.id === id).concluido = !concluido
+
+                console.log('response', find);
+
+                snackStore.activeSnack("Guia Concluído!", "success")
+            } catch (error) {
+                console.log('erro concluir guia')
+                snackStore.activeSnack("Erro ao concluir guia!", "error")
+            }
+        },
+        alternarConclusao(id) {
+            const index = this.revisao.findIndex(x => x.id === id)
+            if (index !== -1) {
+            this.revisao[index] = {
+                ...this.revisao[index],
+                concluido: !this.revisao[index].concluido
+            }
             }
         },
         clearUnMounted(){

@@ -39,7 +39,7 @@
                                                         </v-btn>
                                                     </v-btn-toggle>
                                                 </v-card-title>
-                                            <v-card-text :class="geralStore.readHeaderShow ? 'content': 'conten2'">
+                                            <v-card-text class="content">
                                                 <!-- Exibição do conteúdo completo -->
                                                 <div v-if="viewMode === 'full'">
                                                     <v-expansion-panels>
@@ -565,7 +565,7 @@
         height: 100%;
     }
     .content{
-        height: 60vh;
+        height: 55vh;
         overflow-y: auto;
     }
     .conten2{
