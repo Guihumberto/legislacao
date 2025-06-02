@@ -229,19 +229,19 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch } from 'vue'
+    import { ref, computed, watch, onMounted } from 'vue'
 
     // Props
     const props = defineProps({
         flashcards: {
             type: Array,
             required: true,
-            default: () => [
-                {
-                    pergunta: 'Qual é a capital do Brasil?',
-                    resposta: 'Brasília é a capital do Brasil, localizada na região Centro-Oeste do país.'
-                }
-            ]
+            default: () => []
+        },
+        flahscardsGravados: {
+            type: Array,
+            required: true,
+            default: () => []
         }
     })
 
@@ -306,20 +306,27 @@
         showAnswer.value = true
     }
 
+    const ansewersCards = ref([])
+
     const evaluate = (result) => {
         lastEvaluation.value = result
         showFeedback.value = true
         
         // Armazena a avaliação do card atual
         evaluations.value[currentIndex.value] = result
-        
-        emit('evaluate', {
-            result,
-            cardIndex: currentIndex.value,
-            question: currentCard.value?.pergunta,
-            answer: currentCard.value?.resposta,
-            timestamp: new Date()
-        })
+
+        const exist = ansewersCards.value.find(item => item.id === currentIndex.value)
+
+        if(exist) {
+          exist.response = result
+        } else {
+          ansewersCards.value.push({
+            id: currentIndex.value,
+            response: result
+          })
+        }
+
+        emit('evaluate', ansewersCards.value)
         
         // Auto-avança para o próximo card após 1.5s se não for o último
         if (currentIndex.value < props.flashcards.length - 1) {
@@ -398,6 +405,19 @@
 
     // Adiciona listeners de teclado
     document.addEventListener('keydown', handleKeyPress)
+
+    onMounted(() => {
+      if(props.flahscardsGravados.length) {
+          ansewersCards.value = [ ...props.flahscardsGravados ]
+          const max = ansewersCards.value.map( x => x.id ).reduce((a, b) => Math.max(a, b), 0) + 1
+          //ir para o primeiro nao respondido
+          currentIndex.value = max
+          //gravar os ja respondidos
+          ansewersCards.value.forEach(({ id, response }) => {
+            evaluations.value[id] = response;
+          });
+      }
+    })
 </script>
 
 <style scoped>

@@ -18,6 +18,7 @@
                     <div class="bg-blue-grey-lighten-5" >
                         <CardFlashcard 
                             :flashcards="conteudo.flahscards"
+                            :flahscardsGravados="flahscardsGravados"
                             @evaluate="handleEvaluation"
                             @cardChange="handleCardChange"
                             @complete="handleComplete"
@@ -30,8 +31,11 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import CardFlashcard from './cardFlashcard.vue';
+
+    import { useOptionsStore } from '@/store/concursos/OptionsStore';
+    const optionsStore = useOptionsStore()
 
     const dialog = ref(false)
     
@@ -45,10 +49,13 @@
     })
 
     // Handlers dos eventos
-    const handleEvaluation = (data) => {
-        console.log(`Card ${data.cardIndex + 1}: ${data.result}`)
-        console.log('Pergunta:', data.question)
-        console.log('Timestamp:', data.timestamp)
+    const handleEvaluation = async (data) => {
+        const objeto = {
+            ...props.conteudo,
+            flahscardsreUserMark: [ ...data ]
+        }
+
+        await optionsStore.updateFlashcard(objeto)
     }
 
     const handleCardChange = (data) => {
@@ -65,6 +72,11 @@
         Erros: ${stats.wrong}
         Precisão: ${stats.accuracy}%`)
     }
+
+    const flahscardsGravados = computed(() => {
+        const select = optionsStore.readFlahsCardsControle.find(item => item.guia_id === props.conteudo.id)
+        return select ? select?.flahscardsreUserMark : []
+    })
 
 </script>
 

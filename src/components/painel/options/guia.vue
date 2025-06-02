@@ -8,7 +8,7 @@
         <v-expand-transition>
             <v-card class="content" v-if="!selectGuia && usermaster">
                 <div class="cards-container">
-                    <div class="pa-2" v-for="item,i in typesGuia" :key="i" style="max-width: 350px;">
+                    <div class="pa-2" v-for="item,i in typesGuia" :key="i" style="max-width: 350px; margin: 0 auto;">
                         <v-card class="text-left" variant="outlined" color="grey" hover>
                             <v-card-title class="text-black d-flex align-center ga-2">
                                     <v-icon size="1.5rem">{{ item.icon }}</v-icon>

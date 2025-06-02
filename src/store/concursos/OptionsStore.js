@@ -24,6 +24,9 @@ export const useOptionsStore = defineStore("optionsStore", {
         readSumulasControle(){
             return this.revisao?.filter(x => x?.typeGuide === 'sumulasControle')
         },
+        readFlahsCardsControle(){
+            return this.revisao?.filter(x => x?.typeGuide === 'flashcardsControle')
+        },
         formatDate(){
             const now = new Date();
             
@@ -78,16 +81,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                                 {
                                     "bool": {
                                         "must": [
-                                            { "term": { "typeGuide": "controle" }},
-                                            { "term": { "id_concurso": item.id_edital_ref }},
-                                            { "term": { "user_id": cpf }},
-                                        ]
-                                    }
-                                },
-                                {
-                                    "bool": {
-                                        "must": [
-                                            { "term": { "typeGuide": "jurisControle" }},
+                                            { "terms": { "typeGuide": ["jurisControle", "sumulasControle", "flashcardsControle", "controle"] }},
                                             { "term": { "id_concurso": item.id_edital_ref }},
                                             { "term": { "user_id": cpf }},
                                         ]
@@ -110,7 +104,7 @@ export const useOptionsStore = defineStore("optionsStore", {
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
-            const id = item.id + cpf
+            const id = 'cont-' + item.id + cpf
 
             const { concluido } = item
 
@@ -196,6 +190,32 @@ export const useOptionsStore = defineStore("optionsStore", {
             catch (error) {
                 console.log('erro fav juri')
                 snackStore.activeSnack("Erro ao Favoritar súmula!", "error")
+            }
+        },
+        async updateFlashcard(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            const id = item.id + cpf
+
+            const objeto = {
+                guia_id: item.id,
+                user_id: cpf,
+                data_include: this.formatDate,
+                typeGuide: 'flashcardsControle',
+                id_concurso: item.id_concurso,
+                flahscardsreUserMark: item.flahscardsreUserMark
+            }
+
+            try {
+                const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                console.log('resposen', response);
+                snackStore.activeSnack("Flashcard atualizado!", "success")
+            }
+            catch (error) {
+                console.log('erro fav juri')
+                snackStore.activeSnack("Erro ao atualizar flashcard!", "error")
             }
         }
     }
