@@ -18,6 +18,12 @@ export const useOptionsStore = defineStore("optionsStore", {
         readRevisao(){
             return this.revisao
         },
+        readJurisControle(){
+            return this.revisao?.filter(x => x?.typeGuide === 'jurisControle')
+        },
+        readSumulasControle(){
+            return this.revisao?.filter(x => x?.typeGuide === 'sumulasControle')
+        },
         formatDate(){
             const now = new Date();
             
@@ -77,6 +83,15 @@ export const useOptionsStore = defineStore("optionsStore", {
                                             { "term": { "user_id": cpf }},
                                         ]
                                     }
+                                },
+                                {
+                                    "bool": {
+                                        "must": [
+                                            { "term": { "typeGuide": "jurisControle" }},
+                                            { "term": { "id_concurso": item.id_edital_ref }},
+                                            { "term": { "user_id": cpf }},
+                                        ]
+                                    }
                                 }
                             ]
                         }
@@ -132,6 +147,56 @@ export const useOptionsStore = defineStore("optionsStore", {
             this.load = false
             this.error = null
             this.revisao = []
+        },
+        async favJuris(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            const id = item.id + cpf
+
+            const objeto = {
+                guia_id: item.id,
+                user_id: cpf,
+                data_include: this.formatDate,
+                typeGuide: 'jurisControle',
+                id_concurso: item.id_concurso,
+                favoriteJuris: item.favoriteJuris
+            }
+
+            try {
+                const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                snackStore.activeSnack("Jurisprudência adicionada aos favoritos!", "success")
+            }
+            catch (error) {
+                console.log('erro fav juri')
+                snackStore.activeSnack("Erro ao Favoritar jurisprudência!", "error")
+            }
+        },
+        async favSumulas(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            const id = item.id + cpf
+
+            const objeto = {
+                guia_id: item.id,
+                user_id: cpf,
+                data_include: this.formatDate,
+                typeGuide: 'sumulasControle',
+                id_concurso: item.id_concurso,
+                favoriteSumulas: item.favoriteSumulas
+            }
+
+            try {
+                const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                snackStore.activeSnack("Súmula adicionada aos favoritos!", "success")
+            }
+            catch (error) {
+                console.log('erro fav juri')
+                snackStore.activeSnack("Erro ao Favoritar súmula!", "error")
+            }
         }
     }
 })

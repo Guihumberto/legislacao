@@ -8,6 +8,7 @@
                 <v-chip color="primary" variant="outlined">
                     {{ currentIndex + 1 }} de {{ jurisprudencias.length }}
                 </v-chip>
+                <h1 class="text-h6"> {{ title }}</h1>
             </div>
 
             <!-- Controles de navegação -->
@@ -63,16 +64,27 @@
   <v-card
     class="sumula-card"
     elevation="2"
-    :class="{ 'favorited': isFavorited }"
+    :class="{ 'favorited': isFavorited || sofavs }"
   >
     <!-- Header com título e botão de favoritar -->
     <v-card-title class="d-flex justify-space-between align-center pa-4">
       <div class="title-section">
         <div class="d-flex flex-wrap flex-column mb-5">
-            <h3 class="text-h6 font-weight-bold text-primary mb-1" style="white-space: nowrap;">
-              {{ currentCard?.acao || currentCard.title }}
-            </h3>
-            <p>{{ currentCard?.tese }}</p>
+            <div class="d-flex align-center justify-space-between">
+                <h3 class="text-h6 font-weight-bold text-primary mb-1" style="white-space: nowrap;">
+                  {{ currentCard?.acao || currentCard.title }}
+                </h3>
+                 <v-btn
+                    :icon="isFavorited || sofavs ? 'mdi-heart' : 'mdi-heart-outline'"
+                    :color="isFavorited || sofavs ? 'red' : 'grey'"
+                    variant="text"
+                    size="large"
+                    @click="toggleFavorite"
+                    class="favorite-btn"
+                >
+                </v-btn>
+            </div>
+            <p class="text-wrap">{{ currentCard?.tese }}</p>
         </div>
         <v-chip
           :color="getOrgaoColor(currentCard?.orgao)"
@@ -94,15 +106,7 @@
         </v-chip>
       </div>
       
-      <v-btn
-        :icon="isFavorited ? 'mdi-heart' : 'mdi-heart-outline'"
-        :color="isFavorited ? 'red' : 'grey'"
-        variant="text"
-        size="large"
-        @click="toggleFavorite"
-        class="favorite-btn"
-      >
-      </v-btn>
+     
     </v-card-title>
 
     <v-divider></v-divider>
@@ -143,7 +147,7 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
+    import { ref, computed, onMounted, watch } from 'vue'
 
     // Props do componente
     const props = defineProps({
@@ -154,7 +158,23 @@
         favorito: {
             type: Boolean,
             default: false
+        },
+        title: {
+            type: String,
+            required: true
+        },
+        favGravados: {
+            type: Array,
+            required: true
+        },
+        sofavs: {
+            type: Boolean,
+            required: true
         }
+    })
+
+    watch(() => props.sofavs, (newVal) => {
+        props.sofavs ? currentIndex.value = props.favGravados[0] : currentIndex.value = 0
     })
 
     const currentIndex = ref(0)
@@ -162,9 +182,6 @@
 
     // Emits
     const emit = defineEmits(['toggle-favorite', 'share', 'copy'])
-
-    // Estado reativo
-    const isFavorited = ref(props.favorito)
 
     // Computed
     const getOrgaoColor = computed(() => {
@@ -195,12 +212,20 @@
     })
 
     // Métodos
+
+    const favList = ref([])
+
+    const isFavorited = computed(() => {
+        return favList.value.includes(currentIndex.value)
+    })
+
     const toggleFavorite = () => {
-        isFavorited.value = !isFavorited.value
+        isFavorited.value ? favList.value.splice(favList.value.indexOf(currentIndex.value), 1) : favList.value.push(currentIndex.value)
+
         emit('toggle-favorite', {
             titulo: currentCard.value.title,
             orgao: currentCard.value.title,
-            favorited: isFavorited.value
+            favorited: favList.value
         })
     }
 
@@ -265,6 +290,10 @@
         //     juris: currentCard.value
         // })
     }
+
+    onMounted(() => {
+        favList.value = props.favGravados
+    })  
 </script>
 
 <style scoped>
@@ -285,6 +314,12 @@
 
     .title-section {
         flex: 1;
+    }
+
+    .position-info{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
     }
 
     .favorite-btn {
