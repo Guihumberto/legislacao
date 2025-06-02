@@ -119,6 +119,7 @@
                 ref="divider" 
                 class="panel-divider"
                 @mousedown="startResize"
+                @touchstart="startResize"
                 @mouseover="onDividerHover"
                 @mouseleave="onDividerLeave"
                 >
@@ -412,7 +413,7 @@
 
     watch(sidebar, (newSidebar) => {
        if(!sidebar.value) leftWidth.value = 1050
-       if(sidebar.value) leftWidth.value = containerWidth.value / 2 - 5; // Dividir ao meio inicialmente
+       if(sidebar.value) leftWidth.value = containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
     })
 
     // Largura do painel direito calculada
@@ -420,58 +421,75 @@
         return containerWidth.value - leftWidth.value - 10; // 10px é a largura do divisor
     });
 
+    // Função auxiliar para obter a posição X do evento (mouse ou touch)
+    const getClientX = (e) => {
+        return e.touches ? e.touches[0].clientX : e.clientX;
+    };
+
     // Iniciar o redimensionamento
     const startResize = (e) => {
-    isDragging.value = true;
-    startX.value = e.clientX;
-    startLeftWidth.value = leftWidth.value;
-    
-    // Adicionar evento de mousemove ao documento
-    document.addEventListener('mousemove', resize);
-    document.addEventListener('mouseup', stopResize);
-    
-    // Alterar o cursor durante o arrasto
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none'; // Impedir seleção de texto durante o arrasto
+        // Prevenir comportamento padrão para evitar scroll no mobile
+        e.preventDefault();
+
+        isDragging.value = true;
+        startX.value = e.clientX;
+        startLeftWidth.value = leftWidth.value;
+        
+        // Adicionar evento de mousemove ao documento
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+        document.addEventListener('touchmove', resize, { passive: false });
+        document.addEventListener('touchend', stopResize);
+        
+        if (!e.touches) {
+            document.body.style.cursor = 'col-resize';
+        }
+        document.body.style.userSelect = 'none'; // Impedir seleção de texto durante o arrasto
     };
 
     // Fazer o redimensionamento
     const resize = (e) => {
-    if (!isDragging.value) return;
-    
-    const delta = e.clientX - startX.value;
-    let newLeftWidth = startLeftWidth.value + delta;
-    
-    // Limites para o redimensionamento
-    const minWidth = 100; // Largura mínima para cada painel
-    const maxWidth = containerWidth.value - minWidth - 10; // Largura máxima considerando o divisor
-    
-    if (newLeftWidth < minWidth) {
-        newLeftWidth = minWidth;
-    } else if (newLeftWidth > maxWidth) {
-        newLeftWidth = maxWidth;
-    }
-    
-    leftWidth.value = newLeftWidth;
+        if (!isDragging.value) return;
+
+        // Prevenir scroll no mobile
+        e.preventDefault();
+        
+        const currentX = getClientX(e);
+        const delta = currentX - startX.value;
+        let newLeftWidth = startLeftWidth.value + delta;
+        
+        // Limites para o redimensionamento
+        const minWidth = 100; // Largura mínima para cada painel
+        const maxWidth = containerWidth.value - minWidth - 10; // Largura máxima considerando o divisor
+        
+        if (newLeftWidth < minWidth) {
+            newLeftWidth = minWidth;
+        } else if (newLeftWidth > maxWidth) {
+            newLeftWidth = maxWidth;
+        }
+        
+        leftWidth.value = newLeftWidth;
     };
 
     // Parar o redimensionamento
     const stopResize = () => {
-    isDragging.value = false;
-    
-    // Remover eventos de documento
-    document.removeEventListener('mousemove', resize);
-    document.removeEventListener('mouseup', stopResize);
-    
-    // Restaurar o cursor
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+        isDragging.value = false;
+        
+        // Remover eventos de documento
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+        document.removeEventListener('touchmove', resize);
+        document.removeEventListener('touchend', stopResize);
+        
+        // Restaurar o cursor
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
     };
 
-    // Manipuladores para estilização do divisor
+        // Manipuladores para estilização do divisor
     const onDividerHover = () => {
-    isHovering.value = true;
-    document.body.style.cursor = 'col-resize';
+        isHovering.value = true;
+        document.body.style.cursor = 'col-resize';
     };
 
     const onDividerLeave = () => {
@@ -521,6 +539,10 @@
 
     onUnmounted(() => {
         window.removeEventListener('resize', handleResize);
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+        document.removeEventListener('touchmove', resize);
+        document.removeEventListener('touchend', stopResize);
         optionStore.clearUnMounted()
     });
  
@@ -602,6 +624,8 @@
         scrollbar-color: #888 #f1f1f1;    /* cor do "polegar" e trilho */
     }
     .panel-divider {
+        touch-action: none; 
+        min-width: 20px;
         width: 10px;
         height: 100%;
         background-color: #f5f5f5;
@@ -620,6 +644,13 @@
     .fade-enter-from, .fade-leave-to {
         opacity: 0;
         transform: translatex(30px);
+    }
+
+    @media (max-width: 768px) {
+        .panel-divider {
+            min-width: 30px;
+            padding: 10px 5px;
+        }
     }
 
     

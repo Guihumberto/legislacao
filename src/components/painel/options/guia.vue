@@ -58,7 +58,7 @@
                     <v-list-item-title :class="{ 'text-decoration-line-through' : item.concluido }"> {{ item.title }} </v-list-item-title>
                     <v-list-item-subtitle> {{ item.conteudo }} </v-list-item-subtitle>
                     <template v-slot:append>
-                    {{ item.id }}
+                  
                         <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" />
                         <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" />
                         <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" />

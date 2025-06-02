@@ -237,18 +237,18 @@
     }
 
     const responderQuestao = async () => {
-        if(marked.value == props.listQuestoes.resposta){
+        if(marked.value == currentCard.value.resposta){
             resposta.value = 'acertou'
-            evaluate('wrong')
+            evaluate('correct')
         }else{
             resposta.value = 'errou'
-            evaluate('correct')
+            evaluate('wrong')
         }
         showAnswer.value = true
     }
 
     const responderQuestao2 = async () => {
-        if(marked.value == props.listQuestoes.resposta){
+        if(marked.value == currentCard.value.resposta){
             resposta.value = 'acertou'
         }else{
             resposta.value = 'errou'
@@ -256,11 +256,11 @@
     }
 
     const respostaExist = computed(() => {
-        if(props.listQuestoes?.id_resposta){
-            marked.value = props.listQuestoes.id_resposta
+        if(currentCard.value?.id_resposta){
+            marked.value = currentCard.value.id_resposta
             responderQuestao2()
         }
-        return props.listQuestoes?.id_resposta || marked.value
+        return currentCard.value?.id_resposta || marked.value
     })
 
     const evaluate = (result) => {
