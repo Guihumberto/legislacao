@@ -163,6 +163,7 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             try {
                 const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                this.updateRevisao({id: response.data._id, ...objeto}) 
                 snackStore.activeSnack("Jurisprudência adicionada aos favoritos!", "success")
             }
             catch (error) {
@@ -188,6 +189,7 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             try {
                 const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                this.updateRevisao({id: response.data._id, ...objeto}) 
                 snackStore.activeSnack("Súmula adicionada aos favoritos!", "success")
             }
             catch (error) {
@@ -213,7 +215,7 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             try {
                 const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
-                console.log('resposen', response);
+                this.updateRevisao({id: response.data._id, ...objeto}) 
                 snackStore.activeSnack("Flashcard atualizado!", "success")
             }
             catch (error) {
@@ -239,12 +241,23 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             try {
                 const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
-                console.log('resposen', response);
+                this.updateRevisao({id: response.data._id, ...objeto}) 
                 snackStore.activeSnack("Questões atualizado!", "success")
             }
             catch (error) {
                 console.log('erro fav juri')
                 snackStore.activeSnack("Erro ao atualizar questões!", "error")
+            }
+        },
+        updateRevisao(objeto){
+            const index = this.revisao.findIndex(x => x.id === objeto.id)
+            if (index !== -1) {
+                this.revisao[index] = {
+                    ...this.revisao[index],
+                    ...objeto
+                }
+            } else {
+                this.revisao.push(objeto)
             }
         }
     }

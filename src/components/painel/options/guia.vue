@@ -206,7 +206,7 @@
    const { revisao } = storeToRefs(optionsStore)
 
    const listResumo = computed(() => {
-        const listTypeGuide = ['questoes', 'flahscards', 'resumo', 'sumulas', 'jurisprudencia', 'artigos']
+        const listTypeGuide = ['questoes', 'flahscards', 'resumo', 'sumulas', 'jurisprudencia', 'artigos', 'controle']
 
         const guias = revisao.value.filter( x => listTypeGuide.includes(x.typeGuide) )
         const controle = guias.filter(obj => obj.typeGuide === "controle")
