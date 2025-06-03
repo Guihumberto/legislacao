@@ -125,8 +125,6 @@ export const useOptionsStore = defineStore("optionsStore", {
                 
                 const find = this.revisao.find(x => x.id === id).concluido = !concluido
 
-                console.log('response', find);
-
                 snackStore.activeSnack("Guia Concluído!", "success")
             } catch (error) {
                 console.log('erro concluir guia')
