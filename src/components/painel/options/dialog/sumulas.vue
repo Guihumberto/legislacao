@@ -123,6 +123,13 @@
                         @copy="onCopy"
                     />
                 </v-card-text>
+                <v-card-actions class="d-flex justify-center">
+                    <v-btn 
+                        @click="$emit('concluir', conteudo)" 
+                        :color="conteudo.concluido ? 'error' : 'success'"
+                        :prepend-icon="conteudo.concluido ? 'mdi-close-box-outline' : 'mdi-checkbox-marked-circle-outline'"
+                    >{{ conteudo.concluido ? 'Desmarcar como Concluído' : 'Concluir Atividade' }}</v-btn>
+                </v-card-actions>
             </v-card>
         </v-dialog>
     </div>

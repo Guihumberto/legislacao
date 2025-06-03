@@ -111,21 +111,23 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             const { concluido } = item
 
-            console.log('item', item);
+            const objeto = {
+                guia_id: item.id,
+                user_id: cpf,
+                concluido: !concluido,
+                data_include: this.formatDate,
+                typeGuide: 'controle',
+                id_concurso: item.id_concurso
+            }
 
             try {
-                const response = await api.put(`guia_estudo/_doc/${id}`, {
-                        guia_id: item.id,
-                        user_id: cpf,
-                        concluido: !item.concluido,
-                        data_include: this.formatDate,
-                        typeGuide: 'controle',
-                        id_concurso: item.id_concurso
-                })
+                const response = await api.put(`guia_estudo/_doc/${id}`, objeto )
                 
-                const find = this.revisao.find(x => x.id === id).concluido = !concluido
-
-                snackStore.activeSnack("Guia Concluído!", "success")
+                const find = this.revisao.find(x => x.id === id)
+                if(find) find.concluido = !concluido
+                if(!find) this.revisao.push({ id, ...objeto })
+                
+                concluido ? snackStore.activeSnack("Guia desmarcada como concluída!", "info") : snackStore.activeSnack("Guia concluída!", "success")
             } catch (error) {
                 console.log('erro concluir guia')
                 snackStore.activeSnack("Erro ao concluir guia!", "error")

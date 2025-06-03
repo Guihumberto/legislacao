@@ -51,7 +51,6 @@
     import { useOptionsStore } from '@/store/concursos/OptionsStore';
     const optionsStore = useOptionsStore()
 
-    import Questoes_alternative from './questoes_alternative.vue';
     import CardQuestoes from './cardQuestoes.vue';
 
     const dialog = ref(false)
@@ -76,9 +75,15 @@
         // console.log(`Card ${data.cardIndex + 1}: ${data.result}`)
         // console.log('Pergunta:', data.question)
         // console.log('Timestamp:', data.timestamp)
+        concluirAtividade(objeto)
     }
 
-  
+    const emit = defineEmits(['concluir'])
+
+    const concluirAtividade = (objeto) => {
+        if(props.conteudo.concluido) return
+        if(objeto.questoesUserMark.length === props.conteudo.questoes.length) emit('concluir', props.conteudo)
+    }
 
     const handleCardChange = (data) => {
         // console.log('Card atual:', data.currentIndex + 1)

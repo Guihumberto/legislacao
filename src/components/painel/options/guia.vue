@@ -38,7 +38,7 @@
         <v-expand-transition>
             <v-list class="pa-5 text-left" v-if="!loading && optionsStore.readRevisao.length">
                 <div class="d-flex align-center justify-space-between">
-                    <p>Disciplina: {{ selectDisciplina?.disciplina || "Todas" }}</p>
+                    <p>{{ selectDisciplina?.disciplina || "Todas as disciplinas" }}</p>
                     <v-btn variant="text" class="text-lowercase" @click="$emit('clearDisciplina')">Mostrar todas</v-btn>
                 </div>
                 <v-select
@@ -58,18 +58,24 @@
                     <v-list-item-title :class="{ 'text-decoration-line-through' : item.concluido }"> {{ item.title }} </v-list-item-title>
                     <v-list-item-subtitle> {{ item.conteudo }} </v-list-item-subtitle>
                     <template v-slot:append>
-                        <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" />
-                        <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" />
-                        <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" />
-                        <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" />
-                        <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" />
-                        <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" />
-                        <v-tooltip :text="item.concluido ? 'Desmarcar a atividade.' : 'Marcar como concluído'">
+                        <v-tooltip text="Atividade marcada como concluída." location="top">
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" v-if="item.concluido" color="success">mdi-check-all</v-icon>
+                            </template>
+                        </v-tooltip>
+                        <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" @concluir="concluirGuia" />
+                        <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" />
+                        <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" @concluir="concluirGuia" />
+                        <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" @concluir="concluirGuia" />
+                        <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" @concluir="concluirGuia" />
+                        <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" @concluir="concluirGuia" />
+                       
+                        <v-tooltip :text="item.concluido ? 'Desmarcar a atividade.' : 'Marcar como concluído'" location="top">
                             <template v-slot:activator="{ props }">
                                  <v-btn 
                                     :loading="loadConcluir"
                                     :disabled="loadConcluir"
-                                    v-bind="props" variant="text" :color="item.concluido ? 'error' : 'success'" 
+                                    v-bind="props" variant="text" :color="item?.concluido ? 'error' : 'success'" 
                                     :icon="item.concluido ? 'mdi-close-box-outline' : 'mdi-checkbox-marked-circle-outline'" density="compact" class="hover-button"
                                     @click="concluirGuia(item)"
                                 ></v-btn>

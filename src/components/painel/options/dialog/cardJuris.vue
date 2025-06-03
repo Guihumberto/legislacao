@@ -79,6 +79,7 @@
                     :color="isFavorited || sofavs ? 'red' : 'grey'"
                     variant="text"
                     size="large"
+                    :disabled="sofavs"
                     @click="toggleFavorite"
                     class="favorite-btn"
                 >

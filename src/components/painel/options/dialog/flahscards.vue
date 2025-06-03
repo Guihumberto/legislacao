@@ -56,6 +56,14 @@
         }
 
         await optionsStore.updateFlashcard(objeto)
+        concluirAtividade(objeto)
+    }
+
+    const emit = defineEmits(['concluir'])
+
+    const concluirAtividade = (objeto) => {
+        if(props.conteudo.concluido) return
+        if(objeto?.flahscardsreUserMark?.length === props.conteudo?.flahscards?.length) emit('concluir', props.conteudo)
     }
 
     const handleCardChange = (data) => {

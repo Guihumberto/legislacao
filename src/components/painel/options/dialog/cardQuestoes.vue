@@ -40,7 +40,7 @@
                 >
                     <div class="question-section">
                         <div class="pa-2 bg-primary rounded-lg text-white mb-4">
-                             {{ currentCard.cargo }} - {{ currentCard.ano }} - {{ currentCard.concurso }} - {{ currentCard.concurso }} - {{ currentCard.banca }} 
+                             {{ currentCard?.cargo }} - {{ currentCard?.ano }} - {{ currentCard?.concurso }} - {{ currentCard?.banca }} 
                         </div>
                         <h2 class="text-h6 mb-6 font-weight-medium text-left px-2">
                             {{ currentCard?.pergunta }}
@@ -382,7 +382,7 @@
           const max = ansewersCards.value.map( x => x.id ).reduce((a, b) => Math.max(a, b), 0) + 1
 
           //ir para o primeiro nao respondido
-          max > props.listQuestoes.length ? currentIndex.value = max - 1 : currentIndex.value = max
+          max > props.listQuestoes.length ? currentIndex.value = max - 1 : currentIndex.value = max -1
           //gravar os ja respondidos
           ansewersCards.value.forEach(({ id, resposta }) => {
             evaluations.value[id] = resposta;
