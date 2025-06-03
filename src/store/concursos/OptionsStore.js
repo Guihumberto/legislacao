@@ -76,9 +76,12 @@ export const useOptionsStore = defineStore("optionsStore", {
                     query:{
                         "bool":{
                             "should":[
-                                {
-                                    "term":{
-                                        "id_concurso": item.id_edital_ref
+                                 {
+                                    bool: {
+                                        must: [
+                                            { term: { id_concurso: item.id_edital_ref } },
+                                            { "terms": { "typeGuide": ["jurisprudencia", "sumulas", "flahscards", "questoes", "resumo", "artigos"] }},
+                                        ]
                                     }
                                 },
                                 {
@@ -96,6 +99,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                 })
 
                 this.revisao = response.data.hits.hits.map(item => ({id: item._id, ...item._source}))
+                console.log('revisao', this.revisao);
                 snackStore.activeSnack("Guia Carregado!", "success")
             } catch (error) {
                 console.log('erro resumo1')
