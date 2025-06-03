@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch } from 'vue'
+    import { ref, computed, watch, onMounted } from 'vue'
     import InfoError from './infoError.vue';
 
     const props = defineProps({
@@ -189,7 +189,12 @@
                         justificativa: 'A capital do Brasil é Brasília, localizada na região Centro-Oeste do país.',
                     }
                 ]
-            }
+            },
+            questoesGravadas: {
+                type: Array,
+                required: true,
+                default: () => []
+            },
     })
 
     // Emits
@@ -215,18 +220,18 @@
     const stats = computed(() => {
         const evals = Object.values(evaluations.value)
         const total = evals.length
-        const correct = evals.filter(e => e === 'correct').length
+        const correct = evals.filter(e => e === 'acertou').length
         const partial = evals.filter(e => e === 'partial').length
-        const wrong = evals.filter(e => e === 'wrong').length
+        const wrong = evals.filter(e => e === 'errou').length
         const accuracy = total > 0 ? Math.round(((correct + partial * 0.5) / total) * 100) : 0
         
         return { total, correct, wrong, accuracy }
         })
 
-        const feedbackColor = computed(() => {
+    const feedbackColor = computed(() => {
             switch (lastEvaluation.value) {
-                case 'correct': return 'success'
-                case 'wrong': return 'error'
+                case 'acertou': return 'success'
+                case 'errou': return 'error'
                 case 'partial': return 'warning'
                 default: return 'primary'
             }
@@ -236,15 +241,34 @@
         marked.value = id
     }
 
+    const ansewersCards = ref([])
+
     const responderQuestao = async () => {
         if(marked.value == currentCard.value.resposta){
             resposta.value = 'acertou'
-            evaluate('correct')
+            evaluate('acertou')
         }else{
             resposta.value = 'errou'
-            evaluate('wrong')
+            evaluate('errou')
         }
         showAnswer.value = true
+
+        const exist = ansewersCards.value?.find(item => item?.id === currentIndex.value)
+
+        if(exist) {
+          exist.response = marked.value
+        } else {
+          ansewersCards.value.push({
+            id: currentIndex.value,
+            response: marked.value,
+            resposta: resposta.value
+          })
+        }
+
+        console.log('oi');
+
+        emit('evaluate', ansewersCards.value)
+
     }
 
     const responderQuestao2 = async () => {
@@ -253,14 +277,16 @@
         }else{
             resposta.value = 'errou'
         }
+        showAnswer.value = true
     }
 
     const respostaExist = computed(() => {
-        if(currentCard.value?.id_resposta){
-            marked.value = currentCard.value.id_resposta
+        const list = ansewersCards.value.map(item => item?.id)
+        if(list.includes(currentIndex.value)){
+            marked.value = ansewersCards.value.find( x => x.id == currentIndex.value)?.response
             responderQuestao2()
         }
-        return currentCard.value?.id_resposta || marked.value
+        return ansewersCards.value?.find(x => x?.id == currentIndex.value)?.response || marked.value
     })
 
     const evaluate = (result) => {
@@ -270,13 +296,13 @@
         // Armazena a avaliação do card atual
         evaluations.value[currentIndex.value] = result
         
-        emit('evaluate', {
-            result,
-            cardIndex: currentIndex.value,
-            question: currentCard.value?.pergunta,
-            answer: currentCard.value?.resposta,
-            timestamp: new Date()
-        })
+        // emit('evaluate', {
+        //     result,
+        //     cardIndex: currentIndex.value,
+        //     question: currentCard.value?.pergunta,
+        //     answer: currentCard.value?.resposta,
+        //     timestamp: new Date()
+        // })
         
         // Auto-avança para o próximo card após 1.5s se não for o último
         if (currentIndex.value < props.listQuestoes.length - 1) {
@@ -353,16 +379,30 @@
         } else if (event.key === 'ArrowLeft') {
             previousCard()
         } else if (event.key === '1' && showAnswer.value) {
-            evaluate('wrong')
+            evaluate('errou')
         } else if (event.key === '2' && showAnswer.value) {
             evaluate('partial')
         } else if (event.key === '3' && showAnswer.value) {
-            evaluate('correct')
+            evaluate('acertou')
         }
     }
 
     // Adiciona listeners de teclado
     document.addEventListener('keydown', handleKeyPress)
+
+    onMounted(() => {
+      if(props.questoesGravadas.length) {
+          ansewersCards.value = [ ...props.questoesGravadas ]
+          const max = ansewersCards.value.map( x => x.id ).reduce((a, b) => Math.max(a, b), 0) + 1
+
+          //ir para o primeiro nao respondido
+          max > listQuestoes.length ? currentIndex.value = max - 1 : currentIndex.value = max
+          //gravar os ja respondidos
+          ansewersCards.value.forEach(({ id, resposta }) => {
+            evaluations.value[id] = resposta;
+          });
+      }
+    })
 
 </script>
 

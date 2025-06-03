@@ -411,7 +411,7 @@
           ansewersCards.value = [ ...props.flahscardsGravados ]
           const max = ansewersCards.value.map( x => x.id ).reduce((a, b) => Math.max(a, b), 0) + 1
           //ir para o primeiro nao respondido
-          currentIndex.value = max
+          max > props.flashcards.length ? currentIndex = max :  currentIndex.value = max - 1
           //gravar os ja respondidos
           ansewersCards.value.forEach(({ id, response }) => {
             evaluations.value[id] = response;

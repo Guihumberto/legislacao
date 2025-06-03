@@ -27,6 +27,9 @@ export const useOptionsStore = defineStore("optionsStore", {
         readFlahsCardsControle(){
             return this.revisao?.filter(x => x?.typeGuide === 'flashcardsControle')
         },
+        readQuestoesControle(){
+            return this.revisao?.filter(x => x?.typeGuide === 'questoesControle')
+        },
         formatDate(){
             const now = new Date();
             
@@ -81,7 +84,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                                 {
                                     "bool": {
                                         "must": [
-                                            { "terms": { "typeGuide": ["jurisControle", "sumulasControle", "flashcardsControle", "controle"] }},
+                                            { "terms": { "typeGuide": ["jurisControle", "sumulasControle", "flashcardsControle", "controle", "questoesControle"] }},
                                             { "term": { "id_concurso": item.id_edital_ref }},
                                             { "term": { "user_id": cpf }},
                                         ]
@@ -216,6 +219,32 @@ export const useOptionsStore = defineStore("optionsStore", {
             catch (error) {
                 console.log('erro fav juri')
                 snackStore.activeSnack("Erro ao atualizar flashcard!", "error")
+            }
+        },
+        async updateQuestoes(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            const id = item.id + cpf
+
+            const objeto = {
+                guia_id: item.id,
+                user_id: cpf,
+                data_include: this.formatDate,
+                typeGuide: 'questoesControle',
+                id_concurso: item.id_concurso,
+                questoesUserMark: item.questoesUserMark
+            }
+
+            try {
+                const response = await api.put(`guia_estudo/_doc/${id}`, objeto)
+                console.log('resposen', response);
+                snackStore.activeSnack("Questões atualizado!", "success")
+            }
+            catch (error) {
+                console.log('erro fav juri')
+                snackStore.activeSnack("Erro ao atualizar questões!", "error")
             }
         }
     }

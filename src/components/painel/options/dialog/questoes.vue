@@ -34,6 +34,7 @@
                     </div> -->
                     <CardQuestoes 
                         :listQuestoes="conteudo.questoes"
+                        :questoesGravadas="questoesGravadas"
                         @evaluate="handleEvaluation"
                         @cardChange="handleCardChange"
                         @complete="handleComplete"
@@ -45,7 +46,10 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
+
+    import { useOptionsStore } from '@/store/concursos/OptionsStore';
+    const optionsStore = useOptionsStore()
 
     import Questoes_alternative from './questoes_alternative.vue';
     import CardQuestoes from './cardQuestoes.vue';
@@ -62,7 +66,15 @@
     })
 
     // Handlers dos eventos
-    const handleEvaluation = (data) => {
+    const handleEvaluation = async (data) => {
+         const objeto = {
+            ...props.conteudo,
+            questoesUserMark: [ ...data ]
+        }
+
+        console.log('objeto', objeto);
+
+        // await optionsStore.updateQuestoes(objeto)
         // console.log(`Card ${data.cardIndex + 1}: ${data.result}`)
         // console.log('Pergunta:', data.question)
         // console.log('Timestamp:', data.timestamp)
@@ -82,6 +94,11 @@
         // Erros: ${stats.wrong}
         // Precisão: ${stats.accuracy}%`)
     }
+
+    const questoesGravadas = computed(() => {
+        const select = optionsStore.readQuestoesControle.find(item => item.guia_id === props.conteudo.id)
+        return select ? select?.questoesUserMark : []
+    })
   
 </script>
 
