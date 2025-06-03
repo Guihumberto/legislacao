@@ -72,13 +72,13 @@
             questoesUserMark: [ ...data ]
         }
 
-        console.log('objeto', objeto);
-
-        // await optionsStore.updateQuestoes(objeto)
+        await optionsStore.updateQuestoes(objeto)
         // console.log(`Card ${data.cardIndex + 1}: ${data.result}`)
         // console.log('Pergunta:', data.question)
         // console.log('Timestamp:', data.timestamp)
     }
+
+  
 
     const handleCardChange = (data) => {
         // console.log('Card atual:', data.currentIndex + 1)

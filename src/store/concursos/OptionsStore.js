@@ -111,6 +111,8 @@ export const useOptionsStore = defineStore("optionsStore", {
 
             const { concluido } = item
 
+            console.log('item', item);
+
             try {
                 const response = await api.put(`guia_estudo/_doc/${id}`, {
                         guia_id: item.id,

@@ -182,13 +182,7 @@
             listQuestoes: {
                 type: Array,
                 required: true,
-                default: () => [
-                    {
-                        pergunta: 'Qual é a capital do Brasil?',
-                        resposta: 'falso.',
-                        justificativa: 'A capital do Brasil é Brasília, localizada na região Centro-Oeste do país.',
-                    }
-                ]
+                default: () => []
             },
             questoesGravadas: {
                 type: Array,
@@ -198,7 +192,7 @@
     })
 
     // Emits
-    const emit = defineEmits(['evaluate', 'cardChange', 'complete'])
+    const emit = defineEmits(['evaluate', 'cardChange', 'complete',])
 
     // State
     const currentIndex = ref(0)
@@ -265,8 +259,6 @@
           })
         }
 
-        console.log('oi');
-
         emit('evaluate', ansewersCards.value)
 
     }
@@ -296,13 +288,7 @@
         // Armazena a avaliação do card atual
         evaluations.value[currentIndex.value] = result
         
-        // emit('evaluate', {
-        //     result,
-        //     cardIndex: currentIndex.value,
-        //     question: currentCard.value?.pergunta,
-        //     answer: currentCard.value?.resposta,
-        //     timestamp: new Date()
-        // })
+       
         
         // Auto-avança para o próximo card após 1.5s se não for o último
         if (currentIndex.value < props.listQuestoes.length - 1) {
@@ -396,7 +382,7 @@
           const max = ansewersCards.value.map( x => x.id ).reduce((a, b) => Math.max(a, b), 0) + 1
 
           //ir para o primeiro nao respondido
-          max > listQuestoes.length ? currentIndex.value = max - 1 : currentIndex.value = max
+          max > props.listQuestoes.length ? currentIndex.value = max - 1 : currentIndex.value = max
           //gravar os ja respondidos
           ansewersCards.value.forEach(({ id, resposta }) => {
             evaluations.value[id] = resposta;
