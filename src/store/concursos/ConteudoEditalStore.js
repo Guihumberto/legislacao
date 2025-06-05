@@ -14,9 +14,13 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
         error: null,
         editaisUser: [],
         conteudoEditalUser: [],
-        editalUser: {}
+        editalUser: {},
+        editais: []
     }),
     getters: {
+        readGetAllEditais() {
+            return this.editais;
+        },
         getConteudoEdital() {
             return this.conteudoEdital;
         },
@@ -60,6 +64,28 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
         }
     },
     actions: {
+        async getAllEditais(){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await api.post('edital/_search', {
+                    from: 0,
+                    size: 100
+                });
+                this.editais = response.data.hits.hits.map(hit => ({ id: hit._id, ...hit._source }))
+                snackStore.activeSnack('Editais carregados com sucesso!', 'success')
+            } catch (error) {
+                console.log('erro get all editais');
+                this.error = error;
+                snackStore.activeSnack('Erro ao carregar os editais!', 'error')
+            } finally {
+                this.loading = false;
+            }
+        },
         async getConteudo(id) {
             this.loading = true;
             this.error = null;

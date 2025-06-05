@@ -36,6 +36,24 @@ export default [
         meta: { requiresAuth: true, role: true } 
       },
       {
+        path: '/home/admin',
+        name: 'Admin Home',
+        component: () => import('@/views/admin/home.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
+        path: '/admin/list_cargo_editar',
+        name: 'Lista Cargo',
+        component: () => import('@/views/admin/list_cargo_editar.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
+        path: '/admin/cargo_editar/:id',
+        name: 'Editar Cargo',
+        component: () => import('@/views/admin/cargo_editar.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
         path: '/forum/tratarerros',
         name: 'Tratar error',
         component: () => import('@/views/forum/config/tratar_erros.vue'),
