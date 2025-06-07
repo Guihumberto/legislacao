@@ -161,44 +161,48 @@
 
                 <!-- Exibição apenas das normas -->
                 <div v-else-if="viewMode === 'normas'">
-                    <v-list lines="two">
-                    <template v-for="(disciplina, disciplinaIndex) in disciplinas" :key="disciplinaIndex">
-                        <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>
-                        
-                        <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
-                        <template v-if="topico.normas && topico.normas.length > 0">
-                            <v-list-item
-                            v-for="(norma, normaIndex) in topico.normas"
-                            :key="`t-${topicoIndex}-${normaIndex}`"
-                            :title="norma"
-                            :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
-                            ></v-list-item>
-                        </template>
-                        
-                        <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="subtopicoIndex">
-                            <template v-if="subtopico.normas && subtopico.normas.length > 0">
-                            <v-list-item
-                                v-for="(norma, normaIndex) in subtopico.normas"
-                                :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
-                                :title="norma"
-                                :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
-                            ></v-list-item>
-                            </template>
+                    <Link_normas 
+                        :disciplinas="disciplinas"
+                        @normaClicada="handleNormaClicada"
+                    />
+                    <!-- <v-list lines="two">
+                        <template v-for="(disciplina, disciplinaIndex) in disciplinas" :key="disciplinaIndex">
+                            <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>
                             
-                            <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="subSubtopicoIndex">
-                            <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
+                            <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
+                            <template v-if="topico.normas && topico.normas.length > 0">
                                 <v-list-item
-                                v-for="(norma, normaIndex) in subSubtopico.normas"
-                                :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
+                                v-for="(norma, normaIndex) in topico.normas"
+                                :key="`t-${topicoIndex}-${normaIndex}`"
                                 :title="norma"
-                                :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
+                                :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
                                 ></v-list-item>
                             </template>
+                            
+                            <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="subtopicoIndex">
+                                <template v-if="subtopico.normas && subtopico.normas.length > 0">
+                                <v-list-item
+                                    v-for="(norma, normaIndex) in subtopico.normas"
+                                    :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
+                                    :title="norma"
+                                    :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
+                                ></v-list-item>
+                                </template>
+                                
+                                <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="subSubtopicoIndex">
+                                <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
+                                    <v-list-item
+                                    v-for="(norma, normaIndex) in subSubtopico.normas"
+                                    :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
+                                    :title="norma"
+                                    :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
+                                    ></v-list-item>
+                                </template>
+                                </template>
+                            </template>
                             </template>
                         </template>
-                        </template>
-                    </template>
-                    </v-list>
+                    </v-list> -->
                 </div>
 
                 <!-- Exibição do JSON -->
@@ -352,10 +356,60 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Dialog para mostrar a legislação -->
+    <v-dialog v-model="dialogLegislacao" max-width="800">
+      <v-card v-if="legislacaoSelecionada">
+        <v-card-title>
+          <span class="text-h5">{{ legislacaoSelecionada.nome }}</span>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="dialogLegislacao = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        
+        <v-card-text>
+          <div class="mb-4">
+            <strong>ID:</strong> {{ legislacaoSelecionada.id }}
+          </div>
+          <div class="mb-4">
+            <strong>Tipo:</strong> {{ legislacaoSelecionada.tipo }}
+          </div>
+          <div class="mb-4">
+            <strong>Número:</strong> {{ legislacaoSelecionada.numero }}
+          </div>
+          <div class="mb-4">
+            <strong>Ano:</strong> {{ legislacaoSelecionada.ano }}
+          </div>
+          <div class="mb-4" v-if="legislacaoSelecionada.ementa">
+            <strong>Ementa:</strong> {{ legislacaoSelecionada.ementa }}
+          </div>
+          <div class="mb-4" v-if="legislacaoSelecionada.conteudo">
+            <strong>Conteúdo:</strong>
+            <div class="mt-2" v-html="legislacaoSelecionada.conteudo"></div>
+          </div>
+        </v-card-text>
+        
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="primary" 
+            @click="abrirLegislacaoCompleta"
+            v-if="legislacaoSelecionada.url"
+          >
+            Ver Legislação Completa
+          </v-btn>
+          <v-btn color="grey" @click="dialogLegislacao = false">
+            Fechar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
     import { ref, reactive } from 'vue'
+    import Link_normas from './link_normas.vue';
 
     const props = defineProps({
         conteudo: {
@@ -639,6 +693,24 @@
         
         emit('update:disciplinas', disciplina)
         dialogExclusao.value = false
+    }
+
+    // Estado reativo
+    const dialogLegislacao = ref(false)
+    const legislacaoSelecionada = ref(null)
+
+    // Métodos
+    const handleNormaClicada = (dados) => {
+        console.log('Norma clicada:', dados)
+        
+        legislacaoSelecionada.value = dados.legislacao
+        dialogLegislacao.value = true
+    }
+
+    const abrirLegislacaoCompleta = () => {
+        if (legislacaoSelecionada.value?.url) {
+            window.open(legislacaoSelecionada.value.url, '_blank')
+        }
     }
 
 </script>

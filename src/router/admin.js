@@ -60,6 +60,12 @@ export default [
         meta: { requiresAuth: true, role: true } 
       },
       {
+        path: '/admin/vincularleis',
+        name: 'Vincular Leis',
+        component: () => import('@/views/admin/vincularLeisDisciplinas.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
         path: '/admin/rag',
         name: 'Rag Chat',
         component: () => import('@/views/admin/rag_chat.vue'),

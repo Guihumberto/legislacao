@@ -5,7 +5,6 @@
               <h1 class="text-h5 my-5">Lista de Concursos</h1>
               <div class="d-flex justify-space-between">
                 <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="$router.push('/admin/list_cargo_editar/')">Voltar</v-btn>
-              
               </div>
               <v-divider class="my-5"></v-divider>
 

@@ -19,7 +19,7 @@
       {id: 2, title: 'Lista de cargos', subtitle: 'Listar e editar cargos e ementas', link: '/admin/list_cargo_editar', icon: 'mdi-account-tie'},
       {id: 3, title: 'Incluir questões no forum de leis', subtitle: 'Cadastro de questões por norma', link: '/forum/cadastro', icon: 'mdi-forum'},
       {id: 4, title: 'Tratar erros', subtitle: 'Tratamento de erros informados pelos usuários', link: '/forum/tratarerros', icon: 'mdi-alert-circle'  },
-      {id: 5, title: 'Vincular leis a disciplinas', subtitle: 'Criar vínculos', link: '/forum/tratarerros', icon: 'mdi-link-variant'  },
+      {id: 5, title: 'Vincular leis a disciplinas', subtitle: 'Criar vínculos', link: '/admin/vincularleis', icon: 'mdi-link-variant'  },
     ]
 </script>
 
