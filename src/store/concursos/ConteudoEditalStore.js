@@ -98,9 +98,16 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                         match: {
                             id_concurso: id
                         }
-                    }
+                    },
+                    sort: [
+                         {
+                            disciplina: {
+                                order: "asc", // Ordena pelos IDs em ordem decrescente
+                            },
+                        }
+                    ]
                 });
-                this.conteudoEdital = response.data.hits.hits.map(hit => hit._source);
+                this.conteudoEdital = response.data.hits.hits.map(hit => ({ id: hit._id, ...hit._source}));
             } catch (error) {
                 this.error = error;
             } finally {
@@ -354,6 +361,70 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                 snackStore.activeSnack('Ocorreu um erro ao deletar', 'error',)
             } finally {
                 this.loading = false;
+            }
+        },
+        //update edital
+        async getConteudoEEditalEdit(id){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.loading = true;
+            this.error = null;
+            try {
+                await this.getEdital(id)
+                await this.getConteudo(id)
+                snackStore.activeSnack('Item carregado com sucesso.', 'success',)
+            } catch (error) {
+                this.error = error;
+                snackStore.activeSnack('Ocorreu um erro ao carregar', 'error',)
+            } finally {
+                this.loading = false;
+            }
+        },
+        async updateEdital(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.loading = true;
+            this.error = null;
+
+            const objeto = { ...item }
+            delete objeto.id
+
+            try {
+                const response = await api.post(`edital/_update/${item.id}`, {
+                    doc: objeto
+                });
+                snackStore.activeSnack('Item Atualizado com sucesso.', 'success',)
+            } catch (error) {
+                this.error = error;
+                console.log('error edit edital');
+                snackStore.activeSnack('Ocorreu um erro ao atualizar', 'error',)
+            } finally {
+                this.loading = false;
+            }
+        },
+        async updateConteudoEdital(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+            this.error = null;
+
+            const objeto = { ...item }
+            delete objeto.id
+
+            try {
+                const response = await api.post(`conteudo_edital/_update/${item.id}`, {
+                    doc: objeto
+                })
+                snackStore.activeSnack('Conteúdo atualizado com sucesso.', 'success',)
+            } catch (error) {
+                this.error = error;
+                console.log('error editar conteudo do edital');
+                snackStore.activeSnack('Ocorreu um erro ao atualizar o conteúdo', 'error',)
             }
         }
   }
