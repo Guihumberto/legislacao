@@ -200,7 +200,12 @@
         "Direito Previdenciário",
         "Direito Eleitoral",
         "Direito do Financeiro",
-        "Legislação Especial"
+        "Legislação Especial",
+        "Noções de Direito Administrativo",
+        "Noções de Direito Constitucional",
+        "Noções de Direito Penal e de Direito Processual Penal",
+        "Noções de Criminalística",
+        "Direitos Humanos"
     ]
 
     const snackbar = reactive({

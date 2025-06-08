@@ -88,6 +88,8 @@ export const useLinkLawStore = defineStore("linkLawsStore", {
                     }
                 })
             }
+
+            console.log('item', item);
             
             try {
                 const response = await api.post('laws_v3/_search', {
