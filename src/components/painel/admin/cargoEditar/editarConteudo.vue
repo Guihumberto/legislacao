@@ -360,29 +360,32 @@
     <!-- Dialog para mostrar a legislação -->
     <v-dialog v-model="dialogLegislacao" max-width="800">
       <v-card v-if="legislacaoSelecionada">
-        <v-card-title>
-          <span class="text-h5">{{ legislacaoSelecionada.nome }}</span>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="dialogLegislacao = false">
+        <v-card-title  class="bg-primary d-flex align-center justify-space-between">
+          <span class="text-h6">{{ legislacaoSelecionada.title }}</span>
+          <v-btn variant="text" icon @click="dialogLegislacao = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         
         <v-card-text>
           <div class="mb-4">
-            <strong>ID:</strong> {{ legislacaoSelecionada.id }}
+            <div v-if="existForum(legislacaoSelecionada.id)" class="border rounded-lg pa-4 d-flex align-center justify-space-between bg-purple-lighten-5">
+              <p class="mb-2">Você possui essa lei adicionada em seu forum.</p>
+              <v-btn variant="flat" color="deep-purple-darken-1" @click="$router.push(`/avancado/forumlaw/${existForum(legislacaoSelecionada.id)}?det=false`)">Ir para o forum</v-btn>
+            </div>
+            <v-btn v-else variant="flat" color="success" @click="$router.push(`/avancado/${legislacaoSelecionada.id}`)">Ir para norma</v-btn>
           </div>
           <div class="mb-4">
             <strong>Tipo:</strong> {{ legislacaoSelecionada.tipo }}
           </div>
           <div class="mb-4">
-            <strong>Número:</strong> {{ legislacaoSelecionada.numero }}
+            <strong>Número:</strong> {{ legislacaoSelecionada.title }}
           </div>
           <div class="mb-4">
             <strong>Ano:</strong> {{ legislacaoSelecionada.ano }}
           </div>
-          <div class="mb-4" v-if="legislacaoSelecionada.ementa">
-            <strong>Ementa:</strong> {{ legislacaoSelecionada.ementa }}
+          <div class="mb-4" v-if="legislacaoSelecionada.description_norm">
+            <strong>Ementa:</strong> {{ legislacaoSelecionada.description_norm }}
           </div>
           <div class="mb-4" v-if="legislacaoSelecionada.conteudo">
             <strong>Conteúdo:</strong>
@@ -408,8 +411,12 @@
 </template>
 
 <script setup>
-    import { ref, reactive } from 'vue'
+    import { ref, reactive, onMounted } from 'vue'
+    import { useForumStore } from '@/store/ForumStore';
+    const forumStore = useForumStore()
+
     import Link_normas from './link_normas.vue';
+
 
     const props = defineProps({
         conteudo: {
@@ -701,8 +708,6 @@
 
     // Métodos
     const handleNormaClicada = (dados) => {
-        console.log('Norma clicada:', dados)
-        
         legislacaoSelecionada.value = dados.legislacao
         dialogLegislacao.value = true
     }
@@ -712,6 +717,18 @@
             window.open(legislacaoSelecionada.value.url, '_blank')
         }
     }
+
+    const existForum = (id) => {
+      const find = forumStore.readMyGroup.find(item => item.idLaw == id)
+      if(find) {
+        return find.id
+      }
+      return null
+    }
+
+    onMounted(() => {
+        forumStore.getForum()
+    })
 
 </script>
 

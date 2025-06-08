@@ -10,6 +10,7 @@ export const useLinkLawStore = defineStore("linkLawsStore", {
         load: false,
         error: null,
         normas: [],
+        lawFind: {}
     }),
     getters: {
         readLoad(){
@@ -17,10 +18,13 @@ export const useLinkLawStore = defineStore("linkLawsStore", {
         },
         readNormas(){
             return this.normas
+        },
+        readLawFind(){
+            return this.lawFind
         }
     },
     actions:{
-         async getAllLaw(){
+        async getAllLaw(){
             const snackStore = useSnackStore()
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
@@ -62,6 +66,62 @@ export const useLinkLawStore = defineStore("linkLawsStore", {
                 console.log("error get normas leis federais");
                 snackStore.activeSnack('Erro ao Vincular as normas!', 'error')
             }
+        },
+        async findLinkNormas(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            const filter = [
+                 {
+                    "term": {
+                        "tipo": "leis-federais"
+                    }
+                }
+            ]
+
+            if(item.ano){
+                filter.push({
+                    "term": {
+                        "ano": item.ano
+                    }
+                })
+            }
+            
+            try {
+                const response = await api.post('laws_v3/_search', {
+                    "size": 1,
+                    "query": {
+                        "bool": {
+                        "must": [
+                            {
+                                "match": {
+                                    "title": {
+                                    "query": item.nomeNorma,
+                                    "fuzziness": "AUTO"
+                                    }
+                                }
+                            },
+                            {
+                                "match": {
+                                    "disciplina": item.disciplina
+                                }
+                            }
+                        ],
+                        filter
+                        }
+                    }
+                })  
+                const date = response.data.hits.hits[0]
+                this.lawFind = { idU: date._id, ...date._source}
+                snackStore.activeSnack('Normas encontrada com sucesso !', 'success')
+                return { idU: date._id, ...date._source}
+            } catch (error) {
+                console.log("error normas encontrada");
+                snackStore.activeSnack('Erro ao carregar as normas!', 'error')
+            }
         }
+
     }
 })

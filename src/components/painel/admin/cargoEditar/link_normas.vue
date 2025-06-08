@@ -11,30 +11,14 @@
             v-for="(norma, normaIndex) in topico.normas"
             :key="`t-${topicoIndex}-${normaIndex}`"
             :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
-            @click="abrirNorma(norma)"
-            :class="{ 'cursor-pointer': getNormaVinculada(norma) }"
+            @click="abrirNorma(disciplina.disciplina, norma)"
+            class="{ 'cursor-pointer': getNormaVinculada(norma) }"
           >
             <template #title>
               <div class="d-flex align-center justify-space-between">
                 <span>{{ norma }}</span>
                 <div class="d-flex align-center">
-                  <v-chip
-                    v-if="getNormaVinculada(norma)"
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                    class="ml-2"
-                  >
-                    ID: {{ getNormaVinculada(norma).id }}
-                  </v-chip>
-                  <v-icon
-                    v-if="getNormaVinculada(norma)"
-                    color="success"
-                    size="small"
-                    class="ml-1"
-                  >
-                    mdi-link
-                  </v-icon>
+                
                 </div>
               </div>
             </template>
@@ -47,30 +31,14 @@
               v-for="(norma, normaIndex) in subtopico.normas"
               :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
               :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
-              @click="abrirNorma(norma)"
-              :class="{ 'cursor-pointer': getNormaVinculada(norma) }"
+              @click="abrirNorma(disciplina.disciplina, norma)"
+              class="{ 'cursor-pointer': getNormaVinculada(norma) }"
             >
               <template #title>
                 <div class="d-flex align-center justify-space-between">
                   <span>{{ norma }}</span>
                   <div class="d-flex align-center">
-                    <v-chip
-                      v-if="getNormaVinculada(norma)"
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      class="ml-2"
-                    >
-                      ID: {{ getNormaVinculada(norma).id }}
-                    </v-chip>
-                    <v-icon
-                      v-if="getNormaVinculada(norma)"
-                      color="success"
-                      size="small"
-                      class="ml-1"
-                    >
-                      mdi-link
-                    </v-icon>
+                   
                   </div>
                 </div>
               </template>
@@ -83,30 +51,14 @@
                 v-for="(norma, normaIndex) in subSubtopico.normas"
                 :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
                 :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
-                @click="abrirNorma(norma)"
-                :class="{ 'cursor-pointer': getNormaVinculada(norma) }"
+                @click="abrirNorma(disciplina.disciplina, norma)"
+                class="{ 'cursor-pointer': getNormaVinculada(norma) }"
               >
                 <template #title>
                   <div class="d-flex align-center justify-space-between">
                     <span>{{ norma }}</span>
                     <div class="d-flex align-center">
-                      <v-chip
-                        v-if="getNormaVinculada(norma)"
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        class="ml-2"
-                      >
-                        ID: {{ getNormaVinculada(norma).id }}
-                      </v-chip>
-                      <v-icon
-                        v-if="getNormaVinculada(norma)"
-                        color="success"
-                        size="small"
-                        class="ml-1"
-                      >
-                        mdi-link
-                      </v-icon>
+                     
                     </div>
                   </div>
                 </template>
@@ -120,7 +72,10 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, computed } from 'vue'
+    import { ref, computed } from 'vue'
+
+    import { useLinkLawStore } from '@/store/concursos/LinkLawsDisciplina'
+    const linkNormas = useLinkLawStore()
 
     // Props
     const props = defineProps({
@@ -134,60 +89,40 @@
     const emit = defineEmits(['normaClicada'])
 
     // Estado reativo
-    const legislacaoReferencia = ref([])
+    const legislacaoReferencia = ref({})
     const carregandoLegislacao = ref(false)
 
-    // Computed para criar um mapa de normas vinculadas
-    const normasVinculadasMap = computed(() => {
-        const map = new Map()
-        legislacaoReferencia.value.forEach(legislacao => {
-            // Aqui você pode ajustar a lógica de comparação conforme necessário
-            // Por exemplo, comparação exata, parcial, regex, etc.
-            map.set(legislacao.nome.toLowerCase().trim(), legislacao)
-        })
-        return map
-    })
-
-    // Métodos
-    const buscarLegislacaoReferencia = async () => {
-      console.log('teste');
+    const findLaw = async (item) => {
         carregandoLegislacao.value = true
         try {
-            // Substitua pela sua chamada de API
-            const response = await fetch('/api/legislacao-referencia')
-            const data = await response.json()
+            const response = await linkNormas.findLinkNormas(item)
+            const data = await response
             legislacaoReferencia.value = data
         } catch (error) {
             console.error('Erro ao buscar legislação de referência:', error)
+            legislacaoReferencia.value = {}
         } finally {
             carregandoLegislacao.value = false
         }
     }
 
-    const getNormaVinculada = (nomeNorma) => {
-        if (!nomeNorma) return null
-        
-        // Normaliza o nome da norma para busca
-        const nomeNormalizado = nomeNorma.toLowerCase().trim()
-        
-        // Busca exata primeiro
-        let normaEncontrada = normasVinculadasMap.value.get(nomeNormalizado)
-        
-        if (!normaEncontrada) {
-            // Busca parcial/flexível
-            for (const [key, legislacao] of normasVinculadasMap.value) {
-            if (key.includes(nomeNormalizado) || nomeNormalizado.includes(key)) {
-                normaEncontrada = legislacao
-                break
-            }
-            }
-    }
-    
-    return normaEncontrada
+    const getNormaVinculada = computed(() => {
+        return legislacaoReferencia.value
+    })
+
+    const extrairAno = (texto) => {
+      const match = texto.match(/\b(19|20)\d{2}\b/);
+      return match ? parseInt(match[0]) : null;
     }
 
-    const abrirNorma = (nomeNorma) => {
-        const normaVinculada = getNormaVinculada(nomeNorma)
+    const abrirNorma = async (disciplina, nomeNorma) => {
+        const item = {
+          disciplina,
+          nomeNorma,
+          ano: extrairAno(nomeNorma)
+        }
+        await findLaw(item)
+        const normaVinculada = getNormaVinculada.value
         
         if (normaVinculada) {
             // Emite evento com os dados da norma vinculada
@@ -197,17 +132,11 @@
             })
         } else {
             console.log('Norma não encontrada no sistema:', nomeNorma)
+        }
     }
-    }
-
-    // Lifecycle
-    onMounted(() => {
-        buscarLegislacaoReferencia()
-    })
 
     // Expor métodos se necessário
     defineExpose({
-        buscarLegislacaoReferencia,
         getNormaVinculada
     })
 </script>

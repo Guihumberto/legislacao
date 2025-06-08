@@ -200,6 +200,7 @@
         "Direito Previdenciário",
         "Direito Eleitoral",
         "Direito do Financeiro",
+        "Legislação Especial"
     ]
 
     const snackbar = reactive({

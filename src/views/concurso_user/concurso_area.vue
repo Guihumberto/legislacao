@@ -57,49 +57,10 @@
                 
                                                 <!-- Exibição apenas das normas -->
                                                 <div v-else-if="viewMode === 'normas'">
-                                                    <v-list lines="two" >
-                                                        <template v-for="(disciplina, disciplinaIndex) in conteudoStore.readConteudoEditalUser" :key="disciplinaIndex">
-                                                        <v-list-subheader class="text-h6 text-black"> <v-icon>mdi-arrow-right</v-icon> {{ disciplina.disciplina }}</v-list-subheader>   
-                                                        <template v-for="(topico, topicoIndex) in disciplina.topicos" :key="topicoIndex">
-                                                            <template v-if="topico.normas && topico.normas.length > 0">
-                                                            <v-list-item
-                                                                v-for="(norma, normaIndex) in topico.normas"
-                                                                prepend-icon="mdi-book"
-                                                                :key="`t-${topicoIndex}-${normaIndex}`"
-                                                                :title="norma"
-                                                                :subtitle="`Tópico ${topico.numero} ${topico.conteudo}`"
-                                                                class="ml-5"
-                                                            ></v-list-item>
-                                                            </template>
-                                                            
-                                                            <template v-for="(subtopico, subtopicoIndex) in topico.subtopicos" :key="subtopicoIndex">
-                                                            <template v-if="subtopico.normas && subtopico.normas.length > 0">
-                                                                <v-list-item
-                                                                v-for="(norma, normaIndex) in subtopico.normas"
-                                                                prepend-icon="mdi-book"
-                                                                :key="`st-${topicoIndex}-${subtopicoIndex}-${normaIndex}`"
-                                                                :title="norma"
-                                                                :subtitle="`Subtópico ${subtopico.numero} ${subtopico.conteudo}`"
-                                                                class="ml-5"
-                                                                ></v-list-item>
-                                                            </template>
-                                                            
-                                                            <template v-for="(subSubtopico, subSubtopicoIndex) in subtopico.subtopicos" :key="subSubtopicoIndex">
-                                                                <template v-if="subSubtopico.normas && subSubtopico.normas.length > 0">
-                                                                <v-list-item
-                                                                    v-for="(norma, normaIndex) in subSubtopico.normas"
-                                                                    prepend-icon="mdi-book"
-                                                                    :key="`sst-${topicoIndex}-${subtopicoIndex}-${subSubtopicoIndex}-${normaIndex}`"
-                                                                    :title="norma"
-                                                                    :subtitle="`Sub-subtópico ${subSubtopico.numero} ${subSubtopico.conteudo}`"
-                                                                    class="ml-5"
-                                                                ></v-list-item>
-                                                                </template>
-                                                            </template>
-                                                            </template>
-                                                        </template>
-                                                        </template>
-                                                    </v-list>
+                                                    <Link_normas 
+                                                        :disciplinas="conteudoStore.readConteudoEditalUser"
+                                                        @normaClicada="handleNormaClicada"
+                                                    />
                                                 </div>
                 
                                             </v-card-text>
@@ -146,6 +107,57 @@
             </Transition>
         </div>
    </section>
+   <!-- Dialog para mostrar a legislação -->
+    <v-dialog v-model="dialogLegislacao" max-width="800">
+      <v-card v-if="legislacaoSelecionada">
+        <v-card-title  class="bg-primary d-flex align-center justify-space-between">
+          <span class="text-h6">{{ legislacaoSelecionada.title }}</span>
+          <v-btn variant="text" icon @click="dialogLegislacao = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        
+        <v-card-text>
+          <div class="mb-4">
+            <div v-if="existForum(legislacaoSelecionada.id)" class="border rounded-lg pa-4 d-flex align-center justify-space-between bg-purple-lighten-5">
+              <p class="mb-2">Você possui essa lei adicionada em seu forum.</p>
+              <v-btn variant="flat" color="deep-purple-darken-1" @click="$router.push(`/avancado/forumlaw/${existForum(legislacaoSelecionada.id)}?det=false`)">Ir para o forum</v-btn>
+            </div>
+            <v-btn v-else variant="flat" color="success" @click="$router.push(`/avancado/${legislacaoSelecionada.id}`)">Ir para norma</v-btn>
+          </div>
+          <div class="mb-4">
+            <strong>Tipo:</strong> {{ legislacaoSelecionada.tipo }}
+          </div>
+          <div class="mb-4">
+            <strong>Número:</strong> {{ legislacaoSelecionada.title }}
+          </div>
+          <div class="mb-4">
+            <strong>Ano:</strong> {{ legislacaoSelecionada.ano }}
+          </div>
+          <div class="mb-4" v-if="legislacaoSelecionada.description_norm">
+            <strong>Ementa:</strong> {{ legislacaoSelecionada.description_norm }}
+          </div>
+          <div class="mb-4" v-if="legislacaoSelecionada.conteudo">
+            <strong>Conteúdo:</strong>
+            <div class="mt-2" v-html="legislacaoSelecionada.conteudo"></div>
+          </div>
+        </v-card-text>
+        
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="primary" 
+            @click="abrirLegislacaoCompleta"
+            v-if="legislacaoSelecionada.url"
+          >
+            Ver Legislação Completa
+          </v-btn>
+          <v-btn color="grey" @click="dialogLegislacao = false">
+            Fechar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
@@ -157,12 +169,16 @@
     import Guia from '@/components/painel/options/guia.vue';
     import Details from '@/components/painel/details.vue';
     import DisciplinaItem from '@/components/painel/concurso/disciplinaItem.vue';
+    import Link_normas from '@/components/painel/admin/cargoEditar/link_normas.vue';
 
     import { useGeralStore } from '@/store/GeralStore';
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
     import { useRevisaoStore } from '@/store/concursos/EditalRevisao';
     import { useRoute } from 'vue-router';
     import { useOptionsStore } from '@/store/concursos/OptionsStore';
+    import { useForumStore } from '@/store/ForumStore';
+
+    const forumStore = useForumStore()
     const optionStore = useOptionsStore()
     const route = useRoute()
     const geralStore = useGeralStore()
@@ -526,6 +542,30 @@
         : false
     })
 
+    // Estado reativo
+    const dialogLegislacao = ref(false)
+    const legislacaoSelecionada = ref(null)
+
+    // Métodos
+    const handleNormaClicada = (dados) => {
+        legislacaoSelecionada.value = dados.legislacao
+        dialogLegislacao.value = true
+    }
+
+    const abrirLegislacaoCompleta = () => {
+        if (legislacaoSelecionada.value?.url) {
+            window.open(legislacaoSelecionada.value.url, '_blank')
+        }
+    }
+
+    const existForum = (id) => {
+      const find = forumStore.readMyGroup.find(item => item.idLaw == id)
+      if(find) {
+        return find.id
+      }
+      return null
+    }
+
     onMounted(async() => {
         initDimensions();
         window.addEventListener('resize', handleResize);
@@ -533,6 +573,7 @@
         await conteudoStore.getConteudoEditalUser(id)
         await conteudoStore.getEditalOneUser(id)
         await optionStore.getAllRevisoes(conteudoStore.readEditalUser)
+        forumStore.getForum()
         load.value = false
         geralStore.changeHeaderNoShow(false)
     })  
