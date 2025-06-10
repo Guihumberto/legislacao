@@ -53,13 +53,18 @@
                 <Comentarios v-if="tabSelected == 3" />
                 <Vinculos v-if="tabSelected == 4" />
                 <Questoes v-if="tabSelected == 5" />
+                <MindMapAll v-if="tabSelected == 6" :mapasMentais="mapaMentalStore.readMapaMental" />
             </div>
         </section>
+        {{ mapaMentalStore.readMapaMental }}
     </div>
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide } from "vue";
+    import { ref, watch } from "vue";
+
+    import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
+    const mapaMentalStore = useMapaMentalStore()
 
     import { useRoute } from 'vue-router';
     const route = useRoute()
@@ -67,14 +72,12 @@
     import { useLawStore } from "@/store/LawsStore"
     const lawStore = useLawStore()
 
-    import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
-
     import Law_split from "./law_split.vue";
     import Comentarios from "./comentarios.vue";
     import Marcados from "./marcados.vue";
     import Questoes from "./questoes.vue";
     import Vinculos from "./vinculos.vue";
+    import MindMapAll from "./mindMapAll.vue";
 
     const tabSelected = ref(1)
     const mainLaws = [
@@ -108,6 +111,11 @@
             id: 5,
             name: 'Questões',
             icon: 'mdi-order-bool-ascending-variant'
+        },
+        {
+            id: 6,
+            name: 'Mapas mentais',
+            icon: 'mdi-sitemap'
         }
     ]
 
@@ -162,6 +170,7 @@
 .conteudo {
     padding: 0 20px;
     background-color: #f4f4f4;
+    min-height: 97.2vh;
 }
 
 </style>

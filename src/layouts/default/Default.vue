@@ -92,6 +92,15 @@
   --fs-nav: var(--fs-500);
   --fs-button: var(--fs-300);
 }
+
+.title-root { color: #1976D2; } /* primary */
+.title-concept { color: #2196F3; } /* blue */
+.title-definition { color: #4CAF50; } /* green */
+.title-category { color: #FF9800; } /* orange */
+.title-exclusion { color: #F44336; } /* red */
+.title-special { color: #9C27B0; } /* purple */
+.title-item { color: #9E9E9E; } /* grey */
+
 @media (min-width: 50em) {
   :root {
     --fs-body: var(--fs-500);

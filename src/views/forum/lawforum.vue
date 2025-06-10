@@ -171,6 +171,9 @@
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
     import DadosGrupo from "@/components/legislacao/forum/dadosGrupo.vue";
     import Home from "@/components/legislacao/forum/textavancado/home.vue";
+
+    import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
+    const mapaMentalStore = useMapaMentalStore()
    
     import { useForumStore } from "@/store/ForumStore";
     const forumStore = useForumStore()
@@ -655,6 +658,7 @@
         geralStore.changeHeaderNoShow(false)
         commentStore.getUsersCommentsLaw(route.params.id)
         extractArtsFromQuery()
+        mapaMentalStore.getMapasMentais()
     })
 
     onBeforeUnmount(() => {
