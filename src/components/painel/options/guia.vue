@@ -15,7 +15,7 @@
                                     {{ item.title }}
                             </v-card-title>
                             <v-card-text >
-                                Crie revisão dos pontos relevantes desse assunto
+                               {{ item.subtitle }}
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn variant="outlined" block color="black" @click="selectGuia = item.id">Gerar</v-btn>
@@ -25,16 +25,21 @@
                 </div>
             </v-card>
         </v-expand-transition>
+        <!-- Guias -->
         <v-expand-transition>
-            <div class="content" v-if="selectGuia">
+            <div class="content bg-white" v-if="selectGuia">
                 <Resumo @back="selectGuia = ''" v-if="selectGuia == 2" :selected="selected" @submit="submitForm" />
                 <Questoes @back="selectGuia = ''" v-if="selectGuia == 1" :selected="selected" @submit="submitForm" />
                 <Flashcards @back="selectGuia = ''" v-if="selectGuia == 3" :selected="selected" @submit="submitForm" />
                 <Sumulas @back="selectGuia = ''" v-if="selectGuia == 4" :selected="selected" @submit="submitForm" />
                 <Jurisprudencia @back="selectGuia = ''" v-if="selectGuia == 5" :selected="selected" @submit="submitForm" />
                 <Artigos @back="selectGuia = ''" v-if="selectGuia == 6" :selected="selected" @submit="submitForm" />
+                <Estatisticas @back="selectGuia = ''" v-if="selectGuia == 7" :selected="selected" @submit="submitForm" />
+                <Blog @back="selectGuia = ''" v-if="selectGuia == 8" :selected="selected" @submit="submitForm" />
+                <Mind_map @back="selectGuia = ''" v-if="selectGuia == 9" :selected="selected" @submit="submitForm" />
             </div>
         </v-expand-transition>
+        <!-- Tarefas para revisão -->
         <v-expand-transition>
             <v-list class="pa-5 text-left" v-if="!loading && optionsStore.readRevisao.length">
                 <div class="d-flex align-center justify-space-between">
@@ -69,6 +74,7 @@
                         <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" @concluir="concluirGuia" />
                         <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" @concluir="concluirGuia" />
                         <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" @concluir="concluirGuia" />
+                        <!-- <MapMindDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" /> -->
                        
                         <v-tooltip :text="item.concluido ? 'Desmarcar a atividade.' : 'Marcar como concluído'" location="top">
                             <template v-slot:activator="{ props }">
@@ -110,6 +116,10 @@
    import SumulasDialog from './dialog/sumulas.vue';
    import JurisprudenciaDialog from './dialog/jurisprundencia.vue';
    import ArtigosDialog from './dialog/artigos.vue';
+   import Estatisticas from './guias/estatisticas.vue';
+   import Blog from './guias/blog.vue';
+   import Mind_map from './guias/mind_map.vue';
+   import MapMindDialog from './dialog/mapMind.vue';
 
    const props = defineProps({
         selectDisciplina: {
@@ -146,42 +156,63 @@
         {
             id: 1,
             title: 'Gerar Questões',
-            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            subtitle: 'Gere questões dos pontos relevantes desse assunto',
             icon: 'mdi-list-status',
             color: 'grey',
         },
         {
             id: 2,
             title: 'Gerar Revisão',
-            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            subtitle: 'Gere revisão dos pontos relevantes desse assunto',
             icon: 'mdi-file-document-outline',
             color: 'grey',
         },
         {
             id: 3,
             title: 'Gerar Flashcards',
-            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            subtitle: 'Gre flashcards dos pontos relevantes desse assunto',
             icon: 'mdi-card-text-outline',
             color: 'grey',
         },
         {
             id: 4,
             title: 'Procurar Súmulas',
-            subtitle: 'Crie revisão school pontos relevantes desse assunto',
+            subtitle: 'Busque súmulas dos pontos relevantes desse assunto',
             icon: 'mdi-account-school',
             color: 'grey',
         },
         {
             id: 5,
             title: 'Procurar Jurisprudências',
-            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            subtitle: 'Busque as principais jurisprudências desse assunto',
             icon: 'mdi-gavel',
             color: 'grey',
         },
         {
             id: 6,
             title: 'Procurar Artigos relevantes',
-            subtitle: 'Crie revisão dos pontos relevantes desse assunto',
+            subtitle: 'Busque por artigos da legislação, se houver, dos pontos relevantes desse assunto',
+            icon: 'mdi-numeric-5-box-multiple-outline',
+            color: 'grey',
+        },
+        {
+            id: 7,
+            title: 'Estatísticas',
+            subtitle: 'Veja os conteúdo que precisam ser reforçados e gere material adicional',
+            icon: 'mdi-numeric-5-box-multiple-outline',
+            color: 'grey',
+        },
+        {
+            id: 8,
+            title: 'Blog dos Estudos',
+            subtitle: 'Revise o conteúdo de maneira mais prática e eficente',
+            icon: 'mdi-numeric-5-box-multiple-outline',
+            color: 'grey',
+        },
+        {
+            id: 9,
+            title: 'Mapa Mental',
+            subtitle: 'Gere mapas mentais do conteúdo de maneira mais prática e eficente',
             icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
         },

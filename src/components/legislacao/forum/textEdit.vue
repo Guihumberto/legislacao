@@ -10,6 +10,7 @@
             @paste.prevent
             @dragstart.prevent
             @drop.prevent
+            @input="handleInput"
         >
             <p 
                 :class="dispositivo.estrutura ? 'estrutura': ''"
@@ -108,6 +109,7 @@
     const menuRef = ref(null)
     const menuActivator = ref(null)
     const editable = ref(null)
+    const currentContent = ref('')
 
     const handleSelection =() => {
         const selection = window.getSelection()
@@ -160,6 +162,7 @@
         
         document.execCommand('bold')
         salvarDispositivo()
+        handleInput() // Sincroniza a mudança
     }
 
     const applyColor = (color) => {
@@ -174,6 +177,7 @@
         document.execCommand('styleWithCSS', false, true)
         document.execCommand('foreColor', false, color)
         salvarDispositivo()
+        handleInput() // Sincroniza a mudança
     }
 
     const applyUnderline = () => {
@@ -194,6 +198,7 @@
         document.execCommand('styleWithCSS', false, true)
         document.execCommand('underline')
         salvarDispositivo()
+        handleInput() // Sincroniza a mudança
     }
 
     const taxarTexto = () => {
@@ -214,6 +219,7 @@
         document.execCommand('styleWithCSS', false, true)
         document.execCommand('strikeThrough')
         salvarDispositivo()
+        handleInput() // Sincroniza a mudança
     }
 
     const removerFormatacao = () => {
@@ -227,6 +233,7 @@
 
         document.execCommand('removeFormat')
         salvarDispositivo()
+        handleInput() // Sincroniza a mudança
     }
 
     const salvarDispositivo = () => {
@@ -255,6 +262,29 @@
 
     const handleScroll = () => {
         menu.value = false
+    }
+
+    // Handler para mudanças no conteúdo
+    const handleInput = () => {
+        if (editable.value) {
+            currentContent.value = editable.value.innerHTML
+            // Emite a mudança para o componente pai
+            updateDispositivo()
+        }
+    }
+
+    const emit = defineEmits(['update:dispositivo'])
+
+    // Função para atualizar o dispositivo
+    const updateDispositivo = () => {
+        const updatedDispositivo = {
+            ...props.dispositivo,
+            // Aqui você deve extrair o texto limpo ou formatado conforme sua lógica
+            texto: editable.value?.innerText || '',
+            textoFormatado: currentContent.value
+        }
+        
+        // emit('update:dispositivo', updatedDispositivo)
     }
 
     onMounted(() => {

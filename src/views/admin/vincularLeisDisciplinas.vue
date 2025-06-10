@@ -205,7 +205,8 @@
         "Noções de Direito Constitucional",
         "Noções de Direito Penal e de Direito Processual Penal",
         "Noções de Criminalística",
-        "Direitos Humanos"
+        "Direitos Humanos",
+        "Contabilidade Geral"
     ]
 
     const snackbar = reactive({

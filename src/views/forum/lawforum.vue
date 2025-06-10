@@ -12,7 +12,7 @@
                     </div>
                     <div v-else>
                         <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" class="btn">Voltar</v-btn>   
-                        <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Opções</v-btn>    
+                        <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Ferramentas de Estudo</v-btn>    
                         
                         <DadosGrupo />
             
@@ -125,7 +125,7 @@
                                 <div class="corner-wrapper">
                                     <div :class="{ triangle: item?.tags.length }"></div>
                                 </div>
-                                    <TextDispositivo ref="textDispositivoRef"  :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" :usersCommentsFilter="usersCommentsFilter" />
+                                    <TextDispositivo ref="textDispositivoRef" :dispositivo="item" :search="search" @open="sidelaw = true" @update-dispositivo="updateDispositivo" :listTags="listTags" :usersCommentsFilter="usersCommentsFilter" />
                             </div>
                         </div>
             
@@ -418,14 +418,58 @@
             } else {
                 artsFilterActive.value = false
             } 
+            routeFilterPagesAndArts()
         } else {
            snackStore.activeSnack("Artigo não encontrado.", "error")
+        }
+    }
+
+    const routeFilterPagesAndArts = () => {
+        if( artsFilterActive.value){
+            const { page, arts, perPage, ...outrosParams } = route.query
+            router.push({
+                path: route.path,        // mantém o caminho atual
+                query: {
+                    ...outrosParams,      
+                    page: pagination.value.page,      
+                    perPage: pagination.value.perPage,      
+                    arts: [...artsFilter.value]       
+                }
+            })
+        } else {
+            const { page, arts, perPage, ...outrosParams } = route.query
+            router.push({
+                path: route.path,
+                query: {
+                    ...outrosParams,      
+                    page: pagination.value.page,      
+                    perPage: pagination.value.perPage
+                }
+            })
+        }
+    }
+
+    const extractArtsFromQuery = () => {
+        const queryArts = route.query.arts
+        if (queryArts) {
+            artsFilterActive.value = true
+            // Se arts for um array (múltiplos valores)
+            if (Array.isArray(queryArts)) {
+                artsFilter.value = queryArts.map(art => parseInt(art))
+            } 
+            // Se arts for uma string (um único valor)
+            else {
+                artsFilter.value = [parseInt(queryArts)]
+            } 
+        } else {
+            artsFilter.value = []
         }
     }
 
     const clearAllArtsFilter = () => {
         artsFilter.value = []
         artsFilterActive.value = false
+        routeFilterPagesAndArts()
     }
 
     const artFilterRemove = (art) => {
@@ -434,6 +478,7 @@
         
         if(!artsFilter.value.length > 0) {
             artsFilterActive.value = false
+            routeFilterPagesAndArts()
         }
     }
 
@@ -528,63 +573,63 @@
 
     // Iniciar o redimensionamento
     const startResize = (e) => {
-    isDragging.value = true;
-    startX.value = e.clientX;
-    startLeftWidth.value = leftWidth.value;
-    
-    // Adicionar evento de mousemove ao documento
-    document.addEventListener('mousemove', resize);
-    document.addEventListener('mouseup', stopResize);
-    
-    // Alterar o cursor durante o arrasto
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none'; // Impedir seleção de texto durante o arrasto
+        isDragging.value = true;
+        startX.value = e.clientX;
+        startLeftWidth.value = leftWidth.value;
+        
+        // Adicionar evento de mousemove ao documento
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+        
+        // Alterar o cursor durante o arrasto
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none'; // Impedir seleção de texto durante o arrasto
     };
 
     // Fazer o redimensionamento
     const resize = (e) => {
-    if (!isDragging.value) return;
-    
-    const delta = e.clientX - startX.value;
-    let newLeftWidth = startLeftWidth.value + delta;
-    
-    // Limites para o redimensionamento
-    const minWidth = 100; // Largura mínima para cada painel
-    const maxWidth = containerWidth.value - minWidth - 10; // Largura máxima considerando o divisor
-    
-    if (newLeftWidth < minWidth) {
-        newLeftWidth = minWidth;
-    } else if (newLeftWidth > maxWidth) {
-        newLeftWidth = maxWidth;
-    }
-    
-    leftWidth.value = newLeftWidth;
+        if (!isDragging.value) return;
+        
+        const delta = e.clientX - startX.value;
+        let newLeftWidth = startLeftWidth.value + delta;
+        
+        // Limites para o redimensionamento
+        const minWidth = 100; // Largura mínima para cada painel
+        const maxWidth = containerWidth.value - minWidth - 10; // Largura máxima considerando o divisor
+        
+        if (newLeftWidth < minWidth) {
+            newLeftWidth = minWidth;
+        } else if (newLeftWidth > maxWidth) {
+            newLeftWidth = maxWidth;
+        }
+        
+        leftWidth.value = newLeftWidth;
     };
 
     // Parar o redimensionamento
     const stopResize = () => {
-    isDragging.value = false;
-    
-    // Remover eventos de documento
-    document.removeEventListener('mousemove', resize);
-    document.removeEventListener('mouseup', stopResize);
-    
-    // Restaurar o cursor
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
+        isDragging.value = false;
+        
+        // Remover eventos de documento
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stopResize);
+        
+        // Restaurar o cursor
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
     };
 
     // Manipuladores para estilização do divisor
     const onDividerHover = () => {
-    isHovering.value = true;
-    document.body.style.cursor = 'col-resize';
+        isHovering.value = true;
+        document.body.style.cursor = 'col-resize';
     };
 
     const onDividerLeave = () => {
-    if (!isDragging.value) {
-        isHovering.value = false;
-        document.body.style.cursor = '';
-    }
+        if (!isDragging.value) {
+            isHovering.value = false;
+            document.body.style.cursor = '';
+        }
     };
 
     // Inicializar as dimensões
@@ -609,6 +654,7 @@
         route.query.page ? pagination.value.page = Number(route.query.page)  : ''
         geralStore.changeHeaderNoShow(false)
         commentStore.getUsersCommentsLaw(route.params.id)
+        extractArtsFromQuery()
     })
 
     onBeforeUnmount(() => {

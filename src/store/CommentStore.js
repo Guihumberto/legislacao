@@ -153,9 +153,17 @@ export const useCommentStore = defineStore("commentStore", {
             }
         },
         async saveDispositivoEdit(item){
+            const snackStore = useSnackStore()
+            const forumStore = useForumStore()
             const loginStore = await useLoginStore()
             const cpf = loginStore.readLogin?.cpf || null
             if(!cpf) return
+
+            if(!forumStore.readIsComment){
+                snackStore.activeSnack('Edição não foi salva. Necessário ser participante do grupo para salvar edição.', 'error')
+                return
+            }
+
             try {
                 const resp = await api.post(`law_forum/_update/${item.id}`, {
                     "doc":{
@@ -163,9 +171,11 @@ export const useCommentStore = defineStore("commentStore", {
                         last_date_update: this.formatDate
                     }
                 })
-                console.log('salvo');
+                forumStore.updateEditItem(item)
+                snackStore.activeSnack('Dispositivo editado com sucesso!', 'success')
             } catch (error) {
                 console.log('error save dispositivo');
+                snackStore.activeSnack('Não foi possível salvar alteração.', 'error')
             }
         },
         async getAllCommnetsLawMore(id, search = {}, sortComments = null){

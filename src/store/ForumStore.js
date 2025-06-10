@@ -69,6 +69,15 @@ export const useForumStore = defineStore("forumStore", {
         readNameGorup(){
             const loginStore = useLoginStore()
             return loginStore.readListUsers
+        },
+        readIsComment(){
+            const grupo = this.readGroupForum._source
+            const participantes = [ ...grupo.group, grupo.created_by ]
+
+            return participantes
+                ? true
+                : !!participantes.find( x => x == cpf)
+
         }
     },
     actions:{
@@ -608,6 +617,10 @@ export const useForumStore = defineStore("forumStore", {
             } catch (error) {
                 console.log('error save tag');
             }
+        },
+        updateEditItem(item){
+            const find = this.allPagesLaw.find( x => x.id == item.id)
+            find.textlaw = item.textlaw
         }
     }
 })

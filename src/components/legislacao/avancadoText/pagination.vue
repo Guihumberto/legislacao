@@ -11,7 +11,7 @@
           style="width: 85px"
           :items="dipositivos"
           v-model="pagination.perPage"
-          hide-details=""
+          hide-details
         ></v-select>
 
       </div>
@@ -41,12 +41,10 @@
         15, 30, 40, 50
     ]
 
-
     const props = defineProps({
         pagination: Object, 
         totalPage: Number
     })
-
 
   </script>
 
