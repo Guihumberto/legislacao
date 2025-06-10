@@ -56,7 +56,6 @@
                 <MindMapAll v-if="tabSelected == 6" :mapasMentais="mapaMentalStore.readMapaMental" />
             </div>
         </section>
-        {{ mapaMentalStore.readMapaMental }}
     </div>
 </template>
 

@@ -1,11 +1,17 @@
 <template>
      <div class="wrapper">
         <section class="conteudo" ref="topUp" :class="rightWidth > 900 ? 'conteudo1' : 'conteudo2'">
-            <div class="mt-2 d-flex ga-2 align-center pa-2">
-                <v-icon>mdi-sitemap</v-icon>
-                    <h1 class="text-h5">Mapas Mentais</h1>
+            <div v-if="!mindMapData">
+                <div class="mt-2 d-flex ga-2 align-center pa-2">
+                    <v-icon>mdi-sitemap</v-icon>
+                        <h1 class="text-h5">Mapas Mentais</h1>
+                </div>
+                <p v-if="!route.query.arts">Selecione o Dispositivo para criar mapas mentais por IA</p>
+                <div v-else class="text-center">
+                    <v-btn variant="flat" color="primary" prepend-icon="mdi-robot" disabled>Gerar Mapa Mental por IA</v-btn>
+                </div>
+
             </div>
-            <p>Selecione o Dispositivo</p>
             <MindMap :data="mindMapData" v-if="mindMapData" />
         </section>
     </div>
@@ -35,6 +41,8 @@
         const arts = extractArtsFromQuery()
         if(arts[0]){
             mindMapData.value = props.mapasMentais.find(x => x.art == arts[0])
+        } else {
+            mindMapData.value = null
         }
     }
 
