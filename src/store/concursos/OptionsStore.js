@@ -5,6 +5,9 @@ import api from "@/services/api"
 import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from "@/store/snackStore";
 
+import { useNotificationsStore } from '@/store/NotificationsStore'
+import { notificationService } from '@/services/notificationService'
+
 export const useOptionsStore = defineStore("optionsStore", {
     state: () => ({
         load: false,
@@ -58,6 +61,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                 console.log('revisao', response);
                 this.revisao.push({id: response.data._id, ...objeto }) 
                 snackStore.activeSnack("Revisão criada com sucesso!")
+                // this.createNotificação({id: response.data._id, ...objeto })
 
             }catch(error){
                 snackStore.activeSnack("Erro ao criar revisão!")
@@ -263,6 +267,27 @@ export const useOptionsStore = defineStore("optionsStore", {
                 }
             } else {
                 this.revisao.push(objeto)
+            }
+        },
+        async createNotificação(item){
+            const notificationsStore = useNotificationsStore()
+            console.log('createNotifcao', item);
+            try {
+                // Criar notificação para todos os usuários
+                await notificationService.createLawNotification(item)
+                
+                // Atualizar store local se necessário
+                notificationsStore.addNotification({
+                    type: 'law',
+                    title: 'Nova Lei Adicionada',
+                    message: `A lei "${item.title}" foi adicionada ao sistema`,
+                    actionUrl: `/laws/${item.id}`
+                })
+                
+                // Sucesso
+                console.log('Lei criada e notificação enviada!')
+            } catch (error) {
+                console.error('Erro ao criar lei:', error)
             }
         }
     }

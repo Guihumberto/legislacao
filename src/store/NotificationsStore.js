@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useWebSocket } from '@/composables/useWebSocket'
+import api from "@/services/api"
 
 export const useNotificationsStore = defineStore('notifications', () => {
   const notifications = ref([])
@@ -35,25 +36,22 @@ export const useNotificationsStore = defineStore('notifications', () => {
     
     try {
       // Exemplo de chamada para Elasticsearch
-      const response = await fetch('/api/notifications', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}` // Implemente sua lógica de token
+      const response = await api.get('notifications/_search', {
+        params: {
+          size: 10,
+          sort: 'createdAt:desc'
         }
       })
       
-      if (!response.ok) throw new Error('Erro ao buscar notificações')
-      
-      const data = await response.json()
-      notifications.value = data.hits?.hits?.map(hit => ({
+       // Com axios, os dados já vêm em response.data
+      notifications.value = response.data.hits?.hits?.map(hit => ({
         id: hit._id,
         ...hit._source,
         createdAt: new Date(hit._source.createdAt)
       })) || []
       
     } catch (err) {
-      error.value = err.message
+      error.value = err.response?.data?.message || err.message || 'Erro ao buscar notificações'
       console.error('Erro ao carregar notificações:', err)
     } finally {
       loading.value = false
@@ -65,17 +63,10 @@ export const useNotificationsStore = defineStore('notifications', () => {
       const notification = notifications.value.find(n => n.id === notificationId)
       if (!notification || notification.isRead) return
 
-      // Atualiza no servidor
-      const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({ isRead: true })
+      // Atualiza no servidor usando axios
+      await api.patch(`notifications/${notificationId}`, {
+        isRead: true
       })
-
-      if (!response.ok) throw new Error('Erro ao marcar como lida')
 
       // Atualiza localmente
       notification.isRead = true
@@ -91,17 +82,17 @@ export const useNotificationsStore = defineStore('notifications', () => {
       }
 
     } catch (err) {
-      error.value = err.message
+      error.value = err.response?.data?.message || err.message || 'Erro ao marcar como lida'
       console.error('Erro ao marcar notificação como lida:', err)
     }
   }
 
   const initializeWebSocket = () => {
-    connect()
+    // connect()
   }
 
   const disconnectWebSocket = () => {
-    disconnect()
+    // disconnect()
   }
 
   const markAllAsRead = async () => {
@@ -112,16 +103,10 @@ export const useNotificationsStore = defineStore('notifications', () => {
 
       if (unreadIds.length === 0) return
 
-      const response = await fetch('/api/notifications/mark-all-read', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({ notificationIds: unreadIds })
+      // Atualiza no servidor usando axios
+      await api.patch('notifications/mark-all-read', {
+        notificationIds: unreadIds
       })
-
-      if (!response.ok) throw new Error('Erro ao marcar todas como lidas')
 
       // Atualiza localmente
       notifications.value.forEach(notification => {
@@ -132,21 +117,15 @@ export const useNotificationsStore = defineStore('notifications', () => {
       })
 
     } catch (err) {
-      error.value = err.message
+      error.value = err.response?.data?.message || err.message || 'Erro ao marcar todas como lidas'
       console.error('Erro ao marcar todas as notificações como lidas:', err)
     }
   }
 
   const deleteNotification = async (notificationId) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${getToken()}`
-        }
-      })
-
-      if (!response.ok) throw new Error('Erro ao deletar notificação')
+      // Deleta no servidor usando axios
+      await api.delete(`notifications/${notificationId}`)
 
       // Remove localmente
       const index = notifications.value.findIndex(n => n.id === notificationId)
@@ -155,7 +134,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
       }
 
     } catch (err) {
-      error.value = err.message
+      error.value = err.response?.data?.message || err.message || 'Erro ao deletar notificação'
       console.error('Erro ao deletar notificação:', err)
     }
   }

@@ -12,7 +12,8 @@
         :content="unreadCount"
         :model-value="unreadCount > 0"
         color="error"
-        overlap
+        size="small"
+        dot
       >
         <v-btn
           icon
@@ -22,7 +23,7 @@
           density="compact"
         >
           <v-icon 
-            :color="unreadCount > 0 ? 'primary' : 'default'"
+            :color="unreadCount > 0 ? 'white' : 'default'"
             size="18"
           >
             mdi-bell{{ unreadCount > 0 ? '' : '-outline' }}
@@ -42,8 +43,9 @@
             color="primary"
             @click="markAllAsRead"
             :loading="markingAllAsRead"
+            icon="mdi-check-all"
+            title="Marcar todas como lidas"
           >
-            Marcar todas como lidas
           </v-btn>
           
           <v-btn
@@ -242,7 +244,7 @@ let stopPolling = null
 onMounted(async () => {
   await notificationsStore.fetchNotifications()
   // Inicia polling para verificar novas notificações a cada 30 segundos
-  stopPolling = notificationsStore.startPolling(30000)
+  // stopPolling = notificationsStore.startPolling(30000)
 })
 
 onUnmounted(() => {

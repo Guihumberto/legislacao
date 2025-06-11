@@ -81,15 +81,15 @@
 
   // Escutar novas notificações para mostrar toast
   const unsubscribe = notificationsStore.$subscribe((mutation, state) => {
-    if (mutation.type === 'direct' && mutation.events.some(e => e.key === 'addNotification')) {
-      const latestNotification = state.notifications[0]
-      if (latestNotification && !latestNotification.isRead) {
-        toastTitle.value = latestNotification.title
-        toastMessage.value = latestNotification.message
-        toastIcon.value = getNotificationIcon(latestNotification.type)
-        showToast.value = true
-      }
-    }
+    // if (mutation.type === 'direct' && mutation.events.some(e => e.key === 'addNotification')) {
+    //   const latestNotification = state.notifications[0]
+    //   if (latestNotification && !latestNotification.isRead) {
+    //     toastTitle.value = latestNotification.title
+    //     toastMessage.value = latestNotification.message
+    //     toastIcon.value = getNotificationIcon(latestNotification.type)
+    //     showToast.value = true
+    //   }
+    // }
   })
 
   const getNotificationIcon = (type) => {
@@ -119,7 +119,7 @@
 
   onUnmounted(() => {
     notificationsStore.disconnectWebSocket()
-    unsubscribe()
+    // unsubscribe()
   })
   
 </script>
