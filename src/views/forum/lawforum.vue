@@ -503,6 +503,7 @@
         })
         pagination.value.page = 1
         closeAllComments()
+        routeFilterPagesAndArts()
     }
 
     const updateDispositivo = (event) => {
@@ -640,7 +641,11 @@
         if (leftPanel.value && rightPanel.value) {
             const container = leftPanel.value.parentElement;
             containerWidth.value = container.clientWidth;
-            leftWidth.value =  10000//containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
+            if(sidelaw.value) {
+                leftWidth.value = containerWidth.value / 2 - 10; // Dividir ao meio inicialmente  
+                return
+            } 
+              leftWidth.value = 1200;
         }
     };
 

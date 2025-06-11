@@ -65,4 +65,10 @@ export default [
         component: () => import('@/views/concurso_user/concurso_area.vue'),
         meta: { requiresAuth: true } 
       },
+      {
+        path: '/notifications',
+        name: 'Notificações',
+        component: () => import('@/views/NotificationPage.vue'),
+        meta: { requiresAuth: true } 
+      },
 ]

@@ -236,7 +236,10 @@
         handleInput() // Sincroniza a mudança
     }
 
-    const salvarDispositivo = () => {
+    const salvarDispositivo = async () => {
+        const selection = window.getSelection()
+        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
+
         const div = document.createElement('div')
         div.innerHTML = editable.value.innerHTML
 
@@ -248,7 +251,13 @@
             textlaw: conteudoInterno
         }
 
-        commentStore.saveDispositivoEdit(objeto)
+        await commentStore.saveDispositivoEdit(objeto)
+
+        // Se o DOM ainda for o mesmo, restaura a seleção
+        if (range && editable.value.contains(range.startContainer)) {
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
     }
 
     const handleClickOutside = (event) => {

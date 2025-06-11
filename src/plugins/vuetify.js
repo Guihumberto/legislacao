@@ -7,6 +7,8 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import '@mdi/font/css/materialdesignicons.css'
 import { VTreeview } from 'vuetify/labs/VTreeview'
 // import i18n from '@/plugins/i18n';
 
@@ -17,6 +19,13 @@ import { pt } from 'vuetify/locale'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
+  icons: {
+    defaultSet: 'mdi',
+    aliases,
+    sets: {
+      mdi,
+    },
+  },
   locale: {
     locale: 'pt',
     messages: { pt },

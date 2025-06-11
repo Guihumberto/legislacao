@@ -79,6 +79,7 @@
     import MindMapAll from "./mindMapAll.vue";
 
     const tabSelected = ref(1)
+    
     const mainLaws = [
         {id: 1742907731755, name: 'CF 88'},
         {id: 1742907901454, name: 'CTN'},
@@ -152,10 +153,7 @@
         } 
     }
 
-    watch(
-        () => route.query.art,
-        (newId, oldId) => tabSelected.value = 5
-    )
+    // watch(() => route.query.art, (newId, oldId) => tabSelected.value = 5 )
 
 
 </script>

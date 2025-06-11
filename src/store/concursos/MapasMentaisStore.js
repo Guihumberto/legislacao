@@ -46,6 +46,24 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
                 this.error = error
                 snackStore.activeSnack('Erro ao carregar os mapas mentais!', 'error')
             }
+        },
+        async createMindMap(data){
+            this.error = null;
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const response = await api.post('mind_maps/_doc', data);
+                snackStore.activeSnack('Mapa Mental criado com sucesso!', 'success')
+                this.mapaMental.push({ idLaw: response.data._id, ...data })
+                return response.data
+            } catch (err) {
+                console.error('Erro ao salvar:', err.response?.data || err.message);
+                this.error = err
+                snackStore.activeSnack('Erro ao criar o mapa mental!', 'error')
+            }
         }
     }
 })

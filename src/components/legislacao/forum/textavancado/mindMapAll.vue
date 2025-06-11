@@ -6,9 +6,23 @@
                     <v-icon>mdi-sitemap</v-icon>
                         <h1 class="text-h5">Mapas Mentais</h1>
                 </div>
-                <p v-if="!route.query.arts">Selecione o Dispositivo para criar mapas mentais por IA</p>
+                <p v-if="!route.query.art">Selecione o Dispositivo para criar mapas mentais por IA</p>
                 <div v-else class="text-center">
-                    <v-btn variant="flat" color="primary" prepend-icon="mdi-robot" disabled>Gerar Mapa Mental por IA</v-btn>
+                    Artigo selecionado: {{ route.query.art }}
+                   <v-form @submit.prevent="submitForm" ref="form">
+                        <v-textarea
+                            label="Pergunte ao AI"
+                            v-model="mapFormString"
+                            :rules="[(v) => !!v || 'Campo obrigatório']"
+                            variant="outlined"
+                            class="mt-2"
+                        >
+                        </v-textarea>
+                        <div class="mt-5 d-flex ga-2 justify-center">
+                            <v-btn variant="text" @click="mapForm = ''">limpar</v-btn>
+                            <v-btn type="submit" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
+                        </div>
+                   </v-form>
                 </div>
 
             </div>
@@ -20,10 +34,15 @@
 <script setup>
     import { inject, onMounted, ref, watch } from 'vue';
 
-    import { useRoute, useRouter } from "vue-router";
-    const route = useRoute()
-    const router = useRouter()
+    import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
+    const mapaMentalStore = useMapaMentalStore()
 
+    import { useForumStore } from '@/store/ForumStore';
+    const forumStore = useForumStore()
+
+    import { useRoute } from "vue-router";
+    const route = useRoute()
+ 
     import MindMap from './mindMap.vue';
     const rightWidth = inject('rightWidth')
 
@@ -38,9 +57,9 @@
     const mindMapData = ref(null)
 
     const getMindMapArt = async() => {
-        const arts = extractArtsFromQuery()
-        if(arts[0]){
-            mindMapData.value = props.mapasMentais.find(x => x.art == arts[0])
+        const art = route.query.art || extractArtsFromQuery(route.query.arts)[0]
+        if(art){
+            mindMapData.value = props.mapasMentais.find(x => x.art == art)
         } else {
             mindMapData.value = null
         }
@@ -68,6 +87,32 @@
             getMindMapArt()
         }
     )
+    
+    const mapFormString = ref('')
+    const mapForm = ref({})
+    const form = ref(null)
+
+    const submitForm = async () => {
+        const { valid } = await form.value.validate()
+        if (!valid) return
+
+        let objeto
+        try {
+            objeto = JSON.parse(mapFormString.value)
+            objeto.id = forumStore.readGroupForum._source.idLaw
+            objeto.art = route.query.art
+        } catch (err) {
+            console.error('Erro ao fazer parse de mapFormString.value:', err)
+            alert('Erro: o conteúdo do campo deve estar em formato JSON válido.')
+            return
+        }
+
+        objeto.id = forumStore.readGroupForum._source.idLaw
+        objeto.art = route.query.art
+
+        await mapaMentalStore.createMindMap(objeto)
+    }
+    
 
     onMounted(async() => {
         await getMindMapArt()

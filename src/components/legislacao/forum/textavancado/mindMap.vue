@@ -1,6 +1,5 @@
 <template>
      <div class="wrapper">
-       
         <div class="mindmap-container">
             <v-card class="mindmap-card" elevation="2">
               <v-card-title class="d-flex align-center">
@@ -24,7 +23,6 @@
                       <v-icon>mdi-arrow-collapse-all</v-icon>
                   </v-btn>
               </v-card-title>
-              
               <v-card-text>
                   <div class="mindmap-tree">
                   <MindMapNode

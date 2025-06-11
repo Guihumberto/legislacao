@@ -9,7 +9,7 @@
     "lint": "eslint . --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@mdi/font": "7.0.96",
+    "@mdi/font": "^7.4.47",
     "@tiptap/core": "^2.10.3",
     "@tiptap/extension-bold": "^2.12.0",
     "@tiptap/extension-bullet-list": "^2.12.0",
@@ -31,6 +31,7 @@
     "@tiptap/vue-3": "^2.12.0",
     "axios": "^1.6.5",
     "core-js": "^3.29.0",
+    "date-fns": "^4.1.0",
     "firebase": "^11.7.3",
     "lodash.debounce": "^4.0.8",
     "moment": "^2.30.1",

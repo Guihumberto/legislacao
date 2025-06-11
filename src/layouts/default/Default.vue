@@ -20,12 +20,41 @@
               </v-btn>
           </template>
       </v-snackbar>
+       
+      <v-snackbar
+        v-model="showToast"
+        :timeout="5000"
+        color="primary"
+        multi-line
+        location="top right"
+      >
+        <div class="d-flex align-center">
+          <v-icon class="me-2">{{ toastIcon }}</v-icon>
+          <div>
+            <div class="font-weight-medium">{{ toastTitle }}</div>
+            <div class="text-caption">{{ toastMessage }}</div>
+          </div>
+        </div>
+        
+        <template v-slot:actions>
+          <v-btn
+            color="white"
+            variant="text"
+            @click="showToast = false"
+          >
+            Fechar
+          </v-btn>
+        </template>
+      </v-snackbar>
     </div>
   </v-app>
 </template>
 
 <script setup>
-  import { onMounted, ref, provide } from 'vue'
+  import { onMounted, ref, provide, onUnmounted } from 'vue'
+
+  import { useNotificationsStore } from '@/store/NotificationsStore'
+  const notificationsStore = useNotificationsStore()
 
   import DefaultBar from './AppBar.vue'
   import DefaultView from './View.vue'
@@ -43,16 +72,56 @@
   const theme = ref('light')
   provide('theme', theme)
 
+  
+
+  const showToast = ref(false)
+  const toastTitle = ref('')
+  const toastMessage = ref('')
+  const toastIcon = ref('mdi-bell')
+
+  // Escutar novas notificações para mostrar toast
+  const unsubscribe = notificationsStore.$subscribe((mutation, state) => {
+    if (mutation.type === 'direct' && mutation.events.some(e => e.key === 'addNotification')) {
+      const latestNotification = state.notifications[0]
+      if (latestNotification && !latestNotification.isRead) {
+        toastTitle.value = latestNotification.title
+        toastMessage.value = latestNotification.message
+        toastIcon.value = getNotificationIcon(latestNotification.type)
+        showToast.value = true
+      }
+    }
+  })
+
+  const getNotificationIcon = (type) => {
+    const icons = {
+      law: 'mdi-gavel',
+      revision: 'mdi-file-document-edit-outline',
+      system: 'mdi-cog-outline',
+      announcement: 'mdi-bullhorn-outline'
+    }
+    return icons[type] || 'mdi-bell'
+  }
+
   onMounted(async () => {
     await generalStore.getListFonteMudar()
     await generalStore.getAllYearsLaws()
     await lawStore.getMainLaws()
     await lawStore.getAllLaw()
     await consultaStore.contadores()
+
+    try {
+      await notificationsStore.initializeWebSocket()
+      await notificationsStore.fetchNotifications()
+    } catch (error) {
+      console.error('Erro ao inicializar notificações:', error)
+    }
+  })
+
+  onUnmounted(() => {
+    notificationsStore.disconnectWebSocket()
+    unsubscribe()
   })
   
-
-
 </script>
 
 <style>

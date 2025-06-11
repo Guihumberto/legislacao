@@ -10,6 +10,7 @@
           <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
           <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
           <a @click="loginStore.logOut($router)" class="mr-2 text-orange" v-else>SAIR</a>
+          <Notification v-if="loginStore.readLogin.cpf" />
           <v-btn 
             title="ocultar cabeçalho" 
             density="compact" 
@@ -80,6 +81,7 @@
   import MenuBar from '@/components/dialogs/menuBar.vue'
   import loginInfo from '@/components/partiaslLayout/userInfoLogin.vue'
   import menuUser from './MenuUser.vue'
+  import Notification from './Notification.vue'
 
   import { useGeralStore } from '@/store/GeralStore'
   const geralStore = useGeralStore()
