@@ -1,7 +1,6 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <h1 class="text-h4">Permissões</h1>
             <div v-if="load">Carregando</div>
             <div v-else>
                 <Avaliar />

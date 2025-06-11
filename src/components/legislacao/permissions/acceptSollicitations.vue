@@ -1,52 +1,164 @@
 <template>
-    <div class="mt-5">
-        <v-list class="pa-0">
-            <v-list-subheader>Aceitar Convites</v-list-subheader>
-            <v-list-item link v-for="item, i in solicitationStore.readInvites" :key="i">
-                Grupo: {{ item.nameGroup }}
-                <template v-slot:append>
-                    <v-btn disabled variant="flat" color="error"><v-icon>mdi-close</v-icon></v-btn>
-                    <v-btn variant="flat" color="success" class="mx-2" @click.stop="actionAcceptt(item)"><v-icon>mdi-check</v-icon></v-btn>
-                    <v-btn @click.stop="$router.push(`avancado/forumlaw/${item.idGroup}?permission=true`)" variant="flat" color="grey"><v-icon>mdi-eye-arrow-right-outline</v-icon></v-btn>
-                </template>
-            </v-list-item>
-        </v-list>
-        <v-alert v-if="!solicitationStore.readInvites.length" class="mt-5" type="info" variant="text" text="Não há convites a serem avaliados"></v-alert>
-    </div>
-    <v-expand-transition>
-        <div v-if="links.length">
-            <v-list class="mt-5 border rounded-lg">
-                <v-list-item v-for="item, i in links" :key="i" :to="`avancado/forumlaw/${item.idGroup}?permission=true`">
-                    Abrir grupo {{ item.nameGroup }}
-                    <template v-slot:append>
-                        <v-btn>entrar</v-btn>
-                    </template>
-                </v-list-item>
-            </v-list>
+  <div class="invites-container">
+    <!-- Invites Section -->
+    <v-card class="mb-6" elevation="2" rounded="lg">
+      <v-card-title class="text-h6 font-weight-bold py-3">
+        <v-icon start>mdi-email-outline</v-icon>
+        Convites Pendentes
+      </v-card-title>
+      <v-divider></v-divider>
+      <v-list density="comfortable" class="pa-0">
+        <v-list-item
+          v-for="(item, i) in solicitationStore.readInvites"
+          :key="i"
+          class="invite-item"
+          :class="{ 'bg-grey-lighten-4': i % 2 === 0 }"
+        >
+          <v-list-item-title class="font-weight-medium">
+            {{ item.nameGroup }}
+          </v-list-item-title>
+          <v-list-item-subtitle class="text-caption text-grey-darken-1">
+            Convite para o grupo #{{ item.idGroup }}
+          </v-list-item-subtitle>
+          <template v-slot:append>
+            <v-btn
+              icon="mdi-close"
+              color="error"
+              variant="tonal"
+              size="small"
+              class="mx-1"
+              :disabled="isProcessing"
+              @click.stop="actionReject(item)"
+            ></v-btn>
+            <v-btn
+              icon="mdi-check"
+              color="success"
+              variant="tonal"
+              size="small"
+              class="mx-1"
+              :loading="isProcessing"
+              @click.stop="actionAccept(item)"
+            ></v-btn>
+            <v-btn
+              icon="mdi-eye-arrow-right-outline"
+              color="primary"
+              variant="tonal"
+              size="small"
+              class="mx-1"
+              @click.stop="$router.push(`/avancado/forumlaw/${item.idGroup}?permission=true`)"
+            ></v-btn>
+          </template>
+        </v-list-item>
+        <v-list-item v-if="!solicitationStore.readInvites.length">
+          <v-alert
+            type="info"
+            variant="tonal"
+            text="Não há convites a serem avaliados"
+            class="w-100"
+          ></v-alert>
+        </v-list-item>
+      </v-list>
+    </v-card>
 
-        </div>
+    <!-- Accepted Groups Section -->
+    <v-expand-transition>
+      <v-card v-if="links.length" class="mb-6" elevation="2" rounded="lg">
+        <v-card-title class="text-h6 font-weight-bold py-3">
+          <v-icon start>mdi-account-group-outline</v-icon>
+          Grupos Aceitos
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-list density="comfortable" class="pa-0">
+          <v-list-item
+            v-for="(item, i) in links"
+            :key="i"
+            :to="`/avancado/forumlaw/${item.idGroup}?permission=true`"
+            class="group-item"
+            :class="{ 'bg-grey-lighten-4': i % 2 === 0 }"
+            hover
+          >
+            <v-list-item-title class="font-weight-medium">
+              {{ item.nameGroup }}
+            </v-list-item-title>
+            <template v-slot:append>
+              <v-btn
+                color="primary"
+                variant="flat"
+                size="small"
+                class="text-capitalize"
+              >
+                Entrar
+              </v-btn>
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-card>
     </v-expand-transition>
+  </div>
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+import { ref } from 'vue';
+import { useSolicitationsStore } from '@/store/SolicitationsStore';
 
-    import { useSolicitationsStore } from '@/store/SolicitationsStore';
-    const solicitationStore = useSolicitationsStore()
+const solicitationStore = useSolicitationsStore();
+const links = ref([]);
+const isProcessing = ref(false);
 
-    const actionAcceptt = async (item) => {
-        await solicitationStore.acceptInvites(item)
-        addLink(item)
-    }
+const actionAccept = async (item) => {
+  isProcessing.value = true;
+  try {
+    await solicitationStore.acceptInvites(item);
+    addLink(item);
+  } catch (error) {
+    console.error('Error accepting invite:', error);
+  } finally {
+    isProcessing.value = false;
+  }
+};
 
-    const links = ref([])
+const actionReject = async (item) => {
+  isProcessing.value = true;
+  try {
+    await solicitationStore.rejectInvites(item);
+  } catch (error) {
+    console.error('Error rejecting invite:', error);
+  } finally {
+    isProcessing.value = false;
+  }
+};
 
-    const addLink = (item) => [
-        links.value.push(item)
-    ]
-
+const addLink = (item) => {
+  if (!links.value.some(link => link.idGroup === item.idGroup)) {
+    links.value.push(item);
+  }
+};
 </script>
 
 <style scoped>
+.invites-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
+.invite-item, .group-item {
+  transition: background-color 0.3s ease;
+}
+
+.invite-item:hover, .group-item:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.v-btn {
+  transition: transform 0.2s ease;
+}
+
+.v-btn:hover {
+  transform: scale(1.1);
+}
+
+.v-card-title {
+  background: linear-gradient(to right, #f5f7fa, #e4e7eb);
+}
 </style>
