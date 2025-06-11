@@ -234,6 +234,7 @@
                 page: newPage
             }
         })
+        forumStore.updateItemsAcumulados()
     });
 
     watch(() => route.params.id, async (newId, oldId) => {
@@ -450,6 +451,7 @@
                 }
             })
         }
+        forumStore.updateItemsAcumulados()
     }
 
     const extractArtsFromQuery = () => {

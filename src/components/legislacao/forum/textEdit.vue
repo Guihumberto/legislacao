@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
     import { useCommentStore } from '@/store/CommentStore';
     const commentStore = useCommentStore()
@@ -237,11 +237,13 @@
     }
 
     const salvarDispositivo = async () => {
+        const editableEl = editable.value
         const selection = window.getSelection()
-        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null
+        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null
 
+        // Clona o conteúdo para extrair o que precisa
         const div = document.createElement('div')
-        div.innerHTML = editable.value.innerHTML
+        div.innerHTML = editableEl.innerHTML
 
         const primeiroParagrafo = div.querySelector('p')
         const conteudoInterno = primeiroParagrafo ? primeiroParagrafo.innerHTML : div.innerHTML
@@ -253,11 +255,14 @@
 
         await commentStore.saveDispositivoEdit(objeto)
 
-        // Se o DOM ainda for o mesmo, restaura a seleção
-        if (range && editable.value.contains(range.startContainer)) {
-            selection.removeAllRanges()
-            selection.addRange(range)
-        }
+        // Aguarda próximo tick para garantir que o DOM não foi alterado antes de restaurar a seleção
+        nextTick(() => {
+            if (range && editableEl.contains(range.startContainer)) {
+                const selection = window.getSelection()
+                selection.removeAllRanges()
+                selection.addRange(range)
+            }
+        })
     }
 
     const handleClickOutside = (event) => {

@@ -171,8 +171,7 @@ export const useCommentStore = defineStore("commentStore", {
                         last_date_update: this.formatDate
                     }
                 })
-                setTimeout(() => forumStore.updateEditItem(item), 2000)
-                // forumStore.updateEditItem(item)
+                forumStore.dispositivosEditsAcumuulados(item)
                 // snackStore.activeSnack('Dispositivo editado com sucesso!', 'success')
             } catch (error) {
                 console.log('error save dispositivo');

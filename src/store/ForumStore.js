@@ -18,7 +18,8 @@ export const useForumStore = defineStore("forumStore", {
         groupForum: {},
         solicitations: [],
         solictationPendentes: [],
-        allComments: []
+        allComments: [],
+        editsAcumulados: []
     }),
     getters: {
         readChat(){
@@ -617,6 +618,16 @@ export const useForumStore = defineStore("forumStore", {
             } catch (error) {
                 console.log('error save tag');
             }
+        },
+        dispositivosEditsAcumuulados(item){
+            this.editsAcumulados.push(item)
+        },
+        updateItemsAcumulados(){
+            if(this.editsAcumulados.length == 0) return
+            this.editsAcumulados.forEach(item => {
+                this.updateEditItem(item)
+            })
+            this.editsAcumulados = []
         },
         updateEditItem(item){
             const find = this.allPagesLaw.find( x => x.id == item.id)
