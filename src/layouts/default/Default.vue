@@ -119,7 +119,7 @@
 
   onUnmounted(() => {
     notificationsStore.disconnectWebSocket()
-    // unsubscribe()
+    unsubscribe()
   })
   
 </script>

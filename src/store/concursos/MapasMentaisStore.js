@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
+import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "@/store/LoginStore";
+import { useForumStore } from "../ForumStore";
 import { useSnackStore } from "@/store/snackStore";
 
 export const useMapaMentalStore = defineStore("mapaMentalStore", {
@@ -20,6 +22,10 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
         },
         readMapaMental(){
             return this.mapaMental;
+        },
+        readForumLaw(){
+            const forumStore = useForumStore()
+            return forumStore.readAllPages
         }
     },
     actions: {
@@ -54,15 +60,45 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const arts = [  data.art, ...data.arts].map(art => parseInt(art))
+            const artsNoRepeat = [...new Set(arts)]
+            const dipositivosText = this.getDispositvosForum(artsNoRepeat)
+
+            if(!dipositivosText) return
+
+            try {
+                const resp = await apiChat.post('/generate_mapmind', {
+                    texto: dipositivosText,
+                })
+       
+                const objeto = {
+                    ...data,
+                    ...resp.data.mapamental
+                }
+                const resp2 = await this.saveElasticMapMind(objeto)
+                this.mapaMental.push({ idLaw: resp2._id, ...objeto })
+                snackStore.activeSnack('Mapa Mental criado com sucesso!', 'success')
+            } catch (err) {
+                this.error = err
+                snackStore.activeSnack('Erro ao criar o mapa mental!', 'error')
+            }
+        },
+        async saveElasticMapMind(data){
             try {
                 const response = await api.post('mind_maps/_doc', data);
-                snackStore.activeSnack('Mapa Mental criado com sucesso!', 'success')
                 this.mapaMental.push({ idLaw: response.data._id, ...data })
                 return response.data
             } catch (err) {
                 console.error('Erro ao salvar:', err.response?.data || err.message);
-                this.error = err
-                snackStore.activeSnack('Erro ao criar o mapa mental!', 'error')
+            }
+        },
+        getDispositvosForum(arts){
+            try {
+                const list = this.readForumLaw.filter(item => !item.estrutura)
+                const listDispositivos = list.filter(item => arts.includes(item.art)).map( x => x.textlaw).join('\n')
+                return listDispositivos
+            } catch (error) {
+                return null
             }
         }
     }

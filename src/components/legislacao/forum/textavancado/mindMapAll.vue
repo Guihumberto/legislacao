@@ -6,21 +6,20 @@
                     <v-icon>mdi-sitemap</v-icon>
                         <h1 class="text-h5">Mapas Mentais</h1>
                 </div>
-                <p v-if="!route.query.art">Selecione o Dispositivo para criar mapas mentais por IA</p>
+                <p v-if="!listArtsSelected.length && !artOneSelect">Selecione o Dispositivo para criar mapas mentais por IA</p>
                 <div v-else class="text-center">
-                    Artigo selecionado: {{ route.query.art }}
+                    Artigo<span v-if="listArtsSelected.length > 1">s</span> selecionado<span v-if="listArtsSelected.length > 1">s</span>: {{ artOneSelect }}  {{ listArtsSelected }}
                    <v-form @submit.prevent="submitForm" ref="form">
-                        <v-textarea
+                        <!-- <v-textarea
                             label="Pergunte ao AI"
                             v-model="mapFormString"
                             :rules="[(v) => !!v || 'Campo obrigatório']"
                             variant="outlined"
                             class="mt-2"
                         >
-                        </v-textarea>
+                        </v-textarea> -->
                         <div class="mt-5 d-flex ga-2 justify-center">
-                            <v-btn variant="text" @click="mapForm = ''">limpar</v-btn>
-                            <v-btn type="submit" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
+                            <v-btn :loading="load" :disabled="load" @click="submitForm" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
                         </div>
                    </v-form>
                 </div>
@@ -32,7 +31,7 @@
 </template>
 
 <script setup>
-    import { inject, onMounted, ref, watch } from 'vue';
+    import { inject, onMounted, ref, watch, computed } from 'vue';
 
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
     const mapaMentalStore = useMapaMentalStore()
@@ -52,12 +51,11 @@
             required: true
         }
     })
-
-    const artsFilter = ref([])
+    
     const mindMapData = ref(null)
 
     const getMindMapArt = async() => {
-        const art = route.query.art || extractArtsFromQuery(route.query.arts)[0]
+        const art = artOneSelect.value || listArtsSelected.value[0]
         if(art){
             mindMapData.value = props.mapasMentais.find(x => x.art == art)
         } else {
@@ -65,7 +63,9 @@
         }
     }
 
-    const extractArtsFromQuery = () => {
+    const artOneSelect = ref(route.query.art)
+
+    const listArtsSelected = computed(() => {
         const queryArts = route.query.arts
         if (queryArts) {
             // Se arts for um array (múltiplos valores)
@@ -79,38 +79,49 @@
         } else {
            return []
         }
-    }
+    })
 
     watch(
         () => route.query.arts,
         () => {
             getMindMapArt()
+            artOneSelect.value = null
+        }
+    )
+
+    watch(
+        () => route.query.art,
+        () => {
+            artOneSelect.value = route.query.art
         }
     )
     
     const mapFormString = ref('')
     const mapForm = ref({})
     const form = ref(null)
+    const load = ref(false)
 
     const submitForm = async () => {
-        const { valid } = await form.value.validate()
-        if (!valid) return
+        load.value = true
+        // const { valid } = await form.value.validate()
+        // if (!valid) return
 
-        let objeto
-        try {
-            objeto = JSON.parse(mapFormString.value)
-            objeto.id = forumStore.readGroupForum._source.idLaw
-            objeto.art = route.query.art
-        } catch (err) {
-            console.error('Erro ao fazer parse de mapFormString.value:', err)
-            alert('Erro: o conteúdo do campo deve estar em formato JSON válido.')
-            return
-        }
+        let objeto = { id: null, art: null, arts: []}   
+        // try {
+        //     objeto = JSON.parse(mapFormString.value)
+        // } catch (err) {
+        //     console.error('Erro ao fazer parse de mapFormString.value:', err)
+        //     alert('Erro: o conteúdo do campo deve estar em formato JSON válido.')
+        //     return
+        // }
 
         objeto.id = forumStore.readGroupForum._source.idLaw
-        objeto.art = route.query.art
+        objeto.art = artOneSelect.value || listArtsSelected.value[0]
+        objeto.arts = listArtsSelected.value
 
         await mapaMentalStore.createMindMap(objeto)
+        getMindMapArt()
+        load.value = false
     }
     
 

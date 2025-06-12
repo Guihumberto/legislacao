@@ -47,7 +47,6 @@
                         </v-list>
                     </v-card-text>
                 </v-card>
-
                 <Law_split v-if="tabSelected == 1" ref="childRef"  />
                 <Marcados v-if="tabSelected == 2" />
                 <Comentarios v-if="tabSelected == 3" />
