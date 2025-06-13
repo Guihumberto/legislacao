@@ -1,7 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({
-    baseURL: import.meta.env.VITE_CHATENDPOINT
-})
+const baseURL =
+  import.meta.env.VITE_CHATENDPOINT || import.meta.env.VITE_CHATENDPOINT2;
 
-export default api
+const api = axios.create({
+  baseURL
+});
+
+export default api;

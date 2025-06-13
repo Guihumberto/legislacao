@@ -299,15 +299,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             if(!cpf) return
 
             try {
-                const resp = await apiChat.post('/gerar-revisao-concurso', {
+                const resp = await apiChat.post('/concursos/revisao', {
                     texto: item,
                 })
-                return resp.data.revisao
+                console.log('resp', resp);
+                return resp.data.resumo
 
             } catch (error) {
                 console.log('erro ao gerar resumo')
                 snackStore.activeSnack("Erro ao gerar resumo!", "error")
-                
+                return 'erro ao gerar resumo'
             }
         }
     }

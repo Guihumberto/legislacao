@@ -30,7 +30,33 @@
             <div class="mb-5">
                 {{ topicoRead }}
             </div>
-            <v-btn @click="gerarResumo" :loading="load" :disabled="load" variant="flat" color="primary">Gerar Resumo por IA</v-btn>
+            <v-btn 
+                @click="gerarResumo" 
+                :loading="load" :disabled="load" variant="flat" color="primary">Gerar Resumo por IA
+            </v-btn>
+             <v-form @submit.prevent="submitForm" ref="formref" style="margin: 2rem;" v-if="form.text">
+                <v-text-field
+                    label="Título da Revisão"
+                    variant="outlined"
+                    density="compact"
+                    v-model="form.title"
+                    clearable
+                    :rules="[rules.required]"
+                ></v-text-field>
+
+                <ComentEdit
+                    label="Texto da Revisão"
+                    v-model="form.text"
+                    :disabled="false"
+                    :loading="false"
+                    class="mt-5"
+                    :max-length="100000"
+                />
+
+                <div class="mt-5">
+                    <v-btn type="submit" color="success" variant="flat">Salvar</v-btn>
+                </div>
+            </v-form>
         </div>
         <v-alert type="info" v-else text="Selecione um Tópico do edital." class="ma-5"></v-alert>
 
@@ -93,12 +119,12 @@
 
     const gerarResumo = async () => {
         load.value = true
-        const texto = `Gere uma revisão com os assuntos mais importantes desse assunto: ${topicoRead.value},
+        const texto = `Gere uma revisão com os assuntos mais importantes da discilina: ${topicoRead.value},
             com foco na banca ${props.selected.banca}, use como base as questoes dos concursos dos ultimos 5 anos.
-            O resumo deve ser escrito em português brasileiro, com um estilo formal e profissional.
+            O resumo deve ser escrito em português brasileiro, com um estilo voltardo para estudos.
             Use pareto para destacar os assuntos mais importantes, liste conceitos e classificações importantes, pegadinhas das questoes que tentam confundir o candidato,
             e também os assuntos que mais caem. Se tiver base em legislação cite os os artigos e jurisprudencias relacionadas.
-            Nãoo fuja do assunto. Se houver poucas referencias, utilize outras bancas relevantes coo FGV, FCC, CESGRANRIO, VUNESP, ETC.
+            Não fuja do assunto. Se houver poucas referencias de questões na banca mencionada, utilize outras bancas relevantes como FGV, FCC, CESGRANRIO, VUNESP, ETC.
         `
 
         const resumo = await optionsStore.gerarResumo(texto)
@@ -107,8 +133,16 @@
             title: `Resumo: ${props.selected?.conteudo}`,
             text: resumo,
         }
+
         // await submitForm()
         load.value = false
+    }
+
+    const clearForm = () => {
+        form.value = {
+            title: '',
+            text: '',
+        }
     }
 
     const submitForm = async () => {
@@ -126,8 +160,8 @@
             id_concurso: props.selected.id_concurso,
         }
 
-
         emit('submit', objeto)
+        clearForm()
     }
    
 </script>
