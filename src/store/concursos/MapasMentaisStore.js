@@ -26,10 +26,15 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
         readForumLaw(){
             const forumStore = useForumStore()
             return forumStore.readAllPages
+        },
+        readForumGroup(){
+            const forumStore = useForumStore()
+            return forumStore.readGroupForum
         }
     },
     actions: {
-        async getMapasMentais(id = '1742907391517'){
+        async getMapasMentais(){
+            const id = this.readForumGroup._source.idLaw
             const snackStore = useSnackStore()
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf

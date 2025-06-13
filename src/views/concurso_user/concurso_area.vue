@@ -302,13 +302,13 @@
         const texto = createPrompt3(subtopico, disciplina.disciplina, topico.conteudo)
         const promptInit = textoInit.value.replace(/\n/g, ' ');
         prompt.value = promptInit.trim().replace(/\s+/g, ' ')
-        dialog.value = true
+        // dialog.value = true
       }
       if(local == 'subsubtopico') {
         const texto = createPrompt4(subsubtopico, disciplina.disciplina, topico.conteudo, subtopico.conteudo)
         const promptInit = textoInit.value
         prompt.value = promptInit.replace(/\n/g, ' ').trim().replace(/\s+/g, ' ')
-        dialog.value = true
+        // dialog.value = true
       }
     }
 

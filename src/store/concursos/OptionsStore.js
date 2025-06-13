@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import api from "@/services/api"
+import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from "@/store/snackStore";
@@ -288,6 +289,25 @@ export const useOptionsStore = defineStore("optionsStore", {
                 console.log('Lei criada e notificação enviada!')
             } catch (error) {
                 console.error('Erro ao criar lei:', error)
+            }
+        },
+        //chamada IA
+        async gerarResumo(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await apiChat.post('/gerar-revisao-concurso', {
+                    texto: item,
+                })
+                return resp.data.revisao
+
+            } catch (error) {
+                console.log('erro ao gerar resumo')
+                snackStore.activeSnack("Erro ao gerar resumo!", "error")
+                
             }
         }
     }

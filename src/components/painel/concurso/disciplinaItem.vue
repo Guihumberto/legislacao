@@ -25,6 +25,7 @@
     <v-expansion-panel-text>     
         <v-list density="compact">
             <template v-for="(topico, topicoIndex) in disciplinaItem.topicos" :key="topicoIndex">
+                <!-- Tópicos 1 - -->
                 <v-list-item
                     @mouseover="hoverTopico = topicoIndex"
                     @mouseleave="hoverTopico = null"
