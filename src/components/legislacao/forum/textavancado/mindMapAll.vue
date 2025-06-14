@@ -41,8 +41,9 @@
     import { useForumStore } from '@/store/ForumStore';
     const forumStore = useForumStore()
 
-    import { useRoute } from "vue-router";
+    import { useRoute, useRouter } from "vue-router";
     const route = useRoute()
+    const router = useRouter()
  
     import MindMap from './mindMap.vue';
     const rightWidth = inject('rightWidth')
@@ -124,9 +125,17 @@
 
         await mapaMentalStore.createMindMap(objeto)
         getMindMapArt()
+        const { art, arts, ...outrosParams } = route.query
+        router.push({
+            path: route.path, 
+            query: {
+                ...outrosParams,      
+                art: objeto.art,   
+                arts: [...objeto.arts]          
+            }
+        })
         load.value = false
-    }
-    
+    }  
 
     onMounted(async() => {
         await getMindMapArt()
