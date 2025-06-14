@@ -157,22 +157,56 @@
 
     const usersCommentsFilter = ref([])
 
-
-    onMounted( async () => {
-        load.value = true
-        await commentStore.getList(route.params.id, order.value)
-        load.value = false
+    const listArtsSelected = computed(() => {
+        const queryArts = route.query.arts
+        if (queryArts) {
+            if (Array.isArray(queryArts)) {
+               return queryArts.map(art => parseInt(art))
+            } 
+            else {
+                return [parseInt(queryArts)]
+            } 
+        } else {
+           return []
+        }
     })
 
     watch(
         () => route.params.id,
         (newId, oldId) => {
-            console.log('teste')
             load.value = true
             commentStore.getAllCommnetsLaw(newId)
             load.value = false
         }
     )
+
+    watch(
+        () => route.query.arts,
+        () => {
+            selectArt.value = listArtsSelected.value
+            searchComments()
+        }
+    )
+
+    watch(
+        () => route.query.art,
+        () => {
+           selectArt.value = [ route.query.art ]
+           searchComments()
+        }
+    )
+
+    onMounted( async () => {
+        load.value = true
+        if(listArtsSelected.value.length) {
+            selectArt.value = listArtsSelected.value
+            await searchComments()
+        } else {
+            await commentStore.getList(route.params.id, order.value)
+        }
+
+        load.value = false
+    })
 
     const listArts = computed(() => {
         return commentStore.readListArts.map(x => x.key).sort((a, b) => a - b)

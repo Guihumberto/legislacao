@@ -23,6 +23,7 @@
                       <v-icon>mdi-arrow-collapse-all</v-icon>
                   </v-btn>
               </v-card-title>
+              <v-chip color="info" density="compact" v-if="data.arts.length" v-for="item, i in data.arts" :key="i" class="ml-2">Art.{{ item }}</v-chip>
               <v-card-text>
                   <div class="mindmap-tree">
                   <MindMapNode

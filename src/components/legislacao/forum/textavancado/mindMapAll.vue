@@ -8,7 +8,9 @@
                 </div>
                 <p v-if="!listArtsSelected.length && !artOneSelect">Selecione o Dispositivo para criar mapas mentais por IA</p>
                 <div v-else class="text-center">
-                    Artigo<span v-if="listArtsSelected.length > 1">s</span> selecionado<span v-if="listArtsSelected.length > 1">s</span>: {{ artOneSelect }}  {{ listArtsSelected }}
+                    Artigo<span v-if="listArtsSelected.length > 1">s</span> selecionado<span v-if="listArtsSelected.length > 1">s</span>: 
+                    <v-chip v-if="artOneSelect" color="primary">{{ artOneSelect }} </v-chip> 
+                    <v-chip v-if="listArtsSelected.length" v-for="item, i in listArtsSelected" :key="i" class="ml-2">{{ item }}</v-chip>
                    <v-form @submit.prevent="submitForm" ref="form">
                         <!-- <v-textarea
                             label="Pergunte ao AI"
@@ -57,7 +59,7 @@
     const getMindMapArt = async() => {
         const art = artOneSelect.value || listArtsSelected.value[0]
         if(art){
-            mindMapData.value = props.mapasMentais.find(x => x.art == art)
+            mindMapData.value = props.mapasMentais.find(x => x.art == parseInt(art))
         } else {
             mindMapData.value = null
         }
@@ -93,6 +95,7 @@
         () => route.query.art,
         () => {
             artOneSelect.value = route.query.art
+            getMindMapArt()
         }
     )
     
