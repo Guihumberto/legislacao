@@ -310,6 +310,80 @@ export const useOptionsStore = defineStore("optionsStore", {
                 snackStore.activeSnack("Erro ao gerar resumo!", "error")
                 return 'erro ao gerar resumo'
             }
-        }
+        },
+        async gerarQuestoes(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await apiChat.post('/concursos/questoes', {
+                    texto: item,
+                })
+                return resp.data.questoes
+
+            } catch (error) {
+                console.log('erro ao gerar questoes')
+                snackStore.activeSnack("Erro ao gerar questões!", "error")
+                return 'erro ao gerar resumo'
+            }
+        },
+        async gerarFlashCards(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await apiChat.post('/concursos/flashcards', {
+                    texto: item,
+                })
+                return resp.data.flashcards
+
+            } catch (error) {
+                console.log('erro ao gerar flashcards')
+                snackStore.activeSnack("Erro ao gerar flashcards!", "error")
+                return 'erro ao gerar resumo'
+            }
+        },
+        async gerarJurisprudencia(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await apiChat.post('/concursos/jurisprudencia', {
+                    texto: item,
+                })
+                console.log('resp', resp);
+                return resp.data.resumo
+
+            } catch (error) {
+                console.log('erro ao gerar jurisprudencia')
+                snackStore.activeSnack("Erro ao gerar jurisprudencia!", "error")
+                return 'erro ao gerar resumo'
+            }
+        },
+        async gerarMapaMental(item){
+            const snackStore = useSnackStore()
+            const loginStore = useLoginStore()
+            const cpf = loginStore.readLogin?.cpf
+            if(!cpf) return
+
+            try {
+                const resp = await apiChat.post('/concursos/mindmap', {
+                    texto: item,
+                })
+                console.log('resp', resp);
+                return resp.data.resumo
+
+            } catch (error) {
+                console.log('erro ao gerar mindmap')
+                snackStore.activeSnack("Erro ao gerar mindmap!", "error")
+                return 'erro ao gerar resumo'
+            }
+        },
     }
 })

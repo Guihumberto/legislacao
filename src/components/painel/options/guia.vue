@@ -8,14 +8,15 @@
         <v-expand-transition>
             <v-card class="content" v-if="!selectGuia">
                 <div class="cards-container">
-                    <div class="pa-2" v-for="item, i in typesGuia" :key="i" style="max-width: 350px; margin: 0 auto;" v-if="!item?.admin">
-                        <v-card class="text-left" variant="outlined" color="grey" hover>
+                    <div class="pa-2" v-for="item, i in typesGuia" :key="i" style="max-width: 350px; margin: 0 auto;">
+
+                        <v-card class="text-left" variant="outlined" color="grey" hover v-if="item?.show">
                             <v-card-title class="text-black d-flex align-center ga-2">
-                                    <v-icon size="1.5rem">{{ item.icon }}</v-icon>
-                                    {{ item.title }}
+                                    <v-icon size="1.5rem">{{ item?.icon }}</v-icon>
+                                    {{ item?.title }}
                             </v-card-title>
                             <v-card-text >
-                               {{ item.subtitle }}
+                               {{ item?.subtitle }}
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn variant="outlined" block color="black" @click="selectGuia = item.id">Gerar</v-btn>
@@ -159,7 +160,7 @@
             subtitle: 'Gere questões dos pontos relevantes desse assunto',
             icon: 'mdi-list-status',
             color: 'grey',
-            admin: props.usermaster,
+            show: true,
         },
         {
             id: 2,
@@ -167,7 +168,7 @@
             subtitle: 'Gere revisão dos pontos relevantes desse assunto',
             icon: 'mdi-file-document-outline',
             color: 'grey',
-            admin: true,
+            show: true,
         },
         {
             id: 3,
@@ -175,7 +176,7 @@
             subtitle: 'Gre flashcards dos pontos relevantes desse assunto',
             icon: 'mdi-card-text-outline',
             color: 'grey',
-            admin: props.usermaster,
+            show: true,
         },
         {
             id: 4,
@@ -183,7 +184,7 @@
             subtitle: 'Busque súmulas dos pontos relevantes desse assunto',
             icon: 'mdi-account-school',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
         {
             id: 5,
@@ -191,7 +192,7 @@
             subtitle: 'Busque as principais jurisprudências desse assunto',
             icon: 'mdi-gavel',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
         {
             id: 6,
@@ -199,7 +200,7 @@
             subtitle: 'Busque por artigos da legislação, se houver, dos pontos relevantes desse assunto',
             icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
         {
             id: 7,
@@ -207,7 +208,7 @@
             subtitle: 'Veja os conteúdo que precisam ser reforçados e gere material adicional',
             icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
         {
             id: 8,
@@ -215,7 +216,7 @@
             subtitle: 'Revise o conteúdo de maneira mais prática e eficente',
             icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
         {
             id: 9,
@@ -223,7 +224,7 @@
             subtitle: 'Gere mapas mentais do conteúdo de maneira mais prática e eficente',
             icon: 'mdi-numeric-5-box-multiple-outline',
             color: 'grey',
-            admin: props.usermaster,
+            show: false,
         },
    ]
 

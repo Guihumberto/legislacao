@@ -3,7 +3,7 @@
     <div class="w-100 border rounded-lg">
         <h1>Flashcards</h1>
 
-        <v-form @submit.prevent="submitForm" ref="formref" style="margin: 2rem;">
+        <v-form @submit.prevent="submitForm" ref="formref" style="margin: 2rem;" v-if="false">
             <v-text-field
                 label="Título da Revisão"
                 variant="outlined"
@@ -55,12 +55,57 @@
         </div>
 
         </v-form>
+
+        <div v-if="selected.conteudo" class="ma-5">
+            <div v-if="!concluido && !error">
+                <div class="mb-5">
+                    {{ topicoRead }}
+                </div>
+                <div>
+                    <v-textarea
+                        label="Assuntos ou exemplo de questões"
+                        v-model="listQuestoesErradas"
+                        placeholder="Não é obrigatório, mas ajuda a gerar melhores flashcards focando no que você errou"
+                        density="compact"
+                        maxlength="1000"
+                        variant="outlined"
+                        counter
+                    ></v-textarea>
+                </div>
+                <v-btn 
+                    @click="gerarFlashcards" 
+                    :loading="load" :disabled="load" variant="flat" color="primary">Gerar Flashcards por IA
+                </v-btn>
+            </div>
+            <div v-else>
+                <v-alert v-if="concluido" type="success" text="Questões geradas com sucesso!" class="ma-5"></v-alert>
+                <v-alert v-if="error" type="error" text="erro na operação!" class="ma-5"></v-alert>
+            </div>
+        </div>
+        <v-alert type="info" v-else text="Selecione um Tópico do edital." class="ma-5"></v-alert>
+
+
+        <div v-if="false" class="mt-5">
+            <h5>Lista de questões</h5>
+            {{ form.title }}
+            <div v-for="(item, index) in listImport" :key="index" class="pa-2 mb-2 border rounded-lg">
+                <div class="pa-1 border rounded-lg bg-primary mb-2">
+                    <b>{{ item.banca }}</b> - {{ item.concurso }} - {{ item.cargo }} - {{ item.tipo }}
+                </div>
+                <b>{{ index + 1 }}) </b>{{ item.pergunta }} <br><br>
+                {{ item.resposta }} - {{ item.id_art }} <br>
+                {{ item.justificativa }} <br>
+            </div>
+        </div>
        
     </div>
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
+
+    import { useOptionsStore } from '@/store/concursos/OptionsStore';
+    const optionsStore = useOptionsStore()
 
     const props = defineProps({
         selected: {
@@ -93,15 +138,65 @@
         'dificil'
     ]
 
-    const submitForm = async () => {
-        const { valid } = await formref.value.validate()
-        // if(form.value.text.length == 0) return
-        if (!valid) return
+    const topicoRead = computed(() => {
+        const obj = props.selected
+        let resultado = `${obj.disciplina}: ${obj.numero} ${obj.conteudo}`;
 
-        const resp = isValidJsonString(form.value.listaFlahscards)
+        function processaSubtopicos(subtopicos) {
+                let partes = [];
+                for (const sub of subtopicos || []) {
+                    partes.push(`${sub.numero} ${sub.conteudo}`);
+                    if (sub.subtopicos && sub.subtopicos.length > 0) {
+                        partes = partes.concat(processaSubtopicos(sub.subtopicos));
+                    }
+                }
+                return partes;
+        }
+
+        const linhas = processaSubtopicos(obj.subtopicos);
+        return resultado + '. ' + linhas.join(' ');
+    })
+
+    const listQuestoesErradas = ref(null)
+    const load = ref(false)
+    const concluido = ref(false)
+    const error = ref(false)
+
+    const gerarFlashcards = async () => {
+        if (!listQuestoesErradas.value) listQuestoesErradas.value = ''
+        load.value = true
+        const texto = `Com base na disciplina: ${topicoRead.value} e nas questões que mais tive dificuldades ${listQuestoesErradas.value}, se for informado,
+            com foco na banca ${props.selected.banca}, use como base as questoes dos concursos dos ultimos 5 anos para gerar flashcards focados no assunto.
+            Os flashcards devem ser escrito em português brasileiro, com um estilo voltado para estudos para concursos públicos..
+            Não fuja do assunto. Se houver poucas referencias de questões na banca mencionada, utilize outras bancas relevantes como FGV, FCC, CESGRANRIO, VUNESP, ETC.
+        `
+
+        const flahscards = await optionsStore.gerarFlashCards(texto)
+        
+        form.value = {
+            title: `Flashcards 1: ${props.selected?.conteudo}`,
+            listaFlahscards: flahscards,
+        }
+
+        await submitForm()
+        load.value = false
+    }
+
+    const submitForm = async () => {
+        // const { valid } = await formref.value.validate()
+        // if(form.value.text.length == 0) return
+        // if (!valid) return
+
+        const jsonString = JSON.stringify(form.value.listaFlahscards);
+        const resp = isValidJsonString(jsonString)
+
+         if(!resp) {
+            error.value = true
+            return
+        }
+
         listImport.value = resp.map(obj => ({
-            ...obj,
-            // nivel: form.value.nivel
+            ...obj
         }))
 
         const objeto = {
@@ -116,6 +211,7 @@
         }
         emit('submit', objeto)
         clearFields()
+        concluido.value = true
     }
 
     const clearFields = () => {
