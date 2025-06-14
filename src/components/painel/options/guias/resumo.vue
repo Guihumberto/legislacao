@@ -3,7 +3,7 @@
     <div class="w-100 border rounded-lg">
         <h1>Resumo</h1>
         
-        <v-form @submit.prevent="submitForm" ref="formref" style="margin: 2rem;" v-if="false">
+        <v-form @submit.prevent="submitForm" ref="formref" style="margin: 2rem;" v-if="optionsStore.readUserMaster">
             <v-text-field
                 label="Título da Revisão"
                 variant="outlined"

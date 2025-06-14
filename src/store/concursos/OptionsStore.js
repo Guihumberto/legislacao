@@ -46,6 +46,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             
             return `${day}-${month}-${year} ${hours}:${minutes}`;
         },
+        readUserMaster(){
+            const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+            const login = {
+                login: JSON.parse(data).cpf,
+                password: JSON.parse(data).password
+            } 
+            return login.login == '01791743390'
+            ? true
+            : false
+        }
     },
     actions:{
         async createRevisao(revisao){

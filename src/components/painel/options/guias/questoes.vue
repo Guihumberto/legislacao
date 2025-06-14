@@ -3,7 +3,7 @@
     <div class="w-100 border rounded-lg">
         <h1>Questões</h1>
 
-        <v-form v-if="false" @submit.prevent="submitForm" ref="formref" style="margin: 2rem;">
+        <v-form v-if="optionsStore.readUserMaster" @submit.prevent="submitForm2" ref="formref" style="margin: 2rem;">
             <v-text-field
                 label="Título da Revisão"
                 variant="outlined"
@@ -156,6 +156,38 @@
 
         const jsonString = JSON.stringify(form.value.listaQuestoes);
         const resp = isValidJsonString(jsonString)
+
+        if(!resp) {
+            error.value = true
+            return
+        }
+
+        listImport.value = resp.map(obj => ({
+            ...obj,
+            tipo: "c/e"
+        }))
+
+        const objeto = {
+            title: form.value.title,
+            questoes: [ ...listImport.value ],
+            typeGuide,
+            icon,
+            disciplina: props.selected.disciplina,
+            conteudo: props.selected.conteudo,
+            numero: props.selected.numero,
+            id_concurso: props.selected.id_concurso,
+        }
+        emit('submit', objeto)
+        clearFields()
+        concluido.value = true
+    }
+
+    const submitForm2 = async () => {
+        const { valid } = await formref.value.validate()
+        // if(form.value.text.length == 0) return
+        if (!valid) return
+
+        const resp = isValidJsonString(form.value.listaQuestoes)
 
         if(!resp) {
             error.value = true
