@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div 
+    :style="{ transform: `scale(${scaleValue})` }"
+    style="transform-origin: top left;"
+  >
     <v-card 
       class="mx-auto stats-card" 
       elevation="8"
@@ -88,7 +91,7 @@
             >
               <v-icon size="32" class="mb-2">mdi-fraction-one-half</v-icon>
               <div class="text-h5 font-weight-bold">{{ stats.total_partial }}</div>
-              <div class="text-body-2 text-medium-emphasis">Total</div>
+              <div class="text-body-2 text-medium-emphasis">Parcial</div>
             </v-card>
             <v-card 
               variant="tonal" 
@@ -110,11 +113,11 @@
           <div class="d-flex justify-space-between align-center mb-2">
             <span class="text-body-2 font-weight-medium">Progresso Geral</span>
             <span class="text-body-2 text-medium-emphasis">
-              {{ stats.total_correct + stats.total_incorrect  }}/{{ stats.total }}
+              {{ stats.total_correct + stats.total_incorrect + stats?.total_partial  }}/{{ stats.total }}
             </span>
           </div>
           <v-progress-linear
-            :model-value="successPercentage"
+            :model-value="progressPercentage"
             :color="getPerformanceColor()"
             height="8"
             rounded
@@ -216,7 +219,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, inject, watch } from 'vue'
 
 // Props
 const props = defineProps({
@@ -226,19 +229,17 @@ const props = defineProps({
   }
 })
 
-const containerRef = ref(null)
-const containerWidth = ref(400) // largura inicial
-const baseWidth = 400 // largura de referência
+const scaleValue = ref(1) // 80% do tamanho original
 
-const cardStyle = computed(() => {
-  const scale = containerWidth.value / baseWidth
-  return {
-    transform: `scale(${scale})`,
-    transformOrigin: 'top left'
+const rightWidth = inject('rightWidth')
+
+watch(rightWidth, (newWidth) => {
+  if(rightWidth.value < 600) {
+    scaleValue.value = 0.8
+  } else{
+    scaleValue.value = 1
   }
 })
-
-let resizeObserver = null
 
 // Emits
 const emit = defineEmits(['resumo-texto'])
@@ -261,6 +262,13 @@ const stats = computed(() => {
 })
 
 const successPercentage = computed(() => {
+  if (stats.value.total === 0) return 0
+  return stats.value?.total_partial 
+  ? ((stats.value.total_correct + (stats.value.total_partial/2)) / stats.value.total) * 100
+  : (stats.value.total_correct / stats.value.total) * 100
+})
+
+const progressPercentage = computed(() => {
   if (stats.value.total === 0) return 0
   return stats.value?.total_partial 
   ? ((stats.value.total_correct + stats.value.total_incorrect + stats.value.total_partial) / stats.value.total) * 100
@@ -374,25 +382,12 @@ const tratarQuestoesFlashCards = (item) => {
 
 // Lifecycle
 onMounted(() => {
-   if (containerRef.value) {
-    resizeObserver = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        containerWidth.value = entry.contentRect.width
-      }
-    })
-    resizeObserver.observe(containerRef.value)
-  }
   // Animação de entrada suave
   setTimeout(() => {
     showDetails.value = false
   }, 1000)
 })
 
-onUnmounted(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect()
-  }
-})
 </script>
 
 <style scoped>

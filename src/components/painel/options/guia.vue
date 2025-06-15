@@ -6,7 +6,7 @@
             <p>{{ selected.numero }} - {{ selected?.conteudo }}</p>
         </div>
         <v-expand-transition>
-            <v-card class="content" v-if="!selectGuia">
+            <v-card class="content" v-if="!selectGuia" max-width="820px">
                 <div class="cards-container">
                     <div class="pa-2" v-for="item, i in typesGuia" :key="i" style="max-width: 350px; margin: 0 auto;">
 
@@ -42,57 +42,59 @@
         </v-expand-transition>
         <!-- Tarefas para revisão -->
         <v-expand-transition>
-            <v-list class="pa-5 text-left" v-if="!loading && optionsStore.readRevisao.length">
-                <div class="d-flex align-center justify-space-between">
-                    <p>{{ selectDisciplina?.disciplina || "Todas as disciplinas" }}</p>
-                    <v-btn variant="text" class="text-lowercase" @click="$emit('clearDisciplina')">Mostrar todas</v-btn>
-                </div>
-                <v-select
-                    :items="itemsTypeGuia"
-                    label="Tipo de Guia"
-                    variant="outlined"
-                    density="compact"
-                    clearable
-                    class="mt-5 w-50"
-                    v-model="filter.typeGuia"
-                    hide-details
-                ></v-select>
-
-                <v-checkbox color="error" class="ml-n2" label="ocultar concluídos" v-model="filter.hiddenConcluidos" hide-details></v-checkbox>
-
-                <v-list-item v-for="item, i in listResumo" :key="i" :prepend-icon="item.icon" border class="mb-2 list-item-hover" link>
-                    <v-list-item-title :class="{ 'text-decoration-line-through' : item.concluido }"> {{ item.title }} </v-list-item-title>
-                    <v-list-item-subtitle> {{ item.conteudo }} </v-list-item-subtitle>
-                    <template v-slot:append>
-                        <v-tooltip text="Atividade marcada como concluída." location="top">
-                            <template v-slot:activator="{ props }">
-                                <v-icon v-bind="props" v-if="item.concluido" color="success">mdi-check-all</v-icon>
-                            </template>
-                        </v-tooltip>
-                        <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" @concluir="concluirGuia" />
-                        <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" />
-                        <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" @concluir="concluirGuia" />
-                        <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" @concluir="concluirGuia" />
-                        <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" @concluir="concluirGuia" />
-                        <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" @concluir="concluirGuia" />
-                        <!-- <MapMindDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" /> -->
-                       
-                        <v-tooltip :text="item.concluido ? 'Desmarcar a atividade.' : 'Marcar como concluído'" location="top">
-                            <template v-slot:activator="{ props }">
-                                 <v-btn 
-                                    :loading="loadConcluir"
-                                    :disabled="loadConcluir"
-                                    v-bind="props" variant="text" :color="item?.concluido ? 'error' : 'success'" 
-                                    :icon="item.concluido ? 'mdi-close-box-outline' : 'mdi-checkbox-marked-circle-outline'" density="compact" class="hover-button"
-                                    @click="concluirGuia(item)"
-                                ></v-btn>
-                            </template>
-                        </v-tooltip>
-                    </template>
-                </v-list-item>
-                <v-alert v-if="!listResumo.length" type="info" variant="outlined" text="Não há revisoes criadas neste filtro."></v-alert>
-            </v-list>
-            <v-alert v-if="!loading && !optionsStore.readRevisao.length" text="Ainda não foram criadas revisões para este tópico"></v-alert>
+            <div class="d-flex justify-center" v-if="!loading">
+                <v-list class="pa-5 text-left rounded-lg" v-if="!loading && optionsStore.readRevisao.length">
+                    <div class="d-flex align-center justify-space-between">
+                        <p>{{ selectDisciplina?.disciplina || "Todas as disciplinas" }}</p>
+                        <v-btn variant="text" class="text-lowercase" @click="$emit('clearDisciplina')">Mostrar todas</v-btn>
+                    </div>
+                    <v-select
+                        :items="itemsTypeGuia"
+                        label="Tipo de Guia"
+                        variant="outlined"
+                        density="compact"
+                        clearable
+                        class="mt-5 w-50"
+                        v-model="filter.typeGuia"
+                        hide-details
+                    ></v-select>
+    
+                    <v-checkbox color="error" class="ml-n2" label="ocultar concluídos" v-model="filter.hiddenConcluidos" hide-details></v-checkbox>
+    
+                    <v-list-item v-for="item, i in listResumo" :key="i" :prepend-icon="item.icon" border class="mb-2 list-item-hover" link>
+                        <v-list-item-title :class="{ 'text-decoration-line-through' : item.concluido }"> {{ item.title }} </v-list-item-title>
+                        <v-list-item-subtitle> {{ item.conteudo }} </v-list-item-subtitle>
+                        <template v-slot:append>
+                            <v-tooltip text="Atividade marcada como concluída." location="top">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon v-bind="props" v-if="item.concluido" color="success">mdi-check-all</v-icon>
+                                </template>
+                            </v-tooltip>
+                            <Revisao v-if="item.typeGuide == 'resumo'" :conteudo="item" @concluir="concluirGuia" />
+                            <QuestoesDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" />
+                            <FlashcardsDialog v-if="item.typeGuide == 'flahscards'" :conteudo="item" @concluir="concluirGuia" />
+                            <SumulasDialog v-if="item.typeGuide == 'sumulas'" :conteudo="item" @concluir="concluirGuia" />
+                            <JurisprudenciaDialog v-if="item.typeGuide == 'jurisprudencia'" :conteudo="item" @concluir="concluirGuia" />
+                            <ArtigosDialog v-if="item.typeGuide == 'artigos'" :conteudo="item" @concluir="concluirGuia" />
+                            <!-- <MapMindDialog v-if="item.typeGuide == 'questoes'" :conteudo="item" @concluir="concluirGuia" /> -->
+                           
+                            <v-tooltip :text="item.concluido ? 'Desmarcar a atividade.' : 'Marcar como concluído'" location="top">
+                                <template v-slot:activator="{ props }">
+                                     <v-btn 
+                                        :loading="loadConcluir"
+                                        :disabled="loadConcluir"
+                                        v-bind="props" variant="text" :color="item?.concluido ? 'error' : 'success'" 
+                                        :icon="item.concluido ? 'mdi-close-box-outline' : 'mdi-checkbox-marked-circle-outline'" density="compact" class="hover-button"
+                                        @click="concluirGuia(item)"
+                                    ></v-btn>
+                                </template>
+                            </v-tooltip>
+                        </template>
+                    </v-list-item>
+                    <v-alert v-if="!listResumo.length" type="info" variant="outlined" text="Não há revisoes criadas neste filtro."></v-alert>
+                </v-list>
+                <v-alert v-if="!loading && !optionsStore.readRevisao.length" text="Ainda não foram criadas revisões para este tópico"></v-alert>
+            </div>
         </v-expand-transition>
     </section>
 </template>

@@ -12,13 +12,13 @@
                 clearable
             ></v-select>
     
-             <v-text-field
+             <!-- <v-text-field
                 label="Item"
                 density="compact"
                 variant="outlined"
                 v-model="filter.item"
                 clearable
-            ></v-text-field>
+            ></v-text-field> -->
 
             <v-switch
                 label="Mostrar apenas concluídos"
@@ -174,7 +174,7 @@
             case rightWidth.value >= 400:
                 return 12
             default:
-                return 4
+                return 12
         }
     })
 
