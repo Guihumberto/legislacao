@@ -3,13 +3,14 @@
     <div class="w-100 border rounded-lg">
         <h1>Estatísticas</h1>
         <div class="px-5">
-            <v-text-field
+            <v-select
                 label="Disciplina"
+                :items=listDisciplinas
                 density="compact"
                 variant="outlined"
                 v-model="filter.disciplina"
                 clearable
-            ></v-text-field>
+            ></v-select>
     
              <v-text-field
                 label="Item"
@@ -30,28 +31,30 @@
         
 
         <v-row class="pa-5">
-            <v-col cols="6" v-for="item, i in listAll.filter(x => x.typeGuide == 'flahscards' || x.typeGuide == 'questoes')" :key="i">
+            <v-col :cols="colsQtd" v-for="item, i in listAll.filter(x => x.typeGuide == 'flahscards' || x.typeGuide == 'questoes')" :key="i">
+                <CardEstatistica 
+                    :item="{ 
+                            cardItem: item,
+                            total: tratarQuestoesFlashCards(item)?.total || 0, 
+                            total_correct: tratarQuestoesFlashCards(item)?.total_correct || 0, 
+                            total_incorrect: tratarQuestoesFlashCards(item)?.total_incorrect || 0,
+                            total_partial: tratarQuestoesFlashCards(item).total_partial || 0
+                    }" 
+                />
                 
-                <v-card class="mb-2" variant="outlined" min-height="235">
-                    <v-card-title>{{ item.numero }} - {{ item.title }}</v-card-title>
+                <!-- <v-card class="mb-2" variant="outlined" min-height="235">
+                    <v-card-title>{{ item.title }}</v-card-title>
                     <v-card-text class="d-flex align-center justify-space-between flex-column">
                       <v-chip :color="concluidoResp(item.concluido).color">{{concluidoResp(item.concluido).text}}</v-chip>
                       
                       <div v-if="item.typeGuide == 'flahscards'">
-                            <CardEstatistica 
-                                :item="{ 
-                                        total: tratarQuestoesFlashCards(item)?.total || 0, 
-                                        total_correct: tratarQuestoesFlashCards(item)?.total_correct || 0, 
-                                        total_incorrect: tratarQuestoesFlashCards(item)?.total_incorrect || 0,
-                                        total_partial: tratarQuestoesFlashCards(item)?.total_partial || 0
-                                }" 
-                            />
-                            <!-- <div class="my-5">
+                            
+                            <div class="my-5">
                                 total: {{ tratarQuestoesFlashCards(item).total }} <br>
                                 erros: {{ tratarQuestoesFlashCards(item).total_incorrect }} <br>
                                 <span v-if="tratarQuestoesFlashCards(item)?.total_partial != '0'"></span> Parcial:{{ tratarQuestoesFlashCards(item).total_partial}}
                             </div>
-                            <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).flashcards, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn> -->
+                            <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).flashcards, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn>
                       </div>
 
                       <div v-if="item.typeGuide == 'questoes'">
@@ -62,12 +65,12 @@
                                     total_incorrect: tratarQuestoesFlashCards(item)?.total_incorrect || 0
                             }" 
                         />
-                        <!-- <div class="my-5">
+                        <div class="my-5">
                             total: {{ tratarQuestoesFlashCards(item).total }} <br>
                             erros: {{ tratarQuestoesFlashCards(item).total_incorrect }} <br>
                             Acertos: {{ tratarQuestoesFlashCards(item).total_correct }} <br>
                         </div>
-                        <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).questoes, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn> -->
+                        <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).questoes, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn> 
                       </div>
 
                       <div v-if="item.typeGuide == 'sumulas'">
@@ -93,7 +96,7 @@
                         </v-btn>
                       </div>
                     </v-card-text>
-                </v-card>
+                </v-card>-->
             </v-col>
         </v-row>
 
@@ -145,7 +148,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch } from 'vue';
+    import { ref, computed, watch, inject } from 'vue';
     import { useOptionsStore } from '@/store/concursos/OptionsStore';
     const optionsStore = useOptionsStore();
 
@@ -158,6 +161,21 @@
                 id: null
             },
         },
+    })
+
+    const rightWidth = inject('rightWidth')
+
+    const colsQtd = computed(() => {
+        switch(true) {
+            case rightWidth.value >= 1400 :
+                return 4
+            case rightWidth.value >= 1000:
+                return 6
+            case rightWidth.value >= 400:
+                return 12
+            default:
+                return 4
+        }
     })
 
     const filter = ref({
@@ -206,9 +224,15 @@
         emit('submit', objeto)
     }
 
+    const listDisciplinas = computed(() => {
+        const list = optionsStore.readRevisao.map( x => x.disciplina )
+        const listUnique = [...new Set(list)]
+        return listUnique.sort((a, b) => a.localeCompare(b))
+    })
+
     const listResumo = computed(() => {
         const types = ['resumo', 'questoes', 'flahscards', 'sumulas', 'jurisprudencia'] //'artigos'
-        let list = optionsStore.readRevisao .filter( x => types.includes(x.typeGuide))
+        let list = optionsStore.readRevisao.filter( x => types.includes(x.typeGuide))
 
         if(filter.value.disciplina) {
             list = list.filter( x => x.disciplina == filter.value.disciplina)

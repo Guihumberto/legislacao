@@ -1,15 +1,16 @@
 <template>
   <div>
     <v-card 
-      class="mx-auto my-5 stats-card" 
+      class="mx-auto stats-card" 
       elevation="8"
       :style="{ background: cardGradient }"
+      width="400px"
     >
       <!-- Header do Card -->
       <v-card-title class="d-flex align-center justify-space-between pa-4">
         <div class="d-flex align-center">
           <v-icon color="primary" size="28" class="mr-3">mdi-poll</v-icon>
-          <span class="text-h6 font-weight-bold">Estatísticas de Performance</span>
+          <span class="text-h6 font-weight-bold">Estatísticas</span>
         </div>
         <v-chip 
           :color="getPerformanceColor()" 
@@ -24,7 +25,11 @@
       <v-divider></v-divider>
 
       <!-- Conteúdo Principal -->
-      <v-card-text class="pa-6">
+      <v-card-text class="pa-6" style="min-height: 500px;">
+        <div class="mb-5">
+          <b>{{ item.cardItem.disciplina }}</b> <br>
+          {{ item.cardItem.title }}
+        </div>
         <!-- Progresso Circular Principal -->
         <div class="text-center mb-6">
           <v-progress-circular
@@ -72,7 +77,6 @@
               <div class="text-body-2 text-medium-emphasis">Acertos</div>
             </v-card>
           </v-col>
-
           <!-- Erros -->
           <v-col cols="12" sm="4">
             <v-card 
@@ -94,7 +98,7 @@
           <div class="d-flex justify-space-between align-center mb-2">
             <span class="text-body-2 font-weight-medium">Progresso Geral</span>
             <span class="text-body-2 text-medium-emphasis">
-              {{ stats.total_correct }}/{{ stats.total }}
+              {{ stats.total_correct + stats.total_incorrect  }}/{{ stats.total }}
             </span>
           </div>
           <v-progress-linear
@@ -138,9 +142,9 @@
           @click="resumoTexto(stats.questoes, item.typeGuide)"
           color="primary"
           variant="elevated"
-          size="large"
           class="flex-grow-1"
           prepend-icon="mdi-play-circle"
+          disabled
         >
           Continuar Estudos
         </v-btn>
@@ -150,7 +154,7 @@
             <v-btn
               v-bind="props"
               color="primary"
-              variant="outlined"
+              variant="text"
               icon="mdi-dots-vertical"
               class="ml-2"
             ></v-btn>
@@ -200,7 +204,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 // Props
 const props = defineProps({
@@ -209,6 +213,20 @@ const props = defineProps({
     required: true
   }
 })
+
+const containerRef = ref(null)
+const containerWidth = ref(400) // largura inicial
+const baseWidth = 400 // largura de referência
+
+const cardStyle = computed(() => {
+  const scale = containerWidth.value / baseWidth
+  return {
+    transform: `scale(${scale})`,
+    transformOrigin: 'top left'
+  }
+})
+
+let resizeObserver = null
 
 // Emits
 const emit = defineEmits(['resumo-texto'])
@@ -232,7 +250,9 @@ const stats = computed(() => {
 
 const successPercentage = computed(() => {
   if (stats.value.total === 0) return 0
-  return (stats.value.total_correct / stats.value.total) * 100
+  return stats.value?.total_partial 
+  ? ((stats.value.total_correct + stats.value.total_incorrect + stats.value.total_partial) / stats.value.total) * 100
+  : ((stats.value.total_correct + stats.value.total_incorrect) / stats.value.total) * 100
 })
 
 const cardGradient = computed(() => {
@@ -335,20 +355,39 @@ const tratarQuestoesFlashCards = (item) => {
     total,
     total_correct,
     total_incorrect,
+    total_partial,
     questoes: []
   }
 }
 
 // Lifecycle
 onMounted(() => {
+   if (containerRef.value) {
+    resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        containerWidth.value = entry.contentRect.width
+      }
+    })
+    resizeObserver.observe(containerRef.value)
+  }
   // Animação de entrada suave
   setTimeout(() => {
     showDetails.value = false
   }, 1000)
 })
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 <style scoped>
+.card-container {
+  width: 100%;
+  overflow: hidden;
+}
 .stats-card {
   transition: all 0.3s ease;
   border-radius: 16px !important;

@@ -213,6 +213,7 @@
 
     provide('dialog', dialog)
     provide('options', options)
+    
 
     const textoInit = ref(null)
 
@@ -436,6 +437,8 @@
     const rightWidth = computed(() => {
         return containerWidth.value - leftWidth.value - 10; // 10px é a largura do divisor
     });
+
+    provide('rightWidth', rightWidth)
 
     // Função auxiliar para obter a posição X do evento (mouse ou touch)
     const getClientX = (e) => {
