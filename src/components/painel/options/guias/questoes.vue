@@ -55,7 +55,6 @@
         </div>
         <v-alert type="info" v-else text="Selecione um Tópico do edital." class="ma-5"></v-alert>
 
-
         <div v-if="listImport.length > 0" class="mt-5">
             <h5>Lista de questões</h5>
             {{ form.title }}

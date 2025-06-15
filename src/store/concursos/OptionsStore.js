@@ -367,9 +367,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                 const resp = await apiChat.post('/concursos/jurisprudencia', {
                     texto: item,
                 })
-                console.log('resp', resp);
-                return resp.data.resumo
-
+                return resp.data.juris
             } catch (error) {
                 console.log('erro ao gerar jurisprudencia')
                 snackStore.activeSnack("Erro ao gerar jurisprudencia!", "error")

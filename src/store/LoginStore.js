@@ -3,6 +3,7 @@ import api from "@/services/api"
 
 import { useUserAreaStore } from "./AreaUserStore";
 import { useAuthStore } from "./firebase/authStore";
+import { useConteudoEditalStore } from "./concursos/ConteudoEditalStore";
 
 export const useLoginStore = defineStore("loginStore", {
     state: () => ({
@@ -102,6 +103,7 @@ export const useLoginStore = defineStore("loginStore", {
             } else {
                 router.push('/leges')
             }
+            this.unmountedDestruct()
             sessionStorage.removeItem('userData')
             localStorage.removeItem('userData');
         },
@@ -462,6 +464,10 @@ export const useLoginStore = defineStore("loginStore", {
             } catch (error) {
                 console.log('erro search time real user');
             }
-        }
+        },
+        unmountedDestruct(){
+            const conteudoStore = useConteudoEditalStore()
+            conteudoStore.unMontedDestruct()
+        },
     }
 })

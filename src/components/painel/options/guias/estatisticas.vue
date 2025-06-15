@@ -30,28 +30,44 @@
         
 
         <v-row class="pa-5">
-            <v-col cols="6" v-for="item, i in listAll" :key="i">
+            <v-col cols="6" v-for="item, i in listAll.filter(x => x.typeGuide == 'flahscards' || x.typeGuide == 'questoes')" :key="i">
+                
                 <v-card class="mb-2" variant="outlined" min-height="235">
                     <v-card-title>{{ item.numero }} - {{ item.title }}</v-card-title>
                     <v-card-text class="d-flex align-center justify-space-between flex-column">
                       <v-chip :color="concluidoResp(item.concluido).color">{{concluidoResp(item.concluido).text}}</v-chip>
                       
                       <div v-if="item.typeGuide == 'flahscards'">
-                          <div class="my-5">
-                             total: {{ tratarQuestoesFlashCards(item).total }} <br>
-                             erros: {{ tratarQuestoesFlashCards(item).total_incorrect }} <br>
-                             <span v-if="tratarQuestoesFlashCards(item)?.total_partial != '0'"></span> Parcial:{{ tratarQuestoesFlashCards(item).total_partial}}
-                         </div>
-                         <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).flashcards, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn>
+                            <CardEstatistica 
+                                :item="{ 
+                                        total: tratarQuestoesFlashCards(item)?.total || 0, 
+                                        total_correct: tratarQuestoesFlashCards(item)?.total_correct || 0, 
+                                        total_incorrect: tratarQuestoesFlashCards(item)?.total_incorrect || 0,
+                                        total_partial: tratarQuestoesFlashCards(item)?.total_partial || 0
+                                }" 
+                            />
+                            <!-- <div class="my-5">
+                                total: {{ tratarQuestoesFlashCards(item).total }} <br>
+                                erros: {{ tratarQuestoesFlashCards(item).total_incorrect }} <br>
+                                <span v-if="tratarQuestoesFlashCards(item)?.total_partial != '0'"></span> Parcial:{{ tratarQuestoesFlashCards(item).total_partial}}
+                            </div>
+                            <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).flashcards, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn> -->
                       </div>
 
                       <div v-if="item.typeGuide == 'questoes'">
-                        <div class="my-5">
+                        <CardEstatistica 
+                            :item="{ 
+                                    total: tratarQuestoesFlashCards(item)?.total || 0, 
+                                    total_correct: tratarQuestoesFlashCards(item)?.total_correct || 0, 
+                                    total_incorrect: tratarQuestoesFlashCards(item)?.total_incorrect || 0
+                            }" 
+                        />
+                        <!-- <div class="my-5">
                             total: {{ tratarQuestoesFlashCards(item).total }} <br>
                             erros: {{ tratarQuestoesFlashCards(item).total_incorrect }} <br>
                             Acertos: {{ tratarQuestoesFlashCards(item).total_correct }} <br>
                         </div>
-                        <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).questoes, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn>
+                        <v-btn @click="resumoTexto(tratarQuestoesFlashCards(item).questoes, item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn> -->
                       </div>
 
                       <div v-if="item.typeGuide == 'sumulas'">
@@ -81,6 +97,41 @@
             </v-col>
         </v-row>
 
+        <!-- <v-row class="pa-5">
+            <v-col cols="6" v-for="item, i in listAll" :key="i">
+                <v-card class="mb-2" variant="outlined" min-height="235">
+                    <v-card-title>{{ item.numero }} - {{ item.title }}</v-card-title>
+                    <v-card-text class="d-flex align-center justify-space-between flex-column">
+                      <v-chip :color="concluidoResp(item.concluido).color">{{concluidoResp(item.concluido).text}}</v-chip>
+
+                      <div v-if="item.typeGuide == 'sumulas'">
+                         <div class="my-5">
+                             {{ tratarSumulasJuris(item).length }} Súmulas Favoritadas
+                         </div>
+                         <v-btn @click="resumoTexto(tratarSumulasJuris(item), item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn>
+                      </div>
+
+                      <div v-if="item.typeGuide == 'jurisprudencia'">
+                        <div class="my-5">
+                            {{ tratarSumulasJuris(item).length }} Jurisprudencias Favoritadas
+                        </div>
+                         <v-btn @click="resumoTexto(tratarSumulasJuris(item), item.typeGuide)"><v-icon>mdi-plus</v-icon></v-btn>
+                      </div>
+
+                      <div v-if="item.typeGuide == 'resumo'">
+                        <div class="my-5">
+                            {{ item.title }}
+                        </div>
+                        <v-btn 
+                            @click="resumoTexto(item.text, item.typeGuide)">
+                            <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row> -->
+
         <div v-if="textoFinal">
             <div class="overflow-y-auto border rounded-lg ma-5 pa-2" style="max-height: 300px;">
                 {{ textoFinal }}
@@ -97,6 +148,8 @@
     import { ref, computed, watch } from 'vue';
     import { useOptionsStore } from '@/store/concursos/OptionsStore';
     const optionsStore = useOptionsStore();
+
+    import CardEstatistica  from '@/components/painel/options/guias/cardEstatistica/card.vue'
 
     const props = defineProps({
         selected: {

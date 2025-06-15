@@ -426,6 +426,15 @@ export const useConteudoEditalStore = defineStore("conteudoEditalStore", {
                 console.log('error editar conteudo do edital');
                 snackStore.activeSnack('Ocorreu um erro ao atualizar o conteúdo', 'error',)
             }
+        },
+        unMontedDestruct(){
+            this.editaisUser = []
+            this.edital = {}
+            this.conteudo = {}
+            this.conteudoEdital = []
+            this.conteudoEditalUser = []
+            this.editalUser = {}
+            this.editais = []
         }
   }
 })
