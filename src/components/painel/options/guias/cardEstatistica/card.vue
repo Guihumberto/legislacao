@@ -48,27 +48,12 @@
 
         <!-- Grid de Estatísticas -->
         <v-row class="mb-4">
-          <!-- Total -->
-          <v-col cols="12" sm="4">
-            <v-card 
-              variant="tonal" 
-              color="primary"
-              class="text-center pa-4 stat-mini-card"
-              @click="showDetails = !showDetails"
-              style="cursor: pointer;"
-            >
-              <v-icon size="32" class="mb-2">mdi-format-list-numbered</v-icon>
-              <div class="text-h5 font-weight-bold">{{ stats.total }}</div>
-              <div class="text-body-2 text-medium-emphasis">Total</div>
-            </v-card>
-          </v-col>
-
           <!-- Acertos -->
           <v-col cols="12" sm="4">
             <v-card 
               variant="tonal" 
               color="success"
-              class="text-center pa-4 stat-mini-card"
+              class="text-center pa-2 stat-mini-card"
               @click="showCorrectDetails = !showCorrectDetails"
               style="cursor: pointer;"
             >
@@ -82,13 +67,40 @@
             <v-card 
               variant="tonal" 
               color="error"
-              class="text-center pa-4 stat-mini-card"
+              class="text-center pa-2 stat-mini-card"
               @click="showErrorDetails = !showErrorDetails"
               style="cursor: pointer;"
             >
               <v-icon size="32" class="mb-2">mdi-close-circle</v-icon>
               <div class="text-h5 font-weight-bold text-error">{{ stats.total_incorrect }}</div>
               <div class="text-body-2 text-medium-emphasis">Erros</div>
+            </v-card>
+          </v-col>
+          <!-- Total -->
+           <v-col cols="12" sm="4">
+            <v-card 
+              variant="tonal" 
+              color="warning"
+              class="text-center pa-2 stat-mini-card"
+              @click="showDetails = !showDetails"
+              style="cursor: pointer;"
+              v-if="stats?.total_partial"
+            >
+              <v-icon size="32" class="mb-2">mdi-fraction-one-half</v-icon>
+              <div class="text-h5 font-weight-bold">{{ stats.total_partial }}</div>
+              <div class="text-body-2 text-medium-emphasis">Total</div>
+            </v-card>
+            <v-card 
+              variant="tonal" 
+              color="primary"
+              class="text-center pa-2 stat-mini-card"
+              @click="showDetails = !showDetails"
+              style="cursor: pointer;"
+              v-else
+            >
+              <v-icon size="32" class="mb-2">mdi-format-list-numbered</v-icon>
+              <div class="text-h5 font-weight-bold">{{ stats.total }}</div>
+              <div class="text-body-2 text-medium-emphasis">Total</div>
             </v-card>
           </v-col>
         </v-row>
