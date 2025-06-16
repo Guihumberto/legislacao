@@ -335,7 +335,7 @@
     const getAll = async(id, textoComplementar = null) => {
         await pageStore.getAllPages(id)
         textLaws.value = pageStore.readAllPages
-        const complement = textoComplementar || textoVincular.value
+        const complement = textoComplementar || textoVincular.value.item
         filtrarArtigosDoVincular(complement)
     }
 
@@ -406,10 +406,14 @@
 
     //buscar artigos do vincular leis
 
-    watch(() => textoVincular.value, async (newId, oldId) => {
-        if(textoVincular.value){
+    watch(() => textoVincular.value.item, async (newId, oldId) => {
+        if(textoVincular.value.idLaw){
+            filterJustArt(textoVincular.value.arts.join(','))
+            return
+        }
+        if(textoVincular.value.item){
             await nextTick()
-            filtrarArtigosDoVincular(textoVincular.value)
+            filtrarArtigosDoVincular(textoVincular.value.item)
         }
     })
 

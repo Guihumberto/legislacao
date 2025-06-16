@@ -554,10 +554,18 @@
     provide('listArtsFilter', listArtsTagsFilter)
 
     //receber dados do filho
-    const textoVincular = ref(null)
+    const textoVincular = ref({
+        item: null,
+        arts: [],
+        idLaw: null
+    })
 
-    const vincularDispositivo = (item) => {
-      textoVincular.value = item
+    const vincularDispositivo = (item, arts = [], idLaw = null) => {
+      textoVincular.value = {
+        item,
+        arts,
+        idLaw
+      }
       sidelaw.value = true
     };
 

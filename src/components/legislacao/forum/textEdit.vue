@@ -47,8 +47,10 @@
 
 <script setup>
     import { ref, onMounted, onBeforeUnmount, nextTick, computed, inject } from 'vue'
-
     import { useCommentStore } from '@/store/CommentStore';
+    import { useForumStore } from '@/store/ForumStore';
+    const forumStore = useForumStore()
+
     const commentStore = useCommentStore()
 
     const props = defineProps({
@@ -238,8 +240,9 @@
     }
     const vincularDispositivo = inject('vincularDispositivo');
 
-    const chamarAncestral = (item) => {
-      if (vincularDispositivo) vincularDispositivo(item);
+    const chamarAncestral = (item, arts = [], idLaw = null) => {  
+      if (vincularDispositivo && idLaw) vincularDispositivo(item, arts, idLaw);
+      if (vincularDispositivo && !idLaw) vincularDispositivo(item, arts, idLaw);
     };
 
     const findVinculos = () => {
@@ -248,9 +251,47 @@
         const range = selection.getRangeAt(0)
         const selectedText = range.toString()
         if (!selectedText.trim()) return
+
+        const isArtAlone = extrairArtigos(selectedText)
+
+        if(isArtAlone){
+            chamarAncestral(selectedText, isArtAlone, forumStore.readGroupForum._source.idLaw)
+            return
+        }
         chamarAncestral(selectedText);
     }
 
+    const extrairArtigos = (texto) => {
+        const artigosEncontrados = [];
+
+        // Lista de termos que indicam referência explícita a uma norma
+        const termosProibidos = /\b(Constituição|Lei\s*n[º°o\.]*|\d{4}|Decreto|Medida Provisória|Portaria|Instrução Normativa|Resolução|Normativo|Ato|Estatuto|Código|Ordem)/i;
+
+        // Regex que busca "art. 123", "caput do art. 123", etc.
+        const regexArtigo = /(?:caput do\s*)?art\.\s*(\d+[A-Z\-º]*)/gi;
+
+        // Regex adicional para pegar números sozinhos seguidos de "desta Lei", etc.
+        const regexNumeroDireto = /\b(\d+[A-Z\-º]*)(?=\s+(desta|deste)\s+(Lei|Lei Complementar))/gi;
+
+        // Primeiro: verificar padrão clássico "art."
+        let match;
+        while ((match = regexArtigo.exec(texto)) !== null) {
+            const contexto = texto.slice(match.index, match.index + 100); // trecho de contexto
+            if (!termosProibidos.test(contexto)) {
+                artigosEncontrados.push(match[1].replace('º', ''));
+            }
+        }
+
+        // Segundo: verificar padrão iniciado com número direto
+        while ((match = regexNumeroDireto.exec(texto)) !== null) {
+            const contexto = texto.slice(match.index, match.index + 100);
+            if (!termosProibidos.test(contexto)) {
+                artigosEncontrados.push(match[1].replace('º', ''));
+            }
+        }
+
+        return artigosEncontrados.length > 0 ? artigosEncontrados : false;
+    }
 
     const salvarDispositivo = async () => {
         const editableEl = editable.value
