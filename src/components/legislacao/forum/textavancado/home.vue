@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-    import { ref, watch } from "vue";
+    import { ref, watch, inject, nextTick } from "vue";
 
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
     const mapaMentalStore = useMapaMentalStore()
@@ -122,7 +122,8 @@
 
     const openLaw = (id) => {
         if (childRef.value) {
-            childRef.value.getAll(id)
+            childRef.value.getAll(id, textSerch.value.text)
+            listLaws.value = []
         }
     }
 
@@ -154,6 +155,16 @@
 
     // watch(() => route.query.art, (newId, oldId) => tabSelected.value = 5 )
 
+    const textoVincular = inject('textoVincular')
+
+    watch(() => textoVincular.value, async (newId, oldId) => {
+        if(textoVincular.value){
+            tabSelected.value = 1
+            await nextTick()
+            textSerch.value.text = textoVincular.value
+            searchLaw()
+        }
+    })
 
 </script>
 

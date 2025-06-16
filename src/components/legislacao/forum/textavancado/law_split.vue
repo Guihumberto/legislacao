@@ -26,7 +26,7 @@
                                 density="compact"
                                 label="Busca"
                                 append-inner-icon="mdi-magnify"
-                                v-model.trim="search"
+                                v-model="search"
                                 @keydown.enter="filterJustArt(search)"
                                 :messages="search && !artsFilterActive && listTextLaw.length ? `dispositivos encontrados ${listTextLaw.length}` : ''"
                                 clearable
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide } from "vue";
+    import { ref, computed, watch, onMounted, provide, inject, nextTick } from "vue";
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
@@ -249,15 +249,15 @@
     const listTextLaw = computed(() => {
         let list = listFinal.value
 
-        if(search.value){
-            let searchb = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-            //retirar caracteres especiais
-            let exp = new RegExp(searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
-            //fazer o filtro
-            let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
+        // if(search.value){
+        //     let searchb = search.value.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        //     //retirar caracteres especiais
+        //     let exp = new RegExp(searchb.trim().replace(/[\[\]!'@><|//\\&*()_+=]/g, ""), "i")
+        //     //fazer o filtro
+        //     let filtro =  list.filter(item => exp.test(item.textlaw.normalize('NFD').replace(/[\u0300-\u036f]/g, "") ) || exp.test( item.art ))
 
-            list = filtro
-        } 
+        //     list = filtro
+        // } 
 
         if(artsFilterActive.value){
             let novoFiltro = []
@@ -330,9 +330,13 @@
         return false
     })
 
-    const getAll = async(id) => {
+    const textoVincular = inject('textoVincular')
+
+    const getAll = async(id, textoComplementar = null) => {
         await pageStore.getAllPages(id)
         textLaws.value = pageStore.readAllPages
+        const complement = textoComplementar || textoVincular.value
+        filtrarArtigosDoVincular(complement)
     }
 
     defineExpose({
@@ -400,11 +404,55 @@
         artsFilter.value.push(art)
     }
 
+    //buscar artigos do vincular leis
+
+    watch(() => textoVincular.value, async (newId, oldId) => {
+        if(textoVincular.value){
+            await nextTick()
+            filtrarArtigosDoVincular(textoVincular.value)
+        }
+    })
+
+    const filtrarArtigosDoVincular = async (item) => {
+       await nextTick()
+       const list = extrairNumerosArtigos(item)
+       if(!list.length) return
+       filterJustArt(list.join(','))
+    }
+
+    const extrairNumerosArtigos = (texto) => {
+        // Regex para capturar números após "art.", "artigo", "arts.", "artigos"
+        // Inclui também "no art." e variações
+        // Considera variações como "art. 166", "artigos 165, 166", "art. 45 e 47", "no art. 167, 168"
+        const regex = /(?:no\s+)?(?:artigos?|arts?)\s*\.?\s*([\d\s,e]+?)(?=\s+(?:da|do|de|inciso|parágrafo|§|Lei|Código|\(|$))/gi;
+        
+        const numerosEncontrados = [];
+        let match;
+        
+        while ((match = regex.exec(texto)) !== null) {
+            // Pega o grupo capturado com os números
+            const numerosTexto = match[1];
+            
+            // Extrai todos os números da string capturada
+            const numeros = numerosTexto.match(/\d+/g);
+            
+            if (numeros) {
+                // Converte para números e adiciona ao array
+                numerosEncontrados.push(...numeros.map(num => parseInt(num)));
+            }
+        }
+        
+        // Remove duplicatas e ordena
+        return [...new Set(numerosEncontrados)].sort((a, b) => a - b);
+    }
+
+
     onMounted(() => {
         getAll(1742907731755)
     })
 
     import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
+import { te } from "date-fns/locale";
 
 
 </script>

@@ -36,6 +36,7 @@
                     <v-btn icon @click.stop.prevent="applyColor('red')" title="cor do texto vermelho"><v-icon color="red">mdi-format-color-text</v-icon></v-btn>
                     <v-btn icon @click.stop.prevent="applyColor('blue')" title="cor do texto azul"><v-icon color="blue">mdi-format-color-text</v-icon></v-btn>
                     <v-btn icon @click.stop.prevent="removerFormatacao" :title="'Remover formatação'"><v-icon>mdi-format-clear</v-icon></v-btn>
+                    <v-btn color="primary" icon @click="findVinculos" title="Vínculos"><v-icon>mdi-link</v-icon></v-btn>
                     <v-btn icon @click="menu = false" title="Fechar"><v-icon>mdi-close-circle</v-icon></v-btn>
                 </v-btn-group>
             </v-card>
@@ -45,7 +46,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+    import { ref, onMounted, onBeforeUnmount, nextTick, computed, inject } from 'vue'
 
     import { useCommentStore } from '@/store/CommentStore';
     const commentStore = useCommentStore()
@@ -103,7 +104,6 @@
             }
         }
     };
-
 
     const menu = ref(false)
     const menuRef = ref(null)
@@ -234,7 +234,23 @@
         document.execCommand('removeFormat')
         salvarDispositivo()
         handleInput() // Sincroniza a mudança
+    
     }
+    const vincularDispositivo = inject('vincularDispositivo');
+
+    const chamarAncestral = (item) => {
+      if (vincularDispositivo) vincularDispositivo(item);
+    };
+
+    const findVinculos = () => {
+        const selection = window.getSelection()
+        if (!selection.rangeCount) return
+        const range = selection.getRangeAt(0)
+        const selectedText = range.toString()
+        if (!selectedText.trim()) return
+        chamarAncestral(selectedText);
+    }
+
 
     const salvarDispositivo = async () => {
         const editableEl = editable.value
@@ -301,7 +317,106 @@
         // emit('update:dispositivo', updatedDispositivo)
     }
 
+    // Buscar referencias
+
+    // Estado reativo
+    const panelState = ref({
+        isOpen: false,
+        loading: false,
+        content: null,
+        currentReference: null
+    })
+
+    // Padrões de regex melhorados para captura de referências
+    const referencePatterns = [
+        {
+            id: 'article_internal',
+            pattern: /\b(art\.?\s*\d+(?:\s*-?[A-Za-z])?)\b/gi,
+            type: 'internal_article',
+            description: 'Artigo da própria lei',
+            icon: 'mdi-file-document-outline',
+            color: 'blue'
+        },
+        {
+            id: 'article_external',
+            pattern: /\b(art\.?\s*\d+(?:\s*-?[A-Za-z])?\s+da\s+Lei\s+n[ºo°]\s*[\d.-]+(?:\s*,\s*de\s+\d+\s+de\s+\w+\s+de\s+\d+)?(?:\s*\([^)]+\))?)\b/gi,
+            type: 'external_article',
+            description: 'Artigo de lei externa',
+            icon: 'mdi-file-document-multiple-outline',
+            color: 'green'
+        },
+        {
+            id: 'paragraph',
+            pattern: /\b(§\s*\d+[ºo°]|parágrafo\s+\d+[ºo°]|parágrafo\s+único)\b/gi,
+            type: 'paragraph',
+            description: 'Parágrafo',
+            icon: 'mdi-format-paragraph',
+            color: 'orange'
+        },
+        {
+            id: 'inciso',
+            pattern: /\b(inciso\s+[IVX]+)\b/gi,
+            type: 'inciso',
+            description: 'Inciso',
+            icon: 'mdi-format-list-numbered',
+            color: 'purple'
+        },
+        {
+            id: 'caput',
+            pattern: /\b(caput\s+(?:deste\s+artigo|do\s+art\.?\s*\d+))\b/gi,
+            type: 'caput',
+            description: 'Caput do artigo',
+            icon: 'mdi-format-header-1',
+            color: 'teal'
+        },
+        {
+            id: 'alinea',
+            pattern: /\b(alínea\s+[a-z])\b/gi,
+            type: 'alinea',
+            description: 'Alínea',
+            icon: 'mdi-format-list-bulleted',
+            color: 'indigo'
+        }
+    ]
+
+    const processedContent = computed(() => {
+        let processed = props.dispositivo.textlaw
+        let referenceIndex = 0
+
+        referencePatterns.forEach(patternObj => {
+            processed = processed.replace(patternObj.pattern, (match, p1, offset) => {
+            const refId = `ref_${referenceIndex++}`
+            const cleanMatch = match.trim()
+            
+            return `<span 
+                class="legal-reference ${patternObj.type}" 
+                data-ref-id="${refId}"
+                data-reference="${cleanMatch}"
+                data-type="${patternObj.type}"
+                data-pattern-id="${patternObj.id}"
+                onclick="window.handleReferenceClick('${refId}', '${cleanMatch}', '${patternObj.type}', '${patternObj.id}')"
+                title="Clique para ver a referência: ${cleanMatch}"
+            >${match}</span>`
+            })
+        })
+
+        return processed
+    })
+
+    // Função para lidar com clique na referência
+    const handleReferenceClick = async (refId, referenceText, type, patternId) => {
+    }
+
+    // Função para buscar conteúdo da referência
+    const findReferenceContent = (reference, type) => {
+    }
+
+    // Busca no documento atual
+    const searchInCurrentDocument = (reference) => {
+    }
+
     onMounted(() => {
+        window.handleReferenceClick = handleReferenceClick
         document.addEventListener('click', handleClickOutside)
         document.addEventListener('scroll', handleScroll, true)
         
@@ -332,14 +447,113 @@
 }
 
 .no-drag{
-    .textP{
-    user-drag: none;
-    user-select: none;
-    -webkit-user-drag: none;   /* Para Safari */
-    -webkit-user-select: none; /* Para Safari */
-    -moz-user-select: none;    /* Para Firefox */
-    -ms-user-select: none;     /* Para I/* padrão */
+    .textP {
+        user-drag: none;
+        user-select: none;
+        -webkit-user-drag: none;   /* Para Safari */
+        -webkit-user-select: none; /* Para Safari */
+        -moz-user-select: none;    /* Para Firefox */
+        -ms-user-select: none;     /* Para I/* padrão */
+    }
 }
+
+.legal-text-system {
+  height: 100vh;
+  background-color: #fafafa;
+}
+
+.main-content {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.reference-sidebar {
+  height: 100vh;
+  border-left: 1px solid #e0e0e0;
+}
+
+.reference-card {
+  height: 100vh;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.legal-content {
+  line-height: 1.8;
+  font-size: 16px;
+  text-align: justify;
+  font-family: 'Roboto', sans-serif;
+}
+
+:deep(.legal-reference) {
+  cursor: pointer;
+  padding: 2px 6px;
+  margin: 0 1px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  display: inline-block;
+  position: relative;
+}
+
+:deep(.legal-reference:hover) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-decoration: none;
+}
+
+:deep(.legal-reference.internal_article) {
+  color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.1);
+  border: 1px solid rgba(25, 118, 210, 0.2);
+}
+
+:deep(.legal-reference.external_article) {
+  color: #388e3c;
+  background-color: rgba(56, 142, 60, 0.1);
+  border: 1px solid rgba(56, 142, 60, 0.2);
+}
+
+:deep(.legal-reference.paragraph) {
+  color: #f57c00;
+  background-color: rgba(245, 124, 0, 0.1);
+  border: 1px solid rgba(245, 124, 0, 0.2);
+}
+
+:deep(.legal-reference.inciso) {
+  color: #7b1fa2;
+  background-color: rgba(123, 31, 162, 0.1);
+  border: 1px solid rgba(123, 31, 162, 0.2);
+}
+
+:deep(.legal-reference.caput) {
+  color: #00796b;
+  background-color: rgba(0, 121, 107, 0.1);
+  border: 1px solid rgba(0, 121, 107, 0.2);
+}
+
+:deep(.legal-reference.alinea) {
+  color: #303f9f;
+  background-color: rgba(48, 63, 159, 0.1);
+  border: 1px solid rgba(48, 63, 159, 0.2);
+}
+
+.content-box {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  border-left: 4px solid #1976d2;
+}
+
+.content-box :deep(strong) {
+  color: #1976d2;
 }
 
 </style>

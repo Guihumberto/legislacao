@@ -553,6 +553,17 @@
 
     provide('listArtsFilter', listArtsTagsFilter)
 
+    //receber dados do filho
+    const textoVincular = ref(null)
+
+    const vincularDispositivo = (item) => {
+      textoVincular.value = item
+      sidelaw.value = true
+    };
+
+    provide('vincularDispositivo', vincularDispositivo);
+    provide('textoVincular', textoVincular);
+
     const leftPanel = ref(null);
     const rightPanel = ref(null);
     const divider = ref(null);
