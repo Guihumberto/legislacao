@@ -406,7 +406,8 @@
 
     //buscar artigos do vincular leis
 
-    watch(() => textoVincular.value.item, async (newId, oldId) => {
+    watch(() => textoVincular.value, async (newId, oldId) => {
+        clearAllArtsFilter()
         if(textoVincular.value.idLaw){
             filterJustArt(textoVincular.value.arts.join(','))
             return
@@ -428,25 +429,22 @@
         // Regex para capturar números após "art.", "artigo", "arts.", "artigos"
         // Inclui também "no art." e variações
         // Considera variações como "art. 166", "artigos 165, 166", "art. 45 e 47", "no art. 167, 168"
-        const regex = /(?:no\s+)?(?:artigos?|arts?)\s*\.?\s*([\d\s,e]+?)(?=\s+(?:da|do|de|inciso|parágrafo|§|Lei|Código|\(|$))/gi;
-        
+         const regex = /(?:no\s+)?(?:artigos?|arts?)\s*\.?\s*([\d\s,e\-A-Z]+?)(?=\s+(?:da|do|de|inciso|parágrafo|§|Lei|Código|\(|$))/gi;
+    
         const numerosEncontrados = [];
         let match;
-        
+
         while ((match = regex.exec(texto)) !== null) {
-            // Pega o grupo capturado com os números
             const numerosTexto = match[1];
-            
-            // Extrai todos os números da string capturada
-            const numeros = numerosTexto.match(/\d+/g);
-            
-            if (numeros) {
-                // Converte para números e adiciona ao array
-                numerosEncontrados.push(...numeros.map(num => parseInt(num)));
+
+            // Extrai apenas os números antes de qualquer traço (ex: "156-A" vira "156")
+            const numeros = [...numerosTexto.matchAll(/\d+/g)].map(m => parseInt(m[0]));
+
+            if (numeros.length) {
+                numerosEncontrados.push(...numeros);
             }
         }
-        
-        // Remove duplicatas e ordena
+
         return [...new Set(numerosEncontrados)].sort((a, b) => a - b);
     }
 

@@ -157,8 +157,10 @@
 
     const textoVincular = inject('textoVincular')
 
-    watch(() => textoVincular.value.item, async (newId, oldId) => {
+    watch(() => textoVincular.value, async (newId, oldId) => {
         if(textoVincular.value.idLaw){
+           tabSelected.value = 1
+           await nextTick()
            textSerch.value.text = ''
            openLaw(textoVincular.value.idLaw)
            return
@@ -166,6 +168,7 @@
         if(textoVincular.value.item){
             tabSelected.value = 1
             await nextTick()
+            textSerch.value.fonte = ['leis-federais']
             textSerch.value.text = textoVincular.value.item
             searchLaw()
             return

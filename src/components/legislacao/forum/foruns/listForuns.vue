@@ -1,15 +1,7 @@
 <template>
     <div class="my-5">
         <!-- Botão para criar nova pasta -->
-        <div class="mb-4 d-flex justify-space-between align-center">
-            <v-btn
-                color="primary"
-                variant="outlined"
-                prepend-icon="mdi-check-circle"
-                @click="$router.push('/permissoes')"
-            >
-                Permissões
-            </v-btn>
+        <div class="mb-4 d-flex justify-end align-center">
             <v-btn
                 color="primary"
                 variant="outlined"

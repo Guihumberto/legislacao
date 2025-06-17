@@ -3,7 +3,17 @@
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
             <div class="d-flex justify-space-between align-center">
                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-forum</v-icon>Meus Foruns</h1>
-                <ConfigMyGroup :groups="forumStore.readMyGroup" />
+                <div>
+                    <v-btn
+                        variant="text"
+                        prepend-icon="mdi-check-circle"
+                        @click="$router.push('/permissoes')"
+                        title="permissões"
+                        icon="mdi-lock"
+                    >
+                    </v-btn>
+                    <ConfigMyGroup :groups="forumStore.readMyGroup" />
+                </div>
             </div>
             <ListForuns />
         </div>

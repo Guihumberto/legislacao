@@ -34,7 +34,13 @@ export const usePageStore = defineStore("page", {
                 this.load = false
             }
         },
-        async getAllPages(id){
+        async getAllPages(id, tipo = null){
+            const must = [];
+
+            if (id) {
+                must.push({ match: { "page_to_norma.parent": id } });
+            }
+
             try {
                 this.load = true
                 const response = await api.post("pages_v2/_search", {
@@ -42,13 +48,7 @@ export const usePageStore = defineStore("page", {
                     size: 5000,
                     "query": {
                         "bool": {
-                            "must": [
-                                {
-                                    "match": {
-                                        "page_to_norma.parent": id
-                                    }
-                                }
-                            ]
+                            must
                         }
                     }
                 })

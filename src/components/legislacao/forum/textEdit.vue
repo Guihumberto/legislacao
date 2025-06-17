@@ -264,6 +264,12 @@
     const extrairArtigos = (texto) => {
         const artigosEncontrados = [];
 
+        // Se o texto for apenas um número (ex: 156 ou "156")
+        if (/^\d+$/.test(texto.trim())) {
+            artigosEncontrados.push(texto.trim());
+            return artigosEncontrados;
+        }
+
         // Lista de termos que indicam referência explícita a uma norma
         const termosProibidos = /\b(Constituição|Lei\s*n[º°o\.]*|\d{4}|Decreto|Medida Provisória|Portaria|Instrução Normativa|Resolução|Normativo|Ato|Estatuto|Código|Ordem)/i;
 
@@ -273,8 +279,9 @@
         // Regex adicional para pegar números sozinhos seguidos de "desta Lei", etc.
         const regexNumeroDireto = /\b(\d+[A-Z\-º]*)(?=\s+(desta|deste)\s+(Lei|Lei Complementar))/gi;
 
-        // Primeiro: verificar padrão clássico "art."
         let match;
+
+        // Primeiro: verificar padrão clássico "art."
         while ((match = regexArtigo.exec(texto)) !== null) {
             const contexto = texto.slice(match.index, match.index + 100); // trecho de contexto
             if (!termosProibidos.test(contexto)) {
@@ -291,6 +298,7 @@
         }
 
         return artigosEncontrados.length > 0 ? artigosEncontrados : false;
+
     }
 
     const salvarDispositivo = async () => {
