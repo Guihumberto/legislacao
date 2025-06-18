@@ -9,7 +9,7 @@ export const createNotificationPayload = (type, data) => {
       return {
         ...basePayload,
         type: 'law',
-        title: 'Nova Lei Adicionada',
+        title: 'Nova Norma Adicionada',
         message: `A lei "${data.title}" foi adicionada ao sistema`,
         metadata: { lawId: data.id, lawTitle: data.title },
         actionUrl: `/laws/${data.id}`,

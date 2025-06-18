@@ -163,7 +163,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
       notification.isRead = true
       notification.readAt = new Date()
 
-      const controleNot = notifications.value.find(n => n.notificationId === notificationId)
+      const controleNot = notifications.value.find(n => n?.notificationId === notificationId)
       if(!controleNot) {
         notifications.value.push({
           id: cpf + notificationId,
@@ -175,7 +175,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
           broadcast: notification.broadcast
         })
       }
-      controleNot.isRead = true
+      // controleNot.isRead = true
 
       // Notifica outros dispositivos via WebSocket
       if (isConnected.value) {

@@ -28,7 +28,7 @@ export const notificationService = {
   async createLawNotification(lawData) {
     const notification = {
       type: 'law',
-      title: 'Nova Lei Adicionada',
+      title: 'Nova Norma Adicionada',
       message: `A Norma "${lawData.title}" foi adicionada ao sistema`,
       metadata: {
         lawId: lawData.id,

@@ -303,7 +303,7 @@ const getNotificationColor = (type) => {
 
 const getTypeLabel = (type) => {
   const labels = {
-    law: 'Nova Lei',
+    law: 'Nova Norma',
     revision: 'Nova Revisão',
     system: 'Sistema',
     announcement: 'Anúncio'
