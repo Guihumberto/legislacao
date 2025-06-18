@@ -2,6 +2,9 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
+import { useSnackStore } from "./snackStore";
+import { useNotificationsStore } from '@/store/NotificationsStore'
+import { notificationService } from '@/services/notificationService'
 
 export const useAdminStore = defineStore("admin", {
     state: () => ({
@@ -133,6 +136,7 @@ export const useAdminStore = defineStore("admin", {
         },
         async indexarNorma(law, pages){
             const loginStore = useLoginStore()
+            const snackStore = useSnackStore()
             const cpf = loginStore.readLogin.cpf
             const saveLaw = 'indexar nova norma'
             try {
@@ -140,17 +144,20 @@ export const useAdminStore = defineStore("admin", {
                 const exist = await this.lawExist(law)
 
                 if(exist){
-                    console.log('nome de lei existe', exist);
                     return {idU:"error", text: "Erro: norma já adicionada"}
                 } 
 
                 const respLaw = await this.indexarLaw(law)
                 await this.indexarPages(law, pages)
                 await this.saveLogTransacoes( respLaw.data._id, cpf, saveLaw)
-                return {idU: respLaw.data._id, id_law: law.id}
 
+                snackStore.activeSnack('Norma adicionada com sucesso', 'success')
+                law.tags = [law.tipo, law.ano]
+                this.createNotificação(law)
+                return {idU: respLaw.data._id, id_law: law.id}
             } catch (error) {
                 console.log('erro indexar');
+                snackStore.activeSnack('Erro ao indexar norma', 'error')
             } finally {
                 this.load = false
             }
@@ -228,6 +235,26 @@ export const useAdminStore = defineStore("admin", {
             } catch (error) {
                 console.log('error law exist');
             } 
+        },
+        async createNotificação(item){
+            const notificationsStore = useNotificationsStore()
+            try {
+                // Criar notificação para todos os usuários
+                await notificationService.createLawNotification(item)
+                
+                // Atualizar store local se necessário
+                notificationsStore.addNotification({
+                    type: 'law',
+                    title: 'Nova Norma Adicionada',
+                    message: `A lei "${item.title}" foi adicionada ao sistema`,
+                    actionUrl: `/avancado/${item.id}`
+                })
+                
+                // Sucesso
+                console.log('Lei criada e notificação enviada!')
+            } catch (error) {
+                console.error('Erro ao criar lei:', error)
+            }
         },
     }
 })

@@ -42,7 +42,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
           sort: 'createdAt:desc'
         }
       })
-      
+
        // Com axios, os dados já vêm em response.data
       notifications.value = response.data.hits?.hits?.map(hit => ({
         id: hit._id,

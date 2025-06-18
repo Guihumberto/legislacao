@@ -29,13 +29,13 @@ export const notificationService = {
     const notification = {
       type: 'law',
       title: 'Nova Lei Adicionada',
-      message: `A lei "${lawData.title}" foi adicionada ao sistema`,
+      message: `A Norma "${lawData.title}" foi adicionada ao sistema`,
       metadata: {
         lawId: lawData.id,
         lawTitle: lawData.title,
         tags: lawData.tags || []
       },
-      actionUrl: `/laws/${lawData.id}`,
+      actionUrl: `/avancado/${lawData.id}`,
       createdAt: new Date().toISOString(),
       isRead: false,
       broadcast: true // Para todos os usuários
@@ -61,7 +61,7 @@ export const notificationService = {
       isRead: false
     }))
 
-    // Indexar todas as notificações
+    // Indexar todas as notificações 
     const promises = notifications.map(notification => 
       index(NOTIFICATIONS_INDEX, notification)
     )

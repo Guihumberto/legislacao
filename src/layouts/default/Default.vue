@@ -110,8 +110,8 @@
     await consultaStore.contadores()
 
     try {
-      await notificationsStore.initializeWebSocket()
-      await notificationsStore.fetchNotifications()
+      // await notificationsStore.initializeWebSocket()
+      // await notificationsStore.fetchNotifications()
     } catch (error) {
       console.error('Erro ao inicializar notificações:', error)
     }

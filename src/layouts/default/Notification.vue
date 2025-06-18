@@ -154,6 +154,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useNotificationsStore } from '@/store/NotificationsStore'
 import { formatDistanceToNow } from 'date-fns'
@@ -173,10 +174,10 @@ const {
   error,
   unreadCount,
   sortedNotifications
-} = notificationsStore
+} = storeToRefs(notificationsStore)
 
 const recentNotifications = computed(() => 
-  sortedNotifications.slice(0, 5)
+  sortedNotifications.value.slice(0, 5)
 )
 
 // Methods

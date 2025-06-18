@@ -282,7 +282,6 @@ export const useOptionsStore = defineStore("optionsStore", {
         },
         async createNotificação(item){
             const notificationsStore = useNotificationsStore()
-            console.log('createNotifcao', item);
             try {
                 // Criar notificação para todos os usuários
                 await notificationService.createLawNotification(item)
