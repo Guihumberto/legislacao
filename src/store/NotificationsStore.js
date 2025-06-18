@@ -98,7 +98,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
     try {
       // Exemplo de chamada para Elasticsearch
       const response = await api.post('notifications/_search', {
-        size: 10,
+        size: 1000,
         sort: [
           { "createdAt": { "order": "desc" } }
         ],
