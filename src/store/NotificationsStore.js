@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useWebSocket } from '@/composables/useWebSocket'
+import { useLoginStore } from '@/store/LoginStore'
+import { notificationService } from '@/services/notificationService'
 import api from "@/services/api"
 
 export const useNotificationsStore = defineStore('notifications', () => {
@@ -14,7 +16,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
 
   // Computed
   const unreadCount = computed(() => 
-    notifications.value.filter(n => !n.isRead).length
+    sortedNotifications.value.filter(n => !n.isRead).length
   )
 
   const lawNotifications = computed(() => 
@@ -25,9 +27,68 @@ export const useNotificationsStore = defineStore('notifications', () => {
     notifications.value.filter(n => n.type === 'revision')
   )
 
-  const sortedNotifications = computed(() => 
-    [...notifications.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  )
+  const listNotifications = computed(() => {
+    const list = notifications.value.filter(n => n.type === 'law' || n.type === 'revision')
+    return [...list].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  })
+
+  const controlesRead = computed(() => {
+    const list = notifications.value.filter(n => n.type === 'controle')
+    return list
+  })
+
+  const sortedNotifications = computed(() => {
+    const controleMap = new Map();
+
+    controlesRead.value.forEach(c => {
+      const source = c
+      controleMap.set(source.notificationId, source);
+    });
+
+    // Agora monta o resultado final:
+    const finalNotifications = listNotifications.value.filter(n => {
+      const controle = controleMap.get(n.id);
+
+      // Se foi deletada, exclui
+      if (controle?.isDeleted) {
+        return false;
+      }
+
+      // Caso contrário, mantém
+      return true;
+    }).map(n => {
+      const controle = controleMap.get(n.id);
+
+      return {
+        ...n,
+        isRead: controle?.isRead || false
+      };
+    });
+
+    return [...finalNotifications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  })  
+
+  const formatDate = computed(() => {
+      const now = new Date();
+      
+      const day = String(now.getDate()).padStart(2, '0');  // Garante 2 dígitos para o dia
+      const month = String(now.getMonth() + 1).padStart(2, '0');  // Meses começam em 0, então somamos 1
+      const year = now.getFullYear();
+      
+      const hours = String(now.getHours()).padStart(2, '0');  // Garante 2 dígitos para a hora
+      const minutes = String(now.getMinutes()).padStart(2, '0');  // Garante 2 dígitos para os minutos
+      
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+  })
+
+  const userLogin = computed(() => {
+      const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+      const login = {
+          login: JSON.parse(data).cpf,
+          password: JSON.parse(data).password
+      } 
+      return login.login
+  })
 
   // Actions
   const fetchNotifications = async () => {
@@ -36,12 +97,33 @@ export const useNotificationsStore = defineStore('notifications', () => {
     
     try {
       // Exemplo de chamada para Elasticsearch
-      const response = await api.get('notifications/_search', {
-        params: {
-          size: 10,
-          sort: 'createdAt:desc'
+      const response = await api.post('notifications/_search', {
+        size: 10,
+        sort: [
+          { "createdAt": { "order": "desc" } }
+        ],
+        query: {
+            "bool":{
+              "should":[
+                    {
+                      bool: {
+                          must: [
+                              { "terms": { type: ["law", "pessoal"] } }
+                          ]
+                      }
+                  },
+                  {
+                      "bool": {
+                          "must": [
+                              { "terms": { "type": ["controle"] }},
+                              { "term": { "user_id": userLogin.value }},
+                          ]
+                      }
+                  }
+              ]
+           }
         }
-      })
+      });
 
        // Com axios, os dados já vêm em response.data
       notifications.value = response.data.hits?.hits?.map(hit => ({
@@ -59,18 +141,41 @@ export const useNotificationsStore = defineStore('notifications', () => {
   }
 
   const markAsRead = async (notificationId) => {
+    const loginStore = useLoginStore()
+    const cpf = loginStore.readLogin?.cpf || null
+    if(!cpf) return
+
     try {
       const notification = notifications.value.find(n => n.id === notificationId)
       if (!notification || notification.isRead) return
 
-      // Atualiza no servidor usando axios
-      await api.patch(`notifications/${notificationId}`, {
-        isRead: true
+      //Atualiza no servidor usando axios
+      const response = await api.put(`notifications/_doc/${cpf + notificationId}`, {
+        notificationId,
+        isRead: true,
+        date_read: formatDate.value,
+        user_id: cpf,
+        type: 'controle',
+        broadcast: notification.broadcast
       })
 
       // Atualiza localmente
       notification.isRead = true
       notification.readAt = new Date()
+
+      const controleNot = notifications.value.find(n => n.notificationId === notificationId)
+      if(!controleNot) {
+        notifications.value.push({
+          id: cpf + notificationId,
+          notificationId,
+          isRead: true,
+          readAt: new Date(),
+          type: 'controle',
+          user_id: cpf,
+          broadcast: notification.broadcast
+        })
+      }
+      controleNot.isRead = true
 
       // Notifica outros dispositivos via WebSocket
       if (isConnected.value) {
@@ -87,12 +192,29 @@ export const useNotificationsStore = defineStore('notifications', () => {
     }
   }
 
-  const initializeWebSocket = () => {
-    // connect()
-  }
+  const markAsNotRead  = async (notificationId) => {
+    const loginStore = useLoginStore()
+    const cpf = loginStore.readLogin?.cpf || null
+    if(!cpf) return
 
-  const disconnectWebSocket = () => {
-    // disconnect()
+    try {
+      const notification = notifications.value.find(n => n.id === notificationId)
+      const controleNot = notifications.value.find(n => n.notificationId === notificationId)
+      if (!notification || notification.isRead) return
+
+      const resp = await api.post(`notifications/_update/${cpf + notificationId}`, {
+        "doc":{
+            isRead: false
+        }
+      })
+
+      notification.isRead = false
+      notification.readAt = new Date()
+      controleNot.isRead = false
+
+    } catch (error) {
+      console.log('error marcar como nao lida');
+    }
   }
 
   const markAllAsRead = async () => {
@@ -103,18 +225,9 @@ export const useNotificationsStore = defineStore('notifications', () => {
 
       if (unreadIds.length === 0) return
 
-      // Atualiza no servidor usando axios
-      await api.patch('notifications/mark-all-read', {
-        notificationIds: unreadIds
-      })
-
-      // Atualiza localmente
-      notifications.value.forEach(notification => {
-        if (!notification.isRead) {
-          notification.isRead = true
-          notification.readAt = new Date()
-        }
-      })
+      for (const id of unreadIds) {
+        await markAsRead(id)
+      }
 
     } catch (err) {
       error.value = err.response?.data?.message || err.message || 'Erro ao marcar todas como lidas'
@@ -123,9 +236,20 @@ export const useNotificationsStore = defineStore('notifications', () => {
   }
 
   const deleteNotification = async (notificationId) => {
+    const loginStore = useLoginStore()
+    const cpf = loginStore.readLogin?.cpf || null
+    if(!cpf) return
+
     try {
-      // Deleta no servidor usando axios
-      await api.delete(`notifications/${notificationId}`)
+      const resp = await api.post(`notifications/_update/${cpf + notificationId}`, {
+        "doc":{
+            notificationId,
+            isDeleted: true,
+            date_deleted: formatDate.value,
+            user_id: cpf,
+            type: 'controle',
+        }
+      })
 
       // Remove localmente
       const index = notifications.value.findIndex(n => n.id === notificationId)
@@ -147,6 +271,14 @@ export const useNotificationsStore = defineStore('notifications', () => {
       ...notification
     }
     notifications.value.unshift(newNotification)
+  }
+
+  const initializeWebSocket = () => {
+    // connect()
+  }
+
+  const disconnectWebSocket = () => {
+    // disconnect()
   }
 
   // Função auxiliar para obter token (implemente conforme sua autenticação)
@@ -179,6 +311,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
     // Actions
     fetchNotifications,
     markAsRead,
+    markAsNotRead,
     markAllAsRead,
     deleteNotification,
     addNotification,

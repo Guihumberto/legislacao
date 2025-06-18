@@ -8,28 +8,26 @@
     max-height="500"
   >
     <template v-slot:activator="{ props }">
-      <v-badge
-        :content="unreadCount"
-        :model-value="unreadCount > 0"
-        color="error"
-        size="small"
-        dot
+      <v-btn 
+        class="text-none" 
+        variant="text"  
+        :loading="loading"
+        v-bind="props"
+        icon
+        density="compact"
       >
-        <v-btn
-          icon
-          variant="text"
-          v-bind="props"
-          :loading="loading"
-          density="compact"
+        <v-badge 
+          color="error" 
+          :content="unreadCount"
+          :model-value="unreadCount > 0"
+          size="small"
         >
-          <v-icon 
-            :color="unreadCount > 0 ? 'white' : 'default'"
-            size="18"
-          >
-            mdi-bell{{ unreadCount > 0 ? '' : '-outline' }}
-          </v-icon>
-        </v-btn>
-      </v-badge>
+          <v-icon
+             size="18"
+             :color="unreadCount > 0 ? 'white' : 'default'"
+          > mdi-bell{{ unreadCount > 0 ? '' : '-outline' }}</v-icon>
+        </v-badge>
+      </v-btn>
     </template>
 
     <v-card class="notification-dropdown" elevation="8">

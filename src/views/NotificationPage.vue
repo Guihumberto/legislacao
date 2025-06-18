@@ -12,7 +12,7 @@
             <div class="d-flex gap-3">
               <v-btn-toggle v-model="filterType" color="primary" variant="outlined" divided>
                 <v-btn value="all" size="small">
-                  Todas ({{ notifications.length }})
+                  Todas ({{ notifications.filter(x => x.type == 'law' || x.type == 'revision').length }})
                 </v-btn>
                 <v-btn value="unread" size="small">
                   Não lidas ({{ unreadCount }})
@@ -224,6 +224,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useNotificationsStore } from '@/store/NotificationsStore'
 import { format } from 'date-fns'
@@ -242,6 +243,7 @@ const markingAllAsRead = ref(false)
 
 // Computed
 const {
+  listNotifications,
   notifications,
   loading,
   error,
@@ -249,18 +251,18 @@ const {
   lawNotifications,
   revisionNotifications,
   sortedNotifications
-} = notificationsStore
+} = storeToRefs(notificationsStore)
 
 const filteredNotifications = computed(() => {
   switch (filterType.value) {
     case 'unread':
-      return sortedNotifications.filter(n => !n.isRead)
+      return sortedNotifications.value.filter(n => !n.isRead)
     case 'law':
-      return lawNotifications
+      return lawNotifications.value
     case 'revision':
-      return revisionNotifications
+      return revisionNotifications.value
     default:
-      return sortedNotifications
+      return sortedNotifications.value
   }
 })
 
@@ -359,12 +361,18 @@ const markAsRead = async (notificationId) => {
 }
 
 const markAsUnread = async (notificationId) => {
-  // Implementar no store se necessário
-  const notification = notifications.find(n => n.id === notificationId)
+  const notification = notifications.value.find(n => n.id === notificationId)
   if (notification) {
     notification.isRead = false
     notification.readAt = null
   }
+
+  try {
+    await notificationsStore.markAsNotRead(notificationId);
+  } catch (error) {
+    notification.isRead = true
+  }
+ 
 }
 
 const markAllAsRead = async () => {
