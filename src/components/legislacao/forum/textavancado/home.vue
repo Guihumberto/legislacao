@@ -53,6 +53,7 @@
                 <Vinculos v-if="tabSelected == 4" />
                 <Questoes v-if="tabSelected == 5" />
                 <MindMapAll v-if="tabSelected == 6" :mapasMentais="mapaMentalStore.readMapaMental" />
+                <BlogLaw v-if="tabSelected == 7"  />
             </div>
         </section>
     </div>
@@ -76,6 +77,7 @@
     import Questoes from "./questoes.vue";
     import Vinculos from "./vinculos.vue";
     import MindMapAll from "./mindMapAll.vue";
+    import BlogLaw from "./blogLaw.vue";
 
     const tabSelected = ref(1)
     
@@ -115,6 +117,11 @@
             id: 6,
             name: 'Mapas mentais',
             icon: 'mdi-sitemap'
+        },
+        {
+            id: 7,
+            name: 'Bloi da Lei',
+            icon: 'mdi-post-outline'
         }
     ]
 
