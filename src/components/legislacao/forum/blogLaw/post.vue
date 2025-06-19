@@ -44,7 +44,7 @@
             <div class="mb-4">
               <v-chip-group>
                 <v-chip
-                  v-for="palavra in item.palavras_chaves.slice(0, showAllKeywords.has(index) ? item.palavras_chaves.length : 4)"
+                  v-for="palavra in item?.palavras_chaves?.slice(0, showAllKeywords.has(index) ? item.palavras_chaves?.length : 4)"
                   :key="palavra"
                   size="x-small"
                   variant="outlined"
@@ -53,12 +53,12 @@
                   {{ palavra }}
                 </v-chip>
                 <v-chip
-                  v-if="item.palavras_chaves.length > 4 && !showAllKeywords.has(index)"
+                  v-if="item?.palavras_chaves?.length > 4 && !showAllKeywords.has(index)"
                   size="x-small"
                   variant="text"
                   @click.stop="toggleKeywords(index)"
                 >
-                  +{{ item.palavras_chaves.length - 4 }} mais
+                  +{{ item?.palavras_chaves?.length - 4 }} mais
                 </v-chip>
               </v-chip-group>
             </div>
@@ -202,9 +202,7 @@
                 </div>
               </v-expand-transition>
             </div>
-          </v-card-text>
-
-         
+          </v-card-text>    
         </v-card>
       </div>
     </div>

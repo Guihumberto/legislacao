@@ -108,13 +108,12 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
         postData.createdAt = formatDate.value
         postData.texto = dipositivosText.replace(/<[^>]*>/g, '');
 
-        console.log('postData', postData    );
-
         try {
             const resp = await apiChat.post('forum/gerar_post', postData)
 
-            console.log('resp api', resp.data);
-            posts.value.push({ ...resp.data.analysisData })
+            console.log('resp api', resp.data.data);
+            delete postData.texto
+            posts.value.push({ ...postData, ...resp.data.data })
             return resp.data.analysisData
         } catch (err) {
             error.value = err.response?.data?.message || err.message || 'Erro ao criar post'
