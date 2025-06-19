@@ -82,7 +82,7 @@
               <div class="d-flex align-center mb-2">
                 <v-icon size="small" color="primary" class="mr-2">mdi-format-list-checks</v-icon>
                 <span class="text-subtitle-2 font-weight-medium">
-                  {{ item.questoes.length }} quest{{ item.questoes.length > 1 ? 'ões' : 'ão' }}
+                  {{ item?.questoes?.length }} quest{{ item?.questoes?.length > 1 ? 'ões' : 'ão' }}
                 </span>
               </div>
 

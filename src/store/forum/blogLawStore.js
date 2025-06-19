@@ -97,7 +97,7 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
     }
 
     const generetePostIa = async (postData) => {
-        if(userLogin.value) return
+        // if(userLogin.value) return
 
         const arts = [  postData.art, ...postData.arts].map(art => parseInt(art))
         const artsNoRepeat = [...new Set(arts)]
