@@ -58,8 +58,8 @@
     const rightWidth = inject('rightWidth')
     
     const posts = computed(() => blogLawStore.sortedPosts)
-    const getPostLaw = async() => {
-        blogLawStore.fetchPosts()
+    const getPostLaw = async(id) => {
+        blogLawStore.fetchPosts(id)
     }
 
     const mapaMental = {

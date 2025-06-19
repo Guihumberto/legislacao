@@ -44,14 +44,9 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
     const fetchPosts = async (id) => {
         loading.value = true
         error.value = null
-
-        console.log('fetchposts', userLogin.value);
         try {
-            const response = await api.get('blog_law_v2/_search', {
+            const response = await api.post('blog_law_v2/_search', {
                 size: 1000,
-                sort: [
-                    { "createdAt": { "order": "desc" } }
-                ],
                 query: {
                     "match": {
                         "id_law": id
