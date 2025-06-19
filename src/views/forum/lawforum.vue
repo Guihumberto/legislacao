@@ -39,12 +39,13 @@
                                         </v-chip>
                                     </div>
                                     <div>
-                                        <v-chip-group
-                                            v-if="artsFilterActive"
-                                        >
+                                         <v-chip-group 
+                                                v-if="safeArtsFilterActive && safeArtsFilter.length > 0 && isComponentMounted"
+                                                :key="safeArtsFilter.length"
+                                         >
                                             <v-chip 
                                                 @click="pageFilter(false)" 
-                                                variant="text" v-if="artsFilter.length == 1"
+                                                variant="text" v-if="safeArtsFilter.length === 1"
                                                 exact-active-class="0"
                                             >
                                                 <v-icon>mdi-arrow-left-drop-circle-outline</v-icon>
@@ -58,12 +59,12 @@
                                             </v-chip>
                                             <v-btn 
                                                 variant="text" 
-                                                @click="clearAllArtsFilter()" v-if="artsFilter.length > 1" text color="error">
+                                                @click="clearAllArtsFilter" v-if="safeArtsFilter.length > 1" text color="error">
                                                 Limpar Filtro
                                             </v-btn>
                                             <v-chip 
                                                 @click="pageFilter(true)" 
-                                                variant="text" v-if="artsFilter.length == 1">
+                                                variant="text" v-if="safeArtsFilter.length === 1">
                                                     <v-icon>mdi-arrow-right-drop-circle-outline</v-icon>
                                             </v-chip>
                                         </v-chip-group>
@@ -163,7 +164,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide, onBeforeUnmount } from "vue";
+    import { ref, computed, watch, onMounted, provide, onBeforeUnmount, nextTick  } from "vue";
 
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
@@ -188,6 +189,8 @@
 
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
+
+    const isComponentMounted = ref(false)
 
     const sidelaw = ref(false)
     const search = ref(null)
@@ -403,34 +406,107 @@
         listFinal.value = forumStore.readAllPages
     }
 
-    const filterJustArt = (item) => {
-        const art = item.replace(/[^0-9,]/g,'')
-        const hasComma = art.includes(",");
+    const filterJustArt = async (item) => {
+        // Verificar se o componente ainda está montado
+        if (!isComponentMounted.value) {
+            console.warn('Componente desmontado, cancelando operação');
+            return;
+        }
 
-        if(hasComma && art){   
-            const list = art.split(",").forEach(x => filterArts(x))
-        } else {
-            filterArts(art)
+        if (!item || typeof item !== 'string') {
+            console.warn('Item inválido para filtro:', item);
+            return;
+        }
+
+        try {
+            const art = item.replace(/[^0-9,]/g, '');
+            const hasComma = art.includes(",");
+
+            if (hasComma && art) {
+                const artList = art.split(",").filter(x => x.trim() !== '');
+                
+                // Processar em lotes para evitar bloqueio
+                for (const artItem of artList) {
+                    if (!isComponentMounted.value) break; // Verificar antes de cada iteração
+                    await nextTick(); // Permitir que o Vue processe outras tarefas
+                    filterArts(artItem.trim());
+                }
+            } else if (art) {
+                filterArts(art);
+            }
+        } catch (error) {
+            console.error('Erro em filterJustArt:', error);
+            if (snackStore?.activeSnack) {
+                snackStore.activeSnack("Erro ao processar filtro.", "error");
+            }
         }
     }
 
     const filterArts = (art) => {
-        if(art <= lastArt.value){
-            artIndice.value = ''
-            search.value = ''
-            let findArt = artsFilter.value.find( x => x == art ) 
-            if(!findArt){
-                art > 0 ? artsFilter.value.push(art) : snackStore.activeSnack("Artigo não encontrado.", "error")
+        // Verificação prioritária do ciclo de vida
+        if (!isComponentMounted.value) {
+            console.warn('Componente desmontado, cancelando filterArts');
+            return;
+        }
+
+        try {
+            if (!art || isNaN(art)) {
+                console.warn('Artigo inválido:', art);
+                return;
             }
+
+            const artNumber = parseInt(art);
             
-            if(artsFilter.value.length > 0) {
-                artsFilterActive.value = true
-            } else {
-                artsFilterActive.value = false
-            } 
-            routeFilterPagesAndArts()
-        } else {
-           snackStore.activeSnack("Artigo não encontrado.", "error")
+            // Verificações de segurança com guards
+            if (!lastArt?.value || artNumber > lastArt.value) {
+                if (snackStore?.activeSnack) {
+                    snackStore.activeSnack("Artigo não encontrado.", "error");
+                }
+                return;
+            }
+
+            // Limpar campos apenas se o componente ainda estiver ativo
+            if (isComponentMounted.value) {
+                if (artIndice?.value !== undefined) artIndice.value = '';
+                if (search?.value !== undefined) search.value = '';
+            }
+
+            // Verificar se artsFilter existe e componente está ativo
+            if (!artsFilter?.value || !isComponentMounted.value) {
+                console.error('artsFilter não disponível ou componente desmontado');
+                return;
+            }
+
+            const findArt = artsFilter.value.find(x => x == artNumber);
+
+            if (!findArt && artNumber > 0) {
+                artsFilter.value.push(artNumber);
+            } else if (!findArt) {
+                if (snackStore?.activeSnack) {
+                    snackStore.activeSnack("Artigo não encontrado.", "error");
+                }
+                return;
+            }
+
+            // Atualizar estado apenas se componente ativo
+            if (isComponentMounted.value && artsFilterActive?.value !== undefined) {
+                artsFilterActive.value = artsFilter.value.length > 0;
+            }
+
+            // Chamar roteamento com delay para evitar conflitos
+            if (isComponentMounted.value && typeof routeFilterPagesAndArts === 'function') {
+                nextTick(() => {
+                    if (isComponentMounted.value) {
+                        routeFilterPagesAndArts();
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error('Erro em filterArts:', error);
+            if (snackStore?.activeSnack && isComponentMounted.value) {
+                snackStore.activeSnack("Erro ao filtrar artigo.", "error");
+            }
         }
     }
 
@@ -478,40 +554,121 @@
     }
 
     const clearAllArtsFilter = () => {
-        artsFilter.value = []
-        artsFilterActive.value = false
-        routeFilterPagesAndArts()
+        if (!isComponentMounted.value) return;
+        
+        try {
+            if (artsFilter?.value) {
+                artsFilter.value = [];
+            }
+            if (artsFilterActive?.value !== undefined) {
+                artsFilterActive.value = false;
+            }
+            
+            if (typeof routeFilterPagesAndArts === 'function') {
+                nextTick(() => {
+                    if (isComponentMounted.value) {
+                        routeFilterPagesAndArts();
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Erro ao limpar filtros:', error);
+        }
     }
 
-    const artFilterRemove = (art) => {
-        let artRemove = artsFilter.value.findIndex( i => i == art)
-        artsFilter.value.splice(artRemove, 1)
+    const artFilterRemove = (tag) => {
+        if (!isComponentMounted.value) return;
         
-        if(!artsFilter.value.length > 0) {
-            artsFilterActive.value = false
-            routeFilterPagesAndArts()
+        try {
+            if (!artsFilter?.value) return;
+            
+            const index = artsFilter.value.findIndex(art => art == tag);
+            if (index > -1) {
+                artsFilter.value.splice(index, 1);
+            }
+            
+            if (artsFilterActive?.value !== undefined) {
+                artsFilterActive.value = artsFilter.value.length > 0;
+            }
+            
+            if (typeof routeFilterPagesAndArts === 'function') {
+                nextTick(() => {
+                    if (isComponentMounted.value) {
+                        routeFilterPagesAndArts();
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Erro ao remover filtro:', error);
         }
     }
 
     const pageFilter = (item) => {
-        let art = artsFilter.value[0]
-        if(item) {
-            art == lastArt.value ? art : art++  
-            
-        } else {
-            art == 1 ? art : art--
-        }   
-        artsFilter.value = []
-        artsFilter.value.push(art)
-        router.push({
-            query: {
-                ...route.query,
-                page: 1
+        if (!isComponentMounted.value) {
+            console.warn('Componente desmontado, cancelando pageFilter');
+            return;
+        }
+
+        try {
+            if (!artsFilter?.value || artsFilter.value.length === 0) {
+                console.warn('Nenhum filtro de artigo ativo');
+                return;
             }
-        })
-        pagination.value.page = 1
-        closeAllComments()
-        routeFilterPagesAndArts()
+
+            let art = artsFilter.value[0];
+            
+            if (!lastArt?.value) {
+                console.error('lastArt não está definido');
+                return;
+            }
+
+            if (item) {
+                if (art < lastArt.value) {
+                    art++;
+                }
+            } else {
+                if (art > 1) {
+                    art--;
+                }
+            }
+
+            // Só atualizar se componente ainda estiver ativo
+            if (isComponentMounted.value) {
+                artsFilter.value = [art];
+
+                if (router && route) {
+                    router.push({
+                        query: {
+                            ...route.query,
+                            page: 1
+                        }
+                    });
+                }
+
+                if (pagination?.value) {
+                    pagination.value.page = 1;
+                }
+
+                // Usar nextTick para operações que podem causar re-renderização
+                nextTick(() => {
+                    if (isComponentMounted.value) {
+                        if (typeof closeAllComments === 'function') {
+                            closeAllComments();
+                        }
+                        
+                        if (typeof routeFilterPagesAndArts === 'function') {
+                            routeFilterPagesAndArts();
+                        }
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error('Erro em pageFilter:', error);
+            if (snackStore?.activeSnack && isComponentMounted.value) {
+                snackStore.activeSnack("Erro ao navegar entre artigos.", "error");
+            }
+        }
     }
 
     const updateDispositivo = (event) => {
@@ -683,6 +840,7 @@ import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
     };
     
     onMounted( async () => {
+        isComponentMounted.value = true;
         initDimensions();
         window.addEventListener('resize', handleResize);
         await getGroup()
@@ -695,7 +853,22 @@ import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
     })
 
     onBeforeUnmount(() => {
+        isComponentMounted.value = false;
         window.removeEventListener('resize', handleResize);
+    })
+
+    const safeArtsFilter = computed(() => {
+        if (!isComponentMounted.value || !artsFilter?.value) {
+            return [];
+        }
+        return artsFilter.value;
+    })
+
+    const safeArtsFilterActive = computed(() => {
+        if (!isComponentMounted.value || !artsFilterActive?.value) {
+            return false;
+        }
+        return artsFilterActive.value;
     })
   
 
