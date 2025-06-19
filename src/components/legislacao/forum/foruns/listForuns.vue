@@ -142,10 +142,16 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted } from 'vue'
+    import { ref, computed, onMounted, watch } from 'vue'
     import { useForumStore } from '@/store/ForumStore'
-
     const forumStore = useForumStore()
+
+    const props = defineProps({
+        foldersES: {
+            type: Array,
+            default: () => []
+        }
+    })
 
     // Estados reativos
     const folders = ref([])
@@ -155,6 +161,8 @@
     const draggedItem = ref(null)
     const draggedFromFolder = ref(null)
     const unorganizedDragOver = ref(false)
+
+    const emits = defineEmits(['saveFoldersForum'])
 
     // Computed para itens não organizados
     const unorganizedItems = computed(() => {
@@ -188,11 +196,11 @@
             editingFolder.value.name = folderName.value.trim()
         } else {
             const newFolder = {
-            id: Date.now(),
-            name: folderName.value.trim(),
-            items: [],
-            expanded: true,
-            dragOver: false
+                id: Date.now(),
+                name: folderName.value.trim(),
+                items: [],
+                expanded: true,
+                dragOver: false
             }
             folders.value.push(newFolder)
         }
@@ -211,7 +219,7 @@
 
     const toggleFolder = (folder) => {
         folder.expanded = !folder.expanded
-        saveFoldersToStorage()
+        // saveFoldersToStorage()
     }
 
     // Funções de drag and drop
@@ -307,32 +315,29 @@
             items: folder.items.map(item => ({ id: item.id, title: item.title })),
             expanded: folder.expanded
         }))
-        localStorage.setItem('forum-folders', JSON.stringify(foldersData))
+        // localStorage.setItem('forum-folders', JSON.stringify(foldersData))
+        emits('saveFoldersForum', foldersData)
     }
 
     const loadFoldersFromStorage = () => {
-        const savedFolders = localStorage.getItem('forum-folders')
-        if (savedFolders) {
-            const foldersData = JSON.parse(savedFolders)
-            folders.value = foldersData.map(folder => ({
-            ...folder,
-            dragOver: false,
-            items: folder.items.map(savedItem => {
-                // Encontra o item completo no store
-                const fullItem = forumStore.readMyGroup.find(item => item.id === savedItem.id)
-                return fullItem || savedItem
-            })
-            }))
-        }
+        folders.value = props.foldersES
     }
 
-    // Inicialização
-    onMounted(() => {
-        loadFoldersFromStorage()
-    })
-    </script>
+    watch(
+        () => props.foldersES,
+        (newFolders) => {
+            loadFoldersFromStorage()
+        },
+        { deep: true }
+    )
 
-    <style scoped>
+    // Inicialização
+    onMounted(async () => {
+        await loadFoldersFromStorage()
+    })
+</script>
+
+<style scoped>
     .folder-item {
         cursor: pointer;
         transition: background-color 0.2s;

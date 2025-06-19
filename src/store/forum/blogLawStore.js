@@ -110,8 +110,6 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
 
         try {
             const resp = await apiChat.post('forum/gerar_post', postData)
-
-            console.log('resp api', resp.data.data);
             delete postData.texto
             posts.value.push({ ...postData, ...resp.data.data })
             return resp.data.analysisData

@@ -15,20 +15,33 @@
                     <ConfigMyGroup :groups="forumStore.readMyGroup" />
                 </div>
             </div>
-            <ListForuns />
+            <ListForuns @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
         </div>
     </section>
 </template>
 
 <script setup>
+    import { onMounted } from 'vue';
+
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
 
     import { useForumStore } from '@/store/ForumStore'
     const forumStore = useForumStore()
 
+    import { usePreferencesStore } from '@/store/PreferencesUsersStore';
+    const preferencesStore = usePreferencesStore()
+
     import ListForuns from '@/components/legislacao/forum/foruns/listForuns.vue';
     import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue';
+
+    const saveFoldersForum = async (event) => {
+        await preferencesStore.saveFolders(event);
+    }
+
+    onMounted(async () => {
+        await preferencesStore.loadFolders()
+    })
     
 </script>
 
