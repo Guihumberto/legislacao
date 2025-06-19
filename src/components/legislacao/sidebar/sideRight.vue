@@ -55,9 +55,11 @@
                 </div>
             </div>
             <div v-if="tab == 2">
-                <v-btn 
-                    v-if="areadeTransferencia.length" 
-                    @click="generalStore.clearAreadeTransferencia, tab = 1" class="text-lowercase" variant="text" color="red">limpar área de transferência</v-btn>
+                <div v-if="areadeTransferencia.length">
+                    <EditarTexto :textoList="areadeTransferencia" />
+                    <v-btn 
+                        @click="generalStore.clearAreadeTransferencia, tab = 1" class="text-lowercase" variant="text" color="red">limpar área de transferência</v-btn>
+                </div>
                 <div v-for="item, i in areadeTransferencia" :key="i" class="border-b py-3">
                     <div class="d-flex justify-space-between align-center">
                         <span class="font-weight-bold">Texto {{ i+1 }}</span> 
@@ -148,6 +150,7 @@
     const snackStore = useSnackStore()
     
     import { useGeralStore } from '@/store/GeralStore';
+import EditarTexto from './editarTexto.vue'
 
     const geralStore = useGeralStore()
 

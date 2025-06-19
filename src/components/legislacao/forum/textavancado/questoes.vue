@@ -324,12 +324,8 @@
     }
 
     /* Se a ideia é que 'conteudo1' e 'conteudo2' limitem a largura máxima, mantenha assim: */
-    .conteudo1 {
-        max-width: 900px; /* Altere de 'width' para 'max-width' para que ele cresça até 900px */
-    }
-
-    .conteudo2 {
-        max-width: 900px;
+    .conteudo1, .conteudo2 {
+        max-width: 900px; 
     }
 
     .selectArt {

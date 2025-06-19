@@ -23,7 +23,7 @@
                       <v-icon>mdi-arrow-collapse-all</v-icon>
                   </v-btn>
               </v-card-title>
-              <v-chip color="info" density="compact" v-if="data.arts.length" v-for="item, i in data.arts" :key="i" class="ml-2">Art.{{ item }}</v-chip>
+              <v-chip color="info" density="compact" v-if="data?.arts?.length" v-for="item, i in data.arts" :key="i" class="ml-2">Art.{{ item }}</v-chip>
               <v-card-text>
                   <div class="mindmap-tree">
                   <MindMapNode
@@ -86,7 +86,7 @@
     .wrapper {
         display: flex;
         justify-content: center; /* Isso centraliza o 'conteudo' se ele não ocupar 100% da largura do 'wrapper' */
-        min-height: 50vh;
+        min-height: 30vh;
         font-family: Arial, sans-serif;
         padding-bottom: 2rem;
         /* Se você quer que o conteúdo ocupe toda a altura do wrapper, adicione: */

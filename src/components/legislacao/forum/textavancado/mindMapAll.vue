@@ -28,6 +28,10 @@
 
             </div>
             <MindMap :data="mindMapData" v-if="mindMapData" />
+
+            <div v-for="map, m in mapasMentais" :key="i" v-else>
+                <MindMap :data="map" />
+            </div>
         </section>
     </div>
 </template>

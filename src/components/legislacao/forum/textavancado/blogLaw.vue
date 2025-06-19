@@ -11,7 +11,7 @@
                     Artigo<span v-if="listArtsSelected.length > 1">s</span> selecionado<span v-if="listArtsSelected.length > 1">s</span>: 
                     <v-chip v-if="artOneSelect" color="primary">{{ artOneSelect }} </v-chip> 
                     <v-chip v-if="listArtsSelected.length" v-for="item, i in listArtsSelected" :key="i" class="ml-2">{{ item }}</v-chip>
-                   <v-form @submit.prevent="submitForm" ref="form">
+                    <v-form @submit.prevent="submitForm" ref="form" v-if="blogLawStore.masterUser">
                         <v-textarea
                             label="Gerar"
                             v-model="mapFormString"
@@ -20,14 +20,17 @@
                             class="mt-2"
                         >
                         </v-textarea>
-                        <div class="mt-5 d-flex ga-2 justify-center">
-                            <v-btn :loading="load" :disabled="load" type="submit" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Post por IA</v-btn>
+                        <div class="my-5 d-flex ga-2 justify-center">
+                            <v-btn :loading="load" :disabled="load" type="submit" variant="flat" color="primary">Gerar Post</v-btn>
                         </div>
-                   </v-form>
+                    </v-form>
+                    <div class="mt-5">
+                      <v-btn :loading="load" :disabled="load" @click="generetePostIa" variant="flat" color="error" prepend-icon="mdi-robot">Gerar Post IA</v-btn>
+                    </div>
                 </div>
-                <div class="mt-5">
+                <!-- <div class="mt-5">
                     <MindMapInterativo :dados="mapaMental" />
-                </div>
+                </div> -->
                 <div class="mt-5">
                     <Posts :posts="posts" />
                 </div>
@@ -387,49 +390,41 @@
         objeto.name_law = forumStore.readGroupForum._source.title
 
         await blogLawStore.createPost(objeto)
-        getPostLaw()
+        // getPostLaw()
         const { art, arts, ...outrosParams } = route.query
-        router.push({
-            path: route.path, 
-            query: {
-                ...outrosParams,      
-                art: objeto.art,   
-                arts: [...objeto.arts]          
-            }
-        })
+        // router.push({
+        //     path: route.path, 
+        //     query: {
+        //         ...outrosParams,      
+        //         art: objeto.art,   
+        //         arts: [...objeto.arts]          
+        //     }
+        // })
         load.value = false
         mapFormString.value = ''
     } 
 
-    const submitForm2 = async () => {
+    const generetePostIa = async () => {
         load.value = true
-        // const { valid } = await form.value.validate()
-        // if (!valid) return
 
-        let objeto = { id: null, art: null, arts: []}   
-        try {
-            objeto = JSON.parse(mapFormString.value)
-        } catch (err) {
-            console.error('Erro ao fazer parse de mapFormString.value:', err)
-            alert('Erro: o conteúdo do campo deve estar em formato JSON válido.')
-            return
+        const objeto = {
+          id_law: forumStore.readGroupForum._source.idLaw,
+          art: artOneSelect.value || listArtsSelected.value[0],
+          arts: listArtsSelected.value,
+          name_law: forumStore.readGroupForum._source.title,
         }
 
-        objeto.id = forumStore.readGroupForum._source.idLaw
-        objeto.art = artOneSelect.value || listArtsSelected.value[0]
-        objeto.arts = listArtsSelected.value
-
-        await mapaMentalStore.createMindMap(objeto)
+        await blogLawStore.generetePostIa(objeto)
         // getMindMapArt()
         const { art, arts, ...outrosParams } = route.query
-        router.push({
-            path: route.path, 
-            query: {
-                ...outrosParams,      
-                art: objeto.art,   
-                arts: [...objeto.arts]          
-            }
-        })
+        // router.push({
+        //     path: route.path, 
+        //     query: {
+        //         ...outrosParams,      
+        //         art: objeto.art,   
+        //         arts: [...objeto.arts]          
+        //     }
+        // })
         load.value = false
     }  
 

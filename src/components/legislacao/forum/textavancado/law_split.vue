@@ -477,15 +477,12 @@ import { te } from "date-fns/locale";
     flex-grow: 1; /* Permite que o 'conteudo' se expanda */
     /* 'box-sizing: border-box;' é bom para evitar problemas com padding e largura */
     box-sizing: border-box;
+    max-width: 900px; 
 }
 
 /* Se a ideia é que 'conteudo1' e 'conteudo2' limitem a largura máxima, mantenha assim: */
-.conteudo1 {
-    max-width: 900px; /* Altere de 'width' para 'max-width' para que ele cresça até 900px */
-}
-
-.conteudo2 {
-    max-width: 900px;
+.conteudo1, .conteudo2 {
+    max-width: 900px; 
 }
 
 .sizeLoad{

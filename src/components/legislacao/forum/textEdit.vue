@@ -113,7 +113,23 @@
     const editable = ref(null)
     const currentContent = ref('')
 
-    const handleSelection =() => {
+    // Variáveis de controle de tempo e texto da última seleção
+    let lastExpansionTime  = 0;
+    let lastExpandedText  = '';
+
+    const handleSelection = () => {
+      const now = Date.now();
+      const selection = window.getSelection();
+
+      if (!selection || selection.isCollapsed) {
+        menu.value = false;
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      const selectedText = selection.toString();
+
+      if(selectedText.length < 10) {
         const selection = window.getSelection()
         if (!selection || selection.isCollapsed) {
             menu.value = false
@@ -129,9 +145,7 @@
             return
         }
 
-        // Cria um span como referência para o menu aparecer acima da seleção
         const span = document.createElement('span')
-
         span.style.position = 'absolute'
         span.style.top = `${rect.top + window.scrollY}px`
         span.style.left = `${rect.left + window.scrollX}px`
@@ -139,12 +153,79 @@
 
         menuActivator.value = span
         menu.value = true
-
-        // Limpa o span depois que o menu aparecer
+       
         setTimeout(() => {
             document.body.removeChild(span)
         }, 100)
-    }
+
+        return;
+      }
+
+      const shouldExpand = () => {
+        // Se é uma nova seleção diferente, sempre expande
+        if (selectedText !== lastExpandedText) return true;
+
+        // Se for a mesma seleção, mas fora da janela de tempo, expande de novo
+        return (now - lastExpansionTime) > 3000;
+      };
+
+      if (shouldExpand()) {
+        const newRange = range.cloneRange();
+
+        const isWordBoundary = (char) => /\s|\n|\t|[.,;!?()]/.test(char);
+
+        // Expandir INÍCIO
+        if (newRange.startContainer.nodeType === Node.TEXT_NODE) {
+          const text = newRange.startContainer.textContent;
+          let start = newRange.startOffset;
+          while (start > 0 && !isWordBoundary(text[start - 1])) {
+            start--;
+          }
+          newRange.setStart(newRange.startContainer, start);
+        }
+
+        // Expandir FIM
+        if (newRange.endContainer.nodeType === Node.TEXT_NODE) {
+          const text = newRange.endContainer.textContent;
+          let end = newRange.endOffset;
+          while (end < text.length && !isWordBoundary(text[end])) {
+            end++;
+          }
+          newRange.setEnd(newRange.endContainer, end);
+        }
+
+        // Atualiza a seleção
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        // Salva o estado da última expansão
+        lastExpansionTime = now;
+        lastExpandedText = selection.toString();
+      }
+
+      // Posição do menu
+      const finalRange = selection.getRangeAt(0);
+      const rect = finalRange.getBoundingClientRect();
+
+      if (rect.width === 0 && rect.height === 0) {
+        menu.value = false;
+        return;
+      }
+
+      const span = document.createElement('span');
+      span.style.position = 'absolute';
+      span.style.top = `${rect.top + window.scrollY}px`;
+      span.style.left = `${rect.left + window.scrollX}px`;
+      document.body.appendChild(span);
+
+      menuActivator.value = span;
+      menu.value = true;
+
+      setTimeout(() => {
+        document.body.removeChild(span);
+      }, 100);
+    };
+    
 
     const handleKeyDown = (event) => {
         if (event.ctrlKey || event.metaKey) {

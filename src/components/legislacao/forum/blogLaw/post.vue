@@ -9,7 +9,6 @@
         <v-card
           class="educational-card"
           elevation="2"
-          @click="toggleExpanded(index)"
         >
           <!-- Header do Card -->
           <v-card-title class="pb-2 text-wrap">
@@ -65,28 +64,53 @@
             </div>
 
             <!-- Texto resumido -->
-            <p class="text-body-2 text-medium-emphasis mb-3">
-              {{ getTextPreview(item.texto, expanded.has(index)) }}
-              <v-btn
-                v-if="item.texto.length > 200"
-                variant="text"
-                size="small"
-                color="primary"
-                class="pa-0 ml-1"
-                @click.stop="toggleExpanded(index)"
-              >
-                {{ expanded.has(index) ? 'Ver menos' : 'Ver mais' }}
-              </v-btn>
-            </p>
+            <div class="text-body-1 mb-4 line-height-relaxed text-content"  v-html="getTextPreview(item?.texto || item?.texto_explicativo, expanded.has(index)) "> 
+            </div>
+            <v-btn
+              v-if="item?.texto?.length | item?.texto_explicativo?.length > 200"
+              variant="text"
+              size="small"
+              color="primary"
+              class="pa-0 ml-1"
+              @click.stop="toggleExpanded(index)"
+            >
+              {{ expanded.has(index) ? 'Ver menos' : 'Ver mais' }}
+            </v-btn>
 
             <!-- Questões -->
             <div class="questions-section">
               <div class="d-flex align-center mb-2">
-                <v-icon size="small" color="primary" class="mr-2">mdi-help-circle</v-icon>
+                <v-icon size="small" color="primary" class="mr-2">mdi-format-list-checks</v-icon>
                 <span class="text-subtitle-2 font-weight-medium">
-                  {{ item.questoes.length }} questão{{ item.questoes.length > 1 ? 'ões' : '' }}
+                  {{ item.questoes.length }} quest{{ item.questoes.length > 1 ? 'ões' : 'ão' }}
                 </span>
               </div>
+
+               <!-- Ações do Card -->
+              <v-card-actions class="pt-0">
+                <v-btn
+                  variant="text"
+                  color="primary"
+                  size="small"
+                  @click.stop="toggleQuestions(index)"
+                >
+                  <v-icon size="small" class="mr-1">
+                    {{ showQuestions.has(index) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                  </v-icon>
+                  {{ showQuestions.has(index) ? 'Ocultar' : 'Ver' }} questões
+                </v-btn>
+                
+                <v-spacer></v-spacer>
+                
+                <v-btn
+                  icon
+                  size="small"
+                  variant="text"
+                  @click.stop="shareCard(item)"
+                >
+                  <v-icon size="small">mdi-share-variant</v-icon>
+                </v-btn>
+              </v-card-actions>
               
               <v-expand-transition>
                 <div v-if="showQuestions.has(index)">
@@ -125,7 +149,7 @@
                       <div class="question-actions mb-3">
                         <v-btn
                           v-if="userAnswers.has(`${index}-${qIndex}`) && !showAnswers.has(`${index}-${qIndex}`)"
-                          variant="contained"
+                          variant="text"
                           color="primary"
                           size="small"
                           @click="revealAnswer(index, qIndex, questao.resposta_correta)"
@@ -180,31 +204,7 @@
             </div>
           </v-card-text>
 
-          <!-- Ações do Card -->
-          <v-card-actions class="pt-0">
-            <v-btn
-              variant="text"
-              color="primary"
-              size="small"
-              @click.stop="toggleQuestions(index)"
-            >
-              <v-icon size="small" class="mr-1">
-                {{ showQuestions.has(index) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-              </v-icon>
-              {{ showQuestions.has(index) ? 'Ocultar' : 'Ver' }} questões
-            </v-btn>
-            
-            <v-spacer></v-spacer>
-            
-            <v-btn
-              icon
-              size="small"
-              variant="text"
-              @click.stop="shareCard(item)"
-            >
-              <v-icon size="small">mdi-share-variant</v-icon>
-            </v-btn>
-          </v-card-actions>
+         
         </v-card>
       </div>
     </div>
@@ -294,7 +294,7 @@ const getAlternativeClass = (cardIndex, questionIndex, alternative) => {
     }
   }
   
-  const correctAnswer = props.items[cardIndex].questoes[questionIndex].resposta_correta
+  const correctAnswer = props.posts[cardIndex].questoes[questionIndex].resposta_correta
   
   return {
     'alternative-correct': alternative === correctAnswer,
@@ -322,10 +322,10 @@ const getResultText = (cardIndex, questionIndex, correctAnswer) => {
 }
 
 const getTextPreview = (text, isExpanded) => {
-  if (isExpanded || text.length <= 200) {
+  if (isExpanded || text?.length <= 200) {
     return text
   }
-  return text.substring(0, 200) + '...'
+  return text?.substring(0, 200) + '...'
 }
 
 const getDisciplineColor = (disciplina) => {
@@ -367,7 +367,7 @@ const shareCard = (item) => {
   gap: 16px;
   width: 100%;
   height: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   grid-auto-rows: max-content;
   align-content: start;
 }
@@ -486,6 +486,15 @@ const shareCard = (item) => {
 
 .v-card-actions {
   padding: 8px 16px 16px 16px;
+}
+
+.line-height-relaxed {
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+::v-deep(.text-content p) {
+  margin-bottom: 1.5em;
 }
 
 /* Responsividade baseada no container pai */
