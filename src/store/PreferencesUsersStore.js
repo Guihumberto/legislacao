@@ -82,7 +82,6 @@ export const usePreferencesStore = defineStore('preferences', () => {
         try {
             const response = await api.put(`user_preferences/_doc/${documentId}`, foldersData)
             foldersForum.value = item
-            console.log('Pastas salvas no Elasticsearch:', response.data)
         } catch (error) {
             console.log('error ao salvar pasta');
         }

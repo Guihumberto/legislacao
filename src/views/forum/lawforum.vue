@@ -112,6 +112,7 @@
                                         </v-card>
                                     </v-expand-transition>
                                     <div class="text-right mt-2">
+                                        <IndiceLaw :estrutura="estrutura" @goTo="filterArts" />
                                         <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
                                     </div>
                                 </div>
@@ -310,6 +311,11 @@
 
         return list.slice(start, end)
 
+    })
+
+    const estrutura = computed(() => {
+        const list = listFinal.value.filter(x => x.estrutura)
+        return list
     })
 
     const totalPage = computed(() => {
@@ -527,6 +533,7 @@
 
     //Fitrar por usuários
     import { useCommentStore } from "@/store/CommentStore";
+import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
     const commentStore = useCommentStore()
     
     const usersCommentsFilter = ref([])
