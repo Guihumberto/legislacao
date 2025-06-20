@@ -8,7 +8,7 @@
                 <template v-slot:prepend>
                     <v-icon>mdi-file</v-icon>
                 </template>
-                <div>
+                <div @click.stop="$router.push(`/laws/${item._id}`)">
                     {{ item._source.title }} <br>
                     <small>ano: {{ item._source.ano }} - tipo: {{ item._source.tipo }} - total pág: {{ item._source.total_pages }}</small>
                 </div>
@@ -47,7 +47,7 @@
                         :color="isFav(item._source.id) ? 'amber': 'grey'"
                         @click.stop="changeLawFav(item._source)"
                     ></v-btn>
-                    <Menu_popover class="menu" :item="item._source" />
+                    <Menu_popover class="menu" :item="item" />
                 </template>
             </v-list-item>
         </transition-group>

@@ -18,6 +18,12 @@ export default [
         meta: { requiresAuth: true, role: true } 
       },
       {
+        path: '/laws/:id',
+        name: 'Editar Norma',
+        component: () => import('@/views/admin/editLaws.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
         path: '/users',
         name: 'Usuários',
         component: () => import('@/views/AdmUsers.vue'),

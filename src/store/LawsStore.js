@@ -831,6 +831,14 @@ export const useLawStore = defineStore("Law", {
                 console.log("erro main law exist");
             }
         },
+        async getLawId(id){
+            try {
+                const response = await api.get(`laws_v3/_doc/${id}`)
+                return response.data
+            } catch (error) {
+                console.log("erro main law exist");
+            }
+        },
         async deleteLaw(id){
             try {
                 this.load = true
