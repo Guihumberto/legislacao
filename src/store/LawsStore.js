@@ -881,6 +881,50 @@ export const useLawStore = defineStore("Law", {
                 this.load = false
             }
         },
+        async getLawLeisFederais(){
+            this.load = true
+            try {
+                const response = await api.post('laws_v3/_search', {
+                    size: 30,
+                    query:{
+                        match:{
+                            tipo: "leis-federais"
+                        }
+                    },
+                    min_score: 1.0
+                })
+                return response.data.hits.hits.map(x => x._source)
+            } catch (error) {
+                console.log('erro get disciplines');
+            } finally {
+                this.load = false
+            }
+        },
+        async searchLaw(search){
+            try {
+                const resp = await api.post('laws_v3/_search', {
+                    size: 5,
+                    query:{
+                        bool: {
+                            must: [
+                                { 
+                                    multi_match: { 
+                                        query: search, 
+                                        fields: ["title^2", "description_norm", "ano", "tipo", "disciplina" ],
+                                        fuzziness: "AUTO",
+                                        operator: "and"
+                                    } 
+                                }
+                            ],
+                        }
+                    },
+                    min_score: 1.0
+                })
+                return resp.data.hits.hits.map(x => x._source)
+            } catch (error) {
+                console.log('erro get disciplines');
+            }
+        },
         initSearch(){
             this.search = {
                 text: '',
