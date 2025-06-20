@@ -1,78 +1,194 @@
 <template>
-    <div class="legesWrapper">
-        <div class="sidebar-left pr-2" id="sidebar-left">
-            <sideLeft @large="largeSidebar()" />
-        </div>
-        <section-search/>
-        <div class="sidebar-right">
-            <side-right type="screen" />
-        </div>
-        <v-navigation-drawer 
-            location="right"
-            v-model="geralStore.drawerHistory"
-            temporary
-        >
-            <side-right type="drawer" />
-        </v-navigation-drawer>
-    </div>
+  <div class="leges-wrapper">
+    <!-- Barra lateral esquerda -->
+    <aside 
+      class="sidebar sidebar-left" 
+      :class="{ 'sidebar-expanded': isLeftSidebarExpanded }"
+      v-show="showSidebars"
+    >
+      <div class="sidebar-content">
+        <side-left @large="toggleLeftSidebar" />
+      </div>
+    </aside>
+
+    <!-- Área central principal (fluida) -->
+    <main class="main-content">
+      <section-search />
+    </main>
+
+    <!-- Barra lateral direita -->
+    <aside 
+      class="sidebar sidebar-right" 
+      v-show="showSidebars"
+    >
+      <div class="sidebar-content">
+        <side-right type="screen" />
+      </div>
+    </aside>
+
+    <!-- Navigation drawer para mobile -->
+    <v-navigation-drawer 
+      location="right"
+      v-model="geralStore.drawerHistory"
+      temporary
+      width="300"
+    >
+      <div class="drawer-content">
+        <side-right type="drawer" />
+      </div>
+    </v-navigation-drawer>
+  </div>
 </template>
 
 <script setup>
-    import { ref, inject } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useGeralStore } from '@/store/GeralStore'
 
-    import SectionSearch from '@/components/legislacao/search.vue';
-    import sideLeft from '@/components/legislacao/sidebar/sideLeft'
-    import sideRight from '@/components/legislacao/sidebar/sideRight'
-    
-    import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
+import SectionSearch from '@/components/legislacao/search.vue'
+import SideLeft from '@/components/legislacao/sidebar/sideLeft.vue'
+import SideRight from '@/components/legislacao/sidebar/sideRight.vue'
 
-    const large = ref(true)
-    // const drawerHistory = inject('drawerHistory')
+const geralStore = useGeralStore()
 
-    const largeSidebar = () => {
-        large.value = !large.value
-        let menuLateral = document.getElementById('sidebar-left');
-        if(large.value) {
-            menuLateral.style.width = '250px';
-        } else {
-            menuLateral.style.width = '350px';
-        }
-    }
+// Estado reativo para controle das barras laterais
+const isLeftSidebarExpanded = ref(false)
+const windowWidth = ref(window.innerWidth)
+
+// Computed para mostrar/esconder barras laterais baseado na largura da tela
+const showSidebars = computed(() => windowWidth.value >= 1500)
+
+// Função para alternar o tamanho da barra lateral esquerda
+const toggleLeftSidebar = () => {
+  isLeftSidebarExpanded.value = !isLeftSidebarExpanded.value
+}
+
+// Função para atualizar a largura da janela
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth)
+})
 </script>
 
 <style scoped>
-.legesWrapper{
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
+.leges-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
 }
-.sidebar-left, .sidebar-right{
-    width: 250px;
-    transition: 1s ease;
+
+/* Barras laterais */
+.sidebar {
+  flex-shrink: 0;
+  background-color: var(--v-surface-color, #ffffff);
+  transition: all 0.3s ease-in-out;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-.sidebar-left{
-    border-right: 1px solid rgb(233, 221, 221);
+
+.sidebar-left {
+  width: 250px;
+  border-right: 1px solid var(--v-border-color, #e9dddd);
+  order: 1;
 }
-.sidebar-right{
-    border-left: 1px solid rgb(233, 221, 221);
+
+.sidebar-left.sidebar-expanded {
+  width: 350px;
 }
-@media (max-width: 1600px){
-    .sidebar-left, .sidebar-right{
-        opacity: 0;
-    }
+
+.sidebar-right {
+  width: 250px;
+  border-left: 1px solid var(--v-border-color, #e9dddd);
+  order: 3;
 }
-@media (max-width: 1500px){
-    .sidebar-left, .sidebar-right{
-        display: none;
-    }
-    .legesWrapper{
-        justify-content: center;
-    }
+
+.sidebar-content {
+  padding: 12px;
+  height: 100%;
 }
+
+/* Área principal (fluida) */
+.main-content {
+  flex: 1;
+  min-width: 0; /* Permite que o flex item encolha */
+  order: 2;
+  background-color: var(--v-background-color, #fafafa);
+  overflow-y: auto;
+}
+
+/* Drawer para mobile */
+.drawer-content {
+  padding: 16px;
+  height: 100%;
+}
+
+/* Media queries para responsividade */
 @media (max-width: 1670px) {
-    .sidebar-left{
-        width: 250px;
-    }
+  .sidebar-left.sidebar-expanded {
+    width: 300px; /* Reduz um pouco o tamanho expandido em telas menores */
+  }
+}
+
+@media (max-width: 1600px) {
+  .sidebar {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 1500px) {
+  .leges-wrapper {
+    justify-content: center;
+  }
+  
+  .main-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 8px;
+  }
+}
+
+/* Melhorias de acessibilidade e UX */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--v-surface-variant-color, #f5f5f5);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--v-outline-color, #cccccc);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--v-outline-variant-color, #999999);
+}
+
+/* Animações suaves */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}
+
+/* Estados de foco para acessibilidade */
+.sidebar:focus-within {
+  outline: 2px solid var(--v-primary-color, #1976d2);
+  outline-offset: -2px;
 }
 </style>

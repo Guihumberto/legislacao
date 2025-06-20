@@ -17,9 +17,9 @@
             </div>
             </v-sheet>
             
-            <SectionPainel :concursos="concursos" :title="'Por Concursos'" />
-            <SectionPainel :concursos="disciplinas" :title="'Por Disciplinas'" />
-            <SectionPainel :concursos="normas" :title="'Por Normas'" />
+            <SectionPainel :concursos="concursos" :title="'Por Concursos'" type="concursos" />
+            <SectionPainel :concursos="disciplinas" :title="'Por Disciplinas'" type="disciplinas" />
+            <SectionPainel :concursos="normas" :title="'Por Normas'" type="normas" />
             
         </div>
     </section>
@@ -83,19 +83,34 @@
 
     const normas = [
          {
-          id: 1,
+          id: 1742907731755,
           titulo: 'CF88',
           descricao: 'Constituição Federal de 1988 vinculadas a questões e súmulas',
         },
         {
-          id: 2,
+          id: 1742907901454,
           titulo: 'CTN',
           descricao: 'Lei 5.712/1966 (CTN)  Denominado Código Tributário Nacional',
         },
         {
-          id: 3,
+          id: 1747758035994,
           titulo: 'Nova lei de licitações',
           descricao: 'Lei 14.133/2021. Lei estabelece normas gerais de licitação e contratos.',
+        },
+        {
+          id: 1747696504895,
+          titulo: 'Lei de Processo Administrativo',
+          descricao: 'LEI Nº 9.784/1999. Regula o processo administrativo no âmbito da Administração Pública Federal.',
+        },
+        {
+          id: 1746666536052,
+          titulo: 'Lei de Improbidade Administrativa',
+          descricao: 'LEI Nº 8.429 DE 1992 - Lei de Improbidade Administrativa.',
+        },
+        {
+          id: 1750194743901,
+          titulo: 'NOVO CÓDIGO CIVIL',
+          descricao: 'LEI Nº 10.406, DE 10 DE JANEIRO DE 2002 - NOVO CÓDIGO CIVIL.',
         },
     ]
 

@@ -120,7 +120,7 @@
         },
         {
             id: 7,
-            name: 'Bloi da Lei',
+            name: 'Blog da Lei',
             icon: 'mdi-post-outline'
         }
     ]

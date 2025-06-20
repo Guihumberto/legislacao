@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
+import { cat } from "stopword";
+import { query } from "firebase/firestore";
 
 export const useLawStore = defineStore("Law", {
     state: () => ({
@@ -858,6 +860,25 @@ export const useLawStore = defineStore("Law", {
                 })
             } catch (error) {
                 console.log('erro delete law page')
+            }
+        },
+        //search for disciplinas
+        async getLawForDisciplines(id){
+            this.load = true
+            try {
+                const response = await api.post('laws_v3/_search', {
+                    query:{
+                        match:{
+                            disciplina: id
+                        }
+                    },
+                    min_score: 1.0
+                })
+                return response.data.hits.hits.map(x => x._source)
+            } catch (error) {
+                console.log('erro get disciplines');
+            } finally {
+                this.load = false
             }
         },
         initSearch(){

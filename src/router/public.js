@@ -90,6 +90,21 @@ export default [
         component: () => import('@/views/public/create_plan.vue'),
       },
       {
+        path: '/homepainel/disciplinas/:id',
+        name: 'Normas por Disciplinas',
+        component: () => import('@/views/public/create_plan.vue'),
+      },
+      {
+        path: '/homepainel/disciplinas/:id',
+        name: 'Normas por Disciplinas',
+        component: () => import('@/views/public/disciplinas.vue'),
+      },
+      {
+        path: '/homepainel/showall/normas',
+        name: 'Todas as Normas',
+        component: () => import('@/views/public/allNormas.vue'),
+      },
+      {
         path: '/restricted',
         name: 'Area Restrita',
         component: () => import('@/views/areaRestricted.vue'),

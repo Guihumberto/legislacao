@@ -1,10 +1,10 @@
 <template>
    <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <div ref="leftPanel" class="panel left-panel" :style="{ width: leftWidth + 'px' }">
+            <div ref="leftPanel" class="panel left-panel overflow-y-auto" :style="{ width: leftWidth + 'px' }">
                 <div class="panel-content">
                     <div>
-                            <div class="d-flex align-center justify-space-between mb-5">
+                            <div class="d-flex align-center justify-space-between mb-5 mx-auto" style="max-width: 1080px;">
                                 <v-btn @click="$router.push('/areauser')" variant="text" prepend-icon="mdi-arrow-left">Voltar</v-btn>
                                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-school</v-icon>Concurso</h1>
                                 <Details :concurso="edital" />
@@ -18,7 +18,7 @@
                                     </div>
                                     <v-btn 
                                         variant="text" @click="sidebar = !sidebar" 
-                                        :icon="sidebar ? 'mdi-arrow-left-bold-box-outline': 'mdi-arrow-right-bold-box-outline'"></v-btn>
+                                        :append-icon="sidebar ? 'mdi-arrow-down-bold-box-outline': 'mdi-arrow-right-bold-box-outline'">Revisão</v-btn>
                                 </div>
                                 <div v-else>Carregando....</div>
                                 <div v-if="!load">
@@ -39,7 +39,7 @@
                                                         </v-btn>
                                                     </v-btn-toggle>
                                                 </v-card-title>
-                                            <v-card-text class="content">
+                                            <v-card-text>
                                                 <!-- Exibição do conteúdo completo -->
                                                 <div v-if="viewMode === 'full'">
                                                     <v-expansion-panels>
@@ -429,7 +429,7 @@
     const startLeftWidth = ref(0);
 
     watch(sidebar, (newSidebar) => {
-       if(!sidebar.value) leftWidth.value = 1050
+       if(!sidebar.value) leftWidth.value = 2500
        if(sidebar.value) leftWidth.value = containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
     })
 
