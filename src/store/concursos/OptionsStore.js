@@ -52,7 +52,7 @@ export const useOptionsStore = defineStore("optionsStore", {
                 login: JSON.parse(data).cpf,
                 password: JSON.parse(data).password
             } 
-            return login.login == '01791743390'
+            return login.login == '01791743390' || login.login == '00561723389'
             ? true
             : false
         }
