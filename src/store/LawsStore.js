@@ -2,8 +2,7 @@ import { defineStore } from "pinia";
 
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
-import { cat } from "stopword";
-import { query } from "firebase/firestore";
+import { useSnackStore } from '@/store/snackStore';
 
 export const useLawStore = defineStore("Law", {
     state: () => ({
@@ -837,6 +836,29 @@ export const useLawStore = defineStore("Law", {
                 return response.data
             } catch (error) {
                 console.log("erro main law exist");
+            }
+        },
+        async updateLaw(id, item){
+            const loginStore = useLoginStore()
+            const snackStore = useSnackStore()
+            const cpf = loginStore.readLogin?.cpf
+
+            if(!cpf) {
+                snackStore.activeSnack('Você não tem permissão para editar', 'error')
+                return
+            }
+            
+            try {
+                const response = await api.post(`laws_v3/_update/${id}`, {
+                    "doc":{
+                        ...item
+                    }
+                })
+                snackStore.activeSnack('Atualizado com sucesso', 'success')
+                return response.data
+            } catch (error) {
+                console.log('erro update law')
+                snackStore.activeSnack('Ocorreu um erro', 'error')
             }
         },
         async deleteLaw(id){

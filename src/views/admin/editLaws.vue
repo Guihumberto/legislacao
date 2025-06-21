@@ -3,7 +3,10 @@
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
             <v-btn variant="outlined" prepend-icon="mdi-arrow-left" class="mb-5" @click="$router.push('/laws')">Voltar</v-btn>
             <h1 class="text-h5 d-flex align-center mb-5"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-tools</v-icon>Editar Normas</h1>
-            <div class="mt-5">
+            <div v-if="load">
+                Carregando
+            </div>
+            <div class="mt-5" v-else>
                 <v-form @submit.prevent="handleSubmit">
                     <!-- Campo Título -->
                     <div class="mb-4">
@@ -320,8 +323,6 @@
          law.value = resp
     }
 
-    const emit = defineEmits(['updated', 'error'])
-
     // Dados do formulário
     const formData = reactive({
     title: '',
@@ -431,6 +432,10 @@
     return refs[field]
     }
 
+    const handleSubmit = () => {
+        console.log('chamou');
+    }
+
     const saveField = async (field) => {
     try {
         saving[field] = true
@@ -441,7 +446,7 @@
         }
         
         // Exemplo de chamada para o store
-        // await law.valueStore.updateLaw(law.value._id, updateData)
+        await lawStore.updateLaw(law.value._id, updateData)
         
         // Simula delay da API
         await new Promise(resolve => setTimeout(resolve, 500))
@@ -449,11 +454,8 @@
         editing[field] = false
         originalData.value[field] = formData[field]
         
-        emit('updated', { field, value: formData[field] })
-        
     } catch (error) {
         console.error(`Erro ao salvar ${field}:`, error)
-        emit('error', { field, error })
     } finally {
         saving[field] = false
     }
@@ -465,43 +467,40 @@
     }
 
     const saveAllChanges = async () => {
-    try {
-        savingAll.value = true
-        
-        // Identifica apenas os campos que foram alterados
-        const changedFields = {}
-        Object.keys(formData).forEach(key => {
-        if (formData[key] !== originalData.value[key]) {
-            changedFields[key] = formData[key]
+        try {
+            savingAll.value = true
+            
+            // Identifica apenas os campos que foram alterados
+            const changedFields = {}
+            Object.keys(formData).forEach(key => {
+            if (formData[key] !== originalData.value[key]) {
+                changedFields[key] = formData[key]
+            }
+            })
+            
+            if (Object.keys(changedFields).length === 0) {
+            return
+            }
+            
+            // Simula chamada para API - substitua pela sua lógica
+            // await law.valueStore.updateLaw(law.value._id, changedFields)
+            
+            // Simula delay da API
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            
+            // Atualiza os dados originais
+            originalData.value = { ...formData }
+            
+            // Cancela todas as edições
+            Object.keys(editing).forEach(key => {
+            editing[key] = false
+            })
+            
+        } catch (error) {
+            console.error('Erro ao salvar alterações:', error)
+        } finally {
+            savingAll.value = false
         }
-        })
-        
-        if (Object.keys(changedFields).length === 0) {
-        return
-        }
-        
-        // Simula chamada para API - substitua pela sua lógica
-        // await law.valueStore.updateLaw(law.value._id, changedFields)
-        
-        // Simula delay da API
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Atualiza os dados originais
-        originalData.value = { ...formData }
-        
-        // Cancela todas as edições
-        Object.keys(editing).forEach(key => {
-        editing[key] = false
-        })
-        
-        emit('updated', { fields: changedFields })
-        
-    } catch (error) {
-        console.error('Erro ao salvar alterações:', error)
-        emit('error', { error })
-    } finally {
-        savingAll.value = false
-    }
     }
 
     const resetForm = () => {

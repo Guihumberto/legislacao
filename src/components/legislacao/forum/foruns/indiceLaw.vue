@@ -21,8 +21,7 @@
 </template>
 
 <script setup>
-    import { de } from 'date-fns/locale';
-import { ref, computed } from 'vue';
+    import { ref, computed } from 'vue';
     const dialog = ref(false);
 
     const props = defineProps({
