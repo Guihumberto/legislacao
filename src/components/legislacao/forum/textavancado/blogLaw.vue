@@ -61,8 +61,6 @@
         })
       }
 
-      console.log('list', list);
-
       return list.sort((a, b) => (a.art < b.art) ? -1 : 1)
     })
 

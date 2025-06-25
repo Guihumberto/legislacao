@@ -1,14 +1,17 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" ref="myDiv">
         <section class="conteudo" ref="topUp">
             <div class="sizeLoad" v-if="pageStore.readLoad">
                 <Loading class="my-10 py-2" />
             </div>
             
             <div v-if="!pageStore.readLoad && listTextLaw.length">
-                <!-- <v-btn variant="tonal" class="btn mr-2" @click="listTextLaw = []">Voltar</v-btn> -->
                 <Relacoes />
-                <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
+                <v-btn 
+                    variant="text" 
+                    @click="hiddenCabecalho = !hiddenCabecalho" 
+                    class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'">
+                </v-btn>
 
                 <div>
                     <v-expand-transition>
@@ -72,7 +75,7 @@
                     </v-card-text>
                 </v-card>
     
-                <Pagination :totalPage="totalPage" :pagination="pagination" />
+                <Pagination :totalPage="totalPage" :pagination="pagination" :large="largura" />
     
                 <div class="bg-white">
                     <div class="px-5 py-3" v-for="item, i in listTextLaw" :key="i">
@@ -80,7 +83,7 @@
                     </div>
                 </div>
     
-                <Pagination :totalPage="totalPage" :pagination="pagination" />
+                <Pagination :totalPage="totalPage" :pagination="pagination" :large="largura" />
             </div>
             
         </section>
@@ -88,11 +91,12 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide, inject, nextTick } from "vue";
+    import { ref, computed, watch, onMounted, provide, inject, nextTick, onBeforeUnmount  } from "vue";
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
     import Loading from '../loading.vue';
+    import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
    
     import { usePageStore } from "@/store/PageStore";
     const pageStore = usePageStore()
@@ -448,79 +452,88 @@
         return [...new Set(numerosEncontrados)].sort((a, b) => a - b);
     }
 
+    const myDiv = ref(null)
+    const largura = ref(0)
+    let observer = null
 
     onMounted(() => {
         getAll(1742907731755)
+        if (myDiv.value instanceof Element) {
+            observer = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                largura.value = entry.contentRect.width
+            }
+            })
+            observer.observe(myDiv.value)
+        } else {
+            console.warn('Elemento ainda não disponível para o ResizeObserver')
+        }
     })
 
-    import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
-import { te } from "date-fns/locale";
-
+    onBeforeUnmount(() => {
+        if (observer) observer.disconnect()
+    })
 
 </script>
 
 <style lang="scss" scoped>
- .wrapper {
-    display: flex;
-    justify-content: center; /* Isso centraliza o 'conteudo' se ele não ocupar 100% da largura do 'wrapper' */
-    min-height: 50vh;
-    font-family: Arial, sans-serif;
-    padding-bottom: 2rem;
-    /* Se você quer que o conteúdo ocupe toda a altura do wrapper, adicione: */
-    align-items: stretch;
- }
+    .wrapper {
+        display: flex;
+        justify-content: center; /* Isso centraliza o 'conteudo' se ele não ocupar 100% da largura do 'wrapper' */
+        min-height: 50vh;
+        font-family: Arial, sans-serif;
+        padding-bottom: 2rem;
+        /* Se você quer que o conteúdo ocupe toda a altura do wrapper, adicione: */
+        align-items: stretch;
+    }
 
-.conteudo {
-    margin-top: 1rem;
-    padding: 0 20px;
-    background-color: #fffdfd;
-    flex-grow: 1; /* Permite que o 'conteudo' se expanda */
-    /* 'box-sizing: border-box;' é bom para evitar problemas com padding e largura */
-    box-sizing: border-box;
-    max-width: 900px; 
-}
+    .conteudo {
+        margin-top: 1rem;
+        padding: 0 20px;
+        background-color: #fffdfd;
+        flex-grow: 1; /* Permite que o 'conteudo' se expanda */
+        /* 'box-sizing: border-box;' é bom para evitar problemas com padding e largura */
+        box-sizing: border-box;
+        max-width: 900px; 
+    }
 
-/* Se a ideia é que 'conteudo1' e 'conteudo2' limitem a largura máxima, mantenha assim: */
-.conteudo1, .conteudo2 {
-    max-width: 900px; 
-}
+    /* Se a ideia é que 'conteudo1' e 'conteudo2' limitem a largura máxima, mantenha assim: */
+    .conteudo1, .conteudo2 {
+        max-width: 900px; 
+    }
 
-.sizeLoad{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 5rem auto;
-}
+    .sizeLoad{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5rem auto;
+    }
 
-.form{
-    width: 50%;
-}
-
-
-@media (max-width:900px){
     .form{
-        width: 100%;
+        width: 50%;
     }
-}
 
-@media print {
-    .btn {
-        display: none;
-    }
-    .pagina {
-        width: 190mm;
-        height: 285mm;
-        margin: 0;
-    }
-    // .pagina .header{
-    //     height: 10mm;
-    //     margin-bottom: 2rem;
-    // }
 
-    .content {
-        box-shadow: none;
-        margin: 0;
+    @media (max-width:900px){
+        .form{
+            width: 100%;
+        }
     }
-}
+
+    @media print {
+        .btn {
+            display: none;
+        }
+        .pagina {
+            width: 190mm;
+            height: 285mm;
+            margin: 0;
+        }
+
+        .content {
+            box-shadow: none;
+            margin: 0;
+        }
+    }
 
 </style>

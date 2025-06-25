@@ -4,7 +4,7 @@
         <v-pagination
           :length="totalPage"
           v-model="pagination.page"
-          :total-visible="isMobile ? 1 : 5"
+          :total-visible="checkIfMobile ? 1 : 5"
         ></v-pagination>
         <v-select
           density="compact"
@@ -19,32 +19,23 @@
   </template>
 
   <script setup>
-    import { ref, onMounted, onBeforeUnmount } from 'vue';
+    import { ref, onMounted, computed, onBeforeUnmount } from 'vue';
 
-    const isMobile = ref(false);
+    const props = defineProps({
+        pagination: Object, 
+        totalPage: Number,
+        large: Number
+    })
 
-    const checkIfMobile = () => {
-      isMobile.value = window.innerWidth <= 768; // Define 768px como largura limite
-    };
-
-    onMounted(() => {
-      checkIfMobile(); // Verifica no carregamento inicial
-      window.addEventListener('resize', checkIfMobile); // Adiciona o ouvinte de redimensionamento
-    });
-
-    onBeforeUnmount(() => {
-      // Remove o listener para evitar vazamentos de memória
-      window.removeEventListener('resize', checkIfMobile);
-    });
+    const checkIfMobile = computed(() => {
+      return props.large <= 768
+      ? true
+      : false
+    })
 
     const dipositivos = [
         15, 30, 40, 50
     ]
-
-    const props = defineProps({
-        pagination: Object, 
-        totalPage: Number
-    })
 
   </script>
 
