@@ -113,7 +113,7 @@
                                         </v-card>
                                     </v-expand-transition>
                                     <div class="text-right mt-2">
-                                        <IndiceLaw :estrutura="estrutura" @goTo="filterArts" />
+                                        <IndiceLaw :estrutura="estrutura" @goTo="filterArts($event, true)" />
                                         <v-btn @click="closeAllComments()" density="compact" variant="text">Fechar todos os comentários</v-btn>
                                     </div>
                                 </div>
@@ -442,7 +442,8 @@
         }
     }
 
-    const filterArts = (art) => {
+    const filterArts = (art, indice = false) => {
+        if(indice) clearAllArtsFilter()
         // Verificação prioritária do ciclo de vida
         if (!isComponentMounted.value) {
             console.warn('Componente desmontado, cancelando filterArts');
@@ -691,6 +692,7 @@
     //Fitrar por usuários
     import { useCommentStore } from "@/store/CommentStore";
 import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
+import { id } from "date-fns/locale";
     const commentStore = useCommentStore()
     
     const usersCommentsFilter = ref([])

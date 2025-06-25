@@ -11,7 +11,8 @@
             </v-card-title>
             <v-card-text class="overflow-y-auto" style="max-height: 600px;">
                 <v-list class="pa-0">
-                    <v-list-item class="py-0" :title="item.text" v-for="(item, index) in estruturaMap" :key="index" @click="scrollTo(item)">
+                    <v-list-item 
+                        class="py-0" v-html="item.text" v-for="(item, index) in estruturaMap" :key="index" @click="scrollTo(item)">
 
                     </v-list-item>
                 </v-list>

@@ -21,6 +21,7 @@
               >
                 {{ item.disciplina }}
               </v-chip>
+              <small class="text-overline">{{ item?.createdAt }}</small>
               <v-btn
                 icon
                 size="small"
@@ -38,7 +39,11 @@
           <!-- Conteúdo do Card -->
           <v-card-text class="pt-0">
             <div>
-               Artigos Ref: {{ item.art }} - {{ item.arts }}
+               Artigos Ref: 
+               <v-chip 
+                density="compact" color="success"
+                v-if="item.arts.length" v-for="art, a in item.arts" :key="a" class="mr-1">{{ art }}</v-chip> 
+                <v-chip  density="compact" color="success" v-else>{{ item.art }}</v-chip>
             </div>
             <!-- Palavras-chave -->
             <div class="mb-4">

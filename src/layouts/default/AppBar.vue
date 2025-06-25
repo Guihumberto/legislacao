@@ -43,7 +43,10 @@
               <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/leges">INÍCIO</router-link></li>
               <li class="hidden btn-menu"> <a @click.prevent="menu = !menu">INSTITUCIONAL</a></li>
               <li> <router-link :class="$route.name == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
-              <li> <router-link  to="/about">CONTATO</router-link></li>
+              <li> 
+                  <a  href="https://blogleges.estudodalei.com.br/" target="_blank" rel="noopener">BLOG</a>
+                  <Novo />
+              </li>
               <li class="hidden"> <router-link  to="/about">QUEM SOMOS</router-link></li>
             </ul>
           </nav>
@@ -90,6 +93,7 @@
   const generalStore = useGeneralStore()
 
   import { useLoginStore } from '../../store/LoginStore'
+import Novo from '@/components/partiaslLayout/novo.vue'
   const loginStore = useLoginStore()
 
   const dark = ref(false) 

@@ -15,32 +15,40 @@
                     <ConfigMyGroup :groups="forumStore.readMyGroup" />
                 </div>
             </div>
-            <ListForuns @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
+            <Loading v-if="load" />
+            <ListForuns v-else @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
         </div>
     </section>
 </template>
 
 <script setup>
-    import { onMounted } from 'vue';
+    import { ref, onMounted } from 'vue';
 
     import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
-
     import { useForumStore } from '@/store/ForumStore'
-    const forumStore = useForumStore()
-
     import { usePreferencesStore } from '@/store/PreferencesUsersStore';
-    const preferencesStore = usePreferencesStore()
 
     import ListForuns from '@/components/legislacao/forum/foruns/listForuns.vue';
     import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue';
+    import Loading from '@/components/partiaslLayout/loading.vue';
 
+    const geralStore = useGeralStore()
+    const forumStore = useForumStore()
+    const preferencesStore = usePreferencesStore()
+
+    // Estados reativos
+    const load = ref(false)
+
+    // Funções para gerenciar pastas
     const saveFoldersForum = async (event) => {
         await preferencesStore.saveFolders(event);
     }
 
+    // Carregar pastas ao montar o componente
     onMounted(async () => {
+        load.value = true
         await preferencesStore.loadFolders()
+        load.value = false
     })
     
 </script>
