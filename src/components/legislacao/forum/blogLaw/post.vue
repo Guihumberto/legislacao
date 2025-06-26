@@ -10,6 +10,9 @@
           class="educational-card"
           elevation="2"
         >
+        <v-card-text>
+          <MapMindInteractive :post="item" />
+        </v-card-text>
           <!-- Header do Card -->
           <v-card-title class="pb-2 text-wrap">
             <div class="d-flex align-center justify-space-between w-100">
@@ -215,146 +218,147 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+  import { ref, reactive, computed } from 'vue'
+  import MapMindInteractive from './mapMindInteractive.vue'
 
-// Props
-const props = defineProps({
-  posts: {
-    type: Array,
-    required: true,
-    default: () => []
-  }
-})
+  // Props
+  const props = defineProps({
+    posts: {
+      type: Array,
+      required: true,
+      default: () => []
+    }
+  })
 
-// Estados reativos
-const expanded = reactive(new Set())
-const showQuestions = reactive(new Set())
-const showAllKeywords = reactive(new Set())
-const favorites = reactive(new Set())
-const userAnswers = reactive(new Map())
-const showAnswers = reactive(new Set())
+  // Estados reativos
+  const expanded = reactive(new Set())
+  const showQuestions = reactive(new Set())
+  const showAllKeywords = reactive(new Set())
+  const favorites = reactive(new Set())
+  const userAnswers = reactive(new Map())
+  const showAnswers = reactive(new Set())
 
-// Funções
-const toggleExpanded = (index) => {
-  if (expanded.has(index)) {
-    expanded.delete(index)
-  } else {
-    expanded.add(index)
-  }
-}
-
-const toggleQuestions = (index) => {
-  if (showQuestions.has(index)) {
-    showQuestions.delete(index)
-  } else {
-    showQuestions.add(index)
-  }
-}
-
-const toggleKeywords = (index) => {
-  if (showAllKeywords.has(index)) {
-    showAllKeywords.delete(index)
-  } else {
-    showAllKeywords.add(index)
-  }
-}
-
-const toggleFavorite = (index) => {
-  if (favorites.has(index)) {
-    favorites.delete(index)
-  } else {
-    favorites.add(index)
-  }
-}
-
-const selectAlternative = (cardIndex, questionIndex, alternative) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  if (!showAnswers.has(questionId)) {
-    userAnswers.set(questionId, alternative)
-  }
-}
-
-const revealAnswer = (cardIndex, questionIndex, correctAnswer) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  showAnswers.add(questionId)
-}
-
-const resetQuestion = (cardIndex, questionIndex) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  userAnswers.delete(questionId)
-  showAnswers.delete(questionId)
-}
-
-const getAlternativeClass = (cardIndex, questionIndex, alternative) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  const userAnswer = userAnswers.get(questionId)
-  const isAnswerRevealed = showAnswers.has(questionId)
-  
-  if (!isAnswerRevealed) {
-    return {
-      'alternative-selectable': true,
-      'alternative-selected': userAnswer === alternative
+  // Funções
+  const toggleExpanded = (index) => {
+    if (expanded.has(index)) {
+      expanded.delete(index)
+    } else {
+      expanded.add(index)
     }
   }
-  
-  const correctAnswer = props.posts[cardIndex].questoes[questionIndex].resposta_correta
-  
-  return {
-    'alternative-correct': alternative === correctAnswer,
-    'alternative-incorrect': userAnswer === alternative && alternative !== correctAnswer,
-    'alternative-disabled': true
+
+  const toggleQuestions = (index) => {
+    if (showQuestions.has(index)) {
+      showQuestions.delete(index)
+    } else {
+      showQuestions.add(index)
+    }
   }
-}
 
-const getResultColor = (cardIndex, questionIndex, correctAnswer) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  const userAnswer = userAnswers.get(questionId)
-  return userAnswer === correctAnswer ? 'success' : 'error'
-}
-
-const getResultIcon = (cardIndex, questionIndex, correctAnswer) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  const userAnswer = userAnswers.get(questionId)
-  return userAnswer === correctAnswer ? 'mdi-check-circle' : 'mdi-close-circle'
-}
-
-const getResultText = (cardIndex, questionIndex, correctAnswer) => {
-  const questionId = `${cardIndex}-${questionIndex}`
-  const userAnswer = userAnswers.get(questionId)
-  return userAnswer === correctAnswer ? 'Parabéns! Resposta correta!' : 'Resposta incorreta'
-}
-
-const getTextPreview = (text, isExpanded) => {
-  if (isExpanded || text?.length <= 200) {
-    return text
+  const toggleKeywords = (index) => {
+    if (showAllKeywords.has(index)) {
+      showAllKeywords.delete(index)
+    } else {
+      showAllKeywords.add(index)
+    }
   }
-  return text?.substring(0, 200) + '...'
-}
 
-const getDisciplineColor = (disciplina) => {
-  const colors = {
-    'Direito Tributário': 'blue',
-    'Direito Constitucional': 'green',
-    'Direito Administrativo': 'orange',
-    'Direito Civil': 'purple',
-    'Direito Penal': 'red',
-    'Direito Processual': 'teal'
+  const toggleFavorite = (index) => {
+    if (favorites.has(index)) {
+      favorites.delete(index)
+    } else {
+      favorites.add(index)
+    }
   }
-  return colors[disciplina] || 'grey'
-}
 
-const shareCard = (item) => {
-  if (navigator.share) {
-    navigator.share({
-      title: item.titulo,
-      text: item.texto.substring(0, 100) + '...',
-      url: window.location.href
-    })
-  } else {
-    // Fallback para navegadores que não suportam Web Share API
-    navigator.clipboard.writeText(item.titulo + '\n\n' + item.texto)
+  const selectAlternative = (cardIndex, questionIndex, alternative) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    if (!showAnswers.has(questionId)) {
+      userAnswers.set(questionId, alternative)
+    }
   }
-}
+
+  const revealAnswer = (cardIndex, questionIndex, correctAnswer) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    showAnswers.add(questionId)
+  }
+
+  const resetQuestion = (cardIndex, questionIndex) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    userAnswers.delete(questionId)
+    showAnswers.delete(questionId)
+  }
+
+  const getAlternativeClass = (cardIndex, questionIndex, alternative) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    const userAnswer = userAnswers.get(questionId)
+    const isAnswerRevealed = showAnswers.has(questionId)
+    
+    if (!isAnswerRevealed) {
+      return {
+        'alternative-selectable': true,
+        'alternative-selected': userAnswer === alternative
+      }
+    }
+    
+    const correctAnswer = props.posts[cardIndex].questoes[questionIndex].resposta_correta
+    
+    return {
+      'alternative-correct': alternative === correctAnswer,
+      'alternative-incorrect': userAnswer === alternative && alternative !== correctAnswer,
+      'alternative-disabled': true
+    }
+  }
+
+  const getResultColor = (cardIndex, questionIndex, correctAnswer) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    const userAnswer = userAnswers.get(questionId)
+    return userAnswer === correctAnswer ? 'success' : 'error'
+  }
+
+  const getResultIcon = (cardIndex, questionIndex, correctAnswer) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    const userAnswer = userAnswers.get(questionId)
+    return userAnswer === correctAnswer ? 'mdi-check-circle' : 'mdi-close-circle'
+  }
+
+  const getResultText = (cardIndex, questionIndex, correctAnswer) => {
+    const questionId = `${cardIndex}-${questionIndex}`
+    const userAnswer = userAnswers.get(questionId)
+    return userAnswer === correctAnswer ? 'Parabéns! Resposta correta!' : 'Resposta incorreta'
+  }
+
+  const getTextPreview = (text, isExpanded) => {
+    if (isExpanded || text?.length <= 200) {
+      return text
+    }
+    return text?.substring(0, 200) + '...'
+  }
+
+  const getDisciplineColor = (disciplina) => {
+    const colors = {
+      'Direito Tributário': 'blue',
+      'Direito Constitucional': 'green',
+      'Direito Administrativo': 'orange',
+      'Direito Civil': 'purple',
+      'Direito Penal': 'red',
+      'Direito Processual': 'teal'
+    }
+    return colors[disciplina] || 'grey'
+  }
+
+  const shareCard = (item) => {
+    if (navigator.share) {
+      navigator.share({
+        title: item.titulo,
+        text: item.texto.substring(0, 100) + '...',
+        url: window.location.href
+      })
+    } else {
+      // Fallback para navegadores que não suportam Web Share API
+      navigator.clipboard.writeText(item.titulo + '\n\n' + item.texto)
+    }
+  }
 </script>
 
 <style scoped>

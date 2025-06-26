@@ -691,8 +691,7 @@
 
     //Fitrar por usuários
     import { useCommentStore } from "@/store/CommentStore";
-import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
-import { id } from "date-fns/locale";
+    import IndiceLaw from "@/components/legislacao/forum/foruns/indiceLaw.vue";
     const commentStore = useCommentStore()
     
     const usersCommentsFilter = ref([])

@@ -28,6 +28,7 @@
                       <v-btn :loading="load" :disabled="load" @click="generetePostIa" variant="flat" color="error" prepend-icon="mdi-robot">Gerar Post IA</v-btn>
                     </div>
                 </div>
+                 <Loading v-if="loadPage" class="my-5" />
                 <div class="mt-5">
                     <Posts :posts="posts" />
                 </div>
@@ -41,11 +42,14 @@
     import { inject, onMounted, ref, watch, computed } from 'vue';
 
     import { useBlogLawStore } from '@/store/forum/blogLawStore'
+    import { useMindMapInteractive } from '@/store/forum/mindMapInteractive';
     import { useForumStore } from '@/store/ForumStore';
     import { useRoute } from "vue-router";
-   
+    
     import Posts from '../blogLaw/post.vue';
-
+import Loading from '../loading.vue';
+    
+    const mindMapInt = useMindMapInteractive()
     const blogLawStore = useBlogLawStore()
     const forumStore = useForumStore()
     const route = useRoute()
@@ -167,8 +171,13 @@
         load.value = false
     }  
 
+    const loadPage = ref(false)
+
     onMounted(async() => {
-        await getPostLaw(forumStore.readGroupForum._source.idLaw)
+        loadPage.value = true
+        await getPostLaw(forumStore.readGroupForum?._source?.idLaw)
+        await mindMapInt.fetchMindMaps(forumStore.readGroupForum?._source?.idLaw)
+        loadPage.value = false
     })
 
 </script>

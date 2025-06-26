@@ -10,10 +10,12 @@
                 <v-btn variant="text" icon="mdi-close" @click="dialog = false"></v-btn>
             </v-card-title>
             <v-card-text class="overflow-y-auto" style="max-height: 600px;">
-                <v-list class="pa-0">
+                <v-list class="pa-0 border rounded-lg">
                     <v-list-item 
-                        class="py-0" v-html="item.text" v-for="(item, index) in estruturaMap" :key="index" @click="scrollTo(item)">
-
+                        class="py-0" v-html="item.text" 
+                        v-for="(item, index) in estruturaMap" :key="index" @click="scrollTo(item)"
+                        :class="[selectItem(item?.art), recuo(item?.text)]"
+                    >
                     </v-list-item>
                 </v-list>
             </v-card-text>
@@ -23,6 +25,9 @@
 
 <script setup>
     import { ref, computed } from 'vue';
+    import { useRoute } from 'vue-router';
+    const route = useRoute()
+
     const dialog = ref(false);
 
     const props = defineProps({
@@ -42,6 +47,32 @@
     const scrollTo = (item) => {
         emits('goTo', item.art)
         dialog.value = false
+    }
+
+    const selectItem = (art) => {
+
+        if(!route?.query?.arts) return ''
+
+        if(art == route?.query?.arts[0]) return 'bg-blue-lighten-4 font-weight-bold'
+    }
+    
+
+    const recuo = (text) => {
+        const textoLower = text.toLowerCase()
+
+        if (textoLower.includes('livro')) {
+            return 'pl-2 font-weight-bold'
+        } else if (textoLower.includes('título')) {
+        return 'pl-5 font-weight-medium'
+        } else if (textoLower.includes('capítulo')) {
+            return 'pl-10 font-weight-regular'
+        } else if (textoLower.includes('subseção')) {
+            return 'pl-16 font-weight-thin'
+        } else if (textoLower.includes('seção')) {
+            return 'pl-13 font-weight-light'
+        } else {
+            return 'pl-0'
+        }
     }
 
 </script>
