@@ -362,6 +362,10 @@
       renderMap();
     }, { deep: true });
 
+    watch(dados, () => {
+      renderMap();
+    },  { deep: true });
+
     </script>
 
     <style scoped>

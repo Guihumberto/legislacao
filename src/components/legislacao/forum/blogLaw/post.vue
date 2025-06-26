@@ -10,7 +10,7 @@
           class="educational-card"
           elevation="2"
         >
-        <v-card-text>
+        <v-card-text v-if="false">
           <MapMindInteractive :post="item" />
         </v-card-text>
           <!-- Header do Card -->
