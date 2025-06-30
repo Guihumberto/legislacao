@@ -80,7 +80,7 @@ onUnmounted(() => {
 <style scoped>
 .leges-wrapper {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 320px);
   width: 100%;
   position: relative;
 }

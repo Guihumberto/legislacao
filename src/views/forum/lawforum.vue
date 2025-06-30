@@ -1,7 +1,22 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <section ref="leftPanel" class="panel conteudo overflow-y-auto" :style="{ width: leftWidth + 'px' }">
+            <v-tabs
+                class="mb-2"
+                v-if="mdAndDown"
+                v-model="tab"
+                align-tabs="center"
+                color="deep-purple-accent-4"
+            >
+                <v-tab :value="1">Norma</v-tab>
+                <v-tab :value="2">Ferramentas</v-tab>
+            </v-tabs>
+
+            <section 
+                ref="leftPanel" class="panel conteudo overflow-y-auto" 
+                :style="mdAndDown ? '': { width: leftWidth + 'px' }"
+                v-if="mdAndDown && tab == 1 || !mdAndDown"
+            >
                 <div class="law" ref="lawRef">
                     <div class="sizeLoad" v-if="forumStore.readLoad">
                         <v-progress-circular
@@ -11,8 +26,16 @@
                         ></v-progress-circular>
                     </div>
                     <div v-else>
-                        <v-btn variant="tonal" @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" class="btn">Voltar</v-btn>   
-                        <v-btn class="ml-2" color="success" @click="sidelaw = !sidelaw" variant="flat">Ferramentas de Estudo</v-btn>    
+                        <v-btn 
+                            variant="tonal" 
+                            @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" 
+                            prepend-icon="mdi-arrow-left"
+                            class="btn">Voltar</v-btn>   
+                        <v-btn 
+                            class="ml-2" 
+                            color="success" 
+                            v-if="!mdAndDown"
+                            @click="sidelaw = !sidelaw" variant="flat">Ferramentas de Estudo</v-btn>    
                         
                         <DadosGrupo />
             
@@ -137,7 +160,7 @@
             </section>
             <!-- barra ed ajuste -->
             <div 
-                v-if="sidelaw"
+                v-if="sidelaw && !mdAndDown"
                 ref="divider" 
                 class="panel-divider"
                 @mousedown="startResize"
@@ -154,9 +177,10 @@
                 <div 
                     ref="rightPanel" 
                     class="panel right-panel overflow-y-auto chat" 
-                    :style="{ width: rightWidth + 'px' }" v-show="!xs && sidelaw"
+                    :style="mdAndDown ? '': { width: rightWidth + 'px' }" v-show="!xs && sidelaw || mdAndDown && tab == 2"
+                    v-if="mdAndDown && tab == 2 || !mdAndDown"
                 >
-                    <Home @close="sidelaw = false" class="chat-content" />
+                    <Home @close="sidelaw = false, tab = 1" class="chat-content" />
                 </div>
             </transition>
         </div>
@@ -165,9 +189,8 @@
 
 <script setup>
     import { ref, computed, watch, onMounted, provide, onBeforeUnmount, nextTick  } from "vue";
-
     import { useDisplay } from 'vuetify'
-    const { xs } = useDisplay()
+    const { mobile, xs, sm, md, lg, xl, xxl, name, mdAndDown  } = useDisplay()
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
@@ -175,23 +198,20 @@
     import Home from "@/components/legislacao/forum/textavancado/home.vue";
 
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
-    const mapaMentalStore = useMapaMentalStore()
-   
     import { useForumStore } from "@/store/ForumStore";
-    const forumStore = useForumStore()
-   
     import { useSnackStore } from "@/store/snackStore";
-    const snackStore = useSnackStore()
-   
     import { useRoute, useRouter } from "vue-router";
+    import { useGeralStore } from '@/store/GeralStore';
+
+    const mapaMentalStore = useMapaMentalStore()
+    const forumStore = useForumStore()
+    const snackStore = useSnackStore()
     const route = useRoute()
     const router = useRouter()
-
-    import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()
 
+    const tab = ref(1)
     const isComponentMounted = ref(false)
-
     const sidelaw = ref(false)
     const search = ref(null)
     const artsFilterActive = ref(false)
@@ -1000,6 +1020,17 @@
     }
     .right-panel{
         transition: 1s ease-in-out;
+    }
+
+    @media (max-width:1279px){
+        .container, .container2{
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .panel, .conteudo{
+            width: 100%;
+        }
     }
 
     @media (max-width:900px){

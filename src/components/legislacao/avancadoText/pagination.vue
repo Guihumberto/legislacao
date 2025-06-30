@@ -5,13 +5,15 @@
           :length="totalPage"
           v-model="pagination.page"
           :total-visible="checkIfMobile ? 1 : 5"
+          density="compact"
         ></v-pagination>
         <v-select
           density="compact"
-          style="width: 85px"
+          style="width: 85px; transform: scale(.8);"
           :items="dipositivos"
           v-model="pagination.perPage"
           hide-details
+          class="mb-4"
         ></v-select>
 
       </div>
@@ -19,7 +21,9 @@
   </template>
 
   <script setup>
-    import { ref, onMounted, computed, onBeforeUnmount } from 'vue';
+    import {  computed } from 'vue';
+    import { useDisplay } from 'vuetify'
+    const { mobile } = useDisplay()
 
     const props = defineProps({
         pagination: Object, 
@@ -28,6 +32,7 @@
     })
 
     const checkIfMobile = computed(() => {
+      if(mobile.value) return true
       return props.large <= 768
       ? true
       : false

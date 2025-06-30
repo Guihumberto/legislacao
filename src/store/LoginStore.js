@@ -110,8 +110,11 @@ export const useLoginStore = defineStore("loginStore", {
         clearLogin(){
             this.login = {
                 cpf: null,
+                login: null,
                 name: null,
-                nickname: null
+                apelido: null,
+                firstLogin: false,
+                dateFirstLogin: null
             }
         },
         async getUsers(){

@@ -130,7 +130,6 @@ export const useAuthStore = defineStore("authStore", {
         await firebaseSignOut(auth);
         this.user = null;
       } catch (error) {
-        console.error('Erro ao fazer logout:', error);
         this.error = error.message;
         throw error;
       } finally {
