@@ -72,6 +72,12 @@ export default [
         meta: { requiresAuth: true, role: true } 
       },
       {
+        path: '/admin/precadastro',
+        name: 'Lista de Pre-cadastro',
+        component: () => import('@/views/admin/precadastro.vue'),
+        meta: { requiresAuth: true, role: true } 
+      },
+      {
         path: '/admin/rag',
         name: 'Rag Chat',
         component: () => import('@/views/admin/rag_chat.vue'),

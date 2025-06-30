@@ -177,6 +177,7 @@
               { text: 'Usuários', icon: 'mdi-account-group', url:'/users' },
               { text: 'Fonte', icon: 'mdi-format-list-bulleted-square', url:'/fonte_admin' },
               { text: 'Publicações', icon: 'mdi-newspaper-variant', url:'/publishs_admin' },
+              { text: 'Concursos', icon: 'mdi-account-box-edit-outline', url:'/home/admin' },
     ]
 
 </script>
