@@ -227,7 +227,7 @@
                 this.artsFilterActive = false
             },
             voltar(){
-                this.$router.push("/leges");
+                this.$router.push("/homepainel");
             },
             pageFilter(item){
                 let art = this.artsFilter[0]

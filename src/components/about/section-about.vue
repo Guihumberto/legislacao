@@ -1,7 +1,7 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <v-btn variant="text" class="ml-n4" @click="$router.push('/leges')" color="grey"> <v-icon>mdi-home</v-icon>INÍCIO</v-btn>
+            <v-btn variant="text" class="ml-n4" @click="$router.push(ROUTES.HOME)" color="grey"> <v-icon>mdi-home</v-icon>INÍCIO</v-btn>
             <v-img 
                 class="bg-grey-lighten-2"
                 cover
@@ -48,6 +48,8 @@
 </template>
 <script setup>
     import { useGeralStore } from '@/store/GeralStore';
+    import { ROUTES } from '@/constants/routes';
+
     const geralStore = useGeralStore()
 
 </script>

@@ -59,11 +59,11 @@
        
     const voltar = () => {
         if(route.query.idpage) router.go(-1)
-        if(route.query.search == 'search') router.push("/leges");
+        if(route.query.search == 'search') router.push("/homepainel");
         if(route.query.search == 'leges') router.push("/legesporlei");
         if(route.query.search == 'favs') router.push("/favorites");
         if(route.query.search == 'news') router.push("/newslaws");
-        if(!route.query.search) router.push("/leges");
+        if(!route.query.search) router.push("/homepainel");
     }
 
     const { selectionGet, selectedText, menu, menuPosition } = useHandleTextSelection()

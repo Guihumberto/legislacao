@@ -4,10 +4,10 @@
       <div class="subheader">
         <h6 class="d-flex align-center">
           <v-app-bar-nav-icon density="compact" variant="text" @click.stop="drawer2 = !drawer2" :disabled="!loginStore.readLogin.cpf" title="Necessário estar logado."></v-app-bar-nav-icon>
-          <router-link to="/leges" class="linkinitial">LEGISLAÇÃO</router-link>
+          <router-link to="/homepainel" class="linkinitial">ESTUDO DA LEI</router-link>
         </h6>
         <div class="rigthSubheader">
-          <router-link to="/about" class="mr-2">FALE CONOSCO</router-link>
+          <router-link to="/planos" class="mr-2">PREÇOS</router-link>
           <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
           <a @click="loginStore.logOut($router)" class="mr-2 text-orange" v-else>SAIR</a>
           <Notification v-if="loginStore.readLogin.cpf" />
@@ -35,12 +35,12 @@
               class="btn-side-bar" color="white" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <div class="logo" @click="$router.push(geralStore.readTitleApp.to)">
               <small class="text-white">{{geralStore.readTitleApp.title}}</small>
-              <h1 class="text-white texto_title">OH-MY-SEARCH</h1>
+              <h1 class="text-white texto_title">ESTUDO DA LEI</h1>
             </div>
           </div>
           <nav class="navbar">
             <ul role="list">
-              <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/leges">INÍCIO</router-link></li>
+              <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/homepainel">INÍCIO</router-link></li>
               <li class="hidden btn-menu"> <a @click.prevent="menu = !menu">INSTITUCIONAL</a></li>
               <li> <router-link :class="$route.name == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
               <li> 

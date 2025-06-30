@@ -1,7 +1,7 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <v-btn variant="text" class="pa-0" @click="$router.push('/leges')"> <v-icon>mdi-home</v-icon>Voltar</v-btn>
+            <v-btn variant="text" class="pa-0" @click="$router.push(ROUTES.LEGES)"> <v-icon>mdi-home</v-icon>Voltar</v-btn>
             <h2 class="my-5">Ajuda</h2>
             <v-card elevation="0" class="mb-5">
                 <v-card-text>
@@ -16,8 +16,8 @@
 </template>
 
 <script setup>
-    import { computed } from 'vue'
-    import { ref } from 'vue'
+    import { computed, ref } from 'vue'
+    import { ROUTES } from '@/constants/routes';
 
     import { useGeralStore } from '@/store/GeralStore';
     const geralStore = useGeralStore()

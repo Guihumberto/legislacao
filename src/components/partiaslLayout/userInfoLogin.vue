@@ -66,7 +66,7 @@
     const logout = () => {
       loginStore.logOut()
       menu.value = false
-      router.push('/leges')
+      router.push('/homepainel')
     }
 
     const getFirstAndSecondName = (fullName) => {

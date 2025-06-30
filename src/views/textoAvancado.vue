@@ -10,7 +10,7 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/leges')" class="btn">Voltar</v-btn>
+                    <v-btn variant="tonal" @click="$router.push('/homepainel')" class="btn">Voltar</v-btn>
                     <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
                     <Relacoes />
                     <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>

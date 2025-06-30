@@ -6,7 +6,7 @@ export const useGeralStore = defineStore("geral", {
     menuSide: false,
     headerShow: true,
     drawerHistory: false,
-    titleApp: {title:'Legislação', to: '/' }
+    titleApp: {title:'Leges', to: '/' }
   }),
   getters: {
     readSearch() {

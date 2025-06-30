@@ -105,6 +105,16 @@ export default [
         component: () => import('@/views/public/allNormas.vue'),
       },
       {
+        path: '/planos',
+        name: 'Assinatura',
+        component: () => import('@/views/public/assinaturas.vue'),
+      },
+       {
+        path: '/assinar',
+        name: 'Assinar',
+        component: () => import('@/views/public/assinar.vue'),
+      },
+      {
         path: '/restricted',
         name: 'Area Restrita',
         component: () => import('@/views/areaRestricted.vue'),

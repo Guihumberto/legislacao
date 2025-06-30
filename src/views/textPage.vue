@@ -62,7 +62,7 @@
         if(route.query.page == 'norms'){
             router.push("/gerencial/normas");
         } else {
-            router.push("/leges");
+            router.push("/homepainel");
         }
      }
 

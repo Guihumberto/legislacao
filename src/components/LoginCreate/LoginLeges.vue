@@ -48,8 +48,9 @@
      </v-form>
      <div v-else class="text-center">
          <v-icon class="mb-5" size="5rem" color="primary"> mdi-flash</v-icon>
-         <v-alert variant="outlined" type="info" :text="`Você já está conectado como: ${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''} `"></v-alert>
-         <v-btn variant="flat" color="primary" @click="$router.push('/leges')" class="mt-5" append-icon="mdi-magnify">Iniciar busca</v-btn>
+         <v-alert variant="outlined" type="info" :text="`${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''}, seu plano atual é o BÁSICO`"></v-alert>
+         <v-btn variant="flat" color="primary" @click="$router.push('/homepainel')" class="mt-5" append-icon="mdi-magnify" v-if="$route.name != 'Assinar'">Iniciar</v-btn>
+         <v-btn v-if="$route.name == 'Assinar'" class="mt-5" color="error" @click="loginStore.logOut" variant="text">Entrar com outra conta</v-btn>
         </div>
      <FirstLogin :dialog="dialog" :userNew="userNew" />
  </div>
@@ -61,17 +62,15 @@
     import { mask } from 'vue-the-mask'
 
     import { useAuthStore } from '@/store/firebase/authStore';
-    const authService = useAuthStore();
-
     import { useRouter, useRoute } from 'vue-router';
+    import { useLoginStore } from '../../store/LoginStore'
+    import { useDisplay } from 'vuetify'
+
+    const { xs } = useDisplay()
+    const authService = useAuthStore();
+    const loginStore = useLoginStore()
     const router = useRouter()
     const route = useRoute()
-
-    import { useLoginStore } from '../../store/LoginStore'
-    const loginStore = useLoginStore()
-
-    import { useDisplay } from 'vuetify'
-    const { xs } = useDisplay()
 
     const props = defineProps({
         flutuante: {
@@ -117,7 +116,8 @@
                  if(!login.name){
                     dialog.value = true
                  } else {
-                    const redirectTo = route.query.redirect || '/leges'
+                    if('route', route.name == 'Assinar') return
+                    const redirectTo = route.query.redirect || '/homepainel'
                     router.push(redirectTo)
                  }
              }
@@ -137,7 +137,7 @@
                     userNew.value = { ...login };
                     dialog.value = true;
                 } else {
-                    const redirectTo = route.query.redirect || '/leges';
+                    const redirectTo = route.query.redirect || '/homepainel';
                     router.push(redirectTo);
                 }
           }
@@ -186,7 +186,7 @@
                     userNew.value = { ...login };
                     dialog.value = true;
                 } else {
-                    const redirectTo = route.query.redirect || '/leges';
+                    const redirectTo = route.query.redirect || '/homepainel';
                     router.push(redirectTo);
                 }
             }

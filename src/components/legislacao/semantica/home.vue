@@ -1,7 +1,7 @@
 <template>
     <section class="bg-black">
         <div class="container">
-            <v-btn variant="text" class="pa-0 mb-10" @click="$router.push('/leges')" prepend-icon="mdi-home">INÍCIO</v-btn>
+            <v-btn variant="text" class="pa-0 mb-10" @click="$router.push('/homepainel')" prepend-icon="mdi-home">INÍCIO</v-btn>
             <h2>Busca Legislação</h2>
             <div class="my-5 w-50">
                 <h3 class="mb-2">Insira sua consulta</h3>

@@ -80,7 +80,7 @@
     load.value = false
     idDelete.value = null
 
-    if(route.params.id == id) router.push('/leges')
+    if(route.params.id == id) router.push('/homepainel')
   }
 
 </script>

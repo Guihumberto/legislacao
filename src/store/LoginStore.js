@@ -101,7 +101,7 @@ export const useLoginStore = defineStore("loginStore", {
             if(link){
                 router.push(link)
             } else {
-                router.push('/leges')
+                router.push('/homepainel')
             }
             this.unmountedDestruct()
             sessionStorage.removeItem('userData')

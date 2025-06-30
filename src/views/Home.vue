@@ -25,11 +25,11 @@
     onMounted(() => {
         if(!lawStore.readLoad && !consultaStore.readLoadAll) {
             setTimeout(() => {
-                router.push('/leges')
+                router.push('/homepainel')
             }, 1500)
         } 
         setTimeout(() => {
-            router.push('/leges')
+            router.push('/homepainel')
         }, 3000)
     })
 

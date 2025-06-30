@@ -38,6 +38,8 @@
 <script setup>
   import { ref, watch } from 'vue';
   import { useRouter } from 'vue-router';
+  import { ROUTES } from '@/constants/routes';
+
   const router = useRouter()
 
   import { useGeneralStore } from '@/store/GeneralStore'
@@ -69,7 +71,7 @@
   const actionsSearch = (action) => {
     if(action == 'search') {
       if(props.direct){
-        router.push('/leges')
+        router.push('/homepainel')
         generalStore.reqChangeFromSelectSearch(true, props.selectedText)
       } else {
         generalStore.reqChangeFromSelectSearch(true, props.selectedText)
@@ -79,7 +81,7 @@
     if(action == 'acrescentar') {
       const search = (`${props.searchP} ${props.selectedText}`).trim()
       if(props.direct){
-        router.push('/leges')
+        router.push('/homepainel')
         generalStore.reqChangeFromSelectSearch(true, search)
       } else {
         generalStore.reqChangeFromSelectSearch(true, search)
