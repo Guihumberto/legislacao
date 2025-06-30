@@ -1,10 +1,10 @@
 <template>
   <div class="educational-cards-container">
-    <div class="cards-grid">
+    <div class="cards-gri">
       <div
         v-for="(item, index) in posts"
         :key="index"
-        class="card-wrapper"
+        class="card-wrapper mb-5"
       >
         <v-card
           class="educational-card"
@@ -541,6 +541,10 @@
   .cards-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
+  }
+
+  .card-wrapper{
+    max-width: 768px;
   }
   
   .educational-cards-container {

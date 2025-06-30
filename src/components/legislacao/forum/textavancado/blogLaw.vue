@@ -1,7 +1,6 @@
 <template>
      <div class="wrapper">
         <section class="conteudo" ref="topUp" :class="rightWidth > 900 ? 'conteudo1' : 'conteudo2'">
-            <div>
                 <div class="mt-2 d-flex ga-2 align-center pa-2">
                     <v-icon>mdi-post-outline</v-icon>
                         <h1 class="text-h5">Blog da Lei</h1>
@@ -28,12 +27,8 @@
                       <v-btn :loading="load" :disabled="load" @click="generetePostIa" variant="flat" color="error" prepend-icon="mdi-robot">Gerar Post IA</v-btn>
                     </div>
                 </div>
-                 <Loading v-if="loadPage" class="my-5" />
-                <div class="mt-5">
-                    <Posts :posts="posts" />
-                </div>
-
-            </div>
+                <Loading v-if="loadPage" class="my-5" />
+                <Posts :posts="posts" class="mt-5" />
         </section>
     </div>
 </template>
@@ -47,7 +42,7 @@
     import { useRoute } from "vue-router";
     
     import Posts from '../blogLaw/post.vue';
-import Loading from '../loading.vue';
+    import Loading from '../loading.vue';
     
     const mindMapInt = useMindMapInteractive()
     const blogLawStore = useBlogLawStore()
@@ -203,11 +198,13 @@ import Loading from '../loading.vue';
     }
 
     /* Se a ideia é que 'conteudo1' e 'conteudo2' limitem a largura máxima, mantenha assim: */
-    .conteudo1 {
+    .conteudo1, .conteudo2 {
         max-width: 900px; /* Altere de 'width' para 'max-width' para que ele cresça até 900px */
     }
 
-    .conteudo2 {
-        max-width: 900px;
+    @media (max-width: 768px) {
+        .conteudo1, .conteudo2 {
+            max-width: 100%; /* Altere de 'width' para 'max-width' para que ele cresça até 900px */
+        }
     }
 </style>
