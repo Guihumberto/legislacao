@@ -24,9 +24,9 @@
             
             <h1 class="mb-5 text-h4 mt-5">Sobre a Aplicação</h1>
             <div class="content">
-                <p>A aplicação de busca na Legislação OH-MY-SEARCH é um sistema idealizado e desenvolvido 
-                     por João Humberto Silva Ribeiro Júnior, sendo projetado para ser uma 
-                     ferramenta útil a todos os usuários que desejam um acessso rápido e facilitado da legislação.
+                <p>A aplicação com foco na legislação ESTUDO DA LEI é um sistema idealizado e desenvolvido 
+                     por <b>João Humberto Silva Ribeiro Júnior</b>, sendo projetado para ser uma 
+                     ferramenta útil a todos os estudantes e operadores do direito que desejam um acessso inteligente e facilitado da legislação.
                 </p>
                 <br>
                 <p>Se deseja contribuir com esta iniciativa, envie suas sugestões, elogios e críticas 

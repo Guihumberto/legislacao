@@ -40,18 +40,18 @@
           </div>
           <nav class="navbar">
             <ul role="list">
-              <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/homepainel">INÍCIO</router-link></li>
-              <li class="hidden btn-menu"> <a @click.prevent="menu = !menu">INSTITUCIONAL</a></li>
+              <li> <router-link :class="$route.name == 'Home Painel' ? 'active' : ''" to="/homepainel">INÍCIO</router-link></li>
+              <li> <router-link :class="$route.name == 'Legislacao' ? 'active' : ''" to="/leges">LEGISLAÇÃO</router-link></li>
               <li> <router-link :class="$route.name == 'Legislacaoporlei' ? 'active' : ''" to="/legesporlei">NORMAS</router-link></li>
               <li> 
                   <a  href="https://blogleges.estudodalei.com.br/" target="_blank" rel="noopener">BLOG</a>
                   <Novo />
               </li>
-              <li class="hidden"> <router-link  to="/about">QUEM SOMOS</router-link></li>
+              <li class="hidden"> <router-link :class="$route.name == 'Sobre' ? 'active' : ''" to="/about">QUEM SOMOS</router-link></li>
             </ul>
           </nav>
           <div class="btn_group">    
-            <v-btn variant="flat" title="chat arcadio" icon="mdi-chat" class="mr-1" @click="linkTo()"></v-btn>
+
             <loginInfo :isLogin="!loginStore.readLogin.cpf" :flutuante="false" />   
           </div>
         </div>

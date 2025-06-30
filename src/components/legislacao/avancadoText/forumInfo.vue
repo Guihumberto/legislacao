@@ -1,5 +1,5 @@
 <template>
-      <v-btn @click="dialog = true" class="text-lowercase" variant="text" prepend-icon="mdi-forum" text="Abrir Discussão"></v-btn>
+      <v-btn @click="dialog = true" variant="tonal" color="primary" prepend-icon="mdi-download-box" text="IMPORTAR NORMA" :disabled="!loginStore.readLogin?.cpf"></v-btn>
   
       <v-dialog
         v-model="dialog"
@@ -8,37 +8,19 @@
       >
         <v-card
           max-width="400"
-          prepend-icon="mdi-forum"
-          text="A partir da norma, crie um grupo para comentar os dispositivos, fazer ou responder a perguntas, explicar artigos entre outras coisas."
-          title="Abrir Discussão"
+          prepend-icon="mdi-download-box"
+          text="Ao importar uma norma é possível inserir comentários nos dispositivos, fazer ou responder a perguntas, explicar artigos, resolver questões, criar resumos e muito mais."
+          title="Importar norma"
         >
             <v-card-text>
                 <div class="mb-5">
-                  <h5 class="mb-5">{{ title }}</h5>
-                  <v-btn v-if="!start" color="success" @click="startForum" block :loading="load">Iniciar</v-btn>
-                </div>
-
-                <div class="mb-5" v-if="groupsForum.total && !showForms && !confirm">
-                  <v-alert type="info" text="Já existe grupo criado para esta norma."></v-alert>
-                  <!-- existe grupo -->
-                  <div class="mt-5" v-if="!showGroup">
-                    <p>O que deseja fazer?</p>
-                    <div class="d-flex justify-center ga-1 mt-2">
-                      <div class="border pa-2 text-center" @click="showGroup = true">
-                        Pedir para <br>  participar do grupo <br>  existente
-                      </div>
-                      <div class="border pa-2 d-flex align-center" @click="showForms = true">
-                        Criar novo Grupo
-                      </div>
-                    </div>
-                  </div>
-                  <!-- mostrar grupo -->
-                  <div v-if="showGroup">
-                    <v-btn @click="showGroup = false">Voltar</v-btn>
-                    <v-list class="pa-0" density="compact">
-                      <v-list-item link v-for="item, i in 5" :key="i" @click="solicitationGetIn(item)">Grupos/responsável</v-list-item>
-                    </v-list>
-                  </div>
+                  <h5 class="mb-5 pa-2 bg-primary border rounded-lg">{{ title }}</h5>
+                  <v-alert v-if="info.import" variant="outlined" color="error" text="Esta norma já foi importada para sua área do usuário." class="mb-5">
+                     <template v-slot:append>
+                          <v-btn @click="$router.push(`/avancado/forumlaw/${info.id}?det=false`)" variant="flat" color="primary">Acessar</v-btn>
+                      </template>
+                  </v-alert>
+                  <v-btn v-if="!start" color="success" @click="importarLaw" block :loading="load">importar</v-btn>
                 </div>
 
                 <v-form @submit.prevent="createForum" ref="formref" v-if="showForms">
@@ -53,24 +35,6 @@
                     v-model="form.title"
                   ></v-text-field>
 
-                  <v-autocomplete
-                    label="Grupo"
-                    v-model="selectedUser"
-                    :items="userOptions"
-                    item-title="name"
-                    item-value="cpf"
-                    :loading="loading"
-                    v-model:search="search"
-                    density="compact"
-                    variant="outlined"
-                    class="my-2"
-                    clearable
-                    placeholder="Adicione pessoas ao seus grupo"
-                    multiple
-                    chips
-                    closable-chips
-                  ></v-autocomplete>
-
                   <v-textarea
                     label="Descrição do grupo"
                     density="compact"
@@ -78,13 +42,21 @@
                     placeholder="Fale sobre os objetivos dessa discussão"
                     v-model="form.description"
                   ></v-textarea>
-                  <v-checkbox
-                    density="compact"
-                    label="Abrir para não participantes do grupo"
-                    hide-details
-                    v-model="form.open"
-                  ></v-checkbox>
+
+                  <v-tooltip text="Ao abrir para não parcipantes será possível que outras pessoas vejam suas anotações e comentários." location="top" width="300">
+                    <template v-slot:activator="{ props }">
+                       <v-checkbox
+                        v-bind="props"
+                        density="compact"
+                        label="Abrir para não participantes do grupo"
+                        hide-details
+                        v-model="form.open"
+                      ></v-checkbox>
+                    </template>
+                  </v-tooltip>
+
                   <div class="mt-5 text-center">
+                     <v-btn variant="text" class="mr-2" @click="start = false, showForms = false">cancelar</v-btn>
                     <v-btn color="primary" type="submit" >Criar Forum</v-btn>
                   </div>
                 </v-form>
@@ -117,29 +89,34 @@
       </v-dialog>
   </template>
   <script setup>
-    import { inject, ref, watch } from 'vue'
+    import { inject, ref, watch, computed, onMounted } from 'vue'
     import debounce from 'lodash.debounce'
-
     import { useRoute } from 'vue-router'
-    const route = useRoute()
-
     import { useForumStore } from '@/store/ForumStore'
-    const forumStore = useForumStore()
-
     import { useLoginStore } from '@/store/LoginStore';
-    const loginStore = useLoginStore()
 
+    const route = useRoute()
+    const forumStore = useForumStore()
+    const loginStore = useLoginStore()
     const textlaw = inject('textlaw')
 
     const props = defineProps({
       title: String
     })
-  
+    
+    const idLaw = route.params.id
     const dialog = ref(false)
     const start = ref(false)
     const confirm = ref(false)
     const load = ref(false)
     const error = ref(null)
+
+    const info = computed(() => {
+        const find = forumStore.readMyGroup.find(item => item.idLaw == idLaw)
+        return find
+        ? { type: 'success', text: 'Você já importou esta norma!', import: true, id: find.id }
+        : { type: 'warning', text: 'Você ainda não importou esta norma!', import: false, id: false }
+    })
 
     const form = ref({
       idLaw: route.params.id, 
@@ -164,6 +141,12 @@
 
     const actionShowForm = () => {
       if(!groupsForum.value.total) showForms.value = true
+    }
+
+    const importarLaw = () => {
+      form.value.title = props.title
+      showForms.value = true
+      start.value = true
     }
 
     const startForum = async () => {
@@ -236,6 +219,10 @@
 
     watch(selectedUser, (vale) => {
       search.value = ''
+    })
+
+    onMounted(() => {
+      form.value.title = props.title
     })
 
   </script>

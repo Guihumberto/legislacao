@@ -10,23 +10,30 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/homepainel')" class="btn">Voltar</v-btn>
+                    <v-btn variant="tonal" @click="$router.push('/homepainel')" class="btn" prepend-icon="mdi-arrow-left">Voltar</v-btn>
                     <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
-                    <Relacoes />
-                    <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="my-2 ml-2 btn" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
-                    <div class="d-flex justify-end align-center">
-                        <ForumInfo :title="idLaw?.title" />
-                    </div>
+                    <ForumInfo :title="idLaw?.title" />
 
-                    <div>
-                        <v-expand-transition>
-                            <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
-                                <p v-html="cabecalho"></p>
-                            </div>
-                        </v-expand-transition>
-                    </div>
+                    <LawImportInfo :title="idLaw?.title" />
         
-                    <v-card class="my-5" :title="idLaw?.title">
+                    <v-card class="my-5">
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex align-center ga-2 ml-3">
+                                <v-icon size="1.4rem">mdi-book-outline</v-icon>
+                                <h5>{{ idLaw?.title }}</h5>
+                            </div>
+                            <div class="d-flex align-center ga-2 flex-wrap pa-2">
+                                <v-btn variant="text" @click="hiddenCabecalho = !hiddenCabecalho" class="btn" color="info" :icon="hiddenCabecalho ? 'mdi-information-off':'mdi-information'"></v-btn>
+                                <Relacoes />
+                            </div>
+                        </div>
+                        <v-card-text>
+                            <v-expand-transition>
+                                <div v-if="hiddenCabecalho" class="border px-5 py-3 mb-2">
+                                    <p v-html="cabecalho"></p>
+                                </div>
+                            </v-expand-transition>
+                        </v-card-text>
                         <v-card-text>
                             <div class="form">
                                 <v-text-field
@@ -92,11 +99,11 @@
                 </div>
             </div>
         </section>
-        <div class="chat" :style="{ width: rightWidth + 'px' }" v-if="!xs">
+        <!-- <div class="chat" :style="{ width: rightWidth + 'px' }" v-if="!xs">
             <div class="resizer" @mousedown="startResize('right')"></div>
             <ChatLawComplete :idLaw="idLaw" />
-        </div>
-        <v-bottom-sheet v-model="sheet">
+        </div> -->
+        <!-- <v-bottom-sheet v-model="sheet">
             <template v-slot:activator="{ props: activatorProps }" v-if="xs">
             <div class="fixed">
                 <v-btn
@@ -110,31 +117,30 @@
             <v-card class="text-center">
                 <ChatLawComplete :idLaw="idLaw" />
             </v-card>
-        </v-bottom-sheet>
+        </v-bottom-sheet> -->
     </div>
 </template>
 
 <script setup>
-    import { ref, computed, watch, onMounted, provide } from "vue";
+    import { ref, computed, watch, onMounted, provide, shallowRef } from "vue";
     import { useDisplay } from 'vuetify'
     const { xs } = useDisplay()
 
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/avancadoText/textDispositivo.vue";
-   
     import { usePageStore } from "@/store/PageStore";
-    const pageStore = usePageStore()
-   
     import { useSnackStore } from "@/store/snackStore";
-    const snackStore = useSnackStore()
-   
     import { useRoute } from "vue-router";
-    const route = useRoute()
-
     import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
-
     import ChatLawComplete from "@/components/legislacao/avancadoText/chatLawComplete.vue";
+    import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
+    import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
+    import LawImportInfo from "@/components/legislacao/avancadoText/lawImportInfo.vue";
+   
+    const pageStore = usePageStore()  
+    const snackStore = useSnackStore()
+    const route = useRoute()
+    const geralStore = useGeralStore()
 
     const textLaws = ref([])
     const hiddenCabecalho = ref(false)
@@ -474,10 +480,6 @@
       window.removeEventListener("mousemove", onResize);
       window.removeEventListener("mouseup", stopResize);
     }
-
-    import { shallowRef } from 'vue'
-    import ForumInfo from "@/components/legislacao/avancadoText/forumInfo.vue";
-    import Relacoes from "@/components/legislacao/avancadoText/relacoes.vue";
 
     const sheet = shallowRef(false)
 

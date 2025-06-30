@@ -1,5 +1,5 @@
 <template>
-    <v-btn @click="dialog = true" variant="tonal"><v-icon>mdi-relation-many-to-many</v-icon></v-btn>
+    <v-btn @click="dialog = true" variant="text" color="primary" icon><v-icon>mdi-relation-many-to-many</v-icon></v-btn>
     <v-dialog v-model="dialog" width="800">
         <v-card>
             <v-card-title class="d-flex align-center justify-space-between">
