@@ -15,7 +15,7 @@ export const usePostStore = defineStore("postStore", {
             return this.post
         },
         readPosts(){
-            return this.posts.filter( x => x.active)
+            return this.posts //.filter( x => x.active)
         },
         readLoad(){
             return this.load
@@ -26,14 +26,15 @@ export const usePostStore = defineStore("postStore", {
             try {
                 this.load = true
                 this.posts = []
-                const response = await api.post('posts/_search', {
+                const response = await api.post('blog_law_v2/_search', {
                     from: 0,
-                    size: 2000,
-                    "query":{
-                        match:{
-                            created_by: loginStore.readLogin.cpf
-                        }
-                    }
+                    size: 500,
+                    // "query":{
+                    //     match:{
+                    //         created_by: loginStore.readLogin.cpf,
+                    //         generateIA: true or false
+                    //     }
+                    // }
                 })
                 const resp = response.data.hits.hits
                 this.posts = resp.map( x => ({id: x._id, ...x._source}))

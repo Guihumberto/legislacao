@@ -41,7 +41,7 @@
         <v-list-item v-if="!solicitationStore.readSolicitations.length">
           <v-alert
             type="info"
-            variant="tonal"
+            variant="text"
             text="Não há solicitações pendentes"
             class="w-100"
           ></v-alert>

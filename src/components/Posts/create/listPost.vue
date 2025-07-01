@@ -9,7 +9,7 @@
                     <v-icon>mdi-forum</v-icon>
                 </v-avatar>
             </template>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>    
+            <v-list-item-title>{{ item.titulo }}</v-list-item-title>    
             <v-list-item-subtitle>{{ item.subtitle }}</v-list-item-subtitle>    
             <template v-slot:append v-if="!xs">
                 <div v-if="postStore.readLoad">
@@ -22,10 +22,11 @@
                         color="success"
                         hide-details
                         density="compact"
+                        disabled
                         @update:model-value="postStore.editPost(item)"
                     ></v-switch>
-                   <v-btn @click.stop="router.push(`/myposts/create/${item.id}`)" class="mx-2" variant="text" color="grey" icon="mdi-pencil"></v-btn>
-                   <v-btn @click.stop="deletePost(item)" variant="text" color="red" icon="mdi-delete"></v-btn>
+                   <v-btn disabled @click.stop="router.push(`/myposts/create/${item.id}`)" class="mx-2" variant="text" color="grey" icon="mdi-pencil"></v-btn>
+                   <v-btn disabled @click.stop="deletePost(item)" variant="text" color="red" icon="mdi-delete"></v-btn>
                 </div>
             </template>
         </v-list-item>

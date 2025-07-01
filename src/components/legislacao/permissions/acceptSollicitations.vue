@@ -52,7 +52,7 @@
         <v-list-item v-if="!solicitationStore.readInvites.length">
           <v-alert
             type="info"
-            variant="tonal"
+            variant="text"
             text="Não há convites a serem avaliados"
             class="w-100"
           ></v-alert>

@@ -51,7 +51,7 @@
         <v-list-item v-if="!solicitationStore.readAvaliations.length">
           <v-alert
             type="info"
-            variant="tonal"
+            variant="text"
             text="Não há permissões a serem avaliadas"
             class="w-100"
           ></v-alert>

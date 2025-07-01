@@ -55,8 +55,14 @@ export default [
       },
       {
         path: '/areauser',
-        name: 'Painel do Usuário',
-        component: () => import('@/views/concurso_user/painel_user.vue'),
+        name: 'Área do Usuário',
+        component: () => import('@/views/concurso_user/area_user.vue'),
+        meta: { requiresAuth: true } 
+      },
+      {
+        path: '/meuseditais',
+        name: 'Meus editais',
+        component: () => import('@/views/concurso_user/editais_user.vue'),
         meta: { requiresAuth: true } 
       },
       {

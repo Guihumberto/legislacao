@@ -1,25 +1,15 @@
 <template>
    <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <!-- Header com animação -->
-            <div class="header-section">
-                <h1 class="page-title"> 
-                    <v-icon color="#030131" size="1.9rem" class="title-icon">mdi-account</v-icon>
-                    Área do Usuário
-                </h1>
-                <v-divider class="custom-divider"></v-divider>
-            </div>
-
-            <!-- Card principal com animação -->
-            <v-card class="main-card" elevation="8">
+            <v-card class="main-card" >
                 <v-card-text class="pa-8">
                     <!-- Seção de título -->
                     <div class="section-header" v-if="!load">
                         <div class="title-wrapper">
-                            <h2 class="section-title">Painel de Editais</h2>
-                            <p class="section-subtitle">Gerencie seus concursos</p>
+                            <h2 class="section-title">Área do Usuário</h2>
+                            <p class="section-subtitle">Gerencie suas normas</p>
                         </div>
-                        <v-icon class="header-decoration" color="primary" size="3rem">mdi-clipboard-list-outline</v-icon>
+                        <v-icon color="primary" size="3rem">mdi-account</v-icon>
                     </div>
 
                     <!-- Loading state -->
@@ -35,93 +25,11 @@
 
                     <!-- Conteúdo principal -->
                     <div v-if="!load" class="content-section">
-                        <!-- Lista de editais -->
-                        <v-card 
-                            v-if="conteudoStore.readEditarUser.length" 
-                            class="editais-card"
-                            elevation="2"
-                        >
-                            <v-list class="editais-list">
-                                <v-list-item 
-                                    v-for="(item, i) in conteudoStore.readEditarUser" 
-                                    :key="item.id"
-                                    @click="navigateToEdital(item)"
-                                    class="edital-item"
-                                    :class="`item-${i}`"
-                                >
-                                    <template v-slot:prepend>
-                                        <v-avatar class="item-avatar" color="primary" variant="tonal">
-                                            <v-icon>mdi-account-tie</v-icon>
-                                        </v-avatar>
-                                    </template>
-
-                                    <v-list-item-title class="item-title">
-                                        {{ item.cargo }}
-                                    </v-list-item-title>
-                                    
-                                    <v-list-item-subtitle class="item-subtitle">
-                                        {{ item.concurso }}
-                                    </v-list-item-subtitle>
-
-                                    <template v-slot:append>
-                                        <v-menu>
-                                            <template v-slot:activator="{ props }">
-                                                <v-btn
-                                                    variant="text"
-                                                    color="primary"
-                                                    v-bind="props"
-                                                    icon="mdi-dots-vertical"
-                                                    class="action-btn"
-                                                >
-                                                
-                                                </v-btn>
-                                            </template>
-                                            <v-list class="pa-0">
-                                                <v-list-item
-                                                    :append-icon="menu.icon"
-                                                    v-for="(menu, index) in menuItems"
-                                                    :key="index"
-                                                    :value="index"
-                                                    @click="handleMenuClick(menu, item)"
-                                                >
-                                                    <v-list-item-title>{{ menu.title }}</v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
-                                    </template>
-                                </v-list-item>
-                            </v-list>
-                        </v-card>
-
-                        <!-- Estado vazio -->
-                        <v-card v-else class="empty-state-card" elevation="2">
-                            <v-card-text class="text-center pa-8">
-                                <div class="empty-icon-wrapper">
-                                    <v-icon class="empty-icon" color="grey-lighten-1" size="5rem">
-                                        mdi-clipboard-outline
-                                    </v-icon>
-                                </div>
-                                <h3 class="empty-title">Nenhum edital encontrado</h3>
-                                <p class="empty-subtitle">
-                                    Você ainda não adicionou nenhum edital ao seu painel
-                                </p>
-                                <v-btn 
-                                    color="primary" 
-                                    variant="elevated"
-                                    size="large"
-                                    class="empty-action-btn"
-                                    @click="$router.push('/homepainel')"
-                                    prepend-icon="mdi-plus"
-                                >
-                                    Adicionar Editais
-                                </v-btn>
-                            </v-card-text>
-                        </v-card>
+                      
                     </div>
                 </v-card-text>
             </v-card>
         </div>
-        <DeleteConcursoArea :delete="itemDelete" @delete="actionDeleteItem"/>
     </section>
 </template>
 
@@ -130,41 +38,14 @@
     import { useGeralStore } from '@/store/GeralStore';
     import { useConteudoEditalStore } from '@/store/concursos/ConteudoEditalStore';
     import { useRouter } from 'vue-router';
-    import DeleteConcursoArea from '@/components/painel/concurso/deleteConcursoArea.vue';
     const router = useRouter()
     
     const geralStore = useGeralStore()
     const conteudoStore = useConteudoEditalStore()
     
     const load = ref(false)
-    const itemDelete = ref({})
     const dialog = ref(false)
     provide('dialog', dialog)
-
-    const navigateToEdital = (item) => {
-        const route = `/areauser/concurso/${item.id}?concurso=${item.concurso}&cargo=${item.cargo}`
-        router.push(route)
-    }
-
-    const menuItems = [
-        { id: 1, icon:'mdi-arrow-right', title: 'Entrar' },
-        { id: 2, icon:'mdi-delete', title: 'Apagar' },
-    ]
-
-    const handleMenuClick = (item, delItem) => {
-        if(item.id == 1) {
-            navigateToEdital(delItem)
-        }
-        if(item.id == 2) {
-            itemDelete.value = delItem
-            dialog.value = true
-        }
-    }
-
-    const actionDeleteItem = async() => {
-        await conteudoStore.deleteEditalUser(itemDelete.value.id)
-        dialog.value = false
-    }
 
     onMounted(async() => {
         load.value = true
@@ -245,6 +126,7 @@
 /* Card principal */
 .main-card {
     animation: fadeInUp 0.8s ease-out 0.2s both;
+    margin-top: 2rem;
     border-radius: 16px;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);

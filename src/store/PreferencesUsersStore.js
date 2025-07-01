@@ -29,9 +29,10 @@ export const usePreferencesStore = defineStore('preferences', () => {
         foldersForum.value = []
         
         try {
-            const response = await api.get(`user_preferences/_doc/${documentId}`)
+            const response = await api.get(`user_preferences/_doc/${documentId}`) || { data: {found: false} }
+            const wasFound = response.data.found;
 
-            if(!response.data.found){
+            if(!wasFound){
                 console.log('não foram encontrados registros');
                 return
             }
@@ -58,8 +59,12 @@ export const usePreferencesStore = defineStore('preferences', () => {
                 }))
             }
         } catch (error) {
-            console.error('Erro ao carregar pastas do Elasticsearch:', error)
-            snackStore.activeSnack('Erro ao carregar pastas', 'error')
+            // console.error('Erro ao carregar pastas do Elasticsearch:', error)
+            if (error.response.status != 404) {
+                snackStore.activeSnack('Erro ao carregar pastas', 'error')
+            } else {
+                snackStore.activeSnack('Você ainda não adicionou nenhuma pasta.', 'primary')
+            }
         }
     }
 

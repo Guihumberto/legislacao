@@ -10,8 +10,9 @@
           <v-avatar v-else class="mb-3" size="5rem" variant="tonal" color="blue"><v-icon size="3rem">mdi-account</v-icon></v-avatar>
           <h3>{{ loginStore.readLogin.nickname }}</h3>
           <h4>{{  loginStore.readLogin.setor }}</h4>
-          <!-- <v-btn color="red" variant="text" class="text-lowecase">Sair <v-icon class="ml-1" size=".9rem">mdi-logout</v-icon></v-btn> -->
-           <v-btn @click="$router.push('/areauser')" class="mt-3" prepend-icon="mdi-account" variant="outlined">Área do Usuário</v-btn>
+          <v-btn color="success" @click="$router.push('/assinar?plan=Pro')" class="mt-3" prepend-icon="mdi-rocket" variant="outlined">PLANO GRATUITO</v-btn>
+          <v-btn color="red" variant="text" class="text-lowecase">Sair <v-icon class="ml-1" size=".9rem">mdi-logout</v-icon></v-btn>
+           <!-- <v-btn @click="$router.push('/areauser')" class="mt-3" prepend-icon="mdi-account" variant="outlined">Área do Usuário</v-btn> -->
       </div>
       <v-divider></v-divider>
       <v-card
@@ -139,15 +140,12 @@
 
 <script setup>  
     import { onMounted } from 'vue'
-    import ConfigMyGroup from '@/components/dialogs/configMyGroup.vue'
-
     import { useForumStore } from '@/store/ForumStore'
-    const loginStore = useLoginStore()
-    
     import { useLoginStore } from '../../store/LoginStore'
-    const forumStore = useForumStore()
-    
     import { useSolicitationsStore } from '@/store/SolicitationsStore'
+
+    const loginStore = useLoginStore()
+    const forumStore = useForumStore()
     const solicitationStore = useSolicitationsStore()
 
     onMounted(() => {
@@ -158,12 +156,14 @@
 
     const items = [
               { text: 'Início', icon: 'mdi-home', url:'/homepainel' },
-              { text: 'Normas', icon: 'mdi-file-document-multiple', url:'/legesporlei' },
-              { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
-              { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
-              { text: 'Histórico', icon: 'mdi-history', url:'/history' },
+              // { text: 'Normas', icon: 'mdi-file-document-multiple', url:'/legesporlei' },
+              // { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
+              // { text: 'Histórico', icon: 'mdi-history', url:'/history' },
+              { text: 'Área do Usuário', icon: 'mdi-account', url:'/areauser' },
+              { text: 'Normas por editais', icon: 'mdi-bookshelf', url:'/meuseditais' },
+              { text: 'Minhas Normas', icon: 'mdi-book-outline', url:'/myforuns' },
               { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' },
-              { text: 'Meus Foruns', icon: 'mdi-forum', url:'/myforuns' }
+              { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
     ]
 
     const managerial = [

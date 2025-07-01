@@ -1,62 +1,50 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-            <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-star</v-icon>Favoritos</h1>
-            <!-- <div class="text-right mb-2">
-                <AddFolder :local="'favorites'" />
-            </div>
-            <div class="text-right mb-2">
-                <v-btn variant="text" @click="move = !move" :prepend-icon="move ? 'mdi-close' : 'mdi-swap-horizontal'">mover</v-btn>
-            </div>
-            <v-select
-                label="Pastas"
-                variant="outlined"
-                density="compact"
-                placeholder="Escolha a pasta de Destino"
-                :items="loginStore.readLogin.folders"
-                item-title="name"
-                v-if="move && listMove.length"
-                clearable
-                style="width: 500px;"
-                v-model="folder"
-            >
-                <template v-slot:append>
-                    <v-btn :disabled="!listMove.length" color="primary" @click="moverDocs()">Mover</v-btn>
-                </template>
-            </v-select>
+             <v-card class="main-card" >
+                <v-card-text class="pa-8">
+                    <!-- Seção de título -->
+                    <div class="section-header" v-if="!load">
+                        <div class="title-wrapper">
+                            <h2 class="section-title">Favoritos</h2>
+                            <p class="section-subtitle">Gerencie seus favoritos</p>
+                        </div>
+                        <v-icon color="primary" size="3rem">mdi-star</v-icon>
+                    </div>
 
-            <v-list class="pa-0 my-5">
-                <v-list-item 
-                    link v-for="item, i in loginStore.readLogin.folders" :key="i"
-                    @dragover.prevent
-                    @drop="onDrop(item.name)"
-                    class="folder"
-                >
-                    <template v-slot:prepend>
-                        <v-icon>mdi-folder</v-icon>
-                    </template>
-                    <h2 class="text-h6">{{ item.name }}</h2>
-                </v-list-item>
-            </v-list> -->
+                    <!-- Loading state -->
+                    <div v-if="load" class="loading-container">
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                            size="64"
+                            width="4"
+                        ></v-progress-circular>
+                        <p class="loading-text">Carregando seus editais...</p>
+                    </div>
 
-            <v-card variant="flat" class="my-5">
-                <v-toolbar density="compact">
-                    <v-tabs
-                        v-model="tab"
-                    >
-                        <v-tab
-                            v-for="item in items"
-                            :key="item"
-                            :text="item"
-                            :value="item"
-                        ></v-tab>
-                    </v-tabs>
-                </v-toolbar>
-                <v-card-text v-if="tab == 'Normas'">
-                    <ListFavNormas />
-                </v-card-text>
-                <v-card-text v-if="tab == 'Páginas'">
-                    <ListFavPages />
+                    <!-- Conteúdo principal -->
+                    <div v-if="!load" class="content-section">
+                         <v-toolbar density="compact">
+                            <v-tabs
+                                v-model="tab"
+                            >
+                                <v-tab
+                                    v-for="item in items"
+                                    :key="item"
+                                    :text="item"
+                                    :value="item"
+                                ></v-tab>
+                            </v-tabs>
+                        </v-toolbar>
+                        <v-card-text v-if="tab == 'Normas'">
+                            <ListFavNormas />
+                        </v-card-text>
+                        <v-card-text v-if="tab == 'Páginas'">
+                            <ListFavPages />
+                        </v-card-text>
+                      
+                    </div>
                 </v-card-text>
             </v-card>
         </div>
@@ -65,81 +53,31 @@
 
 <script setup>
     import { onMounted, onUnmounted, ref, watch } from 'vue';
-
     import { useFavStore } from '@/store/FavStore'
-    const favStore = useFavStore()
-
     import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
-
     import { useRoute, useRouter } from 'vue-router';
-    const router = useRouter()
-    const route = useRoute()
-
-
-    import AddFolder from '@/components/userArea/addFolder.vue';
-    import RemoveFav from '@/components/userArea/favorites/removeFav.vue';
     import ListFavNormas from '@/components/userArea/favorites/listFavNormas.vue';
     import ListFavPages from '@/components/userArea/favorites/listFavPages.vue';
 
+    const favStore = useFavStore()
+    const geralStore = useGeralStore()
+    const router = useRouter()
+    const route = useRoute()
+
     const tab = ref('Normas')
     const items = ['Normas', 'Páginas']
+    const load = ref(false)
 
     watch(tab, (newPage) => {
         router.push(`favorites?tab=${tab.value}`)
     })
 
     onMounted(()=>{
+        load.value = true
         if(route.query.tab) tab.value = route.query.tab
         if(!route.query.page) favStore.pagination.page = 1
+        load.value = false
     })
-
-    const move = ref(false)
-    const listMove = ref([])
-    const folder = ref(null)
-    const draggedItem = ref(null);
-
-    const addItem = (item) => {
-        const find = listMove.value.find(x => x.id == item.id)
-        if(find){
-            listMove.value = listMove.value.filter(x => x.id != item.id)
-        } else {
-            listMove.value.push(item)
-        }
-    }
-
-    const moverDocs = async () => {
-        await listMove.value.forEach( x => {
-          x.folder = folder.value
-          favStore.editFav(x)
-        } )
-        listMove.value = []
-        move.value = false
-        folder.value =  null
-    }
-
-    const onDragStart = (item) => {
-      draggedItem.value = item;
-    };
-
-    const onDragEnd = () => {
-      draggedItem.value = null;
-    };
-
-    const onDrop = (folder) => {
-      if (draggedItem.value) {
-        const find = favStore.readFavoritos.find(x => x.id == draggedItem.value) 
-        find.folder = folder
-        favStore.editFav(find)
-      }
-    };
-
-    const goTo = (item) => {
-
-        if(item.section == 'page') window.open(`/textpage/${item.id}?search=favs`, '_blank');
-
-        if(item.section == 'law') window.open(`/text/${item.id}?search=favs`, '_blank');
-    }
 
     onUnmounted(() => {
         favStore.pagination.page = 1
@@ -148,18 +86,288 @@
 </script>
 
 <style scoped>
-    section{
-        min-height: calc(100vh - 330px);
+  @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
-    .container{
-        padding-bottom: 2rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .listFolder{
-        display: flex;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Header */
+.header-section {
+    animation: fadeInUp 0.6s ease-out;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.title-icon {
+    animation: pulse 2s infinite;
+}
+
+.custom-divider {
+    background: linear-gradient(90deg, #030131, #6366f1, transparent);
+    height: 2px;
+    border: none;
+}
+.main-card {
+    margin-top: 2rem;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.main-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: slideInRight 0.8s ease-out 0.4s both;
+}
+
+.title-wrapper {
+    flex: 1;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.header-decoration {
+    animation: float 3s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+/* Loading */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.loading-text {
+    margin-top: 1rem;
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
+/* Content section */
+.content-section {
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+/* Lista de editais */
+.editais-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.editais-list {
+    background: transparent;
+    padding: 0;
+}
+
+.edital-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.edital-item:hover {
+    background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+    transform: translateX(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.edital-item:last-child {
+    border-bottom: none;
+}
+
+/* Animação escalonada para itens */
+.item-0 { animation-delay: 0.1s; }
+.item-1 { animation-delay: 0.2s; }
+.item-2 { animation-delay: 0.3s; }
+.item-3 { animation-delay: 0.4s; }
+.item-4 { animation-delay: 0.5s; }
+
+.item-avatar {
+    transition: all 0.3s ease;
+}
+
+.edital-item:hover .item-avatar {
+    transform: scale(1.1);
+}
+
+.item-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.item-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.action-btn {
+    transition: all 0.3s ease;
+}
+
+.edital-item:hover .action-btn {
+    transform: translateX(4px);
+    color: #6366f1 !important;
+}
+
+/* Estado vazio */
+.empty-state-card {
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+    background: linear-gradient(135deg, #fafbff 0%, #f0f4ff 100%);
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.empty-icon-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.empty-icon {
+    animation: float 4s ease-in-out infinite;
+}
+
+.empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.75rem;
+}
+
+.empty-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.empty-action-btn {
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.025em;
+    transition: all 0.3s ease;
+}
+
+.empty-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+@media (max-width: 768px) {
+    .section-header {
         flex-direction: column;
-        justify-self: start;
+        text-align: center;
+        gap: 1rem;
     }
-    .folder:hover {
-        background-color: rgb(222, 206, 206);
+    
+    .header-decoration {
+        order: -1;
     }
+    
+    .edital-item {
+        padding: 1rem;
+    }
+    
+    .edital-item:hover {
+        transform: none;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .main-card {
+        margin: 0 0.5rem;
+    }
+}
+
+/* Melhorias de acessibilidade */
+.edital-item:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+.empty-action-btn:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* Transições suaves para modo escuro (se aplicável) */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
 </style>
