@@ -3,7 +3,7 @@
         <div class="text-center my-5">
           <v-avatar class="mb-3" size="5rem" variant="tonal" color="blue" v-if="loginStore.readLogin?.img">
               <v-img
-                alt="John"
+                :alt="loginStore.readLogin?.nickname"
                 :src="loginStore.readLogin?.img"
               ></v-img>
           </v-avatar>
