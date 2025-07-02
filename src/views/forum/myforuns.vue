@@ -12,18 +12,6 @@
                         <v-icon color="primary" size="3rem">mdi-book-outline</v-icon>
                     </div>
 
-                     <div class="text-right">
-                        <v-btn
-                            variant="text"
-                            prepend-icon="mdi-check-circle"
-                            @click="$router.push('/permissoes')"
-                            title="permissões"
-                            icon="mdi-lock"
-                        >
-                        </v-btn>
-                        <ConfigMyGroup :groups="forumStore.readMyGroup" />
-                    </div>
-
                     <!-- Loading state -->
                     <div v-if="load" class="loading-container">
                         <v-progress-circular
@@ -37,6 +25,17 @@
 
                     <!-- Conteúdo principal -->
                     <div v-if="!load" class="content-section">
+                        <div class="text-right">
+                            <v-btn
+                                variant="text"
+                                prepend-icon="mdi-check-circle"
+                                @click="$router.push('/permissoes')"
+                                title="permissões"
+                                icon="mdi-lock"
+                            >
+                            </v-btn>
+                            <ConfigMyGroup :groups="forumStore.readMyGroup" />
+                        </div>
                       <ListForuns  @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
                     </div>
                 </v-card-text>

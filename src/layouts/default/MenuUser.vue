@@ -159,11 +159,11 @@
               // { text: 'Normas', icon: 'mdi-file-document-multiple', url:'/legesporlei' },
               // { text: 'Documentos', icon: 'mdi-folder', url:'/documents' },
               // { text: 'Histórico', icon: 'mdi-history', url:'/history' },
-              { text: 'Área do Usuário', icon: 'mdi-account', url:'/areauser' },
+              // { text: 'Área do Usuário', icon: 'mdi-account', url:'/areauser' },
               { text: 'Normas por editais', icon: 'mdi-bookshelf', url:'/meuseditais' },
               { text: 'Minhas Normas', icon: 'mdi-book-outline', url:'/myforuns' },
-              { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' },
-              { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
+              // { text: 'Meus Posts', icon: 'mdi-forum-outline', url:'/myposts' },
+              // { text: 'Favoritos', icon: 'mdi-star', url:'/favorites' },
     ]
 
     const managerial = [
