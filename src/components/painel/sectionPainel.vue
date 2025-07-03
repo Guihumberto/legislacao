@@ -2,10 +2,33 @@
     <section class="mb-12">
         <v-row>
             <v-col cols="12">
-            <h2 class="text-h5 mb-4 grey--text text--darken-3">
-                <v-icon color="grey darken-2" class="mr-2">mdi-clipboard-text-outline</v-icon>
-                {{ title }}
-            </h2>
+              <div class="section-title-container mb-6">
+                  <!-- Linha decorativa -->
+                  <div class="title-line"></div>
+                  
+                  <!-- Título principal -->
+                  <div class="d-flex align-center">
+                  <div class="title-icon-wrapper me-3">
+                      <v-icon 
+                      :icon="title.icon || 'mdi-clipboard-text-outline'" 
+                      size="24"
+                      class="text-primary"
+                      />
+                  </div>
+                  
+                  <div class="title-content">
+                      <h2 class="text-h5 font-weight-bold text-grey-darken-3 mb-0">
+                      {{ title.title }}
+                      </h2>
+                      <div class="title-accent"></div>
+                  </div>
+                  </div>
+                  
+                  <!-- Subtítulo opcional -->
+                  <p v-if="title?.subtitle" class="text-body-2 text-grey-darken-1 mt-2 mb-0 ms-10">
+                  {{ title.subtitle }}
+                  </p>
+              </div>
             </v-col>
         </v-row>
         <v-row>
@@ -15,6 +38,7 @@
                 md="4"
                 v-for="(concurso, i) in concursos"
                 :key="`concurso-${i}`"
+                class="card-one-container"
             >
                 <v-card
                     class="mx-auto h-100"
@@ -57,7 +81,7 @@
 
     const props = defineProps({
         title:  {
-            type: String,
+            type: Object,
             required: true
         },
         concursos: {
@@ -85,5 +109,85 @@
 </script>
 
 <style scoped>
+.section-title-container {
+  position: relative;
+  padding: 16px 0;
+}
 
+.title-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, rgb(var(--v-theme-primary)) 0%, rgba(var(--v-theme-primary), 0.3) 100%);
+  border-radius: 2px;
+}
+
+.title-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(var(--v-theme-primary), 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.title-icon-wrapper:hover {
+  background: rgba(var(--v-theme-primary), 0.15);
+  transform: translateY(-2px);
+}
+
+.title-content {
+  position: relative;
+  flex: 1;
+}
+
+.title-accent {
+  width: 40px;
+  height: 2px;
+  background: rgb(var(--v-theme-primary));
+  border-radius: 1px;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* Animação de entrada */
+.section-title-container, .card-one-container {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .title-line {
+    width: 40px;
+    height: 2px;
+  }
+  
+  .title-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .text-h5 {
+    font-size: 1.3rem !important;
+  }
+  
+  .title-accent {
+    width: 30px;
+  }
+}
 </style>

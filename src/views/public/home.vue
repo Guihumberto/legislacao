@@ -1,25 +1,98 @@
 <template>
      <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
-             <h1 class="text-h4 my-6 text-center grey--text text--darken-3">
+            <v-sheet
+              class="pa-8 mb-6 position-relative overflow-hidden mt-5"
+              color="white"
+              rounded="lg"
+              elevation="0"
+            >
+              <!-- Elemento decorativo de fundo -->
+              <div class="banner-decoration"></div>
+              
+              <!-- Conteúdo principal -->
+              <div class="text-center position-relative">
+                <div class="d-flex justify-center align-center mb-4">
+                  <div>
+                    <v-icon 
+                      icon="mdi-scale-balance" 
+                      size="48" 
+                      class="text-primary me-3"
+                    />
+
+                    <h1 class="text-h4 font-weight-bold text-primary mb-1">
+                      Bem-vindo ao Estudo da Lei
+                    </h1>
+                    <div class="text-caption text-grey-darken-1 font-weight-medium">
+                      OAB • CONCURSOS • LEGISLAÇÃO
+                    </div>
+                  </div>
+                </div>
+              
+                <!-- Indicadores de funcionalidades -->
+                <div class="d-flex justify-center flex-wrap gap-3 mb-4">
+                  <v-chip 
+                    variant="tonal" 
+                    color="primary" 
+                    size="small"
+                    prepend-icon="mdi-book-open-variant"
+                  >
+                    Legislação
+                  </v-chip>
+                  <v-chip 
+                    variant="tonal" 
+                    color="success" 
+                    size="small"
+                    prepend-icon="mdi-target"
+                  >
+                    OAB
+                  </v-chip>
+                  <v-chip 
+                    variant="tonal" 
+                    color="info" 
+                    size="small"
+                    prepend-icon="mdi-trophy"
+                  >
+                    Concursos
+                  </v-chip>
+                </div>
+                
+                <!-- <p class="text-body-2 text-grey-darken-1 mb-0">
+                  Selecione uma das seções abaixo para iniciar seus estudos
+                </p> -->
+                 <p class="text-subtitle-1 text-grey-darken-2 mb-4 mx-auto" style="max-width: 500px;">
+                  Sua plataforma completa para estudos jurídicos e preparação para concursos
+                </p>
+              </div>
+            </v-sheet>
+             <!-- <h1 class="text-h4 mt-6 text-center grey--text text--darken-3">
                 Bem-vindo ao Estudo da Lei
              </h1>
             <v-sheet
-                class="pa-4 mb-6"
+div                class="pa-2 mb-6"
                 color="transparent"
                 rounded
             >
-            <div class="text-center">
-                <p class="text-subtitle-1 text-center grey--text text--darken-2">
-                    Selecione uma das seções abaixo para iniciar ou adicione seu próprio conteúdo.
-                </p>
-                <v-btn color="primary" class="mt-5" variant="flat" prepend-icon="mdi-calendar" @click="$router.push('/homepainel/create_plan')">Criar meu próprio plano</v-btn>
-            </div>
-            </v-sheet>
+              <div class="text-center">
+                  <p class="text-subtitle-1 text-center grey--text text--darken-2">
+                      Selecione uma das seções abaixo para iniciar.
+                  </p>
+                  <v-btn color="primary" class="mt-5" variant="flat" prepend-icon="mdi-calendar" @click="$router.push('/homepainel/create_plan')">Criar meu próprio plano</v-btn>
+              </div>
+            </v-sheet> -->
             
-            <SectionPainel :concursos="concursos" :title="'Por Concursos'" type="concursos" />
-            <SectionPainel :concursos="disciplinas" :title="'Por Disciplinas'" type="disciplinas" />
-            <SectionPainel :concursos="normas" :title="'Por Normas'" type="normas" />
+            <SectionPainel 
+              :concursos="concursos" 
+              :title="{title:'Por Concursos', icon: 'mdi-file-multiple-outline', subtitle:'Legislação agrupada por concurso'}" 
+              type="concursos" />
+            <SectionPainel 
+              :concursos="disciplinas" 
+              :title="{title:'Por Disciplinas', icon: 'mdi-clipboard-text-outline', subtitle:'Legislação agrupada por concurso'}" 
+              type="disciplinas" />
+            <SectionPainel 
+              :concursos="normas" 
+              :title="{title:'Por Normas', icon: 'mdi-file', subtitle:'Legislação agrupada por concurso'}" 
+              type="normas" />
             
         </div>
     </section>
@@ -118,5 +191,56 @@
 </script>
 
 <style scoped>
+.banner-decoration {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08) 0%, rgba(var(--v-theme-primary), 0.02) 100%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.banner-decoration::before {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-primary), 0.01) 100%);
+  border-radius: 50%;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+/* Animação sutil para os chips */
+.v-chip {
+  transition: all 0.3s ease;
+}
+
+.v-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .text-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .d-flex.flex-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .v-chip {
+    margin-bottom: 8px;
+  }
+}
 
 </style>

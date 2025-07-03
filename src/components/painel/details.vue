@@ -5,6 +5,7 @@
         color="grey darken-3"
         variant="text"
         prepend-icon="mdi-information"
+        disabled
     >
         DETALHES
     </v-btn>

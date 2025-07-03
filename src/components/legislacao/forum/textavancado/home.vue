@@ -103,11 +103,11 @@
             name: 'Comentários',
             icon: 'mdi-chat'
         },
-        {
-            id: 4,
-            name: 'Vínculos',
-            icon: 'mdi-link-box'
-        },
+        // {
+        //     id: 4,
+        //     name: 'Vínculos',
+        //     icon: 'mdi-link-box'
+        // },
         {
             id: 5,
             name: 'Questões',

@@ -5,7 +5,7 @@
                 <div class="panel-content">
                     <div>
                             <div class="d-flex align-center justify-space-between mb-5 mx-auto" style="max-width: 1080px;">
-                                <v-btn @click="$router.push('/areauser')" variant="text" prepend-icon="mdi-arrow-left">Voltar</v-btn>
+                                <v-btn @click="$router.push('/meuseditais')" variant="text" prepend-icon="mdi-arrow-left">Voltar</v-btn>
                                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-school</v-icon>Concurso</h1>
                                 <Details :concurso="edital" />
                             </div>
