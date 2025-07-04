@@ -13,15 +13,17 @@
                     </div>
 
                     <!-- Loading state -->
-                    <div v-if="load" class="loading-container">
-                        <v-progress-circular
-                            indeterminate
-                            color="primary"
-                            size="64"
-                            width="4"
-                        ></v-progress-circular>
-                        <p class="loading-text">Carregando seus editais...</p>
-                    </div>
+                     <transition name="loading-fade">
+                         <div v-if="load" class="loading-container">
+                             <v-progress-circular
+                                 indeterminate
+                                 color="primary"
+                                 size="64"
+                                 width="4"
+                             ></v-progress-circular>
+                             <p class="loading-text">Carregando suas normas...</p>
+                         </div>
+                     </transition>
 
                     <!-- Conteúdo principal -->
                     <div v-if="!load" class="content-section">
@@ -59,19 +61,18 @@
     const forumStore = useForumStore()
     const preferencesStore = usePreferencesStore()
 
-    // Estados reativos
     const load = ref(false)
 
-    // Funções para gerenciar pastas
     const saveFoldersForum = async (event) => {
         await preferencesStore.saveFolders(event);
     }
 
-    // Carregar pastas ao montar o componente
     onMounted(async () => {
         load.value = true
         await preferencesStore.loadFolders()
-        load.value = false
+        await setTimeout(async () => {
+            load.value = false
+        }, 800 )
     })
     
 </script>
@@ -188,6 +189,15 @@
 }
 
 /* Loading */
+.loading-fade-enter-active,
+.loading-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.loading-fade-enter-from,
+.loading-fade-leave-to {
+  opacity: 0;
+}
 .loading-container {
     display: flex;
     flex-direction: column;

@@ -118,8 +118,6 @@ export const useSolicitationsStore = defineStore("solicitationStore", {
                     }
                 })
 
-                console.log('resp solic oi', resp);
-
                 this.solicitations = resp.data.hits.hits.map( x => ({ id: x._id, ...x._source }) )
                 
             } catch (error) {

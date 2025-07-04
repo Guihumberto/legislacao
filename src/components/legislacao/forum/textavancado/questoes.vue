@@ -274,7 +274,7 @@
         if(listArtsFilter.value.length) {
             await getQuestoesFilter()
         } else {
-            await questoesStore.getQuestoes({ id_law: route.params.id, id_art: route.query.art }, formQuestions.value)
+            await questoesStore.getQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: route.query.art }, formQuestions.value)
         }
         loadQuestoes.value = false
         setZeroList(questoesStore.readQuestoesMoreResp.length)
@@ -282,20 +282,21 @@
     }
 
     const getQuestoesFilter = async () => {
-        if(!artsFilter.value.length && listArtsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: listArtsFilter.value}, formQuestions.value)
-        if(artsFilter.value.length) await questoesStore.getQuestoes({id_law: route.params.id, id_art: artsFilter.value}, formQuestions.value)
+        if(!artsFilter.value.length && listArtsFilter.value.length) await questoesStore.getQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: listArtsFilter.value}, formQuestions.value)
+        if(artsFilter.value.length) await questoesStore.getQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: artsFilter.value}, formQuestions.value)
     }
 
     const gerarQuestoes = async () => {
         loadQuestoes.value = true
-        await questoesStore.gerarQuestoes({id_law: route.params.id, id_art: route.query.art})
+        await questoesStore.gerarQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: route.query.art})
+        await getQuestoesFilter()
         loadQuestoes.value = false
     }
 
 
     onMounted(async() => {
         loadQuestoes.value = true
-        await questoesStore.totasisQuestoesLaw(route.params.id)
+        await questoesStore.totasisQuestoesLaw(forumStore.readGroupForum._source.idLaw)
         await getQuestoes()
         loadQuestoes.value = false
         questoesStore.getLists()

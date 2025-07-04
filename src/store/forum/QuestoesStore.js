@@ -83,9 +83,12 @@ export const useQuestoesStore = defineStore("questoesStore", {
 
             try {
                 const resp = await apiChat.post('gerar_questoes', {
+                    id_origin_law: item.id_origin_law,
                     id_group: item.id_law,
                     id_art: item.id_art,
                 })
+
+                console.log('resp', resp.data);
 
                 return resp.data
 
@@ -116,12 +119,12 @@ export const useQuestoesStore = defineStore("questoesStore", {
 
             //fitrar todas favoritas
             let listFavoritas = []
-            if(filter.favoritas) listFavoritas = await favStore.getAllFavLaw(item.id_law, [])
+            if(filter?.favoritas) listFavoritas = await favStore.getAllFavLaw(item.id_law, [])
 
             //filtrar todas respondidas
             let listRespondidas = []
-            if(filter.typeRespQuestions != 1) {
-                if(filter.favoritas && listFavoritas.length) {
+            if(filter?.typeRespQuestions != 1) {
+                if(filter?.favoritas && listFavoritas.length) {
                     const ids_questoes = listFavoritas.map(q => q.id_question)
                     listRespondidas = await this.getResposndidas(item.id_law, ids_questoes)
                 } else {
@@ -132,25 +135,25 @@ export const useQuestoesStore = defineStore("questoesStore", {
 
             const must_not = [];
 
-            if(listRespondidas.length && filter.typeRespQuestions == 2){
+            if(listRespondidas.length && filter?.typeRespQuestions == 2){
                 must_not.push({ terms: { _id: listRespondidas } });
             }
 
 
             const must = [];
 
-            if(listRespondidas.length && filter.typeRespQuestions > 2){
+            if(listRespondidas.length && filter?.typeRespQuestions > 2){
                 must.push({ terms: { _id: listRespondidas } });
             }
 
              //favoritas com todas as questoes
-             if(filter.typeRespQuestions == 1 && filter.favoritas && listFavoritas.length){
+             if(filter?.typeRespQuestions == 1 && filter?.favoritas && listFavoritas.length){
                 const ids_questoes = listFavoritas.map(q => q.id_question)
                 must.push({ terms: { _id: ids_questoes } });
             }
            
-            if (item.id_law) {
-                must.push({ match: { id_law: item.id_law } });
+            if (item.id_origin_law) {
+                must.push({ match: { id_origin_law: item.id_origin_law } });
             }
 
             if (item.id_art) {
@@ -158,11 +161,11 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 if(Array.isArray(item.id_art)) must.push({ terms: { id_art: item.id_art } });
             }
 
-            if(filter.ano.length){
+            if(filter?.ano.length){
                 must.push({ terms: { ano: filter.ano } });
             }
 
-            if(filter.banca.length){
+            if(filter?.banca.length){
                 console.log('bancas - fazer algo', filter.banca);
                 must.push({ terms: { 'banca.keyword': filter.banca } });
             }
@@ -192,8 +195,8 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 console.log('erro get questoes');
             } finally {
                 const list = this.questoes.map(item => item.id) || []
-                if(filter.typeRespQuestions == 1) this.q_respondidas = await this.getMyQuestoesResp(item, list)
-                if(!filter.favoritas)await favStore.getAllFavLaw(item.id_law, list)
+                if(filter?.typeRespQuestions == 1) this.q_respondidas = await this.getMyQuestoesResp(item, list)
+                if(!filter?.favoritas)await favStore.getAllFavLaw(item.id_law, list)
                 this.load = false
             }
         },
@@ -440,7 +443,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     size: 0,
                     query:{
                         match:{
-                            id_law: item
+                            id_origin_law: item
                         }
                     }
                 })

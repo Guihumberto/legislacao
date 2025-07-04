@@ -1,5 +1,5 @@
 <template>
-    <div class="my-5">
+    <div class="my-5" v-if="!load">
         <!-- Botão para criar nova pasta -->
         <div class="mb-4 d-flex justify-end align-center">
             <v-btn
@@ -331,9 +331,12 @@
         { deep: true }
     )
 
-    // Inicialização
+    const load = ref(false)
+
     onMounted(async () => {
+        load.value = true
         await loadFoldersFromStorage()
+        load.value = false
     })
 </script>
 

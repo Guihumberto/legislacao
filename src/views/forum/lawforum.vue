@@ -17,15 +17,17 @@
                 :style="mdAndDown ? '': { width: leftWidth + 'px' }"
                 v-if="mdAndDown && tab == 1 || !mdAndDown"
             >
-                <div class="law" ref="lawRef">
-                    <div class="sizeLoad" v-if="forumStore.readLoad">
-                        <v-progress-circular
-                            :size="50"
-                            color="primary"
-                            indeterminate
-                        ></v-progress-circular>
-                    </div>
-                    <div v-else>
+                <div v-if="load" class="loading-container">
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                        size="64"
+                        width="4"
+                    ></v-progress-circular>
+                    <p class="loading-text">Carregando a norma...</p>
+                </div>
+                <div class="law" ref="lawRef" v-else>
+                    <div v-if="!forumStore.readLoad">
                         <v-btn 
                             variant="tonal" 
                             @click="$route.query.permission ? $router.push('/permissoes') : $router.push('/myforuns')" 
@@ -771,7 +773,10 @@
 
     watch(sidelaw, (newSidebar) => {
        if(!sidelaw.value) leftWidth.value = 20000
-       if(sidelaw.value) leftWidth.value = containerWidth.value / 2 - 10; // Dividir ao meio inicialmente
+       if(sidelaw.value) {
+            containerWidth.value = 2500
+            leftWidth.value = containerWidth.value / 2 - 10;
+       } 
     })
 
     // Largura do painel direito calculada
@@ -859,8 +864,11 @@
     const handleResize = () => {
         initDimensions();
     };
+
+    const load = ref(false)
     
     onMounted( async () => {
+        load.value = true
         isComponentMounted.value = true;
         initDimensions();
         window.addEventListener('resize', handleResize);
@@ -871,6 +879,7 @@
         commentStore.getUsersCommentsLaw(route.params.id)
         extractArtsFromQuery()
         mapaMentalStore.getMapasMentais()
+        load.value = false
     })
 
     onBeforeUnmount(() => {
@@ -891,11 +900,25 @@
         }
         return artsFilterActive.value;
     })
-  
 
 </script>
 
 <style lang="scss" scoped>
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .loading-text {
+        margin-top: 1rem;
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+
     .container {
         display: flex;
         justify-content: center;
