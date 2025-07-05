@@ -1,6 +1,9 @@
 <template>
         <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+            <div class="d-flex justify-space-between mb-5">
+                <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="$router.push('/home/admin/')">Voltar</v-btn>
+            </div>
             <div class="d-flex justify-space-between align-center">
                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-information</v-icon>Tratar Erros</h1>
             </div>

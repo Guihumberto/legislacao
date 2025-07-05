@@ -2,6 +2,9 @@
   <section>
         <div class="container2">
           <v-container>
+             <div class="d-flex justify-space-between mb-5">
+                <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="$router.push('/home/admin/')">Voltar</v-btn>
+            </div>
             <h1 class="text-h5 my-5">Organizador de Disciplinas</h1>
             <v-row>
               <v-col cols="12">

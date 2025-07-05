@@ -128,29 +128,22 @@
 
 <script setup>
     import { ref, onMounted, watch, inject, computed } from 'vue';
-
     import { useForumStore } from '@/store/ForumStore';
-    const forumStore = useForumStore()
-
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
-    const questoesStore = useQuestoesStore()
-
     import { useFavQuestoesStore } from '@/store/forum/favQuestionStore';
-    const favQuestoesStores = useFavQuestoesStore()
-
     import Questoes_alternative from './questoes_alternative.vue';
     import Loading from '../loading.vue';
-
     import { useRoute } from 'vue-router';
     import FavQuestoes from './favQuestoes.vue';
-    const route = useRoute()
 
+    const forumStore = useForumStore()
+    const questoesStore = useQuestoesStore()
+    const favQuestoesStores = useFavQuestoesStore()
+    const route = useRoute()
     const load = ref(false)
     const elemento = ref(null)
-
     const listArtsFilter = inject('listArtsFilter')
     const artsFilter = ref([])
-
     const rightWidth = inject('rightWidth')
 
     const formQuestions = ref({
@@ -296,7 +289,7 @@
 
     onMounted(async() => {
         loadQuestoes.value = true
-        await questoesStore.totasisQuestoesLaw(forumStore.readGroupForum._source.idLaw)
+        await questoesStore.totasisQuestoesLaw({ id_law: route.params.id, id_origin_law:forumStore.readGroupForum._source.idLaw })
         await getQuestoes()
         loadQuestoes.value = false
         questoesStore.getLists()

@@ -443,7 +443,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     size: 0,
                     query:{
                         match:{
-                            id_origin_law: item
+                            id_origin_law: item.id_origin_law
                         }
                     }
                 })
@@ -461,7 +461,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
                                 },
                                 {
                                     match:{
-                                        id_law: item
+                                        id_law: item.id_law
                                     }
                                 }
                             ]

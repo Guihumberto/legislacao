@@ -1,6 +1,9 @@
 <template>
     <section>
         <div :class="geralStore.readHeaderShow ? 'container': 'container2'">
+            <div class="d-flex justify-space-between mb-5">
+                <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="$router.push('/home/admin/')">Voltar</v-btn>
+            </div>
             <div class="d-flex justify-space-between align-center">
                 <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-tools</v-icon>Cadastro</h1>
             </div>
@@ -13,7 +16,7 @@
                         v-model="lawSelect"
                         :items="forumStore.readMyGroup"
                         item-title="title"
-                        item-value="id"
+                        item-value="idLaw"
                         :rules="[rules.required]"
                     >
                     </v-select>
@@ -89,15 +92,13 @@
 <script setup>
     import { ref, computed } from 'vue';
     import { useGeralStore } from '@/store/GeralStore';
-    const geralStore = useGeralStore()
-
     import { useForumStore } from '@/store/ForumStore'
-    const forumStore = useForumStore()    
-
     import { useSnackStore } from '@/store/snackStore';
-    const snackStore = useSnackStore()
-    
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
+
+    const geralStore = useGeralStore()
+    const forumStore = useForumStore()    
+    const snackStore = useSnackStore()
     const questoesStore = useQuestoesStore()
 
     const lawSelect = ref(null)
@@ -109,23 +110,13 @@
         required: value => !!value || 'Campo obrigatório',
     }
 
-    const objeto = {
-        pergunta: "O texto sugere que a instalação de obras ou atividades potencialmente causadoras de degradação do meio ambiente não necessita de estudo prévio de impacto ambiental?",
-        resposta: "falso",
-        justificativa: "No inciso IV, o texto exige, na forma da lei, para instalação de obra ou atividade potencialmente causadora de significativa degradação do meio ambiente, um estudo prévio de impacto ambiental.",
-        id_art: "225",
-        id_law: "j9VRlpYBHUN660Nlh4Ik",
-        tipo: "c/e",
-        date_created: 1746457555094,
-        created_by: "admin"
-    }
-
     const importar = async () => {
         const { valid } = await form.value.validate()
         if (valid) {
             const resp = isValidJsonString(listaQuestoes.value)
             listImport.value = resp.map(obj => ({
                 ...obj,
+                id_origin_law: lawSelect.value,
                 id_law: lawSelect.value,
                 tipo: "c/e",
                 date_created: Date.now(),
