@@ -8,12 +8,12 @@
             <div class="pa-2 text-left" v-else>
                 <transition-group name="fade" tag="div">
                     <div class="comment-box" v-for="item, i in commentsArt" :key="i" v-if="commentsArt.length">
-                        <div class="profile-pic"></div>
+                        <div class="profile-pic">{{ item?.user_name.slice(0, 2) || '' }}</div>
                         <div class="comment-content">
                             <div class="username">{{ item.user_name }} <v-chip density="compact" :color="typeComment(item.type).color">{{ typeComment(item.type).title }}</v-chip></div>
                             <div class="timestamp text-subtitle">{{ item.data_include }}</div>
                             <div class="comment-text text-body-2">
-                                <p>{{ item.text }}</p>
+                                <p v-html="item.text"></p>
                             </div>
                         </div>
                     </div>
@@ -49,6 +49,7 @@
         if(item == 1) return { title: "Comentário", color: "success"}
         if(item == 2) return { title: "Pergunta", color: "primary"}
         if(item == 3) return { title: "Resposta", color: "orange"}
+        if(item == 4) return { title: "Resumo", color: "purple"}
     }
 
 </script>
@@ -66,12 +67,18 @@
     gap: 10px;
     margin-bottom: .5rem;
 }
+
 .profile-pic {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     background: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
 }
+
 .comment-content {
     flex: 1;
 }
@@ -97,6 +104,15 @@
 .fade-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+@media (max-width: 600px) {
+    .profile-pic{
+        display: none;
+    }
+    .menu-comments {
+        flex-direction: column;
+    }    
 }
 
 </style>

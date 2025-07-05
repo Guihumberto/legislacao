@@ -11,26 +11,28 @@
                     Artigo<span v-if="listArtsSelected.length > 1">s</span> selecionado<span v-if="listArtsSelected.length > 1">s</span>: 
                     <v-chip v-if="artOneSelect" color="primary">{{ artOneSelect }} </v-chip> 
                     <v-chip v-if="listArtsSelected.length" v-for="item, i in listArtsSelected" :key="i" class="ml-2">{{ item }}</v-chip>
-                   <v-form @submit.prevent="submitForm" ref="form">
-                        <!-- <v-textarea
-                            label="Pergunte ao AI"
-                            v-model="mapFormString"
-                            :rules="[(v) => !!v || 'Campo obrigatório']"
-                            variant="outlined"
-                            class="mt-2"
-                        >
-                        </v-textarea> -->
-                        <div class="mt-5 d-flex ga-2 justify-center">
-                            <v-btn :loading="load" :disabled="load" @click="submitForm" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
-                        </div>
-                   </v-form>
+                    <v-form @submit.prevent="submitForm" ref="form">
+                            <!-- <v-textarea
+                                label="Pergunte ao AI"
+                                v-model="mapFormString"
+                                :rules="[(v) => !!v || 'Campo obrigatório']"
+                                variant="outlined"
+                                class="mt-2"
+                            >
+                            </v-textarea> -->
+                            <div class="mt-5 d-flex ga-2 justify-center">
+                                <v-btn :loading="load" :disabled="load" @click="submitForm" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
+                            </div>
+                    </v-form>
                 </div>
 
             </div>
-            <MindMap :data="mindMapData" v-if="mindMapData" />
-
-            <div v-for="map, m in mapasMentais" :key="i" v-else>
-                <MindMap :data="map" />
+            <div v-if="showNoResult">
+                <MindMap :data="mindMapData" v-if="mindMapData" />
+    
+                <div v-for="map, m in listSortedmapasMentais" :key="i" v-else>
+                    <MindMap :data="map" />
+                </div>
             </div>
         </section>
     </div>
@@ -38,18 +40,15 @@
 
 <script setup>
     import { inject, onMounted, ref, watch, computed } from 'vue';
-
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
-    const mapaMentalStore = useMapaMentalStore()
-
     import { useForumStore } from '@/store/ForumStore';
-    const forumStore = useForumStore()
-
     import { useRoute, useRouter } from "vue-router";
+    import MindMap from './mindMap.vue';
+
+    const mapaMentalStore = useMapaMentalStore()
+    const forumStore = useForumStore()
     const route = useRoute()
     const router = useRouter()
- 
-    import MindMap from './mindMap.vue';
     const rightWidth = inject('rightWidth')
 
     const props = defineProps({
@@ -60,11 +59,18 @@
     })
     
     const mindMapData = ref(null)
+    const showNoResult = ref(true)
+
+    const listSortedmapasMentais = computed(() => {
+        return props.mapasMentais.sort((a, b) => a.art - b.art)
+    })
 
     const getMindMapArt = async() => {
+        showNoResult.value = true
         const art = artOneSelect.value || listArtsSelected.value[0]
         if(art){
             mindMapData.value = props.mapasMentais.find(x => x.art == parseInt(art))
+            if(!mindMapData.value) showNoResult.value = false
         } else {
             mindMapData.value = null
         }

@@ -131,17 +131,15 @@
     import Comments from './comments.vue';
     import ComentEdit from './comentarios/comentEdit.vue';
     import TextEdit from './textEdit.vue';
-
     import { useForumStore } from '@/store/ForumStore';
-    const forumStore = useForumStore()
-
     import { useLoginStore } from '@/store/LoginStore';
-    const LoginStore = useLoginStore()
-
     import { useSnackStore } from '@/store/snackStore';
+    import { useRoute, useRouter } from 'vue-router'
+
+    const forumStore = useForumStore()
+    const LoginStore = useLoginStore()
     const snackStore = useSnackStore()
 
-    import { useRoute, useRouter } from 'vue-router'
     const route = useRoute()
     const router = useRouter()
 
@@ -175,12 +173,10 @@
     }
 
     const handleMouseLeave = () => {
-        hideActionsTimeout = setTimeout(() => {
-        showActions.value = false
-    }, 300) // 300ms de atraso
-}
-
-
+            hideActionsTimeout = setTimeout(() => {
+            showActions.value = false
+        }, 300) // 300ms de atraso
+    }
 
     const activeComment = ref(false)
     const activeArt = ref(false)
@@ -206,9 +202,9 @@
     )
 
     const isArt = computed(() => {
-        return props.dispositivo.textlaw.startsWith('Art') || props.dispositivo.textlaw.startsWith('<b>Art')
-        ? true
-        : false
+        if (!props.dispositivo || !props.dispositivo.textlaw) return false
+        const plainText = props.dispositivo.textlaw.replace(/<[^>]*>/g, '').trim()
+        return plainText.startsWith('Art')
     })
 
     const isComment = computed(() => {
@@ -235,14 +231,15 @@
         art: props.dispositivo.art,
     })
 
-    const types = [
-        ...(isArt.value ? [{ id: 4, title: "Resumo" }] : []),
-        {id: 1, title: "Comentário"},
-        {id: 2, title: "Pergunta"},
-    ]
+    const types = computed(() => {
+        return [
+            ...(isArt.value ? [{ id: 4, title: "Resumo" }] : []),
+            { id: 1, title: "Comentário" },
+            { id: 2, title: "Pergunta" },
+        ]
+    })
 
     const saveComment = async () => {
-        
         comment.value = {
             ...comment.value,
             idRef: props.dispositivo.id,

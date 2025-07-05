@@ -50,7 +50,7 @@ const pricingPlans = ref([
       'importar até 5 Normas',
       'Comentários',
       'Questões limitadas',
-      'Resumos limtados',
+      'Resumos limitados',
       'Suporte básico por e-mail',
     ],
     buttonText: 'Começar Agora',
