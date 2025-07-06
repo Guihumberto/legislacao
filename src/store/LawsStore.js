@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import api from "@/services/api"
 import { useLoginStore } from "./LoginStore";
 import { useSnackStore } from '@/store/snackStore';
+import { query } from "firebase/firestore";
 
 export const useLawStore = defineStore("Law", {
     state: () => ({
@@ -953,6 +954,62 @@ export const useLawStore = defineStore("Law", {
                 return resp.data.hits.hits.map(x => x._source)
             } catch (error) {
                 console.log('erro get disciplines');
+            }
+        },
+        async searchLawAutocomplete(){
+            this.loadSearch = true
+            try {
+                const resp = await api.post('laws_v3/_search', {
+                    from: 0,
+                    size: 10,
+                    query:{
+                        term: {
+                            tipo: 'leis-federais'
+                        }
+                    }
+                })
+                return resp.data.hits.hits.map(x => ({ idU: x._id, ...x._source}))
+            } catch (error) {
+                console.log('erro get disciplines');
+            } finally {
+                this.loadSearch = false
+            }
+        },
+        async searchLawByText(searchText){
+            try {
+               this.loadSearch = true
+                const resp = await api.post('laws_v3/_search', {
+                    from: 0,
+                    size: 20,
+                    query: {
+                        bool: {
+                            must: [
+                                {
+                                    term: {
+                                        tipo: 'leis-federais'
+                                    }
+                                },
+                                {
+                                    multi_match: {
+                                        query: searchText,
+                                        fields: ['title^2', 'description_norm', 'ano', 'tipo', 'disciplina'],
+                                        fuzziness: 'AUTO' // Remova "type: phrase_prefix"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                })
+                
+                return resp.data.hits.hits.map(x => ({ 
+                    idU: x._id, 
+                    ...x._source 
+                }))
+            } catch (error) {
+                console.log('erro search by text', error?.response?.data || error.message)
+                return []
+            } finally {
+                this.loadSearch = false
             }
         },
         initSearch(){

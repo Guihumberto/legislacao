@@ -78,7 +78,6 @@ export const useForumStore = defineStore("forumStore", {
             return participantes
                 ? true
                 : !!participantes.find( x => x == cpf)
-
         }
     },
     actions:{

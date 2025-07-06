@@ -4,43 +4,50 @@
             <div class="d-flex justify-space-between mb-5">
                 <v-btn variant="outlined" prepend-icon="mdi-arrow-left" @click="$router.push('/home/admin/')">Voltar</v-btn>
             </div>
-            <div class="d-flex justify-space-between align-center">
-                <h1 class="text-h5 d-flex align-center"> <v-icon color="#030131" size="1.7rem" class="mr-1">mdi-tools</v-icon>Cadastro</h1>
-            </div>
-            <div>
-                <v-form @submit.prevent="importar" ref="form" class="mt-4" >
-                    <v-select
-                        label="Nome"
-                        density="compact"
-                        variant="outlined"
-                        v-model="lawSelect"
-                        :items="forumStore.readMyGroup"
-                        item-title="title"
-                        item-value="idLaw"
-                        :rules="[rules.required]"
-                    >
-                    </v-select>
-                    <v-textarea
-                        label="Array de questões"
-                        density="compact"
-                        variant="outlined"
-                        v-model="listaQuestoes"
-                        :rules="[rules.required]"
-                    ></v-textarea>
-                    <div class="d-flex ga-2">
-                        <v-btn :loading="loadLei" :disabled="loadLei" type="submit" class="mt-4" color="grey" @click="loadLaw">Carregar</v-btn>
-                        <v-btn type="submit" class="mt-4" color="primary">Importar</v-btn>
-                        <v-btn type="submit" class="mt-4" color="success" @click="saveQuestoes">Salvar</v-btn>
+             <v-card class="main-card" >
+                <v-card-text class="pa-8">
+                    <div class="section-header" v-if="!load">
+                        <div class="title-wrapper">
+                            <h2 class="section-title">Cadastro</h2>
+                            <p class="section-subtitle">Gerencie suas normas</p>
+                        </div>
+                        <v-icon color="primary" size="3rem">mdi-book-outline</v-icon>
                     </div>
-                </v-form>
-            </div>
-
-            <div class="pa-5">
-                gerar tags importante em lote <br>
-                gerar vinculos com sumulas e julgados <br>
-                gerar comentarios em lote <br>
-                filtrar pelo artigo selecionado na busca
-            </div>
+                    <div>
+                        <v-form @submit.prevent="importar" ref="form" class="mt-4" >
+                             <v-autocomplete
+                                label="Normas"
+                                density="compact"
+                                variant="outlined"
+                                v-model="lawSelect"
+                                :items="displayItems"
+                                item-title="title"
+                                item-value="id"
+                                :rules="[rules.required]"
+                                :loading="lawStore.readLoadSearch"
+                                :search="searchText"
+                                :no-filter="true"
+                                @update:search="handleSearchInput"
+                                clearable
+                                no-data-text="Nenhum resultado encontrado"
+                            />
+        
+                            <v-textarea
+                                label="Array de questões"
+                                density="compact"
+                                variant="outlined"
+                                v-model="listaQuestoes"
+                                :rules="[rules.required]"
+                            ></v-textarea>
+                            <div class="d-flex ga-2">
+                                <v-btn :loading="loadLei" :disabled="loadLei" type="submit" class="mt-4" color="grey" @click="loadLaw">Carregar</v-btn>
+                                <v-btn type="submit" class="mt-4" color="primary">Importar</v-btn>
+                                <v-btn type="submit" class="mt-4" color="success" @click="saveQuestoes">Salvar</v-btn>
+                            </div>
+                        </v-form>
+                    </div>
+                </v-card-text>
+            </v-card>
 
             <div v-if="listFinal.length && !loadLei" class="mt-5 border rounded-lg pa-5">
                 <h5 class="mb-5">Adicionar Tags em lote para artigo</h5>
@@ -90,11 +97,13 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, onMounted, watch } from 'vue';
     import { useGeralStore } from '@/store/GeralStore';
     import { useForumStore } from '@/store/ForumStore'
     import { useSnackStore } from '@/store/snackStore';
     import { useQuestoesStore } from '@/store/forum/QuestoesStore';
+    import { useLawStore } from '@/store/LawsStore';
+    const lawStore = useLawStore()
 
     const geralStore = useGeralStore()
     const forumStore = useForumStore()    
@@ -102,6 +111,10 @@
     const questoesStore = useQuestoesStore()
 
     const lawSelect = ref(null)
+    const searchText = ref('')
+    const searchResults = ref([])
+    const isSearching = ref(false)
+
     const listaQuestoes = ref(null)
     const listImport = ref([])
     const form = ref(null)
@@ -135,6 +148,47 @@
     }
 
     const load = ref(false)
+    const listLawStore = ref([])
+
+    const listLaws = computed(() => {
+        return listLawStore.value
+    })
+
+    const displayItems = computed(() => {
+        if (isSearching.value && searchResults.value.length > 0) {
+            return searchResults.value
+        }
+        return listLaws.value //forumStore.readMyGroup
+    })
+
+    let searchTimeout = null
+
+    watch(searchText, async (newValue) => {
+        clearTimeout(searchTimeout)
+        
+        // Se o texto tem menos de 4 caracteres, limpa a busca
+        if (!newValue || newValue.length < 4) {
+            isSearching.value = false
+            searchResults.value = []
+            return
+        }
+        
+        // Debounce de 300ms
+        searchTimeout = setTimeout(async () => {
+            isSearching.value = true
+            try {
+                const results = await lawStore.searchLawByText(newValue)
+                searchResults.value = results
+            } catch (error) {
+                console.error('Erro na busca:', error)
+                searchResults.value = []
+            }
+        }, 300)
+    })
+
+    const handleSearchInput = (value) => {
+        searchText.value = value
+    }
 
     const saveQuestoes = async () => {
         load.value = true
@@ -211,8 +265,65 @@
         }
     }
 
+    onMounted(async () => {
+        const resp = await lawStore.searchLawAutocomplete()
+        listLawStore.value = resp
+    })
+
 </script>
 
 <style scoped>
+.main-card {
+    margin-top: 2rem;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.main-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: slideInRight 0.8s ease-out 0.4s both;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: slideInRight 0.8s ease-out 0.4s both;
+}
+
+.title-wrapper {
+    flex: 1;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.header-decoration {
+    animation: float 3s ease-in-out infinite;
+    opacity: 0.7;
+}
+
 
 </style>
