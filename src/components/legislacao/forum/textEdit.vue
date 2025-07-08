@@ -51,7 +51,7 @@
             location="bottom"
             persistent
         >
-            <v-btn  color="white" prepend-icon="mdi-format-quote-open">Explique essa parte</v-btn>
+            <v-btn @click="emit('explicarBtn')"  color="white" prepend-icon="mdi-format-quote-open">Explique essa parte</v-btn>
         </v-menu>
 
   </div>
@@ -445,7 +445,7 @@
         }
     }
 
-    const emit = defineEmits(['update:dispositivo'])
+    const emit = defineEmits(['update:dispositivo', 'explicarBtn'])
 
     // Função para atualizar o dispositivo
     const updateDispositivo = () => {

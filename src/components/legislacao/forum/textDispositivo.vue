@@ -1,6 +1,6 @@
 <template>
     <div @mouseover="handleMouseOver" @mouseleave="handleMouseLeave" class="relativeContainer">
-        <TextEdit :dispositivo="dispositivo" :search="search" />
+        <TextEdit :dispositivo="dispositivo" :search="search" @explicarBtn="explicarBtn" />
       
         <v-expand-transition>
             <div class="action-art" v-if="isArt && showActions || activeArt" >
@@ -353,6 +353,12 @@
         const resumo = await searchStore.explicarDispositivo(artSelects, props.dispositivo, nameLaw)
         comment.value.text = resumo
         loadResumo.value = false
+    }
+
+    const explicarBtn = () => {
+        activeComment.value = true
+        comment.value.type = 5
+        explicarDispositivo()
     }
     
 </script>
