@@ -95,6 +95,7 @@
                                 ></v-select>
                             </div>
                             <v-btn @click="gerarResumo()" v-if="comment.type == 4" color="red" variant="text" prepend-icon="mdi-robot" :loading="loadResumo" :disabled="loadResumo">Criar Resumo do artigo por ia</v-btn>
+                            <v-btn @click="explicarDispositivo()" v-if="comment.type == 5" color="purple" variant="text" prepend-icon="mdi-robot" :loading="loadResumo" :disabled="loadResumo">Explicar dispositivo por IA</v-btn>
                         </div>
                         <ComentEdit 
                             v-if="comment.type"
@@ -236,6 +237,7 @@
             ...(isArt.value ? [{ id: 4, title: "Resumo" }] : []),
             { id: 1, title: "Comentário" },
             { id: 2, title: "Pergunta" },
+            { id: 5, title: "Explicar" },
         ]
     })
 
@@ -340,6 +342,15 @@
         loadResumo.value = true
         const artSelects = listFinal.value.filter( x => x.art == props.dispositivo.art).map(x => x.textlaw).join('\n')
         const resumo = await searchStore.resumoPage(artSelects)
+        comment.value.text = resumo
+        loadResumo.value = false
+    }
+
+    const explicarDispositivo = async () => {
+        loadResumo.value = true
+        const nameLaw = forumStore.readGroupForum._source?.nameLaw || forumStore.readGroupForum._source?.title
+        const artSelects = listFinal.value.filter( x => x.art == props.dispositivo.art).map(x => x.textlaw).join('\n')
+        const resumo = await searchStore.explicarDispositivo(artSelects, props.dispositivo, nameLaw)
         comment.value.text = resumo
         loadResumo.value = false
     }

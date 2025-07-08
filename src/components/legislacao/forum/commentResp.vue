@@ -135,6 +135,7 @@
         if(item == 2) return { title: "Pergunta", color: "primary"}
         if(item == 3) return { title: "Resposta", color: "orange"}
         if(item == 4) return { title: "Resumo", color: "purple"}
+        if(item == 5) return { title: "Explicação", color: "grey"}
         return { title: "Resposta", color: "orange"}
     }
 

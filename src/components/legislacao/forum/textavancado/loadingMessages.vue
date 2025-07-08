@@ -11,23 +11,18 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const messages = [
-  'Aguarde, estamos gerando suas questões.',
-  'Você poderá treinar com questões focadas no(s) artigo(s) selecionado(s).',
-  'Estamos quase terminando.',
-  'Você poderá favoritar as questões para ter acesso mais rápido.',
-  'A resolução das questões ficam salvas para consultas posteriores.',
-  'Todas as questões são comentadas.',
-]
+const props = defineProps({
+  messages: Array
+})
 
 const currentIndex = ref(0)
-const currentMessage = ref(messages[currentIndex.value])
+const currentMessage = ref(props.messages[currentIndex.value])
 let intervalId
 
 onMounted(() => {
   intervalId = setInterval(() => {
-    currentIndex.value = (currentIndex.value + 1) % messages.length
-    currentMessage.value = messages[currentIndex.value]
+    currentIndex.value = (currentIndex.value + 1) % props.messages.length
+    currentMessage.value = props.messages[currentIndex.value]
   }, 3000) // Troca a cada 3 segundos
 })
 

@@ -40,7 +40,7 @@
             </v-card>
 
             <Loading class="my-10" v-if="loadQuestoes" />
-            <LoadindQuestoesFrases v-if="load" />
+            <LoadingQuestoesFrases v-if="load" :messages="messages"/>
 
             <v-card variant="outlined" v-if="questoesStore.readTotalQuestoes && !loadQuestoes" class="appear">
                 <v-card-title class="d-flex align-start justify-space-between flex-column">
@@ -151,7 +151,7 @@
     import Loading from '../loading.vue';
     import { useRoute } from 'vue-router';
     import FavQuestoes from './favQuestoes.vue';
-    import LoadindQuestoesFrases from './questao/loadindQuestoesFrases.vue';
+    import LoadingQuestoesFrases from './loadingMessages.vue';
 
     const forumStore = useForumStore()
     const questoesStore = useQuestoesStore()
@@ -177,6 +177,15 @@
         {id: 3, name: 'Apenas respondidas'},
         {id: 4, name: 'Apenas as que errei'},
         {id: 5, name: 'Apenas as que acertei'},
+    ]
+
+    const messages = [
+        'Aguarde, estamos gerando suas questões.',
+        'Você poderá treinar com questões focadas no(s) artigo(s) selecionado(s).',
+        'Estamos quase terminando.',
+        'Você poderá favoritar as questões para ter acesso mais rápido.',
+        'A resolução das questões ficam salvas para consultas posteriores.',
+        'Todas as questões são comentadas.',
     ]
 
     const listQuestoes = computed(() => {

@@ -24,6 +24,7 @@
                                 <v-btn :loading="load" :disabled="load" @click="submitForm" variant="flat" color="primary" prepend-icon="mdi-robot">Gerar Mapa Mental por IA</v-btn>
                             </div>
                     </v-form>
+                    <LoadingMessages v-if="load" :messages="messages"/>
                 </div>
 
             </div>
@@ -44,6 +45,7 @@
     import { useForumStore } from '@/store/ForumStore';
     import { useRoute, useRouter } from "vue-router";
     import MindMap from './mindMap.vue';
+import LoadingMessages from './loadingMessages.vue';
 
     const mapaMentalStore = useMapaMentalStore()
     const forumStore = useForumStore()
@@ -57,6 +59,15 @@
             required: true
         }
     })
+
+    const messages = [
+        'Aguarde, estamos gerando o mapa mental interativo.',
+        'Você poderá revisar os artigo(s) selecionado(s) de forma interativa.',
+        'Estamos quase terminando.',
+        'Após a geração do Mapa Mental, clique em expandir para ver toda a estrutura.',
+        'O mapa mental ficará salvo e vinculado ao(s) artigo(s) selecionado(s).',
+        'Selecione artigos que possuam relação para melhorar os esquemas.',
+    ]
     
     const mindMapData = ref(null)
     const showNoResult = ref(true)

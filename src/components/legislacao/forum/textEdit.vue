@@ -42,6 +42,18 @@
             </v-card>
         </v-menu>
 
+         <v-menu
+            v-model="menu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            :activator="menuActivator"
+            offset-y
+            location="bottom"
+            persistent
+        >
+            <v-btn  color="white" prepend-icon="mdi-format-quote-open">Explique essa parte</v-btn>
+        </v-menu>
+
   </div>
 </template>
 

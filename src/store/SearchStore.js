@@ -157,6 +157,29 @@ export const useSearchStore = defineStore("searchStore", {
                 this.load = false
             }
         },
+        async explicarDispositivo(artigo, dispositivo, law){
+
+            try {
+                this.load = true
+
+                const resp = await apiChat.post('forum/explicar_dispositivo', {
+                    artigo,
+                    texto: dispositivo.textlaw,
+                    num_art: dispositivo.art,
+                    law
+                })
+
+                console.log('resp', resp);
+
+                return resp.data.data
+
+            } catch (error) {
+                console.log('erro search');
+                
+            } finally {
+                this.load = false
+            }
+        },
         async palavraChave(texto){
             try {
                 this.load = true
