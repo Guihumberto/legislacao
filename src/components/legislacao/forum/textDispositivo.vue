@@ -359,6 +359,7 @@
         activeComment.value = true
         comment.value.type = 5
         explicarDispositivo()
+        console.log('teste');
     }
     
 </script>
