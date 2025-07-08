@@ -18,7 +18,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script setup>
@@ -48,6 +47,7 @@
 
         const objeto = {
             id_law: props.aleternativa.id_law,
+            id_origin_law: props.aleternativa?.id_origin_law,
             id_art: props.aleternativa.id_art,
             id_question: props.aleternativa.id,
             id_resposta: marked.value,

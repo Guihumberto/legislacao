@@ -33,11 +33,12 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
-            const { id_law, id_art, id, fav } = item
+            const { id_law, id_art, id, fav, id_origin_law } = item
 
             const objeto = {
                 id_question: id, 
                 id_law,
+                id_origin_law,
                 id_art,
                 fav,
                 id_user: cpf,
@@ -102,12 +103,13 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
                 console.log('erroe update fav question');
             }
         },
-        async getAllFavLaw(item, list = []){
+        async getAllFavLaw(item, id_origin_law = null, list = []){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
             const must = [];
+            const should = [];
 
             if(list.length){
                 must.push({ terms: { id_question: list } });
@@ -118,22 +120,28 @@ export const useFavQuestoesStore = defineStore("favQuestoesStore", {
             }
 
             if (item) {
-                must.push({ term: { id_law: item } });
+                should.push({ term: { id_law: item } });
             }
-            
+
+            if(id_origin_law){
+                should.push({ term: { id_origin_law } });
+            }
+
             try {
                 const resp = await api.post('fav_question/_search', {
                     size: 100,
                     query:{
                         bool: {
-                            must
+                            must,
+                            should: should.filter(Boolean),
+                            minimum_should_match: 1,
                         }
                     }
                 })  
                 this.favs = resp.data.hits.hits.map(item => ({id: item._id, ...item._source}))
                 return this.favs
             } catch (error) {
-                console.log('erroe get all fav law');
+                console.log('erroe get all fav law', error?.response?.data || error.message || error);
             } finally {
                 this.load = false
             }	

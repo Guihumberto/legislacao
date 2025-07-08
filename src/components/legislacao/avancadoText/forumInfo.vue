@@ -26,7 +26,7 @@
                 <v-form @submit.prevent="createForum" ref="formref" v-if="showForms">
                   <v-btn v-if="groupsForum.total" variant="outlined" class="mb-4" @click="showForms = false">Voltar</v-btn>
                   <v-text-field
-                    label="Nome do Forum"
+                    label="Nome da Norma"
                     density="compact"
                     variant="outlined"
                     placeholder="Nomei seu forum de discussão"
@@ -36,10 +36,10 @@
                   ></v-text-field>
 
                   <v-textarea
-                    label="Descrição do grupo"
+                    label="Descrição"
                     density="compact"
                     variant="outlined"
-                    placeholder="Fale sobre os objetivos dessa discussão"
+                    placeholder="Fale sobre os objetivos desse estudo (opcional)"
                     v-model="form.description"
                   ></v-textarea>
 
@@ -121,6 +121,7 @@
     const form = ref({
       idLaw: route.params.id, 
       title: null,
+      nameLaw: null,
       description: null,
       group: [],
       open: false,
@@ -143,8 +144,13 @@
       if(!groupsForum.value.total) showForms.value = true
     }
 
-    const importarLaw = () => {
+    const atribuirName = () => {
       form.value.title = props.title
+      form.value.nameLaw = props.title
+    }
+
+    const importarLaw = () => {
+      atribuirName()
       showForms.value = true
       start.value = true
     }
@@ -222,7 +228,7 @@
     })
 
     onMounted(() => {
-      form.value.title = props.title
+      atribuirName()
     })
 
   </script>

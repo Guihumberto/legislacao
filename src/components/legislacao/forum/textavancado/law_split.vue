@@ -457,7 +457,7 @@
     let observer = null
 
     onMounted(() => {
-        getAll(1742907731755)
+        // getAll(1742907731755)
         if (myDiv.value instanceof Element) {
             observer = new ResizeObserver(entries => {
             for (const entry of entries) {

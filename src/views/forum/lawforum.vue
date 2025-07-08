@@ -182,7 +182,7 @@
                     :style="mdAndDown ? '': { width: rightWidth + 'px' }" v-show="!xs && sidelaw || mdAndDown && tab == 2"
                     v-if="mdAndDown && tab == 2 || !mdAndDown"
                 >
-                    <Home @close="sidelaw = false, tab = 1" class="chat-content" />
+                    <Home @close="sidelaw = false, tab = 1" class="chat-content" ref="paiRef" :lawSplitDefault="lawSplitDefault" />
                 </div>
             </transition>
         </div>
@@ -192,19 +192,19 @@
 <script setup>
     import { ref, computed, watch, onMounted, provide, onBeforeUnmount, nextTick  } from "vue";
     import { useDisplay } from 'vuetify'
-    const { mobile, xs, sm, md, lg, xl, xxl, name, mdAndDown  } = useDisplay()
-
+    
     import Pagination from "@/components/legislacao/avancadoText/pagination.vue";
     import TextDispositivo from "@/components/legislacao/forum/textDispositivo.vue";
     import DadosGrupo from "@/components/legislacao/forum/dadosGrupo.vue";
     import Home from "@/components/legislacao/forum/textavancado/home.vue";
-
+    
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
     import { useForumStore } from "@/store/ForumStore";
     import { useSnackStore } from "@/store/snackStore";
     import { useRoute, useRouter } from "vue-router";
     import { useGeralStore } from '@/store/GeralStore';
-
+    
+    const { mobile, xs, sm, md, lg, xl, xxl, name, mdAndDown  } = useDisplay()
     const mapaMentalStore = useMapaMentalStore()
     const forumStore = useForumStore()
     const snackStore = useSnackStore()
@@ -227,6 +227,10 @@
     const withComments = ref(false)
     const withTags = ref(false)
     const withMarks = ref(false)
+
+    const lawSplitDefault = ref(1742907731755)
+
+    const paiRef = ref(null)
 
     watch(withComments, (newConfirm) => {
         pagination.value.page = 1 
@@ -880,6 +884,7 @@
         extractArtsFromQuery()
         mapaMentalStore.getMapasMentais()
         load.value = false
+        paiRef.value.childRef.getAll(lawSplitDefault.value)
     })
 
     onBeforeUnmount(() => {

@@ -10,9 +10,11 @@
                     ></v-progress-circular>
                 </div>
                 <div v-else>
-                    <v-btn variant="tonal" @click="$router.push('/homepainel')" class="btn" prepend-icon="mdi-arrow-left">Voltar</v-btn>
-                    <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="mx-2 btn" color="primary">ir para MODO TEXTO</v-btn>
-                    <ForumInfo :title="idLaw?.title" />
+                    <div class="d-flex ga-2 flex-wrap">
+                        <v-btn variant="tonal" @click="$router.push('/homepainel')" class="btn" prepend-icon="mdi-arrow-left">Voltar</v-btn>
+                        <v-btn variant="tonal" @click="$router.push(`/text/${route.params.id}?search=leges`)" class="btn" color="primary">ir para MODO TEXTO</v-btn>
+                        <ForumInfo :title="idLaw?.title" />
+                    </div>
 
                     <LawImportInfo :title="idLaw?.title" />
         

@@ -50,7 +50,7 @@
                             ></v-select>
                             <v-btn prepend-icon="mdi-magnify" color="success" variant="flat" @click="searchComments">Buscar</v-btn>
                     </div>
-                    <div class=" text-overline mt-5 border rounded-lg pa-2 text-right" style="border-color: #e0e0e0;">
+                    <div class=" text-overline mt-5 border rounded-lg pa-2 text-right" style="border-color: #e0e0e0;" v-if="commentStore.readTotalComments">
                         <p v-if="commentStore.apenasmeusComentarios">Apenas você comentou nesta norma ({{ commentStore.readTotalCommentsUser }})</p>
                         <p v-else>você tem {{ commentStore.readTotalCommentsUser }} comentários do total de {{ commentStore.readTotalComments }}</p>
                     </div>
@@ -93,9 +93,8 @@
                             </v-expand-transition> -->
                         </div>
                     </div>
-                    <v-alert class="appear" v-else type="info" variant="text" text="Não há comentários neste dispositivo."></v-alert>
+                    <v-alert class="appear" v-else type="info" variant="text" :text="selectArt.length ? 'Não há comentários neste dispositivo.' : 'Não há comentários nesta norma.'"></v-alert>
                 </transition-group>
-                
 
                 <v-btn 
                     v-if="commentStore.pagination.total > commentStore.readComments.length && commentsList.length"
@@ -107,6 +106,7 @@
             </div>
         </section>
     </div>
+                
 </template>
 
 <script setup>

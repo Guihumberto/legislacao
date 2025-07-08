@@ -13,6 +13,8 @@
                     </template>
                 </v-tooltip>
             </div>
+            <v-alert type="info" variant="outlined" v-if="!listTextLaw.length" density="compact" text="Seus dispositivos marcados aparecerão aqui." >
+            </v-alert>
         </section>
     </div>
 </template>

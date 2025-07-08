@@ -79,23 +79,22 @@ export const useQuestoesStore = defineStore("questoesStore", {
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
 
-            const prompt = "Gere 5 questões do tipo certo/errado no estilo cespe/cebraspe, retornando o resultado como um array de objetos, com a seguinte estrutura: {pergunta: 'pergunta', resposta: 'resposta', justificativa: 'justificar citando por que ta certo ou errado'}, informando no campo resposta 'verdadeiro ou falso'"
-
             try {
                 const resp = await apiChat.post('gerar_questoes', {
                     id_origin_law: item.id_origin_law,
                     id_group: item.id_law,
                     id_art: item.id_art,
+                    list_arts: item.listArts,
                 })
 
-                console.log('resp', resp.data);
+                this.totalQuestoes += 5
 
                 return resp.data
 
             } catch (error) {
                 console.error('Erro ao gerar questões:', error.response?.data || error.message);
             } finally {
-                await this.getQuestoes(item)
+                // await this.getQuestoes(item)
                 this.load = false
             }
         },
@@ -119,16 +118,16 @@ export const useQuestoesStore = defineStore("questoesStore", {
 
             //fitrar todas favoritas
             let listFavoritas = []
-            if(filter?.favoritas) listFavoritas = await favStore.getAllFavLaw(item.id_law, [])
+            if(filter?.favoritas) listFavoritas = await favStore.getAllFavLaw(item.id_law, item?.id_origin_law, [])
 
             //filtrar todas respondidas
             let listRespondidas = []
             if(filter?.typeRespQuestions != 1) {
                 if(filter?.favoritas && listFavoritas.length) {
                     const ids_questoes = listFavoritas.map(q => q.id_question)
-                    listRespondidas = await this.getResposndidas(item.id_law, ids_questoes)
+                    listRespondidas = await this.getResposndidas(item.id_law, item.id_origin_law, ids_questoes)
                 } else {
-                    listRespondidas = await this.getResposndidas(item.id_law)
+                    listRespondidas = await this.getResposndidas(item.id_law, item.id_origin_law)
                 }
             } 
                 
@@ -196,7 +195,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
             } finally {
                 const list = this.questoes.map(item => item.id) || []
                 if(filter?.typeRespQuestions == 1) this.q_respondidas = await this.getMyQuestoesResp(item, list)
-                if(!filter?.favoritas)await favStore.getAllFavLaw(item.id_law, list)
+                if(!filter?.favoritas)await favStore.getAllFavLaw(item.id_law, item?.id_origin_law, list)
                 this.load = false
             }
         },
@@ -206,6 +205,7 @@ export const useQuestoesStore = defineStore("questoesStore", {
             if(!cpf) return
 
             const must = [];
+            const should  = [];
 
             if(list.length){
                 must.push({ terms: { id_question: list } });
@@ -215,8 +215,12 @@ export const useQuestoesStore = defineStore("questoesStore", {
                 must.push({ term: {  id_user: cpf } });
             }
 
-            if (item.id_law) {
-                must.push({ term: { id_law: item.id_law } });
+            if (item?.id_law) {
+                should.push({ term: { id_law: item.id_law } });
+            }
+
+            if (item?.id_origin_law) {
+                should.push({ term: { id_origin_law: item.id_origin_law } });
             }
 
             if (item.id_art) {
@@ -230,7 +234,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     size: 100,
                     query: {
                         bool: {
-                          must
+                          must,
+                          should,
+                          minimum_should_match: 1,
                         }
                     },
                     sort: [
@@ -385,15 +391,20 @@ export const useQuestoesStore = defineStore("questoesStore", {
             }
         },
         //fitros avancados para questoes
-        async getResposndidas(item, list = []){
+        async getResposndidas(item = null, id_origin_law = null, list = []){
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
             const must = []
+            const should = []
 
             if (item) {
-                must.push({ term: { id_law: item } });
+                should.push({ term: { id_law: item } });
+            }
+
+            if (id_origin_law) {
+                should.push({ term: { id_origin_law: id_origin_law } });
             }
 
             if (cpf) {
@@ -410,7 +421,9 @@ export const useQuestoesStore = defineStore("questoesStore", {
                     size: 500,
                     query: {
                         bool: {
-                          must
+                          must,
+                          should,
+                          minimum_should_match: 1
                         }
                     }
                 })
@@ -458,13 +471,13 @@ export const useQuestoesStore = defineStore("questoesStore", {
                                     term:{
                                         id_user: cpf
                                     }
-                                },
-                                {
-                                    match:{
-                                        id_law: item.id_law
-                                    }
                                 }
-                            ]
+                            ],
+                            should: [
+                                item.id_law ? { match: { id_law: item.id_law } } : null,
+                                item.id_origin_law ? { match: { id_origin_law: item.id_origin_law } } : null
+                            ].filter(Boolean), // remove os nulls
+                            minimum_should_match: 1 // garante que pelo menos um dos shoulds seja verdadeiro
                         }
                     }
                 })

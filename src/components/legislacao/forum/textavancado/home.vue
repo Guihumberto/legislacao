@@ -18,11 +18,7 @@
                         </div>
                         <!-- leis -->
                         <div v-if="tabSelected == 1">
-                            <v-chip-group class="my-2">
-                                <v-chip v-for="item, i in mainLaws" :key="i" @click="openLaw(item.id)">{{ item.name }}</v-chip>
-                            </v-chip-group>
-    
-                            <v-form @submit.prevent="searchLaw">
+                            <v-form @submit.prevent="searchLaw" class="mt-5 mb-2">
                                 <v-text-field
                                     label="Pesquisar"
                                     density="compact"
@@ -38,6 +34,12 @@
                                 </v-text-field>
                                 <v-btn v-if="listLaws.length" variant="text" @click="listLaws = []">limpar</v-btn>
                             </v-form>
+                            <div class="d-flex ga-2 align-center">
+                                <v-chip-group selected-class="text-primary">
+                                    <v-chip v-for="item, i in mainLaws" :key="i" @click="openLaw(item.id)">{{ item.name }}</v-chip>
+                                </v-chip-group>
+                                <!-- <v-btn variant="text" class="text-lowercase">Mudar a norma padrão</v-btn> -->
+                            </div>
                         </div>
                         
                     </v-card-text>
@@ -47,7 +49,7 @@
                         </v-list>
                     </v-card-text>
                 </v-card>
-                <Law_split v-if="tabSelected == 1" ref="childRef"  />
+                <Law_split v-show="tabSelected == 1" ref="childRef"  />
                 <Marcados v-if="tabSelected == 2" />
                 <Comentarios v-if="tabSelected == 3" />
                 <Vinculos v-if="tabSelected == 4" />
@@ -61,16 +63,9 @@
 
 <script setup>
     import { ref, watch, inject, nextTick } from "vue";
-
     import { useMapaMentalStore } from '@/store/concursos/MapasMentaisStore';
-    const mapaMentalStore = useMapaMentalStore()
-
     import { useRoute } from 'vue-router';
-    const route = useRoute()
-
     import { useLawStore } from "@/store/LawsStore"
-    const lawStore = useLawStore()
-
     import Law_split from "./law_split.vue";
     import Comentarios from "./comentarios.vue";
     import Marcados from "./marcados.vue";
@@ -78,19 +73,27 @@
     import Vinculos from "./vinculos.vue";
     import MindMapAll from "./mindMapAll.vue";
     import BlogLaw from "./blogLaw.vue";
-
+import { de } from "date-fns/locale";
+    
+    const mapaMentalStore = useMapaMentalStore()
+    const route = useRoute()
+    const lawStore = useLawStore()
     const tabSelected = ref(1)
+
+    const props = defineProps({
+        lawSplitDefault: String || Number,
+    })
     
     const mainLaws = [
-        {id: 1742907731755, name: 'CF 88'},
-        {id: 1742907901454, name: 'CTN'},
-        {id: 71587, name: 'Lei 7.799'}
+        {id: 1742907731755, name: 'CF 88', default: true},
+        {id: 1742907901454, name: 'CTN', default: false},
+        {id: 71587, name: 'Lei 7.799', default: false},
     ]
 
     const tabs = [
         {
             id: 1,
-            name: 'Leis',
+            name: 'Normas',
             icon: 'mdi-bookshelf'
         },
         {
@@ -126,6 +129,7 @@
     ]
 
     const childRef = ref(null)
+    defineExpose({ childRef })
 
     const openLaw = (id) => {
         if (childRef.value) {

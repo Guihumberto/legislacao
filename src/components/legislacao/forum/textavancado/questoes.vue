@@ -6,9 +6,18 @@
                     <h1 class="text-h5">Questões</h1>
             </div>
             <v-alert variant="outlined" class="my-2">
-                <p v-if="!$route.query.art">Selecione o artigo para gerar questões.</p>
+                <p v-if="!listArtsFilter.length">Selecione o artigo para gerar questões.</p>
                 <div v-else>
-                    <p class="selectArt" ref="elemento">Art. {{ $route.query.art }} foi selecionado</p>
+                    <p class="selectArt" ref="elemento">Artigo<span v-if="listArtsFilter.length > 1">s</span> selecionado<span v-if="listArtsFilter.length > 1">s</span></p>
+                    <div class="d-flex justify-center align-center">
+                        <v-chip-group
+                            multiple
+                            v-model="artsFilter"
+                            column
+                        >
+                            <v-chip class="text-primary" v-for="art, a in listArtsFilter" :key="art" :value="art">{{art}}</v-chip>
+                        </v-chip-group> 
+                    </div>
                     <div class="text-center">
                         <p class="my-2 text-overline">Gere questões a partir do artigo selecionado.</p>
                         <v-btn :disabled="load" :loading="load" color="primary" @click="gerarQuestoes">Gerar Questões</v-btn>
@@ -18,6 +27,7 @@
 
             <v-card class="my-2" variant="flat" v-if="listArtsFilter.length" >
                 <v-card-text>
+                    <h6>Artigo<span v-if="listArtsFilter.length > 1">s</span> Filtrado<span v-if="listArtsFilter.length > 1">s</span></h6>
                     <v-chip-group
                         multiple
                         v-model="artsFilter"
@@ -29,12 +39,13 @@
                 </v-card-text>
             </v-card>
 
-            <Loading class="mt-10" v-if="loadQuestoes" />
+            <Loading class="my-10" v-if="loadQuestoes" />
+            <LoadindQuestoesFrases v-if="load" />
 
             <v-card variant="outlined" v-if="questoesStore.readTotalQuestoes && !loadQuestoes" class="appear">
                 <v-card-title class="d-flex align-start justify-space-between flex-column">
                     <div class="px-1 d-flex justify-space-between align-center w-100">
-                        <div>
+                        <div class="text-wrap mr-5">
                             <span v-if="$route.query.art">Artigo {{ $route.query.art }} - </span>{{ forumStore.readGroupForum._source.title }} 
                         </div>
                         <div class="pa-1 bg-primary rounded">Total: {{ questoesStore.readTotalRespQuestoes }}/{{ questoesStore.readTotalQuestoes }}</div>
@@ -47,41 +58,41 @@
                     </div>
                     <div class="w-100 border rounded-lg pa-2 ">
                         <div class="w-100 d-flex ga-1">
-                        <v-select
-                            label="Filtro"
-                            :items="typeRespQuestions"
-                            item-title="name"
-                            item-value="id"
-                            v-model="formQuestions.typeRespQuestions"
-                            variant="outlined"
-                            density="compact"
-                            hide-details 
-                            class="w-100"
-                        ></v-select>
-                        <div class="d-flex ga-1 w-100">
                             <v-select
-                                label="Ano"
-                                :items="listAnos"
-                                v-model="formQuestions.ano"
-                                multiple
+                                label="Filtro"
+                                :items="typeRespQuestions"
+                                item-title="name"
+                                item-value="id"
+                                v-model="formQuestions.typeRespQuestions"
                                 variant="outlined"
                                 density="compact"
                                 hide-details 
-                                clearable
-                                class="w-50"
+                                class="w-100"
                             ></v-select>
-                            <v-select
-                                label="Banca"
-                                :items="listBancas"
-                                v-model="formQuestions.banca"
-                                multiple
-                                variant="outlined"
-                                density="compact"
-                                hide-details 
-                                clearable
-                                class="w-50"     
-                            ></v-select>
-                        </div>
+                            <div class="d-flex ga-1 w-100">
+                                <v-select
+                                    label="Ano"
+                                    :items="listAnos"
+                                    v-model="formQuestions.ano"
+                                    multiple
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details 
+                                    clearable
+                                    class="w-50"
+                                ></v-select>
+                                <v-select
+                                    label="Banca"
+                                    :items="listBancas"
+                                    v-model="formQuestions.banca"
+                                    multiple
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details 
+                                    clearable
+                                    class="w-50"     
+                                ></v-select>
+                            </div>
                         </div>
                         <v-checkbox
                             label="Apenas favoritas"
@@ -122,6 +133,11 @@
                     </div>
                 </v-card-text>
             </v-card>
+
+            <v-alert v-if="!questoesStore.readTotalQuestoes" variant="outlined" type="info" 
+                text="Ainda não há questões vinculadas a artigos para esta norma. Selecione um artigo para gerar ou buscar questões."
+            >
+            </v-alert>
         </section>
     </div>
 </template>
@@ -135,6 +151,7 @@
     import Loading from '../loading.vue';
     import { useRoute } from 'vue-router';
     import FavQuestoes from './favQuestoes.vue';
+    import LoadindQuestoesFrases from './questao/loadindQuestoesFrases.vue';
 
     const forumStore = useForumStore()
     const questoesStore = useQuestoesStore()
@@ -143,6 +160,7 @@
     const load = ref(false)
     const elemento = ref(null)
     const listArtsFilter = inject('listArtsFilter')
+
     const artsFilter = ref([])
     const rightWidth = inject('rightWidth')
 
@@ -225,7 +243,7 @@
             getQuestoes()
             if(elemento.value) elemento.value.classList.add('selectArtAnimar')
             setTimeout(() => {
-                elemento.value.classList.remove('selectArtAnimar')
+                elemento.value?.classList?.remove('selectArtAnimar')
             }, 1000)
         } 
     )
@@ -280,10 +298,12 @@
     }
 
     const gerarQuestoes = async () => {
+        load.value = true
         loadQuestoes.value = true
-        await questoesStore.gerarQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: route.query.art})
+        await questoesStore.gerarQuestoes({ id_origin_law: forumStore.readGroupForum._source.idLaw, id_law: route.params.id, id_art: listArtsFilter.value[0], listArts: listArtsFilter.value})
         await getQuestoesFilter()
         loadQuestoes.value = false
+        load.value = false
     }
 
 
