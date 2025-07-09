@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import { useLoginStore } from '@/store/LoginStore'
 import { useSnackStore } from '@/store/snackStore'
 import api from "@/services/api"
-import apiChat from "@/services/api_chat"
 
 export const usePrecadastroStore = defineStore('precadstro', () => {
     const listUser = ref([])

@@ -28,6 +28,7 @@
                     </div>
                 </div>
                 <Loading v-if="loadPage" class="my-5" />
+                <LoadingQuestoesFrases v-if="load" :messages="messages"/>
                 <Posts :posts="posts" class="mt-5" />
         </section>
     </div>
@@ -43,6 +44,7 @@
     
     import Posts from '../blogLaw/post.vue';
     import Loading from '../loading.vue';
+    import LoadingQuestoesFrases from './loadingMessages.vue';
     
     const mindMapInt = useMindMapInteractive()
     const blogLawStore = useBlogLawStore()
@@ -50,6 +52,16 @@
     const route = useRoute()
  
     const rightWidth = inject('rightWidth')
+
+    const messages = [
+        'Aguarde, estamos gerando seu post explicativo.',
+        'Você poderá treinar com questões focadas no(s) artigo(s) selecionado(s) ao final do post.',
+        'Estamos quase terminando.',
+        'Você poderá acessar pelo blog estudo da lei.',
+        'Aguarde só mais uns segundos.',
+        'Estamos quase lá...',
+        'Acrescentando as questões interativas ao final e umas acentuações básicas.',
+    ]
     
     const posts = computed(() => {
       let list = blogLawStore.sortedPosts

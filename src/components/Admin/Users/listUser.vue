@@ -37,6 +37,15 @@
                         @update:model-value="updateUser(item)"
                         :disabled="load"
                     ></v-switch>
+                    <v-switch
+                        label="pro"
+                        density="compact"
+                        hide-details
+                        color="success"
+                        v-model="item.is_premium"
+                        @update:model-value="updateUser(item)"
+                        :disabled="load"
+                    ></v-switch>
                 </template>
                 <div>
                     {{ item.cpf }} <span v-if="item?.name">- {{ item.name }}</span> 
@@ -78,7 +87,7 @@
 
     const updateUser = async (item) => {
         load.value = true
-        await loginStore.editUser(item)
+        await loginStore.updatePerfil(item)
         load.value = false
     }
 

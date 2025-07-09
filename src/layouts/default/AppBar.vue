@@ -7,10 +7,12 @@
           <router-link to="/homepainel" class="linkinitial">ESTUDO DA LEI</router-link>
         </h6>
         <div class="rigthSubheader">
+
           <router-link to="/planos" class="mr-2">PREÇOS</router-link>
           <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
           <a @click="loginStore.logOut($router)" class="mr-2 text-orange" v-else>SAIR</a>
           <Notification v-if="loginStore.readLogin.cpf" />
+           <CreditsControl />
           <v-btn 
             title="ocultar cabeçalho" 
             density="compact" 
@@ -80,20 +82,20 @@
 
 <script setup>
   import { ref, onMounted, onBeforeUnmount, provide } from 'vue'
+  import { useGeralStore } from '@/store/GeralStore'
+  import { useGeneralStore } from '@/store/GeneralStore'
+  import { useLoginStore } from '../../store/LoginStore'
+  
+  import Novo from '@/components/partiaslLayout/novo.vue'
   import sidebarleft from '@/components/legislacao/sidebar/sideLeft.vue'
   import MenuBar from '@/components/dialogs/menuBar.vue'
   import loginInfo from '@/components/partiaslLayout/userInfoLogin.vue'
   import menuUser from './MenuUser.vue'
   import Notification from './Notification.vue'
+  import CreditsControl from './creditsControl.vue'
 
-  import { useGeralStore } from '@/store/GeralStore'
   const geralStore = useGeralStore()
-
-  import { useGeneralStore } from '@/store/GeneralStore'
   const generalStore = useGeneralStore()
-
-  import { useLoginStore } from '../../store/LoginStore'
-import Novo from '@/components/partiaslLayout/novo.vue'
   const loginStore = useLoginStore()
 
   const dark = ref(false) 

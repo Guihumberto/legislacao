@@ -1,8 +1,5 @@
 import { defineStore } from "pinia";
-
 import api from "@/services/api"
-import apiChat from "@/services/api_chat"
-
 import { useLoginStore } from "@/store/LoginStore";
 
 export const useChatStore = defineStore("chatStore", {

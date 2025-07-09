@@ -4,6 +4,8 @@ import { useLoginStore } from '@/store/LoginStore'
 import { useSnackStore } from '@/store/snackStore'
 import { useMapaMentalStore } from '../concursos/MapasMentaisStore'
 import { useOptionsStore } from '../concursos/OptionsStore'
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
+
 import api from "@/services/api"
 import apiChat from "@/services/api_chat"
 
@@ -16,6 +18,7 @@ export const useMindMapInteractive = defineStore('mindMapInt', () => {
     const loginStore = useLoginStore() 
     const mindMapStore = useMapaMentalStore()
     const optionsStore = useOptionsStore()
+    const dailyCredit = useDailyCredits()
 
     // Computed
     const sortedMindMap = computed(() => {
@@ -108,6 +111,15 @@ export const useMindMapInteractive = defineStore('mindMapInt', () => {
         postData.createdAt = formatDate.value
         postData.texto = dipositivosText.replace(/<[^>]*>/g, '');
 
+        const hasCredit = await dailyCredit.checkCreditsBalance()
+
+        if(!hasCredit?.remaining){
+            infoSnackNoCredits()
+            return
+        }
+
+        dailyCredit.canUseCredits()
+
         try {
             const resp = await apiChat.post('forum/gerar_post', postData)
             delete postData.texto
@@ -117,6 +129,10 @@ export const useMindMapInteractive = defineStore('mindMapInt', () => {
             error.value = err.response?.data?.message || err.message || 'Erro ao criar post'
             console.error('Erro ao criar post:', err)
         }
+    }
+
+    const infoSnackNoCredits = () => {
+        snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
     }
 
     return {

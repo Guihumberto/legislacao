@@ -4,6 +4,8 @@ import api from "@/services/api"
 import apiChat from "@/services/api_chat"
 import { useLoginStore } from "./LoginStore";
 import { usePageStore } from "./PageStore";
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
+import { useSnackStore } from '@/store/snackStore'
 
 export const useSearchStore = defineStore("searchStore", {
     state: () => ({
@@ -91,6 +93,16 @@ export const useSearchStore = defineStore("searchStore", {
             return resp.data//"resposta"
         },
         async searchChatApi(ask, id){
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 this.load = true
 
@@ -142,9 +154,18 @@ export const useSearchStore = defineStore("searchStore", {
              }
          },
         async resumoPage(texto){
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+            
             try {
                 this.load = true
-
                 const resp = await apiChat.post('resumir', {
                     texto: texto
                 })
@@ -158,6 +179,15 @@ export const useSearchStore = defineStore("searchStore", {
             }
         },
         async explicarDispositivo(artigo, dispositivo, law){
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
 
             try {
                 this.load = true
@@ -181,6 +211,15 @@ export const useSearchStore = defineStore("searchStore", {
             }
         },
         async palavraChave(texto){
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
             try {
                 this.load = true
 
@@ -224,6 +263,17 @@ export const useSearchStore = defineStore("searchStore", {
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             this.load = true
             try {
                 const resp = await apiChat.post('ask', {
@@ -241,10 +291,20 @@ export const useSearchStore = defineStore("searchStore", {
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             this.load = true
-
+            
             const orientacao = 'Faça um pequeno resumo em poucas palavras sobre o o que esse texto se trata. Seja Objetivo e direto.'
-
             const item = {
                 id: id,
                 num_page: 1
@@ -267,6 +327,10 @@ export const useSearchStore = defineStore("searchStore", {
             } finally {
                 this.load = false
             }
+        },
+        infoSnackNoCredits(){
+            const snackStore = useSnackStore()
+            snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
         }
     }
 })

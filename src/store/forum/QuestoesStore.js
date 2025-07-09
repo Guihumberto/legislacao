@@ -5,6 +5,8 @@ import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "@/store/LoginStore";
 import { useFavQuestoesStore } from "./favQuestionStore";
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
+import { useSnackStore } from '@/store/snackStore'
 
 export const useQuestoesStore = defineStore("questoesStore", {
     state: () => ({
@@ -78,6 +80,16 @@ export const useQuestoesStore = defineStore("questoesStore", {
             this.load = true
             const loginStore = await useLoginStore()
             if(!loginStore.readLogin?.cpf) return
+
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
 
             try {
                 const resp = await apiChat.post('gerar_questoes', {
@@ -526,6 +538,10 @@ export const useQuestoesStore = defineStore("questoesStore", {
         async getLists(){
             await this.getListBancas()
             await this.getListAnos()
+        },
+        infoSnackNoCredits(){
+            const snackStore = useSnackStore()
+            snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
         }
     }
 })

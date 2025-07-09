@@ -6,6 +6,7 @@ import apiChat from "@/services/api_chat"
 import { useLoginStore } from "@/store/LoginStore";
 import { useForumStore } from "../ForumStore";
 import { useSnackStore } from "@/store/snackStore";
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
 
 export const useMapaMentalStore = defineStore("mapaMentalStore", {
     state: () => ({
@@ -71,6 +72,16 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
 
             if(!dipositivosText) return
 
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 const resp = await apiChat.post('/generate_mapmind', {
                     texto: dipositivosText,
@@ -105,6 +116,10 @@ export const useMapaMentalStore = defineStore("mapaMentalStore", {
             } catch (error) {
                 return null
             }
+        },
+        infoSnackNoCredits(){
+            const snackStore = useSnackStore()
+            snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
         }
     }
 })

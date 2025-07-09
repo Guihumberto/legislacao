@@ -4,6 +4,8 @@ import { useLoginStore } from '@/store/LoginStore'
 import { useSnackStore } from '@/store/snackStore'
 import { useMapaMentalStore } from '../concursos/MapasMentaisStore'
 import { useOptionsStore } from '../concursos/OptionsStore'
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
+
 import api from "@/services/api"
 import apiChat from "@/services/api_chat"
 
@@ -16,6 +18,7 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
     const loginStore = useLoginStore() 
     const mindMapStore = useMapaMentalStore()
     const optionsStore = useOptionsStore()
+    const dailyCredit = useDailyCredits()
 
     // Computed
     const sortedPosts = computed(() => {
@@ -99,6 +102,15 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
     const generetePostIa = async (postData) => {
         // if(userLogin.value) return
 
+        const hasCredit = await dailyCredit.checkCreditsBalance()
+
+        if(!hasCredit?.remaining){
+            infoSnackNoCredits()
+            return
+        }
+
+        dailyCredit.canUseCredits()
+
         const arts = [  postData.art, ...postData.arts].map(art => parseInt(art))
         const artsNoRepeat = [...new Set(arts)]
         const dipositivosText =  mindMapStore.getDispositvosForum(artsNoRepeat)
@@ -107,6 +119,8 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
 
         postData.createdAt = formatDate.value
         postData.texto = dipositivosText.replace(/<[^>]*>/g, '');
+
+
 
         try {
             const resp = await apiChat.post('forum/gerar_post', postData)
@@ -117,6 +131,10 @@ export const useBlogLawStore = defineStore('bloglaw', () => {
             error.value = err.response?.data?.message || err.message || 'Erro ao criar post'
             console.error('Erro ao criar post:', err)
         }
+    }
+
+    const infoSnackNoCredits = () => {
+        snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
     }
 
     return {

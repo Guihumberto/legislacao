@@ -56,32 +56,26 @@
 
 <script setup>
     import { ref, inject, onMounted, watch } from 'vue'
-
     import api from '@/services/api_hf'
-
     import MenuUser from '@/components/chat/menuUser.vue';
     import Loading from './loading.vue';
-    
     import { useSearchStore } from '@/store/SearchStore';
-    const searchStore = useSearchStore()
-
     import { useChatStore } from '@/store/ChatStore';
-    const chatStore = useChatStore()
-
     import { useLoginStore } from '@/store/LoginStore';
-    const loginStore = useLoginStore()
-    
     import { useRoute } from 'vue-router';
-    const route = useRoute()
-   
     import { useDateNow } from '@/composables/dateFormat';
-    
     import { storeToRefs } from 'pinia';
-    const { readLogin } = storeToRefs(loginStore)
 
+    const searchStore = useSearchStore()
+    const chatStore = useChatStore()
+    const loginStore = useLoginStore()
+    const route = useRoute()
     const theme = inject('theme')
     const load = ref(false)
     const chatContent = ref(null);
+   
+    const { readLogin } = storeToRefs(loginStore)
+
 
     const nextTick = () => {
       setTimeout(() => {

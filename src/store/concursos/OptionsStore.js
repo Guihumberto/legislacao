@@ -5,9 +5,9 @@ import apiChat from "@/services/api_chat"
 
 import { useLoginStore } from "@/store/LoginStore";
 import { useSnackStore } from "@/store/snackStore";
-
 import { useNotificationsStore } from '@/store/NotificationsStore'
 import { notificationService } from '@/services/notificationService'
+import { useDailyCredits } from "@/store/admin_signature/DailyCreditsStore";
 
 export const useOptionsStore = defineStore("optionsStore", {
     state: () => ({
@@ -307,6 +307,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 const resp = await apiChat.post('/concursos/revisao', {
                     texto: item,
@@ -326,6 +336,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 const resp = await apiChat.post('/concursos/questoes', {
                     texto: item,
@@ -343,6 +363,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             const loginStore = useLoginStore()
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
+
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
 
             try {
                 const resp = await apiChat.post('/concursos/flashcards', {
@@ -362,6 +392,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 const resp = await apiChat.post('/concursos/jurisprudencia', {
                     texto: item,
@@ -379,6 +419,16 @@ export const useOptionsStore = defineStore("optionsStore", {
             const cpf = loginStore.readLogin?.cpf
             if(!cpf) return
 
+            const dailyCredit = useDailyCredits()
+            const hasCredit = await dailyCredit.checkCreditsBalance()
+
+            if(!hasCredit?.remaining){
+                this.infoSnackNoCredits()
+                return
+            }
+
+            dailyCredit.canUseCredits()
+
             try {
                 const resp = await apiChat.post('/concursos/mindmap', {
                     texto: item,
@@ -392,5 +442,9 @@ export const useOptionsStore = defineStore("optionsStore", {
                 return 'erro ao gerar resumo'
             }
         },
+        infoSnackNoCredits(){
+            const snackStore = useSnackStore()
+            snackStore.activeSnack('Você não tem créditos suficientes para realizar essa ação', 'error')
+        }
     }
 })

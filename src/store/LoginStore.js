@@ -13,7 +13,8 @@ export const useLoginStore = defineStore("loginStore", {
             name: null,
             apelido: null,
             firstLogin: false,
-            dateFirstLogin: null
+            dateFirstLogin: null,
+            is_premium: false
         },
         user:{
             name: null, 
@@ -56,6 +57,18 @@ export const useLoginStore = defineStore("loginStore", {
         },
         readTotalPages(){
             return this.totalPages
+        },
+        readUser(){
+            const data = sessionStorage.getItem('userData') || localStorage.getItem('userData');
+            if (data) {
+                const login = {
+                    login: JSON.parse(data).cpf,
+                    password: JSON.parse(data).password,
+                    isPremium: JSON.parse(data).is_premium
+                } 
+                return login
+            }
+            return { login: null, password: null, isPremium: false }
         }
     },
     actions:{
@@ -82,7 +95,6 @@ export const useLoginStore = defineStore("loginStore", {
                     await userAreaStore.getAllHistórico()
                     await userAreaStore.getCollection()
                     await userAreaStore.getDocs()
-                    
                     
                     return this.login
                 } else {
@@ -285,18 +297,20 @@ export const useLoginStore = defineStore("loginStore", {
         async editUser(user){
             const objeto = (({ id, ...rest }) => rest)(user);
             if(objeto.cpf) objeto.cpf = this.apenasNumeros(user.cpf)
+
          
             if(objeto?.cpf) {
                 const isInvalidCpf = this.validarCPF(objeto.cpf)
                 if(!isInvalidCpf){
                     return {erro: true, msg: 'CPF inválido'}
                 }
-
                 const isExist = await this.findUserElastic(objeto.cpf)
                 if(isExist){
                     return {erro: true, msg: 'CPF já cadastrado'}
                 }
             }
+
+            console.log('objeto', objeto);
 
             try {
                 const resp = await api.post(`users/_doc/${user.id}`, objeto)
@@ -308,6 +322,32 @@ export const useLoginStore = defineStore("loginStore", {
 
                 this.setLogin(user)
                 console.log('store login: editou user', this.readLogin);
+                return {erro: false, msg: 'Tudo certo!'}
+                
+            } catch (error) {
+                console.log('erro ao edit user');
+                return {erro: true, msg: 'erro nao mapeado'}
+            } 
+        },
+        async updatePerfil(user){
+            const objeto = (({ id, ...rest }) => rest)(user);
+            if(objeto.cpf) objeto.cpf = this.apenasNumeros(user.cpf)
+
+         
+            if(objeto?.cpf) {
+                const isInvalidCpf = this.validarCPF(objeto.cpf)
+                if(!isInvalidCpf){
+                    return {erro: true, msg: 'CPF inválido'}
+                }
+            }
+
+            try {
+                const resp = await api.post(`users/_doc/${user.id}`, objeto)
+                this.listUsers = this.listUsers.map(item =>
+                    item.id === user.id ? {...user } : item
+                );
+
+                this.setLogin(user)
                 return {erro: false, msg: 'Tudo certo!'}
                 
             } catch (error) {
