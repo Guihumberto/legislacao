@@ -10,7 +10,8 @@
           <v-avatar v-else class="mb-3" size="5rem" variant="tonal" color="blue"><v-icon size="3rem">mdi-account</v-icon></v-avatar>
           <h3>{{ loginStore.readLogin.nickname }}</h3>
           <h4>{{  loginStore.readLogin.setor }}</h4>
-          <v-btn color="success" @click="$router.push('/assinar?plan=Pro')" class="mt-3" prepend-icon="mdi-rocket" variant="outlined">PLANO GRATUITO</v-btn>
+          <v-btn v-if="loginStore.readLogin.is_premium" color="primary" @click="$router.push('/assinar?plan=Pro')" class="mt-3" prepend-icon="mdi-medal" variant="outlined">PLANO PRÓ</v-btn>
+          <v-btn v-else color="success" @click="$router.push('/assinar?plan=Pro')" class="mt-3" prepend-icon="mdi-rocket" variant="outlined">PLANO GRATUITO</v-btn><br>
           <v-btn color="red" variant="text" class="text-lowecase">Sair <v-icon class="ml-1" size=".9rem">mdi-logout</v-icon></v-btn>
            <!-- <v-btn @click="$router.push('/areauser')" class="mt-3" prepend-icon="mdi-account" variant="outlined">Área do Usuário</v-btn> -->
       </div>

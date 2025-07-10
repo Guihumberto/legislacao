@@ -57,7 +57,7 @@
 
                   <div class="mt-5 text-center">
                      <v-btn variant="text" class="mr-2" @click="start = false, showForms = false">cancelar</v-btn>
-                    <v-btn color="primary" type="submit" >Criar Forum</v-btn>
+                    <v-btn color="primary" type="submit" >IMPORTAR</v-btn>
                   </div>
                 </v-form>
 

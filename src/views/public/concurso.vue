@@ -23,7 +23,7 @@
                         <span class="d-none d-sm-inline ml-1">Normas</span>
                       </v-btn>
                     </v-btn-toggle>
-                    <v-btn v-if="importSuccess" color="success" append-icon="mdi-login-variant" @click="$router.push('/areauser')">acessar</v-btn>
+                    <v-btn v-if="importSuccess" color="success" append-icon="mdi-login-variant" @click="$router.push('/meuseditais')">acessar</v-btn>
                     <v-btn v-else @click="importar" color="primary" :disabled="load" :loading="load">
                       <v-icon>mdi-import</v-icon>
                       <span class="d-none d-sm-inline ml-1">IMPORTAR</span>

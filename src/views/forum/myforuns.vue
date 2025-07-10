@@ -13,32 +13,61 @@
                     </div>
 
                     <!-- Loading state -->
-                     <transition name="loading-fade">
-                         <div v-if="load" class="loading-container">
-                             <v-progress-circular
-                                 indeterminate
-                                 color="primary"
-                                 size="64"
-                                 width="4"
-                             ></v-progress-circular>
-                             <p class="loading-text">Carregando suas normas...</p>
-                         </div>
-                     </transition>
+                 
+                    <div v-if="load" class="loading-container">
+                        <v-progress-circular
+                            indeterminate
+                            color="primary"
+                            size="64"
+                            width="4"
+                        ></v-progress-circular>
+                        <p class="loading-text">Carregando suas normas...</p>
+                    </div>
+    
 
                     <!-- Conteúdo principal -->
                     <div v-if="!load" class="content-section">
-                        <div class="text-right">
-                            <v-btn
-                                variant="text"
-                                prepend-icon="mdi-check-circle"
-                                @click="$router.push('/permissoes')"
-                                title="permissões"
-                                icon="mdi-lock"
-                            >
-                            </v-btn>
-                            <ConfigMyGroup :groups="forumStore.readMyGroup" />
-                        </div>
-                      <ListForuns  @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
+                      <v-card class="editais-card" v-if="forumStore.readMyGroup.length"  elevation="2">
+                        <v-card-text>
+                            <div class="text-right">
+                                  <v-btn
+                                      variant="text"
+                                      prepend-icon="mdi-check-circle"
+                                      @click="$router.push('/permissoes')"
+                                      title="permissões"
+                                      icon="mdi-lock"
+                                  >
+                                  </v-btn>
+                                  <ConfigMyGroup :groups="forumStore.readMyGroup" />
+                            </div>
+                            <ListForuns  @saveFoldersForum="saveFoldersForum" :foldersES="preferencesStore.foldersForum" />
+                        </v-card-text>
+                      </v-card>  
+
+                       <!-- Estado vazio -->
+                      <v-card v-else class="empty-state-card mb-10" elevation="2">
+                          <v-card-text class="text-center pa-8">
+                              <div class="empty-icon-wrapper">
+                                  <v-icon class="empty-icon" color="grey-lighten-1" size="5rem">
+                                      mdi-book-outline
+                                  </v-icon>
+                              </div>
+                              <h3 class="empty-title">Nenhuma normas adicionada</h3>
+                              <p class="empty-subtitle">
+                                  Você ainda não adicionou nenhuma norma.
+                              </p>
+                              <v-btn 
+                                  color="primary" 
+                                  variant="elevated"
+                                  size="large"
+                                  class="empty-action-btn"
+                                  @click="$router.push('/homepainel')"
+                                  prepend-icon="mdi-plus"
+                              >
+                                  Adicionar Normas
+                              </v-btn>
+                          </v-card-text>
+                      </v-card>
                     </div>
                 </v-card-text>
             </v-card>
@@ -151,6 +180,8 @@
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    min-height: 30rem;
 }
 
 .main-card:hover {

@@ -48,7 +48,7 @@
      </v-form>
      <div v-else class="text-center">
          <v-icon class="mb-5" size="5rem" color="primary"> mdi-flash</v-icon>
-         <v-alert variant="outlined" type="info" :text="`${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''}, seu plano atual é o BÁSICO`"></v-alert>
+         <v-alert variant="outlined" type="info" :text="`${loginStore.readLogin.nickname ? loginStore.readLogin.nickname : ''}, seu plano atual é o ${ loginStore.readLogin?.is_premium ? 'PRÓ' : 'BÁSICO'}`"></v-alert>
          <v-btn variant="flat" color="primary" @click="$router.push('/homepainel')" class="mt-5" append-icon="mdi-magnify" v-if="$route.name != 'Assinar'">Iniciar</v-btn>
          <v-btn v-if="$route.name == 'Assinar'" class="mt-5" color="error" @click="loginStore.logOut" variant="text">Entrar com outra conta</v-btn>
         </div>
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, provide, onMounted } from 'vue';
+    import { ref, provide, onMounted } from 'vue';
     import FirstLogin from './firstLogin.vue'
     import { mask } from 'vue-the-mask'
 
@@ -187,7 +187,7 @@
                     dialog.value = true;
                 } else {
                     const redirectTo = route.query.redirect || '/homepainel';
-                    router.push(redirectTo);
+                    // router.push(redirectTo);
                 }
             }
 

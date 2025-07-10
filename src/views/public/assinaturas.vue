@@ -8,16 +8,16 @@
                     </p>
 
                     <v-row justify="center" align="stretch">
-                        <v-col cols="12" md="6" lg="4" v-for="plan in pricingPlans" :key="plan.title">
+                        <v-col cols="12" md="6" lg="4" v-for="plan in pricingPlans" :key="plan.title" class="mb-5">
                             <PricingCard
-                            :title="plan.title"
-                            :price="plan.price"
-                            :description="plan.description"
-                            :features="plan.features"
-                            :buttonText="plan.buttonText"
-                            :isPopular="plan.isPopular"
-                            :isEnterprise="plan.isEnterprise"
-                            @button-click="handlePlanSelection(plan.title)"
+                              :title="plan.title"
+                              :price="plan.price"
+                              :description="plan.description"
+                              :features="plan.features"
+                              :buttonText="plan.buttonText"
+                              :isPopular="plan.isPopular"
+                              :isEnterprise="plan.isEnterprise"
+                              @button-click="handlePlanSelection(plan.title)"
                             >
                             <template #icon>
                                 <v-icon :color="plan.isPopular ? 'primary' : 'grey-darken-1'" :icon="plan.icon" size="32"></v-icon>

@@ -57,9 +57,8 @@ export const useDailyCredits = defineStore('dailyCredits', () => {
                     }
             });
 
-            console.log('response', response);
-
             remainingCredits.value -= creditsToUse;
+            snackStore.activeSnack('1 crédito  IA foi usado.', 'success')
 
         } catch (error) {
             console.error('Erro ao criar registro:', error);
@@ -73,6 +72,8 @@ export const useDailyCredits = defineStore('dailyCredits', () => {
         const docId = `credit_${today}_${userId}`;
 
         if(!userId) return;
+
+        console.log('teste teste');
 
         try {
             const doc = await api.get(`daily_credits/_doc/${docId}`);

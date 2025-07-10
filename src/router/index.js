@@ -44,6 +44,17 @@ const routes = [
         component: () => import('@/views/Chatarcadio.vue'),
       },
     ]
+  },
+  {
+    path: '/landingpage',
+    component: () => import('@/layouts/clear/Clear.vue'),
+    children:[
+      {
+        path: '',
+        name: 'Legislação Hero',
+        component: () => import('@/views/public/hero_page.vue'),
+      }
+    ]
   }
 ]
 

@@ -77,12 +77,15 @@
 
 <script setup>
     import { useLoginStore } from '@/store/LoginStore';
+    import { useDailyCredits } from '@/store/admin_signature/DailyCreditsStore';
     import { ref, inject } from 'vue';
     import { useRouter } from 'vue-router';
     import { mask } from 'vue-the-mask'
 
     const router = useRouter()
     const loginStore = useLoginStore()
+    const dailyCredtisStore = useDailyCredits()
+    const { checkCreditsBalance } = dailyCredtisStore
 
     const form = ref(null)
     const dialog = inject('dialog')
@@ -141,7 +144,8 @@
                     error.value.msg = resp.msg
                 } else {
                     console.log('app:login', loginStore.readLogin);
-                    router.push(`/leges`)
+                    router.push(`/homepainel`)
+                    checkCreditsBalance()
                     clear()
                     dialog.value = false
                 }        
