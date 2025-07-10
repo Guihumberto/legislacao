@@ -1,7 +1,8 @@
 <template>
     <div v-if="user?.cpf">
-        <v-chip v-if="isUserPremium" class="bg-orange text-white" density="compact">
-            <v-icon size="1rem">mdi-star</v-icon>
+        <v-chip 
+            prepend-icon="mdi-star"
+            v-if="isUserPremium" class="bg-orange text-white" density="compact">
             <span>plano pró</span>
         </v-chip>
         <v-chip 

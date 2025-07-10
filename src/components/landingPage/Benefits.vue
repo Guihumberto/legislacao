@@ -71,6 +71,7 @@
                 block
                 size="large"
                 class="font-weight-bold"
+                @click="$router.push('/login')"
                 >Experimente Grátis</v-btn
               >
             </v-card-text>
@@ -86,24 +87,24 @@ import { ref } from "vue";
 
 const userTypes = ref([
   {
-    title: "Concurseiros",
+    title: "Cocursos Públicos",
     subtitle: "Acelere sua aprovação",
     benefits: [
-      "Questões específicas por banca e cargo",
-      "Estatísticas de cobrança por tema",
-      "Simulados personalizados",
-      "Cronograma de estudos inteligente",
+      "Questões específicas por nomra",
+      "Relacionamento norma com norma",
+      "Questões geradas por IA",
+      "Mapas Mentais Interativos",
     ],
     mainColor: "blue",
     bgColor: "blue-lighten-5",
   },
   {
-    title: "Advogados OAB",
+    title: "Exame da OAB",
     subtitle: "Domine o exame da Ordem",
     benefits: [
-      "Questões OAB de todas as fases",
-      "Jurisprudência atualizada",
-      "Peças processuais comentadas",
+      "Questões OAB",
+      "Jurisprudência vinculada aos dispositivos",
+      "Toda a legislação do exame da OAB",
       "Dicas práticas para 2ª fase",
     ],
     mainColor: "yellow-darken-3",
@@ -113,9 +114,9 @@ const userTypes = ref([
     title: "Profissionais",
     subtitle: "Mantenha-se atualizado",
     benefits: [
-      "Atualizações legislativas automáticas",
-      "Análises práticas de mudanças",
-      "Resumos executivos",
+      "Comentários na legislação",
+      "Resumos de artigos",
+      "Explicação de dispositivos",
       "Alertas personalizados",
     ],
     mainColor: "green",

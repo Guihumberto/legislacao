@@ -10,7 +10,7 @@
           style="max-width: 700px"
         >
           Uma suíte completa de ferramentas alimentadas por IA para revolucionar
-          sua preparação jurídica
+          sua preparação para concursos e exames da OAB.
         </p>
       </div>
 
@@ -37,7 +37,7 @@
               </v-sheet>
             </div>
             <v-card-title
-              class="text-h6 font-weight-bold text-grey-darken-4 mb-2 feature-title"
+              class="text-h6 font-weight-bold text-grey-darken-4 mb-2 feature-title text-wrap"
               >{{ feature.title }}</v-card-title
             >
             <v-card-text class="text-body-1 text-grey-darken-1">
@@ -64,7 +64,7 @@ const features = ref([
     icon: "mdi-file-document-edit-outline",
     title: "Gerador de Questões IA",
     description:
-      "Crie questões personalizadas para qualquer tema jurídico usando nossa IA avançada.",
+      "Crie questões personalizadas para qualquer artigo da norma usando nossa IA avançada.",
   },
   {
     icon: "mdi-database-import-outline",

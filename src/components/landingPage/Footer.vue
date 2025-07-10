@@ -4,16 +4,16 @@
       <v-row>
         <v-col cols="12" md="6">
           <h3 class="text-h5 font-weight-bold footer-brand-text mb-4">
-            LegisIA
+            Estudo da Lei
           </h3>
           <p class="text-grey-lighten-1 mb-6" style="max-width: 400px">
-            A plataforma mais avançada para estudos jurídicos, powered by AI.
+            A plataforma mais avançada para estudos para legislação, powered by AI.
             Transforme sua preparação e acelere sua aprovação.
           </p>
           <div class="d-flex ga-2">
-            <v-btn variant="outlined" size="small">Facebook</v-btn>
-            <v-btn variant="outlined" size="small">Instagram</v-btn>
-            <v-btn variant="outlined" size="small">LinkedIn</v-btn>
+            <!-- <v-btn variant="outlined" size="small">Facebook</v-btn> -->
+            <v-btn variant="outlined" size="small" @click="linkTo">Instagram</v-btn>
+            <!-- <v-btn variant="outlined" size="small">LinkedIn</v-btn> -->
           </div>
         </v-col>
 
@@ -30,10 +30,10 @@
         <v-col cols="6" md="3">
           <h4 class="font-weight-bold mb-4">Suporte</h4>
           <ul class="footer-links">
-            <li><a href="#">Central de Ajuda</a></li>
-            <li><a href="#">Contato</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Status</a></li>
+            <!-- <li><a href="#">Central de Ajuda</a></li> -->
+            <li><a @click="$router.push('/about')">Contato</a></li>
+            <li><a href="https://blogleges.estudodalei.com.br/">Blog</a></li>
+            <!-- <li><a href="#">Status</a></li> -->
           </ul>
         </v-col>
       </v-row>
@@ -42,12 +42,12 @@
 
       <div class="d-flex flex-column flex-md-row justify-space-between align-center">
         <p class="text-grey-lighten-2 text-sm">
-          © {{ new Date().getFullYear() }} LegisIA. Todos os direitos reservados.
+          © {{ new Date().getFullYear() }} Estudo da Lei. Todos os direitos reservados.
         </p>
         <div class="d-flex ga-6 text-sm text-grey-lighten-2 mt-4 mt-md-0 footer-links">
-          <a href="#">Termos de Uso</a>
-          <a href="#">Política de Privacidade</a>
-          <a href="#">Cookies</a>
+          <!-- <a href="#">Termos de Uso</a> -->
+          <!-- <a href="#">Política de Privacidade</a> -->
+          <!-- <a href="#">Cookies</a> -->
         </div>
       </div>
     </v-container>
@@ -56,6 +56,11 @@
 
 <script setup>
 // Componente estático, sem necessidade de script.
+
+  const linkTo = () => {
+    window.open('https://www.instagram.com/estudodalei.com.br/', '_blank');
+  }
+    
 </script>
 
 <style scoped>

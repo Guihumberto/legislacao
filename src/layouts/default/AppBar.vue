@@ -8,7 +8,7 @@
         </h6>
         <div class="rigthSubheader">
 
-          <router-link to="/planos" class="mr-2">PREÇOS</router-link>
+          <router-link v-if="!loginStore.readLogin?.is_premium" to="/planos" class="mr-2">PREÇOS</router-link>
           <router-link to="/login" class="mr-2" v-if="!loginStore.readLogin.cpf">ENTRAR</router-link>
           <a @click="loginStore.logOut($router)" class="mr-2 text-orange" v-else>SAIR</a>
           <Notification v-if="loginStore.readLogin.cpf" />

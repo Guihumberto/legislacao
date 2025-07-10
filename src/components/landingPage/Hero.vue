@@ -33,8 +33,8 @@
             class="text-h6 text-md-h5 font-weight-regular text-blue-lighten-4 mx-auto mb-8"
             style="max-width: 700px"
           >
-            A plataforma mais completa para concurseiros e advogados. Estude
-            legislação, gere questões, crie resumos e muito mais com o poder da
+            A plataforma mais completa para estudo da legislação. Comente a
+            a norma, gere questões, crie resumos e muito mais com o poder da
             IA.
           </p>
 
@@ -46,7 +46,8 @@
               color="yellow-accent-4"
               class="text-black font-weight-bold"
               elevation="4"
-              >Começar Gratuitamente</v-btn
+              @click="$router.push('/login')"
+            >Começar Gratuitamente</v-btn
             >
             <v-btn size="x-large" variant="outlined" class="backdrop-blur"
               >Ver Demonstração</v-btn
@@ -54,29 +55,23 @@
           </div>
 
           <v-row justify="center" class="mx-auto" style="max-width: 600px">
-            <v-col cols="6" md="3">
+            <v-col cols="6" md="4">
               <div class="text-h4 font-weight-bold text-yellow-accent-4">
-                50k+
+                Questões
               </div>
-              <div class="text-blue-lighten-3 text-sm">Questões Geradas</div>
+              <div class="text-blue-lighten-3 text-sm">Geradas por IA e de Bancas</div>
             </v-col>
-            <v-col cols="6" md="3">
+            <v-col cols="6" md="4">
               <div class="text-h4 font-weight-bold text-yellow-accent-4">
-                1000+
+                Relações
               </div>
-              <div class="text-blue-lighten-3 text-sm">Aprovados</div>
+              <div class="text-blue-lighten-3 text-sm">entre normas e jurisprudência</div>
             </v-col>
-            <v-col cols="6" md="3">
+            <v-col cols="6" md="4">
               <div class="text-h4 font-weight-bold text-yellow-accent-4">
-                200+
+                Esquemas
               </div>
-              <div class="text-blue-lighten-3 text-sm">Bancas Cobertas</div>
-            </v-col>
-            <v-col cols="6" md="3">
-              <div class="text-h4 font-weight-bold text-yellow-accent-4">
-                99%
-              </div>
-              <div class="text-blue-lighten-3 text-sm">Satisfação</div>
+              <div class="text-blue-lighten-3 text-sm">Interativos</div>
             </v-col>
           </v-row>
         </v-col>
@@ -133,7 +128,7 @@
 }
 .arrow-down-animation {
   position: absolute;
-  bottom: 40px;
+  bottom: -10rem;
   left: 50%;
   transform: translateX(-50%);
   animation: bounce 2s infinite;

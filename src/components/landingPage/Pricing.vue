@@ -13,74 +13,30 @@
         </p>
         <v-btn-toggle v-model="billingCycle" mandatory variant="outlined" divided color="blue">
           <v-btn value="monthly">Mensal</v-btn>
-          <v-btn value="annual">Anual (20% off)</v-btn>
+          <!-- <v-btn value="annual">Anual (20% off)</v-btn> -->
         </v-btn-toggle>
       </div>
 
-      <v-row justify="center" align="center">
-        <v-col
-          v-for="(plan, index) in plans"
-          :key="index"
-          cols="12"
-          md="4"
-        >
-          <v-card
-            class="pricing-card"
-            :class="{ 'is-popular': plan.isPopular }"
-            :elevation="plan.isPopular ? 8 : 2"
-          >
-            <v-chip
-              v-if="plan.isPopular"
-              color="blue"
-              class="popular-chip font-weight-bold"
-              label
-              >Mais Popular</v-chip
-            >
-
-            <v-card-text class="pa-8">
-              <div class="text-center mb-8">
-                <h3 class="text-h5 font-weight-bold text-grey-darken-4 mb-2">
-                  {{ plan.name }}
-                </h3>
-                <p class="text-body-1 text-grey-darken-1 mb-4">
-                  {{ plan.description }}
-                </p>
-                <div class="d-flex align-baseline justify-center">
-                  <span class="text-h3 font-weight-bold text-grey-darken-4">{{
-                    plan.price
-                  }}</span>
-                  <span class="text-body-1 text-grey-darken-1 ml-1">{{
-                    plan.period
-                  }}</span>
-                </div>
-              </div>
-
-              <v-list bg-color="transparent" class="mb-8">
-                <v-list-item
-                  v-for="(feature, featureIndex) in plan.features"
-                  :key="featureIndex"
-                  class="px-0"
-                >
-                  <template v-slot:prepend>
-                    <v-icon icon="mdi-check" color="green" class="mr-3"></v-icon>
-                  </template>
-                  <v-list-item-title class="text-body-1 text-grey-darken-2">{{
-                    feature
-                  }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-
-              <v-btn
-                :color="plan.isPopular ? 'blue' : 'grey-darken-3'"
-                size="large"
-                block
-                class="font-weight-bold"
-                >{{ plan.buttonText }}</v-btn
+      <v-row justify="center" align="stretch">
+          <v-col cols="12" md="6" lg="4" v-for="plan in pricingPlans" :key="plan.title" class="mb-5">
+              <PricingCard
+                :title="plan.title"
+                :price="plan.price"
+                :description="plan.description"
+                :features="plan.features"
+                :buttonText="plan.buttonText"
+                :isPopular="plan.isPopular"
+                :isEnterprise="plan.isEnterprise"
+                @button-click="handlePlanSelection(plan.title)"
               >
-            </v-card-text>
-          </v-card>
-        </v-col>
+              <template #icon>
+                  <v-icon :color="plan.isPopular ? 'primary' : 'grey-darken-1'" :icon="plan.icon" size="32"></v-icon>
+              </template>
+              </PricingCard>
+          </v-col>
       </v-row>
+      
+
       
       <div class="text-center mt-12">
          <p class="text-grey-darken-1 mb-4">Todos os planos incluem:</p>
@@ -96,58 +52,79 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue';
+import PricingCard from '@/components/concursos/public/PricingCard.vue'; // Importe o componente
+
+
+import { useGeralStore } from '@/store/GeralStore';    
+import { useRouter } from 'vue-router';
+const geralStore = useGeralStore()
+const router = useRouter()
 
 const billingCycle = ref("monthly"); // 'monthly' or 'annual'
-
-const plans = ref([
+// Dados dos planos de preços
+const pricingPlans = ref([
   {
-    name: "Básico",
-    price: "R$ 29",
-    period: "/mês",
-    description: "Perfeito para começar",
+    title: 'Básico',
+    price: 'R$0,00',
+    description: 'Ideal para quem está começando.',
     features: [
-      "100 questões geradas por mês",
-      "Resumos básicos",
-      "Acesso à legislação",
-      "Suporte por email",
+      'importar até 5 Normas',
+      'Comentários',
+      'Questões limitadas',
+      'Resumos limitados',
+      'Suporte básico por e-mail',
     ],
+    buttonText: 'Começar Agora',
     isPopular: false,
-    buttonText: "Começar Grátis",
+    isEnterprise: false,
+    icon: 'mdi-rocket-launch-outline' // Ícone do Material Design
   },
   {
-    name: "Profissional",
-    price: "R$ 79",
-    period: "/mês",
-    description: "Para concurseiros sérios",
+    title: 'Pro',
+    price: 'R$49',
+    description: 'Perfeito para quem precisa de mais poder e suporte.',
     features: [
-      "Questões ilimitadas",
-      "Todos os recursos de IA",
-      "Mapas mentais e flashcards",
-      "Análise de desempenho",
-      "Suporte prioritário",
-      "Simulados personalizados",
+      'Tudo do Básico',
+      'Importação ilimitada de normas',
+      'Suporte prioritário',
+      'Geração de questões',
+      'Geração de resumos',
+      'Geração de esquemas',
+      'Análises em tempo real',
+      'Estatísticas',
+      'Colaboração em equipe'
     ],
+    buttonText: 'Escolher o Pro',
     isPopular: true,
-    buttonText: "Escolher Profissional",
+    isEnterprise: false,
+    icon: 'mdi-star-circle-outline'
   },
   {
-    name: "Premium",
-    price: "R$ 149",
-    period: "/mês",
-    description: "Solução completa",
+    title: 'Grupo',
+    price: 'R$199',
+    description: 'Adicione até 5 amigos.',
     features: [
-      "Todos os recursos Pro",
-      "Mentoria com especialistas",
-      "Cronograma personalizado",
-      "Acesso antecipado a novos recursos",
-      "API para integração",
-      "Suporte 24/7",
+      'Tudo do básico',
+      'Tudo do Pro',
+      'Valor Diferenciado',
+      'Administre seu grupo',
     ],
+    buttonText: 'Escolher Grupo',
     isPopular: false,
-    buttonText: "Escolher Premium",
-  },
+    isEnterprise: true,
+    icon: 'mdi-account-multiple'
+  }
 ]);
+
+// Função para lidar com o clique no botão
+const handlePlanSelection = (planTitle) => {
+  if(planTitle == "Básico") {
+    router.push('/login')
+  } else {
+    router.push(`/assinar?plan=${planTitle}`)
+  }
+}
 </script>
 
 <style scoped>
