@@ -66,6 +66,7 @@
                 variant="outlined"
                 color="primary"
                 class="cta-button-outline"
+                @click="lawOpen()"
               >
                 Ver Demonstração
               </v-btn>
@@ -78,15 +79,18 @@
           <div class="relative animate-fade-in-right">
             <div class="image-container">
               <!-- Imagem principal com sobreposição de gradiente -->
-              <v-img
-                :src="heroImage"
-                alt="Interface da aplicação de legislação mostrando recursos de IA"
-                class="rounded-xl"
-                cover
-                aspect-ratio="1"
-              >
-                <div class="gradient-overlay"></div>
-              </v-img>
+              <v-card-text class="pa-4">
+                <v-responsive :aspect-ratio="16/9">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    :src="videoUrl"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                  ></iframe>
+                </v-responsive>
+              </v-card-text>
             </div>
 
             <!-- Elemento flutuante "IA Ativa" -->
@@ -115,9 +119,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import heroImage from '/leges.png';
 
+const lawOpen = () => {
+     window.open('https://www.youtube.com/watch?v=h7JDeHcEAlU', '_blank');
+}
+
+const videoId = 'h7JDeHcEAlU'; // ID extraído da URL https://www.youtube.com/watch?v=h7JDeHcEAlU
+
+const videoUrl = computed(() => {
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1` ;
+});
 
 const features = ref([
   "Comentários inteligentes em normas",

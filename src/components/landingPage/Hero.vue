@@ -49,7 +49,7 @@
               @click="$router.push('/login')"
             >Começar Gratuitamente</v-btn
             >
-            <v-btn size="x-large" variant="outlined" class="backdrop-blur"
+            <v-btn size="x-large" variant="outlined" class="backdrop-blur" @click="lawOpen"
               >Ver Demonstração</v-btn
             >
           </div>
@@ -87,7 +87,9 @@
 </template>
 
 <script setup>
-// Nenhuma lógica de script necessária para este componente estático.
+  const lawOpen = () => {
+      window.open('https://www.youtube.com/watch?v=h7JDeHcEAlU', '_blank');
+  }
 </script>
 
 <style scoped>

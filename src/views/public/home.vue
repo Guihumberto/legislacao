@@ -65,7 +65,10 @@
                 </p>
               </div>
             </v-sheet>
-            <TutorialInit />
+             <div class="d-flex ga-2 align-center justify-center mb-5">
+              <TutorialInit />
+              <Demonstracao />
+            </div>
              <!-- <h1 class="text-h4 mt-6 text-center grey--text text--darken-3">
                 Bem-vindo ao Estudo da Lei
              </h1>
@@ -105,6 +108,7 @@ div                class="pa-2 mb-6"
     
     import SectionPainel from '@/components/painel/sectionPainel.vue';
     import TutorialInit from '@/components/painel/tutorialInit.vue';
+import Demonstracao from '@/components/painel/demonstracao.vue';
     
     const concursos = [
         {

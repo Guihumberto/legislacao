@@ -1,10 +1,7 @@
 <template>
-  <div class="text-center pa-4">
-    <v-btn @click="dialog = true" color="primary">
-      INÍCIO RÁPIDO
-    </v-btn>
-  </div>
-
+  <v-btn @click="dialog = true" color="primary" prepend-icon="mdi-timer-play-outline">
+    INÍCIO RÁPIDO
+  </v-btn>
   <v-dialog
     v-model="dialog"
     persistent
@@ -17,6 +14,7 @@
 
       <v-card-text>
         <v-stepper
+          :mobile="mobile"
           v-model="step"
           :items="tutorialSteps.map(s => s.title)"
           show-actions
@@ -24,12 +22,11 @@
         >
           <template v-slot:item="{ item }">
             <v-card variant="text">
-                {{ item }}
               <v-row class="ma-4" align="center" justify="center">
                 <v-col cols="12">
                   <v-img
                      :src="tutorialSteps[step - 1]?.image"
-                    height="250px"
+                    :height="mobile ? '150px' : '550px'"
                     contain
                     class="rounded-lg"
                   ></v-img>
@@ -87,10 +84,14 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { useDisplay } from 'vuetify'
+
 import step2 from '/steps/Step2.png';
 import step3 from '/steps/Step3.png';
 import step4 from '/steps/Step4.png';
 import step5 from '/steps/step5.png';
+
+const { mobile } = useDisplay()
 
 
 const dialog = ref(false); // Controla a visibilidade do diálogo
