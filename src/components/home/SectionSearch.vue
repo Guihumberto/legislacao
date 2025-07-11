@@ -2,11 +2,11 @@
   <section class="search" :class="geralStore.readSearch ? 'activeSearch' : 'flagmaranhao'">
     <div class="container">
       <div class="logo">
-        <v-icon size="5rem" color="blue-grey-darken-3">mdi-text-search</v-icon>
+        <v-icon size="5rem" color="blue-grey-darken-3">mdi-account-school</v-icon>
         <div class="ml-2">
           <small>Legislação <v-chip density="compact" class="ml-1" color="primary">BETA</v-chip></small>
           <div class="d-flex justify-center align-center">
-            <h1 class="title text-blue-grey-darken-5">OH-MY-SEARCH</h1>
+            <h1 class="title text-blue-grey-darken-5">ESTUDO DA LEI</h1>
           </div>
           <progress-linear :load="consultaStore.loadAll" />
         </div>
