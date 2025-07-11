@@ -1,33 +1,30 @@
 <template>
     <section class="mb-12">
-        <v-row>
-            <v-col cols="12">
-              <div class="section-title-container mb-6">
-                  <!-- Linha decorativa -->
-                  <div class="title-line"></div>
-                  
+        <v-row class="ma-0">
+            <v-col cols="12" class="pa-0 ma-0">
+              <div class="section-title-container">
                   <!-- Título principal -->
-                  <div class="d-flex align-center">
-                  <div class="title-icon-wrapper me-3">
-                      <v-icon 
-                      :icon="title.icon || 'mdi-clipboard-text-outline'" 
-                      size="24"
-                      class="text-primary"
-                      />
-                  </div>
+                   <div class="bg-primary rounded-lg py-2 pl-2">
+                     <div class="d-flex align-center">
+                       <div class="title-icon-wrapper me-3">
+                           <v-icon 
+                           :icon="title.icon || 'mdi-clipboard-text-outline'" 
+                           size="24"
+                           />
+                       </div>
+                     
+                       <div class="title-content">
+                           <h2 class="text-h5 font-weight-bold text-white">
+                           {{ title.title }}
+                           </h2>
+                           <div class="title-accent"></div>
+                       </div>
+                     </div>
+                     <p v-if="title?.subtitle" class="text-body-2 text-grey-lighten-1 mt-2 mb-0 ms-14">
+                       {{ title.subtitle }}
+                     </p>
+                   </div>
                   
-                  <div class="title-content">
-                      <h2 class="text-h5 font-weight-bold text-grey-darken-3 mb-0">
-                      {{ title.title }}
-                      </h2>
-                      <div class="title-accent"></div>
-                  </div>
-                  </div>
-                  
-                  <!-- Subtítulo opcional -->
-                  <p v-if="title?.subtitle" class="text-body-2 text-grey-darken-1 mt-2 mb-0 ms-10">
-                  {{ title.subtitle }}
-                  </p>
               </div>
             </v-col>
         </v-row>
@@ -43,16 +40,16 @@
                 <v-card
                     class="mx-auto h-100"
                     max-width="400"
-                    elevation="3"
+                    variant="flat"
                     hover
                     @click="linkTo(concurso)"
                 >
                     <v-img
-                    v-if="concurso.img"
-                    :src="concurso.img"
-                    height="150"
-                    cover
-                    class="grey lighten-2"
+                      v-if="concurso.img"
+                      :src="concurso.img"
+                      height="150"
+                      cover
+                      class="grey lighten-2"
                     ></v-img>
                     <v-card-title class="text-shadow bg-grey-lighten-4">
                         {{ concurso.titulo }}
@@ -60,10 +57,6 @@
                     <v-card-text class="pt-4">
                         <div>{{ concurso.descricao }}</div>
                     </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <Details :concurso="concurso" />
-                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
@@ -111,7 +104,6 @@
 <style scoped>
 .section-title-container {
   position: relative;
-  padding: 16px 0;
 }
 
 .title-line {
@@ -148,7 +140,7 @@
 .title-accent {
   width: 40px;
   height: 2px;
-  background: rgb(var(--v-theme-primary));
+  background: white;
   border-radius: 1px;
   margin-top: 4px;
   opacity: 0.7;

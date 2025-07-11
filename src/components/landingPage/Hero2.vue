@@ -116,10 +116,9 @@
 
 <script setup>
 import { ref } from 'vue';
-// Importe a imagem do seu diretório de assets
-import heroImage from '/leges.png';;
+import heroImage from '/leges.png';
 
-// Lista de funcionalidades
+
 const features = ref([
   "Comentários inteligentes em normas",
 //   "Formatação automática de documentos",

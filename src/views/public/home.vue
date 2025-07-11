@@ -65,6 +65,7 @@
                 </p>
               </div>
             </v-sheet>
+            <TutorialInit />
              <!-- <h1 class="text-h4 mt-6 text-center grey--text text--darken-3">
                 Bem-vindo ao Estudo da Lei
              </h1>
@@ -103,6 +104,7 @@ div                class="pa-2 mb-6"
     const geralStore = useGeralStore()
     
     import SectionPainel from '@/components/painel/sectionPainel.vue';
+    import TutorialInit from '@/components/painel/tutorialInit.vue';
     
     const concursos = [
         {
